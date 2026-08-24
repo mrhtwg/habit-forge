@@ -1,0 +1,316 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:habit_forge_app/core/constants/app_constants.dart';
+import 'package:habit_forge_app/core/services/hive_service.dart';
+import 'package:habit_forge_app/core/theme/app_colors.dart';
+import 'package:habit_forge_app/core/theme/app_theme.dart';
+import 'package:habit_forge_app/features/quests/controllers/quests_controller.dart';
+import 'package:habit_forge_app/features/quests/pages/task_form_sheet.dart';
+import 'package:habit_forge_app/models/task/task_model.dart';
+import 'package:habit_forge_app/widgets/task_ticket.dart';
+
+class QuestsPage extends GetView<QuestsController> {
+  const QuestsPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.scaffold,
+      body: SafeArea(
+        child: Stack(
+          children: [
+            Column(
+              children: [
+                _buildSkyHeader(),
+                _buildSegmentedFilter(),
+                _buildTagChips(),
+                Expanded(child: _buildTaskList(context)),
+              ],
+            ),
+            // Add task FAB
+            Positioned(
+              bottom: 24.h,
+              right: 20.w,
+              child: GestureDetector(
+                onTap: () => TaskFormSheet.show(context),
+                child: Container(
+                  width: 56.w,
+                  height: 56.w,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: AppColors.border, width: 2.5),
+                    boxShadow: const [BoxShadow(color: AppColors.primaryDark, offset: Offset(0, 4))],
+                  ),
+                  child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 96.w,
+            height: 96.w,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.violetLight,
+              border: Border.all(color: AppColors.border, width: 3),
+            ),
+            child: Icon(Icons.checklist_rounded, size: 44.w, color: AppColors.primaryDark),
+          ),
+          SizedBox(height: 14.h),
+          Text('No quests here yet', style: textStyleBold(fontSize: 20.sp)),
+          SizedBox(height: 6.h),
+          Text(
+            'Tap + to forge your first quest.',
+            style: textStyleMedium(fontSize: 13.sp, color: AppColors.textSecondary),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ─────────── Segmented filter: All / Habit / Daily / ToDo ───────────
+  Widget _buildSegmentedFilter() {
+    final options = <(String, TaskType?)>[
+      ('All', null),
+      ('Habit', TaskType.habit),
+      ('Daily', TaskType.daily),
+      ('ToDo', TaskType.todo),
+    ];
+    return Padding(
+      padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 0),
+      child: Container(
+        padding: EdgeInsets.all(4.w),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF3E7CE),
+          border: Border.all(color: AppColors.border, width: 2),
+          borderRadius: BorderRadius.circular(999),
+        ),
+        child: Row(
+          children: options.map((opt) {
+            return Expanded(
+              child: Obx(() {
+                final isActive = (opt.$2 == null && controller.showAll.value) ||
+                    (opt.$2 != null && !controller.showAll.value && controller.activeType.value == opt.$2);
+                return GestureDetector(
+                  onTap: () {
+                    if (opt.$2 == null) {
+                      controller.showAll.value = true;
+                    } else {
+                      controller.showAll.value = false;
+                      controller.activeType.value = opt.$2!;
+                    }
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(vertical: 8.h),
+                    decoration: BoxDecoration(
+                      color: isActive ? Colors.white : Colors.transparent,
+                      borderRadius: BorderRadius.circular(999),
+                      boxShadow: isActive ? const [BoxShadow(color: Color(0xFFE4D2B0), offset: Offset(0, 2))] : null,
+                    ),
+                    child: Text(
+                      opt.$1,
+                      textAlign: TextAlign.center,
+                      style: textStyleBold(
+                        fontSize: 13.sp,
+                        color: isActive ? AppColors.textPrimary : AppColors.textSecondary,
+                      ),
+                    ),
+                  ),
+                );
+              }),
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
+
+  // ─────────── Sky header: title + today's count ───────────
+  Widget _buildSkyHeader() {
+    return Container(
+      width: double.infinity,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFF8FD4FF), Color(0xFFC8ECFF), Color(0xFFE4F6FF)],
+        ),
+        borderRadius: BorderRadius.only(bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30)),
+      ),
+      padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 18.h),
+      child: Row(
+        children: [
+          Text('Quests', style: textStyleBlack(fontSize: 26.sp, color: AppColors.textPrimary)),
+          const Spacer(),
+          Obx(() {
+            final n = HiveService.to.tasks.where((t) => !t.isSkipped && t.isDueToday).length;
+            return Container(
+              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 5.h),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(color: AppColors.border, width: 2),
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: const [BoxShadow(color: Color(0xFFD6C3A4), offset: Offset(0, 3))],
+              ),
+              child: Text('$n today', style: textStyleBold(fontSize: 13.sp, color: AppColors.textSecondary)),
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  // ─────────── Tag filter chips ───────────
+  Widget _buildTagChips() {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 4.h),
+      child: Obx(
+        () => SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: ['All', ...AppConstants.taskTags].map((tag) {
+              final tagKey = tag.toLowerCase();
+              final isActive = controller.activeTag.value == tagKey;
+              return Padding(
+                padding: EdgeInsets.only(right: 8.w),
+                child: GestureDetector(
+                  onTap: () => controller.activeTag.value = tagKey,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 6.h),
+                    decoration: BoxDecoration(
+                      color: isActive ? AppColors.primary : Colors.white,
+                      borderRadius: BorderRadius.circular(999),
+                      border: Border.all(color: AppColors.border, width: 2),
+                    ),
+                    child: Text(
+                      tag,
+                      style: textStyleBold(
+                        fontSize: 12.sp,
+                        color: isActive ? Colors.white : AppColors.textSecondary,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ─────────── Task list ───────────
+  Widget _buildTaskList(BuildContext context) {
+    return Obx(() {
+      final tasks = controller.filteredTasks;
+      if (tasks.isEmpty) return _buildEmptyState(context);
+      return ListView.separated(
+        padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 90.h),
+        itemCount: tasks.length,
+        separatorBuilder: (_, __) => SizedBox(height: 10.h),
+        itemBuilder: (context, index) {
+          final task = tasks[index];
+          return TaskTicket(
+            task: task,
+            onComplete: () => controller.toggleComplete(task),
+            onLongPress: () => _showTaskMenu(context, task),
+          );
+        },
+      );
+    });
+  }
+
+  Widget _menuItem({
+    required IconData icon,
+    required Color color,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 14.h),
+        decoration: const BoxDecoration(
+          border: Border(bottom: BorderSide(color: AppColors.elevated, width: 1)),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 20, color: color),
+            SizedBox(width: 12.w),
+            Text(label, style: textStyleBold(fontSize: 15.sp, color: AppColors.textPrimary)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showTaskMenu(BuildContext context, TaskModel task) {
+    Get.bottomSheet(
+      Container(
+        padding: EdgeInsets.all(20.w),
+        decoration: const BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.textMuted,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            SizedBox(height: 16.h),
+            Text(task.title, style: textStyleBold(fontSize: 18.sp)),
+            SizedBox(height: 16.h),
+            _menuItem(
+              icon: Icons.skip_next_rounded,
+              color: AppColors.warning,
+              label: 'Skip',
+              onTap: () {
+                Get.back();
+                controller.toggleSkip(task);
+              },
+            ),
+            _menuItem(
+              icon: Icons.schedule_rounded,
+              color: AppColors.info,
+              label: 'Postpone to tomorrow',
+              onTap: () {
+                Get.back();
+                controller.onTaskPostpone(task);
+              },
+            ),
+            _menuItem(
+              icon: Icons.delete_rounded,
+              color: AppColors.error,
+              label: 'Delete',
+              onTap: () {
+                Get.back();
+                controller.deleteTask(task.id);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

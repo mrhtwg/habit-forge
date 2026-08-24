@@ -1,0 +1,10 @@
+/.gradle
+/captures/
+/local.properties
+GeneratedPluginRegistrant.java
+.cxx/
+
+# Never commit keystore files or key.properties.
+key.properties
+**/*.keystore
+**/*.jks

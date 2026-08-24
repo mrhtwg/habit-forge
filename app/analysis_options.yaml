@@ -1,0 +1,12 @@
+analyzer:
+  errors:
+    invalid_annotation_target: ignore
+
+linter:
+  rules:
+    require_trailing_commas: true
+formatter:
+  # Key: preserve your hand-written trailing commas! A comma forces multi-line vertical layout (restores old Flutter formatting)
+  trailing_commas: preserve
+  # Page width 80 -> 120: fewer forced line breaks when saving with formatting, more compact long code
+  page_width: 120

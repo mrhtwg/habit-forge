@@ -1,0 +1,6 @@
+{
+  "env": "server",
+  "storage": "server",
+  "auth": "server",
+  "apiUrl": "http://localhost:8080"
+}

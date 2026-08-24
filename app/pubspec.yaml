@@ -1,0 +1,60 @@
+name: habit_forge_app
+description: HabitForge - RPG habit tracker
+publish_to: "none"
+version: 0.1.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  get: ^4.6.6
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  audioplayers: ^6.1.0
+  phosphor_flutter: ^2.1.0
+  uuid: ^4.5.1
+  intl: ^0.19.0
+  flutter_screenutil: ^5.9.3
+  lottie: ^3.3.3
+  flutter_slidable: ^4.0.3
+  firebase_auth: ^6.5.6
+  firebase_core: ^4.12.1
+  google_sign_in: ^7.2.0
+  sign_in_with_apple: ^8.1.0
+  carousel_slider: ^5.1.2
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+  fonts:
+    - family: Baloo2
+      fonts:
+        - asset: assets/fonts/Baloo2-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Baloo2-ExtraBold.ttf
+          weight: 800
+    - family: Nunito
+      fonts:
+        - asset: assets/fonts/Nunito-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Nunito-Medium.ttf
+          weight: 500
+    - family: Caveat
+      fonts:
+        - asset: assets/fonts/Caveat-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Caveat-SemiBold.ttf
+          weight: 600
+  assets:
+    - assets/animations/knight_idle/
+    - assets/animations/mage_idle/
+    - assets/animations/ranger_idle/
+    - assets/images/characters/
+    - assets/images/home/
+    - assets/images/shared/

@@ -1,0 +1,5 @@
+{
+  "env": "hive",
+  "storage": "hive",
+  "auth": "local"
+}
