@@ -9,23 +9,9 @@ class ShopItemIcon extends StatelessWidget {
 
   const ShopItemIcon({super.key, required this.itemId, this.size = 36});
 
-  static IconData icon(String id) {
-    switch (id) {
-      case 'sword_flame':
-        return PhosphorIcons.sword(PhosphorIconsStyle.fill);
-      case 'armor_golden':
-        return PhosphorIcons.shield(PhosphorIconsStyle.fill);
-      case 'helm_dragon':
-        return PhosphorIcons.crown(PhosphorIconsStyle.fill);
-      case 'cloak_shadow':
-        return PhosphorIcons.moonStars(PhosphorIconsStyle.fill);
-      case 'amulet_star':
-        return PhosphorIcons.star(PhosphorIconsStyle.fill);
-      case 'staff_arcane':
-        return PhosphorIcons.sparkle(PhosphorIconsStyle.fill);
-      default:
-        return PhosphorIcons.package(PhosphorIconsStyle.fill);
-    }
+  @override
+  Widget build(BuildContext context) {
+    return Icon(icon(itemId), size: size, color: AppColors.primaryDark);
   }
 
   static Color bg(String id) {
@@ -45,8 +31,22 @@ class ShopItemIcon extends StatelessWidget {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Icon(icon(itemId), size: size, color: AppColors.primaryDark);
+  static IconData icon(String id) {
+    switch (id) {
+      case 'sword_flame':
+        return PhosphorIcons.sword(PhosphorIconsStyle.fill);
+      case 'armor_golden':
+        return PhosphorIcons.shield(PhosphorIconsStyle.fill);
+      case 'helm_dragon':
+        return PhosphorIcons.crown(PhosphorIconsStyle.fill);
+      case 'cloak_shadow':
+        return PhosphorIcons.moonStars(PhosphorIconsStyle.fill);
+      case 'amulet_star':
+        return PhosphorIcons.star(PhosphorIconsStyle.fill);
+      case 'staff_arcane':
+        return PhosphorIcons.sparkle(PhosphorIconsStyle.fill);
+      default:
+        return PhosphorIcons.package(PhosphorIconsStyle.fill);
+    }
   }
 }

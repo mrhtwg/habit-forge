@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:habit_forge_app/core/constants/app_constants.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
 import 'package:habit_forge_app/core/services/hive_service.dart';
-import 'package:habit_forge_app/generated/assets.dart';
 import 'package:habit_forge_app/models/character/character_model.dart';
 import 'package:habit_forge_app/models/task/task_model.dart';
 import 'package:habit_forge_app/models/user/user_prefs.dart';
@@ -17,11 +16,6 @@ class BoardingController extends GetxController {
 
   final showLevelUpOnReadyStep = false.obs;
 
-  final List<String> classImages = [
-    Assets.imagesSharedWarrior,
-    Assets.imagesSharedMage,
-    Assets.imagesSharedRanger,
-  ];
   int get currentStep => _step.value;
 
   void complete() {

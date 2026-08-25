@@ -115,7 +115,7 @@ The app supports **English** and **中文** (Simplified Chinese), following the 
 - Keys are defined as an enum in `lib/core/i18n/lan_key.dart` and used as `LanKey.save.tr` (with `trParams(...)` for placeholders).
 - Per-language copy lives in `lib/core/i18n/en_us.dart` and `lib/core/i18n/zh_cn.dart`; `lib/core/i18n/app_translations.dart` wires them into GetX.
 - Data-driven lookups use enum helpers: `LanKey.difficultyFor(value)`, `LanKey.taskType(type)`, `LanKey.characterClass(name)`, `LanKey.achievementTitle(id)`.
-- The active language (`system` / English / 中文) is persisted in Hive and can be changed in **Settings → Language** — see `lib/core/i18n/app_locale.dart`.
+- The active language (English by default; 中文 selectable) is persisted in Hive and can be changed in **Settings → Language** — see `lib/core/i18n/app_locale.dart`.
 - Dates are formatted with the active locale through `intl` (`DateFormat(..., AppLocale.languageCode())`, date symbols initialized in `main()`).
 - Code comments and TODOs intentionally stay in English.
 
