@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/common/animation/frame_sequence_player.dart';
+import 'package:habit_forge_app/core/constants/env_constants.dart';
+import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
@@ -48,7 +50,7 @@ class BoardingPage extends GetView<BoardingController> {
             child: GestureDetector(
               onTap: controller.skip,
               child: _button(
-                label: 'Skip',
+                label: LanKey.skip.tr,
                 bg: Colors.transparent,
                 borderColor: AppColors.textMuted,
                 textColor: AppColors.textSecondary,
@@ -63,7 +65,7 @@ class BoardingPage extends GetView<BoardingController> {
               return GestureDetector(
                 onTap: enabled ? () => controller.nextStep() : null,
                 child: _button(
-                  label: 'Next',
+                  label: LanKey.next.tr,
                   bg: enabled ? AppColors.gold : AppColors.elevated,
                   borderColor: enabled ? AppColors.border : AppColors.elevated,
                   textColor: enabled ? AppColors.textPrimary : AppColors.textMuted,
@@ -76,9 +78,9 @@ class BoardingPage extends GetView<BoardingController> {
     }
 
     final label = switch (step) {
-      0 => 'Get Started',
-      1 => 'Choose ${controller.selectedClass.value.name}',
-      _ => 'Enter the Realm',
+      0 => LanKey.getStarted.tr,
+      1 => LanKey.chooseClass.trParams({'class': LanKey.characterClass(controller.selectedClass.value.name).tr}),
+      _ => LanKey.enterTheRealm.tr,
     };
     return SizedBox(
       width: double.infinity,
@@ -129,7 +131,8 @@ class BoardingPage extends GetView<BoardingController> {
             )
           else
             GestureDetector(
-              onTap: () => Get.offAllNamed(Routers.login),
+              // Hive (local) mode: no login page — back goes to main instead.
+              onTap: () => Get.offAllNamed(EnvConstants.isHive() ? Routers.main : Routers.login),
               child: Container(
                 width: 34.w,
                 height: 34.w,
@@ -143,14 +146,14 @@ class BoardingPage extends GetView<BoardingController> {
             ),
           SizedBox(width: 10.w),
           Text(
-            'Step ${step + 1} of 4',
+            LanKey.stepOf.trParams({'n': '${step + 1}', 'total': '4'}),
             style: textStyleBold(fontSize: 14.sp, color: AppColors.textSecondary),
           ),
           const Spacer(),
           if (step < _totalSteps - 1)
             GestureDetector(
               onTap: controller.skip,
-              child: Text('Skip', style: textStyleBold(fontSize: 14.sp, color: AppColors.primaryDark)),
+              child: Text(LanKey.skip.tr, style: textStyleBold(fontSize: 14.sp, color: AppColors.primaryDark)),
             ),
         ],
       ),
@@ -183,25 +186,25 @@ class BoardingPage extends GetView<BoardingController> {
 
   // ── Step 2: Class ──
   Widget _classContent() {
-    final classes = <(CharacterClass, String, String, List<double>, Color)>[
+    final classes = <(CharacterClass, LanKey, LanKey, List<double>, Color)>[
       (
         CharacterClass.warrior,
-        'Warrior',
-        'Brave and tough. Big HP, bigger heart.',
+        LanKey.warrior,
+        LanKey.braveAndTough,
         [0.92, 0.7, 0.45],
         AppColors.primary,
       ),
       (
         CharacterClass.mage,
-        'Mage',
-        'Clever and curious. Master of streaks.',
+        LanKey.mage,
+        LanKey.cleverAndCurious,
         [0.45, 0.7, 0.95],
         AppColors.primaryDark,
       ),
       (
         CharacterClass.ranger,
-        'Ranger',
-        'Swift and steady. Built for daily streaks.',
+        LanKey.ranger,
+        LanKey.swiftAndSteady,
         [0.65, 0.7, 0.85],
         AppColors.greenDark,
       ),
@@ -210,10 +213,10 @@ class BoardingPage extends GetView<BoardingController> {
       key: const ValueKey('class'),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Choose your hero', style: textStyleBlack(fontSize: 28.sp, color: AppColors.textPrimary)),
+        Text(LanKey.chooseYourHero.tr, style: textStyleBlack(fontSize: 28.sp, color: AppColors.textPrimary)),
         SizedBox(height: 6.h),
         Text(
-          'Each class grows a little differently',
+          LanKey.classesGrowDifferently.tr,
           style: textStyleMedium(fontSize: 13.sp, color: AppColors.textSecondary),
         ),
         SizedBox(height: 16.h),
@@ -275,12 +278,12 @@ class BoardingPage extends GetView<BoardingController> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                cls.$2,
+                                cls.$2.tr,
                                 style: textStyleBlack(fontSize: 17.sp, color: AppColors.textPrimary),
                               ),
                               SizedBox(height: 2.h),
                               Text(
-                                cls.$3,
+                                cls.$3.tr,
                                 style: textStyleMedium(fontSize: 11.5.sp, color: AppColors.textSecondary),
                               ),
                               SizedBox(height: 8.h),
@@ -338,19 +341,19 @@ class BoardingPage extends GetView<BoardingController> {
 
   // ── Step 3: Habit ──
   Widget _habitContent() {
-    final suggestions = <(String, IconData)>[
-      ('Drink 8 glasses of water', Icons.water_drop_rounded),
-      ('Read for 30 minutes', Icons.menu_book_rounded),
-      ('Morning exercise', Icons.directions_run_rounded),
+    final suggestions = <(LanKey, String, IconData)>[
+      (LanKey.drink8GlassesOfWater, 'Drink 8 glasses of water', Icons.water_drop_rounded),
+      (LanKey.readFor30Minutes, 'Read for 30 minutes', Icons.menu_book_rounded),
+      (LanKey.morningExercise, 'Morning exercise', Icons.directions_run_rounded),
     ];
     return Column(
       key: const ValueKey('habit'),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Forge your first habit', style: textStyleBlack(fontSize: 26.sp, color: AppColors.textPrimary)),
+        Text(LanKey.forgeFirstHabit.tr, style: textStyleBlack(fontSize: 26.sp, color: AppColors.textPrimary)),
         SizedBox(height: 6.h),
         Text(
-          'Small quests lead to big rewards',
+          LanKey.smallQuestsBigRewards.tr,
           style: textStyleMedium(fontSize: 13.sp, color: AppColors.textSecondary),
         ),
         SizedBox(height: 16.h),
@@ -363,9 +366,9 @@ class BoardingPage extends GetView<BoardingController> {
                 separatorBuilder: (_, __) => SizedBox(height: 12.h),
                 itemBuilder: (context, i) {
                   final s = suggestions[i];
-                  final selected = selectedTitle == s.$1;
+                  final selected = selectedTitle == s.$2;
                   return GestureDetector(
-                    onTap: () => controller.selectHabit(s.$1),
+                    onTap: () => controller.selectHabit(s.$2),
                     child: Container(
                       padding: EdgeInsets.all(14.w),
                       decoration: BoxDecoration(
@@ -389,12 +392,12 @@ class BoardingPage extends GetView<BoardingController> {
                               borderRadius: BorderRadius.circular(14),
                               border: Border.all(color: AppColors.border, width: 1.5),
                             ),
-                            child: Icon(s.$2, size: 22.w, color: AppColors.goldDark),
+                            child: Icon(s.$3, size: 22.w, color: AppColors.goldDark),
                           ),
                           SizedBox(width: 12.w),
                           Expanded(
                             child: Text(
-                              s.$1,
+                              s.$1.tr,
                               style: textStyleBold(fontSize: 15.sp, color: AppColors.textPrimary),
                             ),
                           ),
@@ -440,13 +443,13 @@ class BoardingPage extends GetView<BoardingController> {
         ),
         SizedBox(height: 18.h),
         Text(
-          "You're all set,\nadventurer!",
+          LanKey.youreAllSetAdventurer.tr,
           textAlign: TextAlign.center,
           style: textStyleBlack(fontSize: 28.sp, color: AppColors.textPrimary),
         ),
         SizedBox(height: 10.h),
         Text(
-          'Complete quests, earn XP and gold, and watch your hero grow every day.',
+          LanKey.completeQuestsEarnXpAndGold.tr,
           textAlign: TextAlign.center,
           style: textStyleMedium(fontSize: 13.5.sp, color: AppColors.textSecondary).copyWith(height: 1.5),
         ),
@@ -465,15 +468,16 @@ class BoardingPage extends GetView<BoardingController> {
               _summaryRow(
                 icon: Icons.auto_awesome_rounded,
                 bg: const Color(0xFFF6E6FF),
-                title: controller.selectedClass.value.name.toUpperCase(),
-                subtitle: 'Your hero class',
+                title: LanKey.characterClass(controller.selectedClass.value.name).tr.toUpperCase(),
+                subtitle: LanKey.yourHeroClass.tr,
               ),
               SizedBox(height: 10.h),
               _summaryRow(
                 icon: Icons.flag_rounded,
                 bg: AppColors.goldLight,
-                title: controller.firstHabitTitle.value.isEmpty ? 'No habit yet' : controller.firstHabitTitle.value,
-                subtitle: 'Your first habit',
+                title:
+                    controller.firstHabitTitle.value.isEmpty ? LanKey.noHabitYet.tr : controller.firstHabitTitle.value,
+                subtitle: LanKey.yourFirstHabit.tr,
               ),
             ],
           ),
@@ -595,7 +599,7 @@ class BoardingPage extends GetView<BoardingController> {
         ),
         SizedBox(height: 20.h),
         Text(
-          'Your life is\na grand adventure',
+          LanKey.lifeIsGrandAdventure.tr,
           textAlign: TextAlign.center,
           style: textStyleBlack(fontSize: 30.sp, color: AppColors.textPrimary),
         ),
@@ -603,7 +607,7 @@ class BoardingPage extends GetView<BoardingController> {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 16.w),
           child: Text(
-            'Finish real tasks, earn XP and gold, and watch your hero grow stronger every day.',
+            LanKey.finishTasksEarnXpAndGold.tr,
             textAlign: TextAlign.center,
             style: textStyleMedium(fontSize: 14.sp, color: AppColors.textSecondary).copyWith(height: 1.5),
           ),

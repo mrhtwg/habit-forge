@@ -20,35 +20,40 @@ import 'package:habit_forge_app/features/statistics/pages/statistics_page.dart';
 
 class AppPages {
   static final List<GetPage> pages = [
-    commonFadeInPage(name: Routers.splash, binding: SplashBinding(), page: () => SplashPage()),
-    commonFadeInPage(name: Routers.login, binding: AuthBinding(), page: () => AuthPage()),
-    commonFadeInPage(name: Routers.boarding, binding: BoardBinding(), page: () => BoardingPage()),
-    commonFadeInPage(name: Routers.main, binding: MainBinding(), page: () => MainPage()),
-    commonCupertinoPage(name: Routers.emailLogin, binding: AuthBinding(), page: () => EmailLoginPage()),
-    commonCupertinoPage(name: Routers.character, binding: CharacterBinding(), page: () => CharacterPage()),
-    commonCupertinoPage(name: Routers.achievements, binding: AchievementsBinding(), page: () => AchievementsPage()),
-    commonCupertinoPage(name: Routers.statistics, binding: StatisticsBinding(), page: () => StatisticsPage()),
-    commonCupertinoPage(name: Routers.settings, binding: SettingsBinding(), page: () => SettingsPage()),
+    fadeInPage(name: Routers.splash, binding: SplashBinding(), page: () => SplashPage()),
+    fadeInPage(name: Routers.login, binding: AuthBinding(), page: () => AuthPage()),
+    fadeInPage(name: Routers.boarding, binding: BoardBinding(), page: () => BoardingPage()),
+    fadeInPage(name: Routers.main, binding: MainBinding(), page: () => MainPage()),
+    cupertinoPage(name: Routers.emailLogin, binding: AuthBinding(), page: () => EmailLoginPage()),
+    cupertinoPage(name: Routers.character, binding: CharacterBinding(), page: () => CharacterPage()),
+    cupertinoPage(name: Routers.achievements, binding: AchievementsBinding(), page: () => AchievementsPage()),
+    cupertinoPage(name: Routers.statistics, binding: StatisticsBinding(), page: () => StatisticsPage()),
+    cupertinoPage(name: Routers.settings, binding: SettingsBinding(), page: () => SettingsPage()),
   ];
 
   // Common transition route (right to left)
-  static GetPage commonCupertinoPage(
-          {required String name, required Bindings binding, required Widget Function() page,}) =>
+  static GetPage cupertinoPage({
+    required String name,
+    required Bindings binding,
+    required Widget Function() page,
+  }) =>
       GetPage(
-          name: name,
-          binding: binding,
-          page: page,
-          transition: Transition.cupertino,
-          transitionDuration: const Duration(milliseconds: 300),);
+        name: name,
+        binding: binding,
+        page: page,
+        transition: Transition.cupertino,
+        transitionDuration: const Duration(milliseconds: 300),
+      );
 
   // Common transition route (FadeIn)
-  static GetPage commonFadeInPage({required String name, required Bindings binding, required Widget Function() page}) =>
+  static GetPage fadeInPage({required String name, required Bindings binding, required Widget Function() page}) =>
       GetPage(
-          name: name,
-          binding: binding,
-          page: page,
-          transition: Transition.fadeIn,
-          transitionDuration: const Duration(milliseconds: 500),);
+        name: name,
+        binding: binding,
+        page: page,
+        transition: Transition.fadeIn,
+        transitionDuration: const Duration(milliseconds: 500),
+      );
 }
 
 class Routers {

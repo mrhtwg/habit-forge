@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/core/theme/app_typography.dart';
@@ -57,14 +58,14 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
               // Title
               Center(
                 child: Text(
-                  _isRegister ? 'Create Account' : 'Sign In',
+                  _isRegister ? LanKey.createAccount.tr : LanKey.signIn.tr,
                   style: AppTypography.headline,
                 ),
               ),
               SizedBox(height: 8.h),
               Center(
                 child: Text(
-                  _isRegister ? 'Start your adventure' : 'Welcome back, adventurer',
+                  _isRegister ? LanKey.startYourAdventure.tr : LanKey.welcomeBackAdventurer.tr,
                   style: AppTypography.caption,
                 ),
               ),
@@ -78,24 +79,24 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
                   children: [
                     _buildTextField(
                       controller: _emailCtrl,
-                      label: 'Email',
-                      hint: 'Enter your email',
+                      label: LanKey.email.tr,
+                      hint: LanKey.enterYourEmail.tr,
                       keyboardType: TextInputType.emailAddress,
                       validator: (v) {
-                        if (v == null || v.isEmpty) return 'Please enter your email';
-                        if (!v.contains('@')) return 'Invalid email address';
+                        if (v == null || v.isEmpty) return LanKey.pleaseEnterYourEmail.tr;
+                        if (!v.contains('@')) return LanKey.invalidEmailAddress.tr;
                         return null;
                       },
                     ),
                     SizedBox(height: 16.h),
                     _buildTextField(
                       controller: _passCtrl,
-                      label: 'Password',
-                      hint: 'Enter your password',
+                      label: LanKey.password.tr,
+                      hint: LanKey.enterYourPassword.tr,
                       obscureText: true,
                       validator: (v) {
-                        if (v == null || v.isEmpty) return 'Please enter your password';
-                        if (v.length < 6) return 'Password must be at least 6 characters';
+                        if (v == null || v.isEmpty) return LanKey.pleaseEnterYourPassword.tr;
+                        if (v.length < 8) return LanKey.passwordMinLength.tr;
                         return null;
                       },
                     ),
@@ -103,12 +104,12 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
                       SizedBox(height: 16.h),
                       _buildTextField(
                         controller: _confirmPassCtrl,
-                        label: 'Confirm Password',
-                        hint: 'Re-enter your password',
+                        label: LanKey.confirmPassword.tr,
+                        hint: LanKey.reEnterYourPassword.tr,
                         obscureText: true,
                         validator: (v) {
-                          if (v == null || v.isEmpty) return 'Please confirm your password';
-                          if (v != _passCtrl.text) return 'Passwords do not match';
+                          if (v == null || v.isEmpty) return LanKey.pleaseConfirmYourPassword.tr;
+                          if (v != _passCtrl.text) return LanKey.passwordsDoNotMatch.tr;
                           return null;
                         },
                       ),
@@ -141,7 +142,7 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
                                   ),
                                 )
                               : Text(
-                                  _isRegister ? 'Create Account' : 'Sign In',
+                                  _isRegister ? LanKey.createAccount.tr : LanKey.signIn.tr,
                                   style: AppTypography.title.copyWith(fontSize: 16.sp),
                                 ),
                         ),
@@ -155,7 +156,7 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          _isRegister ? 'Already have an account?' : "Don't have an account?",
+                          _isRegister ? LanKey.alreadyHaveAccount.tr : LanKey.noAccountYet.tr,
                           style: textStyleRegular(color: AppColors.textMuted, fontSize: 14.sp),
                         ),
                         SizedBox(width: 4.w),
@@ -165,7 +166,7 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
                             _formKey.currentState?.reset();
                           }),
                           child: Text(
-                            _isRegister ? 'Sign In' : 'Sign Up',
+                            _isRegister ? LanKey.signIn.tr : LanKey.signUp.tr,
                             style: textStyleSemiBold(
                               color: AppColors.primaryLight,
                               fontSize: 14.sp,

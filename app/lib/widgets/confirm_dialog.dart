@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 
 class ConfirmDialog extends StatelessWidget {
   final String title;
   final String message;
-  final String confirmLabel;
-  final String cancelLabel;
+  final String? confirmLabel;
+  final String? cancelLabel;
   final bool isDestructive;
   final VoidCallback onConfirm;
 
@@ -15,8 +16,8 @@ class ConfirmDialog extends StatelessWidget {
     super.key,
     required this.title,
     required this.message,
-    this.confirmLabel = 'Confirm',
-    this.cancelLabel = 'Cancel',
+    this.confirmLabel,
+    this.cancelLabel,
     this.isDestructive = false,
     required this.onConfirm,
   });
@@ -74,7 +75,7 @@ class ConfirmDialog extends StatelessWidget {
                     child: TextButton(
                       onPressed: () => Navigator.of(context).pop(false),
                       child: Text(
-                        cancelLabel,
+                        (cancelLabel ?? LanKey.cancel.tr),
                         style: textStyleNormal(color: AppColors.textMuted, fontSize: 14.sp),
                       ),
                     ),
@@ -84,7 +85,7 @@ class ConfirmDialog extends StatelessWidget {
                     child: TextButton(
                       onPressed: onConfirm,
                       child: Text(
-                        confirmLabel,
+                        (confirmLabel ?? LanKey.confirm.tr),
                         style: textStyleMedium(color: confirmColor, fontSize: 14.sp),
                       ),
                     ),
@@ -102,8 +103,8 @@ class ConfirmDialog extends StatelessWidget {
     BuildContext context, {
     required String title,
     required String message,
-    String confirmLabel = 'Confirm',
-    String cancelLabel = 'Cancel',
+    String? confirmLabel,
+    String? cancelLabel,
     bool isDestructive = false,
   }) {
     return showDialog<bool>(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/constants/app_constants.dart';
+import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/services/hive_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
@@ -69,10 +70,10 @@ class QuestsPage extends GetView<QuestsController> {
             child: Icon(Icons.checklist_rounded, size: 44.w, color: AppColors.primaryDark),
           ),
           SizedBox(height: 14.h),
-          Text('No quests here yet', style: textStyleBold(fontSize: 20.sp)),
+          Text(LanKey.noQuestsHereYet.tr, style: textStyleBold(fontSize: 20.sp)),
           SizedBox(height: 6.h),
           Text(
-            'Tap + to forge your first quest.',
+            LanKey.tapToForgeQuest.tr,
             style: textStyleMedium(fontSize: 13.sp, color: AppColors.textSecondary),
           ),
         ],
@@ -83,10 +84,10 @@ class QuestsPage extends GetView<QuestsController> {
   // ─────────── Segmented filter: All / Habit / Daily / ToDo ───────────
   Widget _buildSegmentedFilter() {
     final options = <(String, TaskType?)>[
-      ('All', null),
-      ('Habit', TaskType.habit),
-      ('Daily', TaskType.daily),
-      ('ToDo', TaskType.todo),
+      (LanKey.all.tr, null),
+      (LanKey.habit.tr, TaskType.habit),
+      (LanKey.daily.tr, TaskType.daily),
+      (LanKey.todoFilter.tr, TaskType.todo),
     ];
     return Padding(
       padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 0),
@@ -152,7 +153,7 @@ class QuestsPage extends GetView<QuestsController> {
       padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 18.h),
       child: Row(
         children: [
-          Text('Quests', style: textStyleBlack(fontSize: 26.sp, color: AppColors.textPrimary)),
+          Text(LanKey.quests.tr, style: textStyleBlack(fontSize: 26.sp, color: AppColors.textPrimary)),
           const Spacer(),
           Obx(() {
             final n = HiveService.to.tasks.where((t) => !t.isSkipped && t.isDueToday).length;
@@ -164,7 +165,10 @@ class QuestsPage extends GetView<QuestsController> {
                 borderRadius: BorderRadius.circular(14),
                 boxShadow: const [BoxShadow(color: Color(0xFFD6C3A4), offset: Offset(0, 3))],
               ),
-              child: Text('$n today', style: textStyleBold(fontSize: 13.sp, color: AppColors.textSecondary)),
+              child: Text(
+                LanKey.questCountToday.trParams({'n': '$n'}),
+                style: textStyleBold(fontSize: 13.sp, color: AppColors.textSecondary),
+              ),
             );
           }),
         ],
@@ -284,7 +288,7 @@ class QuestsPage extends GetView<QuestsController> {
             _menuItem(
               icon: Icons.skip_next_rounded,
               color: AppColors.warning,
-              label: 'Skip',
+              label: LanKey.skip.tr,
               onTap: () {
                 Get.back();
                 controller.toggleSkip(task);
@@ -293,7 +297,7 @@ class QuestsPage extends GetView<QuestsController> {
             _menuItem(
               icon: Icons.schedule_rounded,
               color: AppColors.info,
-              label: 'Postpone to tomorrow',
+              label: LanKey.postponeToTomorrow.tr,
               onTap: () {
                 Get.back();
                 controller.onTaskPostpone(task);
@@ -302,7 +306,7 @@ class QuestsPage extends GetView<QuestsController> {
             _menuItem(
               icon: Icons.delete_rounded,
               color: AppColors.error,
-              label: 'Delete',
+              label: LanKey.delete.tr,
               onTap: () {
                 Get.back();
                 controller.deleteTask(task.id);

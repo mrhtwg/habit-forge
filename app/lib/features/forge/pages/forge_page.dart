@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/services/hive_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
@@ -65,7 +66,7 @@ class ForgePage extends GetView<ForgeController> {
                         boxShadow: const [BoxShadow(color: AppColors.coralDark, offset: Offset(0, 3))],
                       ),
                       child: Text(
-                        '${deal.discountPercent}% OFF',
+                        LanKey.forgeOff.trParams({'percent': '${deal.discountPercent}'}),
                         style: textStyleBold(fontSize: 12.sp, color: Colors.white),
                       ),
                     ),
@@ -210,7 +211,7 @@ class ForgePage extends GetView<ForgeController> {
                         border: Border.all(color: AppColors.green, width: 1.2),
                       ),
                       child: Text(
-                        'OWNED',
+                        LanKey.owned.tr,
                         style: textStyleBold(fontSize: 10.sp, color: AppColors.greenDark),
                       ),
                     )
@@ -245,7 +246,7 @@ class ForgePage extends GetView<ForgeController> {
 
   // ─────────── Category segment ───────────
   Widget _buildSegmented() {
-    const options = [('Appearance', 'appearance'), ('Equipment', 'equipment')];
+    const options = [(LanKey.appearance, 'appearance'), (LanKey.equipment, 'equipment')];
     return Padding(
       padding: EdgeInsets.fromLTRB(20.w, 14.h, 20.w, 0),
       child: Container(
@@ -270,7 +271,7 @@ class ForgePage extends GetView<ForgeController> {
                       boxShadow: isActive ? const [BoxShadow(color: Color(0xFFE4D2B0), offset: Offset(0, 2))] : null,
                     ),
                     child: Text(
-                      opt.$1,
+                      opt.$1.tr,
                       textAlign: TextAlign.center,
                       style: textStyleBold(
                         fontSize: 13.sp,
@@ -302,7 +303,7 @@ class ForgePage extends GetView<ForgeController> {
       padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 18.h),
       child: Row(
         children: [
-          Text('Forge', style: textStyleBlack(fontSize: 26.sp, color: AppColors.textPrimary)),
+          Text(LanKey.forge.tr, style: textStyleBlack(fontSize: 26.sp, color: AppColors.textPrimary)),
           const Spacer(),
           Obx(() {
             final gold = HiveService.to.userPrefs.value?.currentGold ?? 0;

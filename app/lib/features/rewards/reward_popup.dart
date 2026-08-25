@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 
@@ -74,12 +75,12 @@ class RewardPopup {
           ),
           SizedBox(height: 12.h),
           Text(
-            isAchievement ? 'Achievement unlocked!' : 'Quest complete!',
+            isAchievement ? LanKey.achievementUnlocked.tr : LanKey.questComplete.tr,
             style: textStyleBold(fontSize: 14.sp, color: AppColors.primaryDark),
           ),
           SizedBox(height: 4.h),
           Text(
-            isAchievement ? (achievementName ?? 'New achievement') : 'Nice work!',
+            isAchievement ? (achievementName ?? LanKey.newAchievement.tr) : LanKey.niceWork.tr,
             style: textStyleHand(fontSize: 30.sp, color: AppColors.textPrimary),
             textAlign: TextAlign.center,
           ),
@@ -88,11 +89,17 @@ class RewardPopup {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _rewardChip(icon: Icons.bolt_rounded, text: '+$expGained XP', bg: AppColors.goldLight),
+              _rewardChip(
+                icon: Icons.bolt_rounded,
+                text: LanKey.xpGained.trParams({'n': '$expGained'}),
+                bg: AppColors.goldLight,
+              ),
               SizedBox(width: 10.w),
               _rewardChip(
                 icon: Icons.star_rounded,
-                text: isAchievement ? '+$goldGained gems' : '+$goldGained gold',
+                text: isAchievement
+                    ? LanKey.gemsGained.trParams({'n': '$goldGained'})
+                    : LanKey.goldGained.trParams({'n': '$goldGained'}),
                 bg: AppColors.goldLight,
               ),
             ],
@@ -109,7 +116,7 @@ class RewardPopup {
               boxShadow: const [BoxShadow(color: AppColors.goldDark, offset: Offset(0, 4))],
             ),
             child: Text(
-              'Continue',
+              LanKey.continueLabel.tr,
               textAlign: TextAlign.center,
               style: textStyleBold(fontSize: 15.sp, color: AppColors.textPrimary),
             ),
@@ -137,19 +144,27 @@ class RewardPopup {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('Your hero reached', style: textStyleBold(fontSize: 16.sp, color: const Color(0xFF7A4A00))),
+          Text(LanKey.yourHeroReached.tr, style: textStyleBold(fontSize: 16.sp, color: const Color(0xFF7A4A00))),
           SizedBox(height: 6.h),
           Text(
-            'LEVEL ${newLevel ?? ''}',
+            LanKey.levelValue.trParams({'n': '${newLevel ?? ''}'}),
             style: textStyleBlack(fontSize: 44.sp, color: const Color(0xFF7A4A00)),
           ),
           SizedBox(height: 14.h),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _rewardChip(icon: Icons.bolt_rounded, text: '+$expGained XP', bg: Colors.white),
+              _rewardChip(
+                icon: Icons.bolt_rounded,
+                text: LanKey.xpGained.trParams({'n': '$expGained'}),
+                bg: Colors.white,
+              ),
               SizedBox(width: 10.w),
-              _rewardChip(icon: Icons.star_rounded, text: '+$goldGained gold', bg: Colors.white),
+              _rewardChip(
+                icon: Icons.star_rounded,
+                text: LanKey.goldGained.trParams({'n': '$goldGained'}),
+                bg: Colors.white,
+              ),
             ],
           ),
           SizedBox(height: 16.h),
@@ -163,7 +178,7 @@ class RewardPopup {
               boxShadow: const [BoxShadow(color: Color(0x55B56A00), offset: Offset(0, 4))],
             ),
             child: Text(
-              'Awesome!',
+              LanKey.awesome.tr,
               textAlign: TextAlign.center,
               style: textStyleBold(fontSize: 15.sp, color: AppColors.textPrimary),
             ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:habit_forge_app/core/constants/app_constants.dart';
+import 'package:habit_forge_app/core/i18n/app_locale.dart';
+import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_spacing.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
@@ -58,7 +60,7 @@ class TaskTile extends StatelessWidget {
               backgroundColor: AppColors.green,
               foregroundColor: Colors.white,
               icon: Icons.check_rounded,
-              label: 'Done',
+              label: LanKey.done.tr,
               borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
             ),
           ],
@@ -73,7 +75,7 @@ class TaskTile extends StatelessWidget {
               backgroundColor: AppColors.warning,
               foregroundColor: Colors.white,
               icon: Icons.skip_next_rounded,
-              label: 'Skip',
+              label: LanKey.skip.tr,
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(AppSpacing.cardRadius),
                 bottomLeft: Radius.circular(AppSpacing.cardRadius),
@@ -84,7 +86,7 @@ class TaskTile extends StatelessWidget {
               backgroundColor: AppColors.textMuted,
               foregroundColor: Colors.white,
               icon: Icons.schedule_rounded,
-              label: 'Postpone',
+              label: LanKey.postpone.tr,
             ),
           ],
         ),
@@ -255,7 +257,7 @@ class TaskTile extends StatelessWidget {
       children.add(const SizedBox(width: 8));
       children.add(
         Text(
-          '📅 ${DateFormat('MMM d').format(task.dueDate!)}',
+          '📅 ${DateFormat('MMM d', AppLocale.languageCode()).format(task.dueDate!)}',
           style: textStyleRegular(fontSize: 10, color: AppColors.textMuted),
         ),
       );
@@ -448,23 +450,23 @@ class _TaskDetailSheet extends StatelessWidget {
               if (task.priority.isNotEmpty)
                 _detailChip(
                   _priorityColor(task.priority),
-                  'Priority: ${task.priority}',
+                  LanKey.priorityLabel.trParams({'value': task.priority}),
                   Icons.flag_rounded,
                 ),
               _detailChip(
                 _difficultyColor(task.difficulty),
-                task.difficulty[0].toUpperCase() + task.difficulty.substring(1),
+                LanKey.difficultyFor(task.difficulty).tr,
                 Icons.speed_rounded,
               ),
               if (task.type != TaskType.habit && task.dueDate != null)
                 _detailChip(
                   AppColors.info,
-                  DateFormat('MMM d, yyyy').format(task.dueDate!),
+                  DateFormat('MMM d, yyyy', AppLocale.languageCode()).format(task.dueDate!),
                   Icons.calendar_today_rounded,
                 ),
               _detailChip(
                 AppColors.textMuted,
-                task.type.str,
+                LanKey.taskType(task.type.name).tr,
                 task.type == TaskType.habit ? Icons.loop_rounded : Icons.task_alt_rounded,
               ),
             ],
@@ -515,7 +517,7 @@ class _TaskDetailSheet extends StatelessWidget {
               },
               icon: const Icon(Icons.delete_outline_rounded, color: AppColors.error, size: 20),
               label: Text(
-                'Delete Task',
+                LanKey.deleteTask.tr,
                 style: textStyleSemiBold(color: AppColors.error),
               ),
               style: TextButton.styleFrom(
@@ -535,10 +537,10 @@ class _TaskDetailSheet extends StatelessWidget {
   Widget _buildTypeBadge() {
     final color = task.type == 'habit' ? AppColors.green : AppColors.primary;
     final label = task.type == 'habit'
-        ? 'Habit'
+        ? LanKey.habit.tr
         : task.type == 'daily'
-            ? 'Daily'
-            : 'Todo';
+            ? LanKey.daily.tr
+            : LanKey.todo.tr;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
@@ -586,22 +588,22 @@ class _TaskDetailSheet extends StatelessWidget {
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text('Delete Task', style: textStyleRegular(color: AppColors.textPrimary)),
+        title: Text(LanKey.deleteTask.tr, style: textStyleRegular(color: AppColors.textPrimary)),
         content: Text(
-          'Are you sure you want to delete "${task.title}"?',
+          LanKey.deleteConfirm.trParams({'title': task.title}),
           style: textStyleRegular(color: AppColors.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
+            child: Text(LanKey.cancel.tr),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
               onDelete?.call();
             },
-            child: Text('Delete', style: textStyleBold(color: AppColors.error)),
+            child: Text(LanKey.delete.tr, style: textStyleBold(color: AppColors.error)),
           ),
         ],
       ),

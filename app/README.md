@@ -33,8 +33,8 @@ The app is **local-first**: all game data lives in Hive on-device. Firebase Auth
 ### Onboarding & auth
 - 4-step onboarding: Welcome → Class → Habit → Ready
 - Hive (local) mode runs with **guest/local mock auth** and no backend
-- Firebase mode enables **Firebase Auth**: email/password, Google Sign-In, and Sign in with Apple
-- Server mode targets the self-hosted backend auth (see `env/server.json`)
+- Firebase mode offers **Google Sign-In only** (email/Apple to be added later)
+- Server mode offers **email/password** login with a **registration** entry (no email verification)
 
 ## Tech Stack
 
@@ -45,6 +45,7 @@ The app is **local-first**: all game data lives in Hive on-device. Firebase Auth
 | Local storage | Hive + hive_flutter |
 | Auth (prod) | firebase_auth, google_sign_in, sign_in_with_apple |
 | UI | flutter_screenutil (393×852 design size), phosphor_flutter icons, custom fonts (Baloo2 / Nunito / Caveat) |
+| i18n | GetX translations + flutter_localizations (English / 中文) |
 | Effects | Lottie, audioplayers, haptics service, frame-sequence PNG animation player |
 | Other | uuid, intl, flutter_slidable, carousel_slider |
 
@@ -63,12 +64,12 @@ The runtime mode is selected by the `env/` config file passed via `--dart-define
 | Mode | File | Data storage | Auth |
 |---|---|---|---|
 | Hive (default) | `env/hive.json` | Local on-device (Hive) | Guest / local mock |
-| Firebase | `env/firebase.json` | Firebase (cloud data + auth) | Firebase email / Google / Apple |
-| Server | `env/server.json` | Self-hosted backend (`apiUrl`) | Backend auth |
+| Firebase | `env/firebase.json` | Firebase (cloud data + auth) | Google Sign-In (only) |
+| Server | `env/server.json` | Self-hosted backend (`apiUrl`) | Email/password + registration (no verification) |
 
-- **Hive** — local-first mode, no backend required; Firebase is skipped.
-- **Firebase** — initializes Firebase for cloud-backed auth and data; requires [Firebase setup](docs/firebase-setup.md) and valid platform config in `lib/firebase_options.dart`.
-- **Server** — targets the self-hosted Go backend; the base URL comes from `apiUrl` in `env/server.json` (defaults to `http://localhost:8080`).
+- **Hive** — local-first mode, no backend required; the login page is skipped and the app enters directly (guest/local auth), Firebase is never initialized.
+- **Firebase** — initializes Firebase for cloud-backed auth and data; offers **Google Sign-In only** for now (email/Apple to be added later); requires [Firebase setup](docs/firebase-setup.md) and valid platform config in `lib/firebase_options.dart`.
+- **Server** — targets the self-hosted Go backend; offers **email/password login** with a **registration** entry (`POST /api/v1/auth/login` / `/api/v1/auth/register`); registration requires **no email verification**. The base URL comes from `apiUrl` in `env/server.json` (defaults to `http://localhost:8080`).
 
 The active mode is exposed through `EnvConstants` (`lib/core/constants/env_constants.dart`) — `storageMode`, `authMode`, `apiBaseUrl`, and helpers `isHive()` / `isFirebase()` / `isServer()`.
 
@@ -106,6 +107,17 @@ app/
 ├── build_habit_android.sh        # Android release build helper
 └── pubspec.yaml
 ```
+
+## Internationalization
+
+The app supports **English** and **中文** (Simplified Chinese), following the tata-project pattern (enum keys):
+
+- Keys are defined as an enum in `lib/core/i18n/lan_key.dart` and used as `LanKey.save.tr` (with `trParams(...)` for placeholders).
+- Per-language copy lives in `lib/core/i18n/en_us.dart` and `lib/core/i18n/zh_cn.dart`; `lib/core/i18n/app_translations.dart` wires them into GetX.
+- Data-driven lookups use enum helpers: `LanKey.difficultyFor(value)`, `LanKey.taskType(type)`, `LanKey.characterClass(name)`, `LanKey.achievementTitle(id)`.
+- The active language (`system` / English / 中文) is persisted in Hive and can be changed in **Settings → Language** — see `lib/core/i18n/app_locale.dart`.
+- Dates are formatted with the active locale through `intl` (`DateFormat(..., AppLocale.languageCode())`, date symbols initialized in `main()`).
+- Code comments and TODOs intentionally stay in English.
 
 ## Assets
 

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:habit_forge_app/core/i18n/app_locale.dart';
+import 'package:habit_forge_app/core/i18n/app_translations.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 
@@ -21,6 +24,15 @@ class HabitForgeApp extends StatelessWidget {
         title: 'HabitForge',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.light(),
+        translations: AppTranslations(),
+        locale: AppLocale.initialLocale(),
+        fallbackLocale: const Locale('en'),
+        supportedLocales: const [Locale('en'), Locale('zh')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
         initialRoute: Routers.splash,
         getPages: AppPages.pages,
         builder: (context, child) {

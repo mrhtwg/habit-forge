@@ -1,7 +1,10 @@
 import 'package:get/get.dart';
+import 'package:habit_forge_app/core/constants/env_constants.dart';
+import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
 import 'package:habit_forge_app/core/services/firebase_auth_service.dart';
 import 'package:habit_forge_app/core/services/hive_service.dart';
+import 'package:habit_forge_app/core/services/server_auth_service.dart';
 
 class AuthController extends GetxController {
   static AuthController get to => Get.find();
@@ -15,7 +18,7 @@ class AuthController extends GetxController {
     try {
       final error = await FirebaseAuthService.to.loginWithApple();
       if (error != null) {
-        Get.snackbar('Apple Login Failed', error);
+        Get.snackbar(LanKey.appleLoginFailed.tr, error);
         return false;
       }
       HiveService.to.setLoggedIn(true, method: 'apple');
@@ -28,12 +31,18 @@ class AuthController extends GetxController {
   }
 
   /// Email/Password login
+  /// Server mode → self-hosted backend; otherwise → Firebase (future extension).
   Future<bool> loginWithEmail(String email, String password) async {
     isLoading.value = true;
     try {
-      final error = await FirebaseAuthService.to.loginWithEmail(email, password);
+      final String? error;
+      if (EnvConstants.isAuthServer()) {
+        error = await ServerAuthService.to.loginWithEmail(email, password);
+      } else {
+        error = await FirebaseAuthService.to.loginWithEmail(email, password);
+      }
       if (error != null) {
-        Get.snackbar('Login Failed', error);
+        Get.snackbar(LanKey.loginFailed.tr, error);
         return false;
       }
       HiveService.to.setLoggedIn(true, method: 'email');
@@ -51,7 +60,7 @@ class AuthController extends GetxController {
     try {
       final error = await FirebaseAuthService.to.loginWithGoogle();
       if (error != null) {
-        Get.snackbar('Google Login Failed', error);
+        Get.snackbar(LanKey.googleLoginFailed.tr, error);
         return false;
       }
       HiveService.to.setLoggedIn(true, method: 'google');
@@ -65,10 +74,15 @@ class AuthController extends GetxController {
 
   /// Logout
   Future<void> logout() async {
-    await FirebaseAuthService.to.signOut();
+    if (EnvConstants.isAuthServer()) {
+      await ServerAuthService.to.signOut();
+    } else {
+      await FirebaseAuthService.to.signOut();
+    }
     HiveService.to.setLoggedIn(false);
     isLoggedIn.value = false;
-    Get.offAllNamed(Routers.login);
+    // Hive (local) mode has no real login — return to onboarding instead of the login page.
+    Get.offAllNamed(EnvConstants.isHive() ? Routers.boarding : Routers.login);
   }
 
   @override
@@ -78,12 +92,19 @@ class AuthController extends GetxController {
   }
 
   /// Register new Email account
+  /// Server mode → self-hosted backend (no email verification);
+  /// otherwise → Firebase (future extension).
   Future<bool> registerWithEmail(String email, String password) async {
     isLoading.value = true;
     try {
-      final error = await FirebaseAuthService.to.registerWithEmail(email, password);
+      final String? error;
+      if (EnvConstants.isAuthServer()) {
+        error = await ServerAuthService.to.registerWithEmail(email, password);
+      } else {
+        error = await FirebaseAuthService.to.registerWithEmail(email, password);
+      }
       if (error != null) {
-        Get.snackbar('Registration Failed', error);
+        Get.snackbar(LanKey.registrationFailed.tr, error);
         return false;
       }
       HiveService.to.setLoggedIn(true, method: 'email');

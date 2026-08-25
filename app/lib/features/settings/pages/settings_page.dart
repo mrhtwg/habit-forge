@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:habit_forge_app/core/i18n/app_locale.dart';
+import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
 import 'package:habit_forge_app/core/services/audio_service.dart';
 import 'package:habit_forge_app/core/services/haptic_service.dart';
@@ -18,7 +20,7 @@ class SettingsPage extends GetView<SettingsController> {
     return Scaffold(
       backgroundColor: AppColors.scaffold,
       appBar: AppBar(
-        title: const Text('Settings'),
+        title: Text(LanKey.settings.tr),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
@@ -29,7 +31,7 @@ class SettingsPage extends GetView<SettingsController> {
           padding: const EdgeInsets.all(16),
           children: [
             // Account section
-            const _SectionHeader('Account'),
+            _SectionHeader(LanKey.account.tr),
             _SettingsCard(
               child: Column(
                 children: [
@@ -37,11 +39,11 @@ class SettingsPage extends GetView<SettingsController> {
                     dense: true,
                     leading: const Icon(Icons.person_outline, color: AppColors.textSecondary),
                     title: Text(
-                      HiveService.to.authMethod.isEmpty ? 'Guest' : HiveService.to.authMethod.capitalizeFirst!,
+                      HiveService.to.authMethod.isEmpty ? LanKey.guest.tr : HiveService.to.authMethod.capitalizeFirst!,
                       style: textStyleRegular(color: AppColors.textPrimary),
                     ),
                     subtitle: Text(
-                      'Signed in',
+                      LanKey.signedIn.tr,
                       style: textStyleRegular(color: AppColors.textMuted, fontSize: 12),
                     ),
                   ),
@@ -50,15 +52,15 @@ class SettingsPage extends GetView<SettingsController> {
                     dense: true,
                     leading: const Icon(Icons.logout, color: AppColors.red),
                     title: Text(
-                      'Sign Out',
+                      LanKey.signOut.tr,
                       style: textStyleRegular(color: AppColors.red),
                     ),
                     onTap: () async {
                       final confirmed = await ConfirmDialog.show(
                         context,
-                        title: 'Sign Out',
-                        message: 'Are you sure you want to sign out?',
-                        confirmLabel: 'Sign Out',
+                        title: LanKey.signOut.tr,
+                        message: LanKey.signOutConfirm.tr,
+                        confirmLabel: LanKey.signOut.tr,
                         isDestructive: true,
                       );
                       if (confirmed == true) {
@@ -72,12 +74,12 @@ class SettingsPage extends GetView<SettingsController> {
             const SizedBox(height: 20),
 
             // Preferences section
-            const _SectionHeader('Preferences'),
+            _SectionHeader(LanKey.preferences.tr),
             _SettingsCard(
               child: Column(
                 children: [
                   _PreferenceRow(
-                    label: 'Sound',
+                    label: LanKey.sound.tr,
                     value: prefs.soundEnabled,
                     onChanged: (v) {
                       Get.find<AudioService>().setEnabled(v);
@@ -86,7 +88,7 @@ class SettingsPage extends GetView<SettingsController> {
                   ),
                   const Divider(color: AppColors.elevated, height: 1, thickness: 1),
                   _PreferenceRow(
-                    label: 'Haptic',
+                    label: LanKey.haptic.tr,
                     value: prefs.hapticEnabled,
                     onChanged: (v) {
                       Get.find<HapticService>().setEnabled(v);
@@ -98,8 +100,23 @@ class SettingsPage extends GetView<SettingsController> {
             ),
             const SizedBox(height: 20),
 
+            // Language section
+            _SectionHeader(LanKey.language.tr),
+            _SettingsCard(
+              child: Column(
+                children: [
+                  _LanguageOption(label: LanKey.followSystem.tr, value: AppLocale.system),
+                  const Divider(color: AppColors.elevated, height: 1, thickness: 1),
+                  _LanguageOption(label: 'English', value: AppLocale.en),
+                  const Divider(color: AppColors.elevated, height: 1, thickness: 1),
+                  _LanguageOption(label: '中文', value: AppLocale.zh),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+
             // Data section
-            const _SectionHeader('Data'),
+            _SectionHeader(LanKey.data.tr),
             _SettingsCard(
               child: ListTile(
                 leading: Text(
@@ -107,15 +124,15 @@ class SettingsPage extends GetView<SettingsController> {
                   style: textStyleRegular(fontSize: 20),
                 ),
                 title: Text(
-                  'Reset All Data',
+                  LanKey.resetAllData.tr,
                   style: textStyleRegular(color: AppColors.red),
                 ),
                 onTap: () async {
                   final confirmed = await ConfirmDialog.show(
                     context,
-                    title: 'Reset Game',
-                    message: 'This will delete all your data. Are you sure?',
-                    confirmLabel: 'Reset',
+                    title: LanKey.resetGame.tr,
+                    message: LanKey.resetAllConfirm.tr,
+                    confirmLabel: LanKey.reset.tr,
                     isDestructive: true,
                   );
                   if (confirmed == true) {
@@ -174,6 +191,29 @@ class _CustomToggle extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+// ── Language Option (label + check when active) ──
+
+class _LanguageOption extends StatelessWidget {
+  final String label;
+  final String value;
+
+  const _LanguageOption({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      dense: true,
+      title: Text(
+        label,
+        style: textStyleRegular(color: AppColors.textPrimary),
+      ),
+      trailing:
+          AppLocale.current() == value ? const Icon(Icons.check_rounded, color: AppColors.primary, size: 20) : null,
+      onTap: () => AppLocale.set(value),
     );
   }
 }

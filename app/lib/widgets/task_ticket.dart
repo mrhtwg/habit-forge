@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:habit_forge_app/core/constants/app_constants.dart';
 import 'package:habit_forge_app/core/constants/game_constants.dart';
+import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/models/task/task_model.dart';
@@ -139,11 +140,11 @@ class TaskTicket extends StatelessWidget {
   String _typeLabel() {
     switch (task.type) {
       case TaskType.daily:
-        return 'DAILY';
+        return LanKey.dailyBadge.tr;
       case TaskType.todo:
-        return 'TODO';
+        return LanKey.todoBadge.tr;
       default:
-        return 'HABIT';
+        return LanKey.habitBadge.tr;
     }
   }
 }

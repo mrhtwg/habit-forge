@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/forge/controllers/forge_controller.dart';
@@ -61,7 +62,7 @@ class ItemDetailSheet extends StatelessWidget {
               borderRadius: BorderRadius.circular(999),
             ),
             child: Text(
-              item.rarity.toUpperCase(),
+              item.rarity.tr.toUpperCase(),
               style: textStyleBold(fontSize: 11.sp, color: rarityColor).copyWith(letterSpacing: 0.5),
             ),
           ),
@@ -106,13 +107,13 @@ class ItemDetailSheet extends StatelessWidget {
       };
       bg = AppColors.primary;
       fg = Colors.white;
-      label = 'Equip';
+      label = LanKey.equip.tr;
       showPrice = false;
     } else if (!affordable) {
       onTap = () {
         Get.snackbar(
           '',
-          'Not enough gold! Need $shortfall more.',
+          LanKey.notEnoughGold.trParams({'shortfall': '$shortfall'}),
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: AppColors.surface,
           colorText: AppColors.red,
@@ -123,7 +124,7 @@ class ItemDetailSheet extends StatelessWidget {
       };
       bg = AppColors.coral;
       fg = Colors.white;
-      label = 'Need $shortfall more';
+      label = LanKey.needMoreGold.trParams({'shortfall': '$shortfall'});
       showPrice = false;
     } else {
       onTap = () {
@@ -132,7 +133,7 @@ class ItemDetailSheet extends StatelessWidget {
       };
       bg = AppColors.gold;
       fg = AppColors.textPrimary;
-      label = 'Buy';
+      label = LanKey.buy.tr;
       showPrice = true;
     }
 

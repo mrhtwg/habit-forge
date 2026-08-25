@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/common/animation/frame_sequence_player.dart';
 import 'package:habit_forge_app/core/constants/game_constants.dart';
+import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/services/hive_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
@@ -38,11 +39,11 @@ class HomePage extends GetView<HomeController> {
             padding: EdgeInsets.fromLTRB(20.w, 14.h, 20.w, 10.h),
             child: Row(
               children: [
-                Text("Today's Quests", style: textStyleBold(fontSize: 18.sp, color: AppColors.textPrimary)),
+                Text(LanKey.todaysQuests.tr, style: textStyleBold(fontSize: 18.sp, color: AppColors.textPrimary)),
                 const Spacer(),
                 GestureDetector(
                   onTap: () => TaskFormSheet.show(Get.context!),
-                  child: Text('+ Add', style: textStyleBold(fontSize: 18.sp, color: AppColors.primaryDark)),
+                  child: Text(LanKey.addQuest.tr, style: textStyleBold(fontSize: 18.sp, color: AppColors.primaryDark)),
                 ),
               ],
             ),
@@ -90,13 +91,13 @@ class HomePage extends GetView<HomeController> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Good morning, adventurer!',
+                        LanKey.goodMorningAdventurer.tr,
                         style: textStyleHand(fontSize: 19.sp, color: AppColors.textPrimary),
                       ),
                       Obx(() {
                         final n = controller.todayTasks.length;
                         return Text(
-                          n > 0 ? '$n quests ready for today' : 'A fresh day awaits',
+                          n > 0 ? LanKey.questsReadyCount.trParams({'n': '$n'}) : LanKey.aFreshDayAwaits.tr,
                           style: textStyleMedium(fontSize: 12.sp, color: AppColors.textSecondary),
                         );
                       }),
@@ -154,7 +155,7 @@ class HomePage extends GetView<HomeController> {
                           boxShadow: const [BoxShadow(color: Color(0xFFE9D9BE), offset: Offset(0, 2))],
                         ),
                         child: Text(
-                          'Lv ${char?.level ?? 1}',
+                          LanKey.levelLabel.trParams({'level': '${char?.level ?? 1}'}),
                           style: textStyleBold(fontSize: 12.sp, color: AppColors.textPrimary),
                         ),
                       ),
@@ -169,9 +170,9 @@ class HomePage extends GetView<HomeController> {
             padding: EdgeInsets.fromLTRB(24.w, 8.h, 24.w, 18.h),
             child: Column(
               children: [
-                _hudBar(label: 'XP', color: AppColors.gold, text: _xpText()),
+                _hudBar(label: LanKey.xp.tr, color: AppColors.gold, text: _xpText()),
                 SizedBox(height: 8.h),
-                _hudBar(label: 'HP', color: AppColors.coral, text: _hpText()),
+                _hudBar(label: LanKey.hp.tr, color: AppColors.coral, text: _hpText()),
               ],
             ),
           ),
@@ -196,12 +197,12 @@ class HomePage extends GetView<HomeController> {
             child: Icon(Icons.auto_stories_rounded, size: 44.w, color: AppColors.goldDark),
           ),
           SizedBox(height: 14.h),
-          Text('No quests for today!', style: textStyleBold(fontSize: 20.sp)),
+          Text(LanKey.noQuestsToday.tr, style: textStyleBold(fontSize: 20.sp)),
           SizedBox(height: 6.h),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 40.w),
             child: Text(
-              'Your day is clear. Add your first quest to start earning XP and gold.',
+              LanKey.dayClearAddFirstQuest.tr,
               textAlign: TextAlign.center,
               style: textStyleMedium(fontSize: 13.sp, color: AppColors.textSecondary),
             ),
@@ -222,7 +223,7 @@ class HomePage extends GetView<HomeController> {
                 children: [
                   const Icon(Icons.add_rounded, color: Colors.white, size: 20),
                   SizedBox(width: 6.w),
-                  Text('Create Quest', style: textStyleBold(fontSize: 15.sp, color: Colors.white)),
+                  Text(LanKey.createQuest.tr, style: textStyleBold(fontSize: 15.sp, color: Colors.white)),
                 ],
               ),
             ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/common/animation/frame_sequence_player.dart';
+import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
 import 'package:habit_forge_app/core/services/hive_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
@@ -25,16 +26,74 @@ class ProfilePage extends GetView<ProfileController> {
                 children: [
                   _buildStatsRow(),
                   SizedBox(height: 16.h),
-                  _buildQuickLink(icon: Icons.military_tech_rounded, color: AppColors.primary, title: 'View Character', onTap: () => Get.toNamed(Routers.character)),
+                  _buildQuickLink(
+                    icon: Icons.military_tech_rounded,
+                    color: AppColors.primary,
+                    title: LanKey.viewCharacter.tr,
+                    onTap: () => Get.toNamed(Routers.character),
+                  ),
                   SizedBox(height: 10.h),
-                  _buildQuickLink(icon: Icons.emoji_events_rounded, color: AppColors.goldDark, title: 'Achievements', onTap: () => Get.toNamed(Routers.achievements)),
+                  _buildQuickLink(
+                    icon: Icons.emoji_events_rounded,
+                    color: AppColors.goldDark,
+                    title: LanKey.achievements.tr,
+                    onTap: () => Get.toNamed(Routers.achievements),
+                  ),
                   SizedBox(height: 10.h),
-                  _buildQuickLink(icon: Icons.bar_chart_rounded, color: AppColors.info, title: 'Statistics', onTap: () => Get.toNamed(Routers.statistics)),
+                  _buildQuickLink(
+                    icon: Icons.bar_chart_rounded,
+                    color: AppColors.info,
+                    title: LanKey.statistics.tr,
+                    onTap: () => Get.toNamed(Routers.statistics),
+                  ),
                   SizedBox(height: 10.h),
-                  _buildQuickLink(icon: Icons.settings_rounded, color: AppColors.textSecondary, title: 'Settings', onTap: () => Get.toNamed(Routers.settings)),
+                  _buildQuickLink(
+                    icon: Icons.settings_rounded,
+                    color: AppColors.textSecondary,
+                    title: LanKey.settings.tr,
+                    onTap: () => Get.toNamed(Routers.settings),
+                  ),
                 ],
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ─────────── Quick links ───────────
+  Widget _buildQuickLink({
+    required IconData icon,
+    required Color color,
+    required String title,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: AppColors.border, width: 2),
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: const [BoxShadow(color: Color(0xFFEFDFC4), offset: Offset(0, 4))],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 42.w,
+              height: 42.w,
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(13),
+                border: Border.all(color: AppColors.border, width: 1.5),
+              ),
+              child: Icon(icon, size: 22.w, color: color),
+            ),
+            SizedBox(width: 12.w),
+            Expanded(child: Text(title, style: textStyleBold(fontSize: 15.sp, color: AppColors.textPrimary))),
+            Icon(Icons.chevron_right_rounded, color: AppColors.textMuted, size: 22.w),
           ],
         ),
       ),
@@ -84,7 +143,7 @@ class ProfilePage extends GetView<ProfileController> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Adventurer', style: textStyleBlack(fontSize: 20.sp, color: AppColors.textPrimary)),
+                  Text(LanKey.adventurer.tr, style: textStyleBlack(fontSize: 20.sp, color: AppColors.textPrimary)),
                   SizedBox(height: 3.h),
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 3.h),
@@ -94,7 +153,10 @@ class ProfilePage extends GetView<ProfileController> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      'Lv ${char?.level ?? 1} · ${char?.characterClass.name ?? 'warrior'}',
+                      LanKey.profileLevelClass.trParams({
+                        'level': '${char?.level ?? 1}',
+                        'className': LanKey.characterClass(char?.characterClass.name ?? 'warrior').tr,
+                      }),
                       style: textStyleBold(fontSize: 12.sp, color: AppColors.primaryDark),
                     ),
                   ),
@@ -112,6 +174,19 @@ class ProfilePage extends GetView<ProfileController> {
           ],
         );
       }),
+    );
+  }
+
+  // ─────────── Stats row ───────────
+  Widget _buildStatsRow() {
+    return Row(
+      children: [
+        _statCard('${(controller.completionRate * 100).round()}%', LanKey.rate.tr),
+        SizedBox(width: 10.w),
+        _statCard('${controller.maxStreak}d', LanKey.streak.tr),
+        SizedBox(width: 10.w),
+        _statCard('${controller.totalTasksCompleted}', LanKey.tasks.tr),
+      ],
     );
   }
 
@@ -142,19 +217,6 @@ class ProfilePage extends GetView<ProfileController> {
     );
   }
 
-  // ─────────── Stats row ───────────
-  Widget _buildStatsRow() {
-    return Row(
-      children: [
-        _statCard('${(controller.completionRate * 100).round()}%', 'Rate'),
-        SizedBox(width: 10.w),
-        _statCard('${controller.maxStreak}d', 'Streak'),
-        SizedBox(width: 10.w),
-        _statCard('${controller.totalTasksCompleted}', 'Tasks'),
-      ],
-    );
-  }
-
   Widget _statCard(String value, String label) {
     return Expanded(
       child: Container(
@@ -170,44 +232,6 @@ class ProfilePage extends GetView<ProfileController> {
             Text(value, style: textStyleBold(fontSize: 20.sp, color: AppColors.textPrimary)),
             SizedBox(height: 2.h),
             Text(label, style: textStyleBold(fontSize: 11.sp, color: AppColors.textSecondary)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ─────────── Quick links ───────────
-  Widget _buildQuickLink({
-    required IconData icon,
-    required Color color,
-    required String title,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: AppColors.border, width: 2),
-          borderRadius: BorderRadius.circular(18),
-          boxShadow: const [BoxShadow(color: Color(0xFFEFDFC4), offset: Offset(0, 4))],
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 42.w,
-              height: 42.w,
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(13),
-                border: Border.all(color: AppColors.border, width: 1.5),
-              ),
-              child: Icon(icon, size: 22.w, color: color),
-            ),
-            SizedBox(width: 12.w),
-            Expanded(child: Text(title, style: textStyleBold(fontSize: 15.sp, color: AppColors.textPrimary))),
-            Icon(Icons.chevron_right_rounded, color: AppColors.textMuted, size: 22.w),
           ],
         ),
       ),

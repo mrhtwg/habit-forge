@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/common/animation/frame_sequence_player.dart';
 import 'package:habit_forge_app/core/constants/game_constants.dart';
+import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/services/hive_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_spacing.dart';
@@ -48,7 +49,7 @@ class CharacterPage extends GetView<CharacterController> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Equipment', style: textStyleBold(fontSize: 18.sp)),
+        Text(LanKey.equipment.tr, style: textStyleBold(fontSize: 18.sp)),
         SizedBox(height: 10.h),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -121,7 +122,7 @@ class CharacterPage extends GetView<CharacterController> {
                 ),
                 const Spacer(),
                 Text(
-                  '${char.characterClass.name.toUpperCase()}',
+                  '${LanKey.characterClass(char.characterClass.name).tr.toUpperCase()}',
                   style: textStyleBold(fontSize: 16.sp, color: AppColors.textSecondary),
                 ),
                 const Spacer(),
@@ -165,7 +166,10 @@ class CharacterPage extends GetView<CharacterController> {
                       boxShadow: const [BoxShadow(color: Color(0xFFE9D9BE), offset: Offset(0, 2))],
                     ),
                     child: Text(
-                      'Lv ${char.level} · ${char.characterClass.name}',
+                      LanKey.levelClassLabel.trParams({
+                        'level': '${char.level}',
+                        'className': LanKey.characterClass(char.characterClass.name).tr,
+                      }),
                       style: textStyleBold(fontSize: 12.sp, color: AppColors.textPrimary),
                     ),
                   ),
@@ -180,7 +184,7 @@ class CharacterPage extends GetView<CharacterController> {
               children: [
                 Row(
                   children: [
-                    Text('XP', style: textStyleBold(fontSize: 11.sp, color: AppColors.textSecondary)),
+                    Text(LanKey.xp.tr, style: textStyleBold(fontSize: 11.sp, color: AppColors.textSecondary)),
                     const Spacer(),
                     Text(
                       '${char.currentExp}/${GameConstants.expForLevel(char.level)}',
@@ -218,20 +222,20 @@ class CharacterPage extends GetView<CharacterController> {
   // ─────────── Attributes ───────────
   Widget _buildStatsSection(CharacterModel char) {
     final stats = char.baseStats;
-    final items = <(String, int)>[
-      ('STR', stats.strength),
-      ('INT', stats.intelligence),
-      ('AGI', stats.agility),
-      ('DEF', stats.defense),
-      ('VIT', stats.vitality),
-      ('LUK', stats.luck),
+    final items = <(LanKey, int)>[
+      (LanKey.statStr, stats.strength),
+      (LanKey.statInt, stats.intelligence),
+      (LanKey.statAgi, stats.agility),
+      (LanKey.statDef, stats.defense),
+      (LanKey.statVit, stats.vitality),
+      (LanKey.statLuk, stats.luck),
     ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            Text('Attributes', style: textStyleBold(fontSize: 18.sp)),
+            Text(LanKey.attributes.tr, style: textStyleBold(fontSize: 18.sp)),
             const Spacer(),
             if (char.availableStatPoints > 0)
               Container(
@@ -242,7 +246,7 @@ class CharacterPage extends GetView<CharacterController> {
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
-                  '${char.availableStatPoints} points',
+                  LanKey.pointsRemaining.trParams({'n': '${char.availableStatPoints}'}),
                   style: textStyleBold(fontSize: 11.sp, color: AppColors.goldDark),
                 ),
               ),
@@ -270,7 +274,7 @@ class CharacterPage extends GetView<CharacterController> {
                 ),
                 child: Row(
                   children: [
-                    Text(it.$1, style: textStyleBold(fontSize: 12.sp, color: AppColors.textSecondary)),
+                    Text(it.$1.tr, style: textStyleBold(fontSize: 12.sp, color: AppColors.textSecondary)),
                     const Spacer(),
                     Text('${it.$2}', style: textStyleBold(fontSize: 18.sp, color: AppColors.textPrimary)),
                     if (canAdd) ...[
@@ -294,7 +298,7 @@ class CharacterPage extends GetView<CharacterController> {
 
     final owned = hive.ownedItemIds;
     if (owned.isEmpty) {
-      Toast.show('No items for this slot. Visit the Forge!');
+      Toast.show(LanKey.noItemsForSlot.tr);
       return;
     }
 
@@ -321,13 +325,13 @@ class CharacterPage extends GetView<CharacterController> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Select ${_slotLabel(slot)}',
+              LanKey.selectSlot.trParams({'slot': _slotLabel(slot)}),
               style: textStyleBold(fontSize: 16.sp, color: AppColors.textPrimary),
             ),
             const SizedBox(height: 12),
             ListTile(
               leading: Icon(Icons.close_rounded, color: AppColors.textMuted, size: 20),
-              title: Text('None (unequip)', style: textStyleRegular(color: AppColors.textMuted)),
+              title: Text(LanKey.noneUnequip.tr, style: textStyleRegular(color: AppColors.textMuted)),
               onTap: () {
                 final updated = Map<String, String>.from(char.equipment)..remove(slot);
                 hive.saveCharacter(char.copyWith(equipment: updated));
@@ -373,27 +377,27 @@ class CharacterPage extends GetView<CharacterController> {
   String _slotLabel(String slot) {
     switch (slot) {
       case 'weapon':
-        return 'Weapon';
+        return LanKey.weapon.tr;
       case 'helmet':
-        return 'Helmet';
+        return LanKey.helmet.tr;
       case 'armor':
-        return 'Armor';
+        return LanKey.armor.tr;
       default:
-        return 'Trinket';
+        return LanKey.trinket.tr;
     }
   }
 
-  String _statKey(String abbr) {
-    switch (abbr) {
-      case 'STR':
+  String _statKey(LanKey k) {
+    switch (k) {
+      case LanKey.statStr:
         return 'strength';
-      case 'INT':
+      case LanKey.statInt:
         return 'intelligence';
-      case 'AGI':
+      case LanKey.statAgi:
         return 'agility';
-      case 'DEF':
+      case LanKey.statDef:
         return 'defense';
-      case 'VIT':
+      case LanKey.statVit:
         return 'vitality';
       default:
         return 'luck';

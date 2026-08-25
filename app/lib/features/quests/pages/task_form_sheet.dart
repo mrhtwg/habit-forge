@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/constants/app_constants.dart';
 import 'package:habit_forge_app/core/constants/game_constants.dart';
+import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/quests/controllers/quests_controller.dart';
@@ -29,7 +30,15 @@ class TaskFormSheet extends StatefulWidget {
 }
 
 class _TaskFormSheetState extends State<TaskFormSheet> {
-  static const _weekdayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  static final _weekdayLabels = [
+    LanKey.mon.tr,
+    LanKey.tue.tr,
+    LanKey.wed.tr,
+    LanKey.thu.tr,
+    LanKey.fri.tr,
+    LanKey.sat.tr,
+    LanKey.sun.tr,
+  ];
   late TextEditingController _titleCtrl;
   late TextEditingController _descCtrl;
   TaskType _type = TaskType.habit;
@@ -69,7 +78,7 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
             SizedBox(height: 14.h),
             Center(
               child: Text(
-                isEdit ? 'Edit Quest' : 'New Quest',
+                isEdit ? LanKey.editQuest.tr : LanKey.newQuest.tr,
                 style: textStyleBlack(fontSize: 22.sp, color: AppColors.textPrimary),
               ),
             ),
@@ -82,7 +91,7 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
               controller: _titleCtrl,
               style: textStyleRegular(fontSize: 15.sp),
               decoration: InputDecoration(
-                hintText: "What's your quest?",
+                hintText: LanKey.whatsYourQuest.tr,
                 hintStyle: textStyleRegular(fontSize: 14.sp, color: AppColors.textMuted),
                 prefixIcon: Icon(Icons.checklist_rounded, size: 20, color: AppColors.textSecondary),
                 filled: true,
@@ -108,7 +117,7 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
               controller: _descCtrl,
               style: textStyleRegular(fontSize: 14.sp),
               decoration: InputDecoration(
-                hintText: 'Description (optional)',
+                hintText: LanKey.descriptionOptional.tr,
                 hintStyle: textStyleRegular(fontSize: 13.sp, color: AppColors.textMuted),
                 filled: true,
                 fillColor: const Color(0xFFFBF5EA),
@@ -132,12 +141,12 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
             if (_type == TaskType.todo) ..._buildTodoFields(),
             SizedBox(height: 14.h),
             // Difficulty
-            _buildSectionLabel('Difficulty'),
+            _buildSectionLabel(LanKey.difficulty.tr),
             SizedBox(height: 8.h),
             _difficultySelector(),
             SizedBox(height: 14.h),
             // Tags
-            _buildSectionLabel('Tags'),
+            _buildSectionLabel(LanKey.tags.tr),
             SizedBox(height: 8.h),
             Wrap(
               spacing: 8.w,
@@ -206,7 +215,7 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
                   ),
                   child: Center(
                     child: Text(
-                      isEdit ? 'Save Changes' : 'Create Quest',
+                      isEdit ? LanKey.saveChanges.tr : LanKey.createQuest.tr,
                       style: textStyleBold(fontSize: 16.sp, color: Colors.white),
                     ),
                   ),
@@ -246,7 +255,7 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
   List<Widget> _buildDailyFields() {
     return [
       SizedBox(height: 14.h),
-      _buildSectionLabel('Repeat on'),
+      _buildSectionLabel(LanKey.repeatOn.tr),
       SizedBox(height: 8.h),
       Wrap(
         spacing: 6.w,
@@ -277,7 +286,7 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
         Padding(
           padding: EdgeInsets.only(top: 4.h),
           child: Text(
-            'Select at least one day',
+            LanKey.selectAtLeastOneDay.tr,
             style: textStyleRegular(fontSize: 11.sp, color: AppColors.warning.withValues(alpha: 0.7)),
           ),
         ),
@@ -291,7 +300,7 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
       children: [
         Icon(Icons.favorite_border_rounded, size: 16.w, color: AppColors.coral),
         SizedBox(width: 6.w),
-        Text('Miss penalty: ', style: textStyleRegular(fontSize: 12.sp, color: AppColors.textMuted)),
+        Text(LanKey.missPenalty.tr, style: textStyleRegular(fontSize: 12.sp, color: AppColors.textMuted)),
         Text('-$_hpPenalty HP', style: textStyleBold(fontSize: 12.sp, color: AppColors.coralDark)),
       ],
     );
@@ -303,7 +312,7 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
     final gold = GameConstants.baseGoldReward(_difficulty);
     return Row(
       children: [
-        Text('Reward', style: textStyleBold(fontSize: 13.sp, color: AppColors.textSecondary)),
+        Text(LanKey.reward.tr, style: textStyleBold(fontSize: 13.sp, color: AppColors.textSecondary)),
         const Spacer(),
         _rewardChip(icon: Icons.bolt_rounded, text: '+$exp XP', bg: AppColors.goldLight),
         SizedBox(width: 8.w),
@@ -320,7 +329,7 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
   List<Widget> _buildTodoFields() {
     return [
       SizedBox(height: 14.h),
-      _buildSectionLabel('Due Date & Priority'),
+      _buildSectionLabel(LanKey.dueDateAndPriority.tr),
       SizedBox(height: 8.h),
       Row(
         children: [
@@ -343,7 +352,7 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
                     Icon(Icons.calendar_today_rounded, size: 15.w, color: AppColors.textSecondary),
                     SizedBox(width: 8.w),
                     Text(
-                      _dueDate != null ? DateFormat('MMM d, yyyy').format(_dueDate!) : 'Pick date',
+                      _dueDate != null ? DateFormat('MMM d, yyyy').format(_dueDate!) : LanKey.pickDate.tr,
                       style: textStyleRegular(
                         fontSize: 12.sp,
                         color: _dueDate != null ? AppColors.textPrimary : AppColors.textMuted,
@@ -413,7 +422,7 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
               activeBg: _diffColor(d),
               onTap: () => setState(() => _difficulty = d),
               child: Text(
-                d[0].toUpperCase() + d.substring(1),
+                LanKey.difficultyFor(d).tr,
                 textAlign: TextAlign.center,
                 style: textStyleBold(
                   fontSize: 13.sp,
@@ -515,7 +524,7 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
-                  t.str,
+                  LanKey.taskType(t.name).tr,
                   textAlign: TextAlign.center,
                   style: textStyleBold(
                     fontSize: 13.sp,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/services/hive_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
@@ -76,7 +77,7 @@ class StatisticsPage extends GetView<StatisticsController> {
                       children: [
                         _kpiCard(
                           '$totalCompleted',
-                          'TASKS DONE',
+                          LanKey.tasksDONE.tr,
                           controller.period != TimePeriod.all && rateChange != 0
                               ? '${rateChange >= 0 ? '↑' : '↓'} ${rateChange.abs()}%'
                               : null,
@@ -85,7 +86,7 @@ class StatisticsPage extends GetView<StatisticsController> {
                         SizedBox(width: 10.w),
                         _kpiCard(
                           '${(profile.totalTasksCompleted / (allTasks.length == 0 ? 1 : allTasks.length) * 100).round()}%',
-                          'COMPLETION',
+                          LanKey.completion.tr,
                           null,
                           AppColors.info,
                         ),
@@ -94,9 +95,19 @@ class StatisticsPage extends GetView<StatisticsController> {
                     SizedBox(height: 10.h),
                     Row(
                       children: [
-                        _kpiCard('${profile.maxStreak}d', 'DAY STREAK', '🔥 best yet', const Color(0xFFE9852C)),
+                        _kpiCard(
+                          '${profile.maxStreak}d',
+                          LanKey.daySTREAK.tr,
+                          LanKey.bestYet.tr,
+                          const Color(0xFFE9852C),
+                        ),
                         SizedBox(width: 10.w),
-                        _kpiCard('$totalXp', 'TOTAL XP', 'Lv ${char?.level ?? 1} hero', AppColors.primaryDark),
+                        _kpiCard(
+                          '$totalXp',
+                          LanKey.totalXP.tr,
+                          LanKey.levelHeroLabel.trParams({'level': '${char?.level ?? 1}'}),
+                          AppColors.primaryDark,
+                        ),
                       ],
                     ),
                     SizedBox(height: 20.h),
@@ -114,10 +125,10 @@ class StatisticsPage extends GetView<StatisticsController> {
                         children: [
                           Row(
                             children: [
-                              Text('Quests completed', style: textStyleBold(fontSize: 15.sp)),
+                              Text(LanKey.questsCompleted.tr, style: textStyleBold(fontSize: 15.sp)),
                               const Spacer(),
                               Text(
-                                'last 7 days',
+                                LanKey.last7Days.tr,
                                 style: textStyleBold(fontSize: 11.sp, color: AppColors.textMuted),
                               ),
                             ],
@@ -160,7 +171,7 @@ class StatisticsPage extends GetView<StatisticsController> {
                     ),
                     SizedBox(height: 20.h),
                     // Streak leaderboard
-                    Text('Streaks', style: textStyleBold(fontSize: 18.sp)),
+                    Text(LanKey.streaks.tr, style: textStyleBold(fontSize: 18.sp)),
                     SizedBox(height: 10.h),
                     if (topStreaks.isEmpty)
                       Container(
@@ -172,7 +183,7 @@ class StatisticsPage extends GetView<StatisticsController> {
                         ),
                         child: Center(
                           child: Text(
-                            'No streaks yet — keep going!',
+                            LanKey.noStreaksYet.tr,
                             style: textStyleMedium(fontSize: 13.sp, color: AppColors.textSecondary),
                           ),
                         ),
@@ -262,14 +273,18 @@ class StatisticsPage extends GetView<StatisticsController> {
             ),
           ),
           SizedBox(width: 10.w),
-          Text('Statistics', style: textStyleBlack(fontSize: 22.sp, color: AppColors.textPrimary)),
+          Text(LanKey.statistics.tr, style: textStyleBlack(fontSize: 22.sp, color: AppColors.textPrimary)),
         ],
       ),
     );
   }
 
   Widget _buildTimeToggle() {
-    const options = [(TimePeriod.week, 'Week'), (TimePeriod.month, 'Month'), (TimePeriod.all, 'All')];
+    final options = [
+      (TimePeriod.week, LanKey.week.tr),
+      (TimePeriod.month, LanKey.month.tr),
+      (TimePeriod.all, LanKey.all.tr),
+    ];
     return Container(
       padding: EdgeInsets.all(4.w),
       decoration: BoxDecoration(

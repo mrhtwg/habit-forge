@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/services/hive_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
@@ -97,7 +98,7 @@ class AchievementsPage extends GetView<AchievementsController> {
             ),
           ),
           SizedBox(width: 10.w),
-          Text('Achievements', style: textStyleBlack(fontSize: 22.sp, color: AppColors.textPrimary)),
+          Text(LanKey.achievements.tr, style: textStyleBlack(fontSize: 22.sp, color: AppColors.textPrimary)),
           const Spacer(),
           Obx(() {
             final n = HiveService.to.achievements.where((a) => a.isUnlocked).length;
@@ -166,7 +167,7 @@ class AchievementsPage extends GetView<AchievementsController> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      unlocked ? def.title : '???',
+                      unlocked ? LanKey.achievementTitle(def.id).tr : '???',
                       style: textStyleBold(
                         fontSize: 14.sp,
                         color: unlocked ? AppColors.textPrimary : AppColors.textMuted,
@@ -174,7 +175,7 @@ class AchievementsPage extends GetView<AchievementsController> {
                     ),
                     SizedBox(height: 3.h),
                     Text(
-                      def.description,
+                      LanKey.achievementDescription(def.id).tr,
                       style: textStyleMedium(fontSize: 11.5.sp, color: AppColors.textSecondary),
                     ),
                   ],

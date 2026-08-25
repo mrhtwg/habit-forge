@@ -1,10 +1,9 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/common/animation/frame_sequence_player.dart';
 import 'package:habit_forge_app/core/constants/env_constants.dart';
+import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
 import 'package:habit_forge_app/core/services/firebase_auth_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
@@ -43,52 +42,31 @@ class AuthPage extends GetView<AuthController> {
                 ),
                 SizedBox(height: 8.h),
                 Text(
-                  'Your Habits. Your Legend.',
+                  LanKey.yourHabitsYourLegend.tr,
                   style: textStyleHand(fontSize: 18.sp, color: AppColors.textSecondary),
                 ),
                 SizedBox(height: 50.h),
 
-                // Google
-                _SocialButton(
-                  icon: Icons.g_mobiledata_rounded,
-                  label: 'Continue with Google',
-                  onTap: () => controller.loginWithGoogle(),
-                  textColor: AppColors.textPrimary,
-                  backgroundColor: Colors.white,
-                ),
-                SizedBox(height: 14.h),
-
-                // Apple
-                if (Platform.isIOS)
+                // Firebase mode: Google Sign-In only (other methods come later)
+                if (EnvConstants.isAuthFirebase())
                   _SocialButton(
-                    icon: Icons.apple_rounded,
-                    label: 'Continue with Apple',
-                    onTap: () => controller.loginWithApple(),
-                    textColor: Colors.white,
-                    backgroundColor: const Color(0xFF010100),
+                    icon: Icons.g_mobiledata_rounded,
+                    label: LanKey.continueWithGoogle.tr,
+                    onTap: () => controller.loginWithGoogle(),
+                    textColor: AppColors.textPrimary,
+                    backgroundColor: Colors.white,
                   ),
-                if (Platform.isIOS) SizedBox(height: 14.h),
+                if (EnvConstants.isAuthFirebase()) SizedBox(height: 14.h),
 
-                if (EnvConstants.isAuthLocal()) ...[
-                  Row(
-                    children: [
-                      Expanded(child: Divider(color: AppColors.textMuted, thickness: 1)),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16.w),
-                        child: Text('OR', style: textStyleBold(fontSize: 12.sp, color: AppColors.textSecondary)),
-                      ),
-                      Expanded(child: Divider(color: AppColors.textMuted, thickness: 1)),
-                    ],
-                  ),
-                  SizedBox(height: 14.h),
+                // Server mode: email/password login (registration inside the form)
+                if (EnvConstants.isAuthServer())
                   _SocialButton(
                     icon: Icons.email_rounded,
-                    label: 'Continue with Email',
+                    label: LanKey.continueWithEmail.tr,
                     onTap: () => Get.toNamed(Routers.emailLogin),
                     textColor: Colors.white,
                     backgroundColor: AppColors.primary,
                   ),
-                ],
 
                 // Guest skip
                 if (!FirebaseAuthService.to.isAvailable)
@@ -100,7 +78,7 @@ class AuthPage extends GetView<AuthController> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            'Skip for now',
+                            LanKey.skipForNow.tr,
                             style: textStyleBold(fontSize: 14.sp, color: AppColors.textSecondary),
                           ),
                           SizedBox(width: 4.w),
@@ -113,7 +91,7 @@ class AuthPage extends GetView<AuthController> {
                 // SizedBox(height: 24.h),
                 const Spacer(),
                 Text(
-                  'By continuing, you agree to our Terms of Service\nand Privacy Policy.',
+                  LanKey.termsAndPrivacy.tr,
                   textAlign: TextAlign.center,
                   style: textStyleRegular(fontSize: 11.sp, color: AppColors.textSecondary),
                 ),

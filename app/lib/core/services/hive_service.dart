@@ -31,6 +31,9 @@ class HiveService extends GetxService {
 
   String get authMethod => _userBox.get('authMethod', defaultValue: '');
 
+  /// JWT token issued by the self-hosted backend (server mode).
+  String? get authToken => _userBox.get('serverToken') as String?;
+
   // ── Auth ──
   bool get isLoggedIn => _userBox.get('isLoggedIn', defaultValue: false);
 
@@ -88,6 +91,14 @@ class HiveService extends GetxService {
   void saveAchievement(Achievement a) {
     _achievementBox.put('ach_${a.id}', _json.encode(a.toJson()));
     _loadAchievements();
+  }
+
+  void saveAuthToken(String? token) {
+    if (token == null) {
+      _userBox.delete('serverToken');
+    } else {
+      _userBox.put('serverToken', token);
+    }
   }
 
   // ── Character ──

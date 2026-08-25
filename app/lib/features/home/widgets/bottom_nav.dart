@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class BottomNav extends StatelessWidget {
+  static final _tabs = [
+    (label: LanKey.home.tr, icon: PhosphorIcons.house(PhosphorIconsStyle.fill)),
+    (label: LanKey.quests.tr, icon: PhosphorIcons.scroll(PhosphorIconsStyle.fill)),
+    (label: LanKey.forge.tr, icon: PhosphorIcons.hammer(PhosphorIconsStyle.fill)),
+    (label: LanKey.profile.tr, icon: PhosphorIcons.user(PhosphorIconsStyle.fill)),
+  ];
   final int currentIndex;
+
   final ValueChanged<int> onTabChanged;
 
   const BottomNav({
@@ -13,13 +21,6 @@ class BottomNav extends StatelessWidget {
     required this.currentIndex,
     required this.onTabChanged,
   });
-
-  static final _tabs = [
-    (label: 'Home', icon: PhosphorIcons.house(PhosphorIconsStyle.fill)),
-    (label: 'Quests', icon: PhosphorIcons.scroll(PhosphorIconsStyle.fill)),
-    (label: 'Forge', icon: PhosphorIcons.hammer(PhosphorIconsStyle.fill)),
-    (label: 'Profile', icon: PhosphorIcons.user(PhosphorIconsStyle.fill)),
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -54,12 +55,9 @@ class BottomNav extends StatelessWidget {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: isActive ? AppColors.primary : Colors.transparent,
-                        border: isActive
-                            ? Border.all(color: AppColors.primaryDark, width: 2)
-                            : null,
-                        boxShadow: isActive
-                            ? const [BoxShadow(color: AppColors.primaryDark, offset: Offset(0, 3))]
-                            : null,
+                        border: isActive ? Border.all(color: AppColors.primaryDark, width: 2) : null,
+                        boxShadow:
+                            isActive ? const [BoxShadow(color: AppColors.primaryDark, offset: Offset(0, 3))] : null,
                       ),
                       child: Icon(
                         _tabs[index].icon,
