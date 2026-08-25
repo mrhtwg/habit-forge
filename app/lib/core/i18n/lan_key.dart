@@ -146,7 +146,6 @@ enum LanKey {
   yourHabitsYourLegend, // 'Your Habits. Your Legend.'
   continueWithGoogle, // 'Continue with Google'
   continueWithEmail, // 'Continue with Email'
-  skipForNow, // 'Skip for now'
   byContinuingYouAgreeToOurTermsOfServiceNandPrivacyPolicy, // 'By continuing, you agree to our Terms of Service\\nand Privacy Policy.'
   createAccount, // 'Create Account'
   signIn, // 'Sign In'

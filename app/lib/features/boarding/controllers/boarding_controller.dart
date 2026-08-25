@@ -9,6 +9,7 @@ import 'package:habit_forge_app/models/task/task_model.dart';
 import 'package:habit_forge_app/models/user/user_prefs.dart';
 
 class BoardingController extends GetxController {
+  final totalStepsCount = 4;
   final _step = 0.obs;
   final selectedClass = CharacterClass.warrior.obs;
   final firstHabitTitle = ''.obs;
@@ -49,7 +50,7 @@ class BoardingController extends GetxController {
   }
 
   void nextStep() {
-    if (_step.value < 3) {
+    if (_step.value < totalStepsCount - 1) {
       _step.value++;
     }
   }

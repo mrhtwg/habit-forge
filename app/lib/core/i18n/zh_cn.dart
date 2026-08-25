@@ -145,7 +145,6 @@ const Map<LanKey, String> zhCN = {
   LanKey.yourHabitsYourLegend: '你的习惯。你的传奇。',
   LanKey.continueWithGoogle: '使用 Google 登录',
   LanKey.continueWithEmail: '使用邮箱登录',
-  LanKey.skipForNow: '暂时跳过',
   LanKey.byContinuingYouAgreeToOurTermsOfServiceNandPrivacyPolicy: '继续即表示你同意我们的服务条款\\n和隐私政策。',
   LanKey.createAccount: '创建账号',
   LanKey.signIn: '登录',

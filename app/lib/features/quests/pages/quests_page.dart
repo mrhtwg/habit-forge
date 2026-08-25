@@ -18,38 +18,36 @@ class QuestsPage extends GetView<QuestsController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.scaffold,
-      body: SafeArea(
-        child: Stack(
-          children: [
-            Column(
-              children: [
-                _buildSkyHeader(),
-                _buildSegmentedFilter(),
-                _buildTagChips(),
-                Expanded(child: _buildTaskList(context)),
-              ],
-            ),
-            // Add task FAB
-            Positioned(
-              bottom: 24.h,
-              right: 20.w,
-              child: GestureDetector(
-                onTap: () => TaskFormSheet.show(context),
-                child: Container(
-                  width: 56.w,
-                  height: 56.w,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.border, width: 2.5),
-                    boxShadow: const [BoxShadow(color: AppColors.primaryDark, offset: Offset(0, 4))],
-                  ),
-                  child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
+      body: Stack(
+        children: [
+          Column(
+            children: [
+              _buildSkyHeader(),
+              _buildSegmentedFilter(),
+              _buildTagChips(),
+              Expanded(child: _buildTaskList(context)),
+            ],
+          ),
+          // Add task FAB
+          Positioned(
+            bottom: 24.h,
+            right: 20.w,
+            child: GestureDetector(
+              onTap: () => TaskFormSheet.show(context),
+              child: Container(
+                width: 56.w,
+                height: 56.w,
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppColors.border, width: 2.5),
+                  boxShadow: const [BoxShadow(color: AppColors.primaryDark, offset: Offset(0, 4))],
                 ),
+                child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -150,7 +148,7 @@ class QuestsPage extends GetView<QuestsController> {
         ),
         borderRadius: BorderRadius.only(bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30)),
       ),
-      padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 18.h),
+      padding: EdgeInsets.fromLTRB(20.w, 12.h + MediaQuery.of(Get.context!).padding.top, 20.w, 18.h),
       child: Row(
         children: [
           Text(LanKey.quests.tr, style: textStyleBlack(fontSize: 26.sp, color: AppColors.textPrimary)),

@@ -20,7 +20,6 @@ class HomePage extends GetView<HomeController> {
       backgroundColor: AppColors.scaffold,
       body: Column(
         children: [
-          SizedBox(height: MediaQuery.of(context).padding.top),
           _buildSkyHeader(),
           Expanded(child: _buildQuestsSection()),
         ],
@@ -41,10 +40,12 @@ class HomePage extends GetView<HomeController> {
               children: [
                 Text(LanKey.todaysQuests.tr, style: textStyleBold(fontSize: 18.sp, color: AppColors.textPrimary)),
                 const Spacer(),
-                GestureDetector(
-                  onTap: () => TaskFormSheet.show(Get.context!),
-                  child: Text(LanKey.addQuest.tr, style: textStyleBold(fontSize: 18.sp, color: AppColors.primaryDark)),
-                ),
+                if (tasks.isNotEmpty)
+                  GestureDetector(
+                    onTap: () => TaskFormSheet.show(Get.context!),
+                    child:
+                        Text(LanKey.addQuest.tr, style: textStyleBold(fontSize: 18.sp, color: AppColors.primaryDark)),
+                  ),
               ],
             ),
           ),
@@ -70,6 +71,7 @@ class HomePage extends GetView<HomeController> {
   // ─────────────── Sky header: greeting + wallet + hero + status bars ───────────────
   Widget _buildSkyHeader() {
     return Container(
+      padding: EdgeInsets.only(top: MediaQuery.of(Get.context!).padding.top),
       width: double.infinity,
       decoration: const BoxDecoration(
         gradient: LinearGradient(

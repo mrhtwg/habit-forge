@@ -145,7 +145,6 @@ const Map<LanKey, String> enUS = {
   LanKey.yourHabitsYourLegend: 'Your Habits. Your Legend.',
   LanKey.continueWithGoogle: 'Continue with Google',
   LanKey.continueWithEmail: 'Continue with Email',
-  LanKey.skipForNow: 'Skip for now',
   LanKey.byContinuingYouAgreeToOurTermsOfServiceNandPrivacyPolicy:
       'By continuing, you agree to our Terms of Service\\nand Privacy Policy.',
   LanKey.createAccount: 'Create Account',

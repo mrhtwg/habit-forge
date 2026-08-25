@@ -16,48 +16,46 @@ class ProfilePage extends GetView<ProfileController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.scaffold,
-      body: SafeArea(
-        child: Column(
-          children: [
-            _buildSkyHeader(),
-            Expanded(
-              child: ListView(
-                padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 24.h),
-                children: [
-                  _buildStatsRow(),
-                  SizedBox(height: 16.h),
-                  _buildQuickLink(
-                    icon: Icons.military_tech_rounded,
-                    color: AppColors.primary,
-                    title: LanKey.viewCharacter.tr,
-                    onTap: () => Get.toNamed(Routers.character),
-                  ),
-                  SizedBox(height: 10.h),
-                  _buildQuickLink(
-                    icon: Icons.emoji_events_rounded,
-                    color: AppColors.goldDark,
-                    title: LanKey.achievements.tr,
-                    onTap: () => Get.toNamed(Routers.achievements),
-                  ),
-                  SizedBox(height: 10.h),
-                  _buildQuickLink(
-                    icon: Icons.bar_chart_rounded,
-                    color: AppColors.info,
-                    title: LanKey.statistics.tr,
-                    onTap: () => Get.toNamed(Routers.statistics),
-                  ),
-                  SizedBox(height: 10.h),
-                  _buildQuickLink(
-                    icon: Icons.settings_rounded,
-                    color: AppColors.textSecondary,
-                    title: LanKey.settings.tr,
-                    onTap: () => Get.toNamed(Routers.settings),
-                  ),
-                ],
-              ),
+      body: Column(
+        children: [
+          _buildSkyHeader(),
+          Expanded(
+            child: ListView(
+              padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 24.h),
+              children: [
+                _buildStatsRow(),
+                SizedBox(height: 16.h),
+                _buildQuickLink(
+                  icon: Icons.military_tech_rounded,
+                  color: AppColors.primary,
+                  title: LanKey.viewCharacter.tr,
+                  onTap: () => Get.toNamed(Routers.character),
+                ),
+                SizedBox(height: 10.h),
+                _buildQuickLink(
+                  icon: Icons.emoji_events_rounded,
+                  color: AppColors.goldDark,
+                  title: LanKey.achievements.tr,
+                  onTap: () => Get.toNamed(Routers.achievements),
+                ),
+                SizedBox(height: 10.h),
+                _buildQuickLink(
+                  icon: Icons.bar_chart_rounded,
+                  color: AppColors.info,
+                  title: LanKey.statistics.tr,
+                  onTap: () => Get.toNamed(Routers.statistics),
+                ),
+                SizedBox(height: 10.h),
+                _buildQuickLink(
+                  icon: Icons.settings_rounded,
+                  color: AppColors.textSecondary,
+                  title: LanKey.settings.tr,
+                  onTap: () => Get.toNamed(Routers.settings),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -112,7 +110,7 @@ class ProfilePage extends GetView<ProfileController> {
         ),
         borderRadius: BorderRadius.only(bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30)),
       ),
-      padding: EdgeInsets.fromLTRB(20.w, 14.h, 20.w, 20.h),
+      padding: EdgeInsets.fromLTRB(20.w, 14.h + MediaQuery.of(Get.context!).padding.top, 20.w, 20.h),
       child: Obx(() {
         final char = HiveService.to.character.value;
         final prefs = HiveService.to.userPrefs.value;

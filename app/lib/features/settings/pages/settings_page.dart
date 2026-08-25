@@ -105,8 +105,6 @@ class SettingsPage extends GetView<SettingsController> {
             _SettingsCard(
               child: Column(
                 children: [
-                  _LanguageOption(label: LanKey.followSystem.tr, value: AppLocale.system),
-                  const Divider(color: AppColors.elevated, height: 1, thickness: 1),
                   _LanguageOption(label: 'English', value: AppLocale.en),
                   const Divider(color: AppColors.elevated, height: 1, thickness: 1),
                   _LanguageOption(label: '中文', value: AppLocale.zh),
@@ -119,10 +117,7 @@ class SettingsPage extends GetView<SettingsController> {
             _SectionHeader(LanKey.data.tr),
             _SettingsCard(
               child: ListTile(
-                leading: Text(
-                  '\u{1F5D1}\u{FE0F}',
-                  style: textStyleRegular(fontSize: 20),
-                ),
+                leading: Icon(Icons.recycling_outlined, color: AppColors.textPrimary.withValues(alpha: 0.5)),
                 title: Text(
                   LanKey.resetAllData.tr,
                   style: textStyleRegular(color: AppColors.red),

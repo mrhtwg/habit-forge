@@ -16,15 +16,13 @@ class ForgePage extends GetView<ForgeController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.scaffold,
-      body: SafeArea(
-        child: Column(
-          children: [
-            _buildSkyHeader(),
-            _buildDealBanner(context),
-            _buildSegmented(),
-            Expanded(child: _buildItemGrid(context)),
-          ],
-        ),
+      body: Column(
+        children: [
+          _buildSkyHeader(),
+          _buildDealBanner(context),
+          _buildSegmented(),
+          Expanded(child: _buildItemGrid(context)),
+        ],
       ),
     );
   }
@@ -300,7 +298,7 @@ class ForgePage extends GetView<ForgeController> {
         ),
         borderRadius: BorderRadius.only(bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30)),
       ),
-      padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 18.h),
+      padding: EdgeInsets.fromLTRB(20.w, 12.h + MediaQuery.of(Get.context!).padding.top, 20.w, 18.h),
       child: Row(
         children: [
           Text(LanKey.forge.tr, style: textStyleBlack(fontSize: 26.sp, color: AppColors.textPrimary)),

@@ -5,7 +5,6 @@ import 'package:habit_forge_app/core/common/animation/frame_sequence_player.dart
 import 'package:habit_forge_app/core/constants/env_constants.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
-import 'package:habit_forge_app/core/services/firebase_auth_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/auth/controllers/auth_controller.dart';
@@ -66,26 +65,6 @@ class AuthPage extends GetView<AuthController> {
                     onTap: () => Get.toNamed(Routers.emailLogin),
                     textColor: Colors.white,
                     backgroundColor: AppColors.primary,
-                  ),
-
-                // Guest skip
-                if (!FirebaseAuthService.to.isAvailable)
-                  Padding(
-                    padding: EdgeInsets.only(top: 20.h),
-                    child: TextButton(
-                      onPressed: () => controller.skipLogin(),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            LanKey.skipForNow.tr,
-                            style: textStyleBold(fontSize: 14.sp, color: AppColors.textSecondary),
-                          ),
-                          SizedBox(width: 4.w),
-                          Icon(Icons.arrow_forward_rounded, size: 16, color: AppColors.textSecondary),
-                        ],
-                      ),
-                    ),
                   ),
 
                 // SizedBox(height: 24.h),

@@ -129,9 +129,8 @@ class BoardingPage extends GetView<BoardingController> {
                 child: const Icon(Icons.arrow_back_rounded, size: 18, color: AppColors.textPrimary),
               ),
             )
-          else
+          else if (!EnvConstants.isHive()) ...[
             GestureDetector(
-              // Hive (local) mode: no login page — back goes to main instead.
               onTap: () => Get.offAllNamed(EnvConstants.isHive() ? Routers.main : Routers.login),
               child: Container(
                 width: 34.w,
@@ -144,9 +143,10 @@ class BoardingPage extends GetView<BoardingController> {
                 child: const Icon(Icons.arrow_back_rounded, size: 18, color: AppColors.textPrimary),
               ),
             ),
-          SizedBox(width: 10.w),
+          ],
+          if (step > 0) SizedBox(width: 10.w),
           Text(
-            LanKey.stepOf.trParams({'n': '${step + 1}', 'total': '4'}),
+            LanKey.stepOf.trParams({'n': '${step + 1}', 'total': controller.totalStepsCount.toString()}),
             style: textStyleBold(fontSize: 14.sp, color: AppColors.textSecondary),
           ),
           const Spacer(),
