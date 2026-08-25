@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package api.stats.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "github.com/habitforge/backend/api/stats/v1;v1";
+
+// StatsService — completion statistics and streak leaderboard.
+service StatsService {
+  // GetStats returns task statistics over a time range.
+  rpc GetStats(GetStatsRequest) returns (GetStatsReply) {
+    option (google.api.http) = {
+      get: "/api/v1/stats"
+    };
+  }
+}
+
+// StatsRange — aggregation window.
+enum StatsRange {
+  STATS_RANGE_UNSPECIFIED = 0;
+  STATS_RANGE_DAY = 1;
+  STATS_RANGE_WEEK = 2;
+  STATS_RANGE_MONTH = 3;
+  STATS_RANGE_ALL = 4;
+}
+
+message TimeSegment {
+  string label = 1; // e.g. "Mon", "2026-08"
+  int64 completed_count = 2;
+}
+
+message StreakEntry {
+  string task_id = 1;
+  string title = 2;
+  int32 streak = 3;
+}
+
+message StatsReply {
+  StatsRange range = 1;
+  repeated TimeSegment segments = 2; // completion bar chart data
+  repeated StreakEntry streak_leaderboard = 3; // top streaks, desc
+  int64 total_tasks_completed = 4;
+  int64 total_gold_earned = 5;
+  int64 total_exp_earned = 6;
+}
+
+message GetStatsRequest {
+  StatsRange range = 1;
+}
+
+message GetStatsReply {
+  StatsReply stats = 1;
+}

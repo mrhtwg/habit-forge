@@ -1,0 +1,142 @@
+syntax = "proto3";
+
+package api.task.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "github.com/habitforge/backend/api/task/v1;v1";
+
+// TaskService — Habit / Daily / ToDo task management with RPG rewards.
+service TaskService {
+  // ListTasks lists tasks for the current user with optional filters.
+  rpc ListTasks(ListTasksRequest) returns (ListTasksReply) {
+    option (google.api.http) = {
+      get: "/api/v1/tasks"
+    };
+  }
+  // GetTask returns one task by id.
+  rpc GetTask(GetTaskRequest) returns (GetTaskReply) {
+    option (google.api.http) = {
+      get: "/api/v1/tasks/{id}"
+    };
+  }
+  // CreateTask creates a new task.
+  rpc CreateTask(CreateTaskRequest) returns (CreateTaskReply) {
+    option (google.api.http) = {
+      post: "/api/v1/tasks"
+      body: "*"
+    };
+  }
+  // UpdateTask updates an existing task (title, difficulty, tags, skip, etc.).
+  rpc UpdateTask(UpdateTaskRequest) returns (UpdateTaskReply) {
+    option (google.api.http) = {
+      put: "/api/v1/tasks/{id}"
+      body: "*"
+    };
+  }
+  // DeleteTask removes a task.
+  rpc DeleteTask(DeleteTaskRequest) returns (DeleteTaskReply) {
+    option (google.api.http) = {
+      delete: "/api/v1/tasks/{id}"
+    };
+  }
+  // CompleteTask marks a task completed and grants EXP/gold rewards.
+  rpc CompleteTask(CompleteTaskRequest) returns (CompleteTaskReply) {
+    option (google.api.http) = {
+      post: "/api/v1/tasks/{id}/complete"
+      body: "*"
+    };
+  }
+}
+
+// TaskType — habit (daily repeat), daily (weekday repeat), todo (due date).
+enum TaskType {
+  TASK_TYPE_UNSPECIFIED = 0;
+  TASK_TYPE_HABIT = 1;
+  TASK_TYPE_DAILY = 2;
+  TASK_TYPE_TODO = 3;
+}
+
+// TaskDifficulty — drives base EXP/gold rewards.
+enum TaskDifficulty {
+  TASK_DIFFICULTY_UNSPECIFIED = 0;
+  TASK_DIFFICULTY_EASY = 1;
+  TASK_DIFFICULTY_MEDIUM = 2;
+  TASK_DIFFICULTY_HARD = 3;
+}
+
+message Task {
+  string id = 1;
+  string title = 2;
+  string description = 3;
+  TaskType type = 4;
+  TaskDifficulty difficulty = 5;
+  repeated string tags = 6;
+  bool is_completed = 7;
+  int64 completed_at = 8; // unix millis
+  int64 due_date = 9; // unix millis
+  repeated int32 repeat_days = 10; // 0=Mon .. 6=Sun (for dailies)
+  int32 streak = 11;
+  int64 last_streak_date = 12; // unix millis
+  int32 custom_exp_reward = 13;
+  int32 custom_gold_reward = 14;
+  string priority = 15;
+  int32 hp_penalty = 16;
+  bool is_skipped = 17;
+  int64 created_at = 18; // unix millis
+  int64 updated_at = 19; // unix millis
+}
+
+message ListTasksRequest {
+  TaskType type = 1; // optional filter
+  TaskDifficulty difficulty = 2; // optional filter
+  repeated string tags = 3; // optional filter
+  bool only_due_today = 4;
+  bool include_completed = 5;
+}
+
+message ListTasksReply {
+  repeated Task tasks = 1;
+}
+
+message GetTaskRequest {
+  string id = 1;
+}
+
+message GetTaskReply {
+  Task task = 1;
+}
+
+message CreateTaskRequest {
+  Task task = 1;
+}
+
+message CreateTaskReply {
+  Task task = 1;
+}
+
+message UpdateTaskRequest {
+  string id = 1;
+  Task task = 2;
+}
+
+message UpdateTaskReply {
+  Task task = 1;
+}
+
+message DeleteTaskRequest {
+  string id = 1;
+}
+
+message DeleteTaskReply {}
+
+message CompleteTaskRequest {
+  string id = 1;
+}
+
+message CompleteTaskReply {
+  Task task = 1;
+  int32 exp_reward = 2;
+  int32 gold_reward = 3;
+  int32 hp_change = 4;
+}

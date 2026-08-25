@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+package api.auth.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "github.com/habitforge/backend/api/auth/v1;v1";
+
+// AuthService — email/password register & login, OAuth login, current user.
+service AuthService {
+  // Register a new email account. No email verification required.
+  rpc Register(RegisterRequest) returns (RegisterReply) {
+    option (google.api.http) = {
+      post: "/api/v1/auth/register"
+      body: "*"
+    };
+  }
+  // Login with email and password.
+  rpc Login(LoginRequest) returns (LoginReply) {
+    option (google.api.http) = {
+      post: "/api/v1/auth/login"
+      body: "*"
+    };
+  }
+  // OAuth login (google / apple), auto-creates the user when missing.
+  rpc OAuthLogin(OAuthLoginRequest) returns (LoginReply) {
+    option (google.api.http) = {
+      post: "/api/v1/auth/oauth"
+      body: "*"
+    };
+  }
+  // Me returns the current authenticated user (JWT required).
+  rpc Me(MeRequest) returns (MeReply) {
+    option (google.api.http) = {
+      get: "/api/v1/auth/me"
+    };
+  }
+}
+
+message RegisterRequest {
+  string email = 1;
+  string password = 2; // min 8 characters
+  string nickname = 3;
+}
+
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message OAuthLoginRequest {
+  string provider = 1; // "google" | "apple"
+  string provider_id = 2;
+  string email = 3;
+  string nickname = 4;
+}
+
+message MeRequest {}
+
+message UserInfo {
+  string id = 1;
+  string email = 2;
+  string nickname = 3;
+  string avatar_url = 4;
+  int64 created_at = 5; // unix millis
+  int64 updated_at = 6; // unix millis
+}
+
+message RegisterReply {
+  string token = 1;
+  UserInfo user = 2;
+}
+
+message LoginReply {
+  string token = 1;
+  UserInfo user = 2;
+}
+
+message MeReply {
+  UserInfo user = 1;
+}

@@ -7,11 +7,11 @@ HabitForge is a mobile-first habit tracker that turns your real-life tasks into 
 This repository is a **full-stack monorepo**:
 
 - `app/` — Flutter client (GetX, Hive, Firebase Auth)
-- `server/` — Go backend (Gin, GORM, PostgreSQL, Wire DI)
+- `server/` — Go backend (go-kratos, GORM, PostgreSQL, Wire DI)
 - `proto/` — shared API contract directory (planned evolution)
 - `docs/` — product, design, and development docs
 
-> **Status:** MVP. The Flutter app is local-first and playable; the Go backend currently provides auth APIs. See [Roadmap](docs/roadmap.md).
+> **Status:** MVP. The Flutter app is local-first and playable; the Go backend is a go-kratos skeleton with all route interfaces defined (auth, user, character, task, shop, achievement, stats) — implementations are pending. See [Roadmap](docs/roadmap.md).
 
 ## Why this project exists
 
@@ -27,7 +27,7 @@ HabitForge is not trying to clone Habitica. The goal is a modern, native, and **
 | Layer | Technology |
 |---|---|
 | Mobile | Flutter, GetX, Hive, Firebase Auth |
-| Backend | Go, Gin, GORM, PostgreSQL, Wire |
+| Backend | Go, go-kratos, GORM, PostgreSQL, Wire |
 | Shared contract | proto (planned) |
 | Infra | Docker Compose |
 
@@ -43,10 +43,10 @@ habit-forge/
 │   │   └── widgets/      # shared UI widgets
 │   └── test/
 ├── server/               # Go backend
-│   ├── api/              # HTTP router
+│   ├── api/              # proto contracts + generated code (auth/user/character/task/shop/achievement/stats)
 │   ├── cmd/              # entrypoint + Wire
-│   ├── config/           # env config
-│   └── internal/         # handler / service / repository / model
+│   ├── configs/          # config reference
+│   └── internal/         # conf / data / biz / service / server / middleware / model
 ├── proto/                # shared API contracts (planned)
 ├── docs/                 # PRD, design docs, architecture
 ├── docker-compose.yml    # PostgreSQL for local development

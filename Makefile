@@ -15,9 +15,9 @@ test:
 	cd server && go test ./...
 	cd app && flutter test
 
-## Generate shared proto contracts (when proto files are added)
+## Generate server proto contracts (Go) — requires buf + protoc-gen-go(+http/grpc) on PATH
 proto:
-	@echo "No proto files yet. This target will generate Dart/Go code in the future."
+	cd server && buf generate --path api/auth/v1 --path api/user/v1 --path api/character/v1 --path api/task/v1 --path api/shop/v1 --path api/achievement/v1 --path api/stats/v1
 
 ## Clean local build artifacts
 clean:

@@ -1,0 +1,20 @@
+# HabitForge server configuration (documentation only).
+#
+# The server reads its configuration from environment variables — see
+# internal/conf. This file documents the equivalent settings.
+
+server:
+  http_addr: ":8080"   # SERVER_HTTP_ADDR
+  grpc_addr: ":9000"   # SERVER_GRPC_ADDR
+
+data:
+  database:
+    dsn: "host=localhost user=habitforge password=habitforge dbname=habitforge port=5432 sslmode=disable" # DATABASE_DSN
+  redis:
+    addr: "localhost:6379"  # REDIS_ADDR
+    password: ""            # REDIS_PASSWORD
+    db: 0
+
+jwt:
+  secret: "change-me-in-production" # JWT_SECRET
+  expire_time: 72h

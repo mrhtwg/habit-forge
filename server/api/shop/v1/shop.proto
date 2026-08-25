@@ -1,0 +1,90 @@
+syntax = "proto3";
+
+package api.shop.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "github.com/habitforge/backend/api/shop/v1;v1";
+
+// ShopService — Forge shop: items, daily deals, purchases, owned items.
+service ShopService {
+  // ListShopItems lists all purchasable shop items.
+  rpc ListShopItems(ListShopItemsRequest) returns (ListShopItemsReply) {
+    option (google.api.http) = {
+      get: "/api/v1/shop/items"
+    };
+  }
+  // GetDailyDeal returns the current rotating discounted item.
+  rpc GetDailyDeal(GetDailyDealRequest) returns (GetDailyDealReply) {
+    option (google.api.http) = {
+      get: "/api/v1/shop/daily-deal"
+    };
+  }
+  // BuyItem purchases an item with gold or gems.
+  rpc BuyItem(BuyItemRequest) returns (BuyItemReply) {
+    option (google.api.http) = {
+      post: "/api/v1/shop/items/{item_id}/buy"
+      body: "*"
+    };
+  }
+  // ListOwnedItems lists items the current user owns.
+  rpc ListOwnedItems(ListOwnedItemsRequest) returns (ListOwnedItemsReply) {
+    option (google.api.http) = {
+      get: "/api/v1/shop/owned"
+    };
+  }
+}
+
+// ShopCurrency — purchase currency.
+enum ShopCurrency {
+  SHOP_CURRENCY_UNSPECIFIED = 0;
+  SHOP_CURRENCY_GOLD = 1;
+  SHOP_CURRENCY_GEMS = 2;
+}
+
+message ShopItem {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  int64 price = 4;
+  string category = 5; // e.g. "weapon" | "helmet" | "armor" | "accessory"
+  string rarity = 6; // e.g. "common" | "rare" | "epic" | "legendary"
+  string glb_asset_path = 7;
+  bool is_owned = 8;
+}
+
+message DailyDeal {
+  string item_id = 1;
+  int32 discount_percent = 2;
+  int64 expires_at = 3; // unix millis
+}
+
+message ListShopItemsRequest {
+  string category = 1; // optional filter
+}
+
+message ListShopItemsReply {
+  repeated ShopItem items = 1;
+}
+
+message GetDailyDealRequest {}
+
+message GetDailyDealReply {
+  DailyDeal deal = 1;
+}
+
+message BuyItemRequest {
+  string item_id = 1;
+  ShopCurrency currency = 2;
+}
+
+message BuyItemReply {
+  ShopItem item = 1;
+  int64 balance = 2; // remaining balance of the spent currency
+}
+
+message ListOwnedItemsRequest {}
+
+message ListOwnedItemsReply {
+  repeated string item_ids = 1;
+}

@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package api.achievement.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "github.com/habitforge/backend/api/achievement/v1;v1";
+
+// AchievementService — achievement definitions, progress and unlock claiming.
+service AchievementService {
+  // ListAchievements lists all achievements with unlock state.
+  rpc ListAchievements(ListAchievementsRequest) returns (ListAchievementsReply) {
+    option (google.api.http) = {
+      get: "/api/v1/achievements"
+    };
+  }
+  // Unlock claims an achievement and grants its gem reward.
+  rpc Unlock(UnlockRequest) returns (UnlockReply) {
+    option (google.api.http) = {
+      post: "/api/v1/achievements/{id}/unlock"
+      body: "*"
+    };
+  }
+}
+
+message Achievement {
+  string id = 1;
+  string title = 2;
+  string description = 3;
+  string condition_type = 4; // e.g. "tasks_completed" | "streak" | "level"
+  int32 threshold = 5;
+  int32 progress = 6;
+  bool is_unlocked = 7;
+  int64 unlocked_at = 8; // unix millis
+  int32 gem_reward = 9;
+}
+
+message ListAchievementsRequest {}
+
+message ListAchievementsReply {
+  repeated Achievement achievements = 1;
+}
+
+message UnlockRequest {
+  string id = 1;
+}
+
+message UnlockReply {
+  Achievement achievement = 1;
+  int32 gem_reward = 2;
+}

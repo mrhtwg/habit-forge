@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package api.user.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "github.com/habitforge/backend/api/user/v1;v1";
+
+// UserService — user preferences, wallet and settings.
+service UserService {
+  // GetPrefs returns the current user's preferences and wallet.
+  rpc GetPrefs(GetPrefsRequest) returns (GetPrefsReply) {
+    option (google.api.http) = {
+      get: "/api/v1/user/prefs"
+    };
+  }
+  // UpdatePrefs saves the current user's preferences and wallet.
+  rpc UpdatePrefs(UpdatePrefsRequest) returns (UpdatePrefsReply) {
+    option (google.api.http) = {
+      put: "/api/v1/user/prefs"
+      body: "*"
+    };
+  }
+}
+
+message UserPrefs {
+  bool onboarding_completed = 1;
+  int32 last_onboarding_step = 2;
+  int64 current_gold = 3;
+  int64 current_gems = 4;
+  bool sound_enabled = 5;
+  bool haptic_enabled = 6;
+  bool notifications_enabled = 7;
+  int64 total_tasks_completed = 8;
+  int64 first_task_date = 9; // unix millis
+}
+
+message GetPrefsRequest {}
+
+message GetPrefsReply {
+  UserPrefs prefs = 1;
+}
+
+message UpdatePrefsRequest {
+  UserPrefs prefs = 1;
+}
+
+message UpdatePrefsReply {
+  UserPrefs prefs = 1;
+}

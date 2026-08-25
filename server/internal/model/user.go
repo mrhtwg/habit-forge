@@ -19,33 +19,3 @@ type AuthProvider struct {
 	ProviderID string    `json:"provider_id" gorm:"index"`
 	CreatedAt  time.Time `json:"created_at"`
 }
-
-// ── Request/Response DTOs ──
-
-type RegisterRequest struct {
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required,min=8"`
-	Nickname string `json:"nickname"`
-}
-
-type LoginRequest struct {
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required"`
-}
-
-type OAuthLoginRequest struct {
-	Provider   string `json:"provider" binding:"required"` // "google" | "apple"
-	ProviderID string `json:"provider_id" binding:"required"`
-	Email      string `json:"email"`
-	Nickname   string `json:"nickname"`
-}
-
-type AuthResponse struct {
-	Token string `json:"token"`
-	User  User   `json:"user"`
-}
-
-type ErrorResponse struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
-}

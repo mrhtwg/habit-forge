@@ -1,47 +1,39 @@
 package main
 
 import (
-	"fmt"
-	"log"
 	"os"
 
-	"github.com/habitforge/backend/config"
-	"github.com/habitforge/backend/internal/model"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
+	"github.com/go-kratos/kratos/v2"
+	"github.com/go-kratos/kratos/v2/log"
+	"github.com/go-kratos/kratos/v2/transport/grpc"
+	"github.com/go-kratos/kratos/v2/transport/http"
+
+	"github.com/habitforge/backend/internal/conf"
 )
 
 func main() {
-	cfg := config.Load()
+	cfg := conf.Load()
 
-	// Database
-	db, err := gorm.Open(postgres.Open(cfg.Database.DSN), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info),
-	})
+	logger := log.NewStdLogger(os.Stdout)
+	helper := log.NewHelper(logger)
+
+	app, cleanup, err := wireApp(cfg, logger)
 	if err != nil {
-		log.Fatalf("failed to connect database: %v", err)
+		helper.Fatal(err)
 	}
+	defer cleanup()
 
-	// Auto migrate all models
-	if err := db.AutoMigrate(
-		&model.User{},
-		&model.AuthProvider{},
-		&model.Character{},
-		&model.Task{},
-		&model.OwnedItem{},
-		&model.Achievement{},
-	); err != nil {
-		log.Fatalf("failed to migrate: %v", err)
+	if err := app.Run(); err != nil {
+		helper.Fatal(err)
 	}
+}
 
-	// Wire DI
-	router := InitializeApp(db, cfg)
-
-	addr := fmt.Sprintf(":%s", cfg.Server.Port)
-	log.Printf("server starting on %s", addr)
-	if err := router.Engine.Run(addr); err != nil {
-		log.Fatalf("server failed: %v", err)
-		os.Exit(1)
-	}
+// newApp assembles the kratos application with all transports.
+func newApp(logger log.Logger, hs *http.Server, gs *grpc.Server) *kratos.App {
+	return kratos.New(
+		kratos.Name("habitforge"),
+		kratos.Version("v0.1.0"),
+		kratos.Logger(logger),
+		kratos.Server(hs, gs),
+	)
 }
