@@ -323,7 +323,7 @@ class TaskTile extends StatelessWidget {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Image.asset(Assets.imagesSharedGold, width: 11, height: 11),
+            Image.asset(Assets.imagesSharedIcGold, width: 11, height: 11),
             const SizedBox(width: 3),
             Text(
               '+$gold',
@@ -493,7 +493,7 @@ class _TaskDetailSheet extends StatelessWidget {
                 _rewardItem(
                   '+${_calcGold(task)}',
                   AppColors.textSecondary,
-                  Image.asset(Assets.imagesSharedGold, width: 16, height: 16),
+                  Image.asset(Assets.imagesSharedIcGold, width: 16, height: 16),
                 ),
                 if (task.hpPenalty > 0)
                   _rewardItem(

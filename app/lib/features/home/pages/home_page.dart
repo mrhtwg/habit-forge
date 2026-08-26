@@ -9,6 +9,7 @@ import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/home/controllers/home_controller.dart';
 import 'package:habit_forge_app/features/quests/pages/task_form_sheet.dart';
+import 'package:habit_forge_app/generated/assets.dart';
 import 'package:habit_forge_app/widgets/task_ticket.dart';
 
 class HomePage extends GetView<HomeController> {
@@ -301,14 +302,10 @@ class HomePage extends GetView<HomeController> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
+            Image.asset(
+              gold ? Assets.imagesSharedIcGold : Assets.imagesSharedIcExp,
               width: 16.w,
               height: 16.w,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: gold ? AppColors.gold : const Color(0xFF7ED0FF),
-                border: Border.all(color: AppColors.border, width: 1.5),
-              ),
             ),
             SizedBox(width: 5.w),
             Text('$value', style: textStyleBold(fontSize: 14.sp, color: AppColors.textPrimary)),
