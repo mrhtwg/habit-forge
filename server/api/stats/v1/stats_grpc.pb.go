@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.2
 // - protoc             (unknown)
-// source: stats/v1/stats.proto
+// source: api/stats/v1/stats.proto
 
 package v1
 
@@ -123,5 +123,5 @@ var StatsService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "stats/v1/stats.proto",
+	Metadata: "api/stats/v1/stats.proto",
 }

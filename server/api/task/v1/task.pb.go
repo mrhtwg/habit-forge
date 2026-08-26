@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.12
 // 	protoc        (unknown)
-// source: task/v1/task.proto
+// source: api/task/v1/task.proto
 
 package v1
 
@@ -59,11 +59,11 @@ func (x TaskType) String() string {
 }
 
 func (TaskType) Descriptor() protoreflect.EnumDescriptor {
-	return file_task_v1_task_proto_enumTypes[0].Descriptor()
+	return file_api_task_v1_task_proto_enumTypes[0].Descriptor()
 }
 
 func (TaskType) Type() protoreflect.EnumType {
-	return &file_task_v1_task_proto_enumTypes[0]
+	return &file_api_task_v1_task_proto_enumTypes[0]
 }
 
 func (x TaskType) Number() protoreflect.EnumNumber {
@@ -72,7 +72,7 @@ func (x TaskType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use TaskType.Descriptor instead.
 func (TaskType) EnumDescriptor() ([]byte, []int) {
-	return file_task_v1_task_proto_rawDescGZIP(), []int{0}
+	return file_api_task_v1_task_proto_rawDescGZIP(), []int{0}
 }
 
 // TaskDifficulty — drives base EXP/gold rewards.
@@ -112,11 +112,11 @@ func (x TaskDifficulty) String() string {
 }
 
 func (TaskDifficulty) Descriptor() protoreflect.EnumDescriptor {
-	return file_task_v1_task_proto_enumTypes[1].Descriptor()
+	return file_api_task_v1_task_proto_enumTypes[1].Descriptor()
 }
 
 func (TaskDifficulty) Type() protoreflect.EnumType {
-	return &file_task_v1_task_proto_enumTypes[1]
+	return &file_api_task_v1_task_proto_enumTypes[1]
 }
 
 func (x TaskDifficulty) Number() protoreflect.EnumNumber {
@@ -125,7 +125,7 @@ func (x TaskDifficulty) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use TaskDifficulty.Descriptor instead.
 func (TaskDifficulty) EnumDescriptor() ([]byte, []int) {
-	return file_task_v1_task_proto_rawDescGZIP(), []int{1}
+	return file_api_task_v1_task_proto_rawDescGZIP(), []int{1}
 }
 
 type Task struct {
@@ -155,7 +155,7 @@ type Task struct {
 
 func (x *Task) Reset() {
 	*x = Task{}
-	mi := &file_task_v1_task_proto_msgTypes[0]
+	mi := &file_api_task_v1_task_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -167,7 +167,7 @@ func (x *Task) String() string {
 func (*Task) ProtoMessage() {}
 
 func (x *Task) ProtoReflect() protoreflect.Message {
-	mi := &file_task_v1_task_proto_msgTypes[0]
+	mi := &file_api_task_v1_task_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -180,7 +180,7 @@ func (x *Task) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Task.ProtoReflect.Descriptor instead.
 func (*Task) Descriptor() ([]byte, []int) {
-	return file_task_v1_task_proto_rawDescGZIP(), []int{0}
+	return file_api_task_v1_task_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *Task) GetId() string {
@@ -329,7 +329,7 @@ type ListTasksRequest struct {
 
 func (x *ListTasksRequest) Reset() {
 	*x = ListTasksRequest{}
-	mi := &file_task_v1_task_proto_msgTypes[1]
+	mi := &file_api_task_v1_task_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -341,7 +341,7 @@ func (x *ListTasksRequest) String() string {
 func (*ListTasksRequest) ProtoMessage() {}
 
 func (x *ListTasksRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_task_v1_task_proto_msgTypes[1]
+	mi := &file_api_task_v1_task_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -354,7 +354,7 @@ func (x *ListTasksRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListTasksRequest.ProtoReflect.Descriptor instead.
 func (*ListTasksRequest) Descriptor() ([]byte, []int) {
-	return file_task_v1_task_proto_rawDescGZIP(), []int{1}
+	return file_api_task_v1_task_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *ListTasksRequest) GetType() TaskType {
@@ -401,7 +401,7 @@ type ListTasksReply struct {
 
 func (x *ListTasksReply) Reset() {
 	*x = ListTasksReply{}
-	mi := &file_task_v1_task_proto_msgTypes[2]
+	mi := &file_api_task_v1_task_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -413,7 +413,7 @@ func (x *ListTasksReply) String() string {
 func (*ListTasksReply) ProtoMessage() {}
 
 func (x *ListTasksReply) ProtoReflect() protoreflect.Message {
-	mi := &file_task_v1_task_proto_msgTypes[2]
+	mi := &file_api_task_v1_task_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -426,7 +426,7 @@ func (x *ListTasksReply) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListTasksReply.ProtoReflect.Descriptor instead.
 func (*ListTasksReply) Descriptor() ([]byte, []int) {
-	return file_task_v1_task_proto_rawDescGZIP(), []int{2}
+	return file_api_task_v1_task_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *ListTasksReply) GetTasks() []*Task {
@@ -445,7 +445,7 @@ type GetTaskRequest struct {
 
 func (x *GetTaskRequest) Reset() {
 	*x = GetTaskRequest{}
-	mi := &file_task_v1_task_proto_msgTypes[3]
+	mi := &file_api_task_v1_task_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -457,7 +457,7 @@ func (x *GetTaskRequest) String() string {
 func (*GetTaskRequest) ProtoMessage() {}
 
 func (x *GetTaskRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_task_v1_task_proto_msgTypes[3]
+	mi := &file_api_task_v1_task_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -470,7 +470,7 @@ func (x *GetTaskRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTaskRequest.ProtoReflect.Descriptor instead.
 func (*GetTaskRequest) Descriptor() ([]byte, []int) {
-	return file_task_v1_task_proto_rawDescGZIP(), []int{3}
+	return file_api_task_v1_task_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *GetTaskRequest) GetId() string {
@@ -489,7 +489,7 @@ type GetTaskReply struct {
 
 func (x *GetTaskReply) Reset() {
 	*x = GetTaskReply{}
-	mi := &file_task_v1_task_proto_msgTypes[4]
+	mi := &file_api_task_v1_task_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -501,7 +501,7 @@ func (x *GetTaskReply) String() string {
 func (*GetTaskReply) ProtoMessage() {}
 
 func (x *GetTaskReply) ProtoReflect() protoreflect.Message {
-	mi := &file_task_v1_task_proto_msgTypes[4]
+	mi := &file_api_task_v1_task_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -514,7 +514,7 @@ func (x *GetTaskReply) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTaskReply.ProtoReflect.Descriptor instead.
 func (*GetTaskReply) Descriptor() ([]byte, []int) {
-	return file_task_v1_task_proto_rawDescGZIP(), []int{4}
+	return file_api_task_v1_task_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *GetTaskReply) GetTask() *Task {
@@ -533,7 +533,7 @@ type CreateTaskRequest struct {
 
 func (x *CreateTaskRequest) Reset() {
 	*x = CreateTaskRequest{}
-	mi := &file_task_v1_task_proto_msgTypes[5]
+	mi := &file_api_task_v1_task_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -545,7 +545,7 @@ func (x *CreateTaskRequest) String() string {
 func (*CreateTaskRequest) ProtoMessage() {}
 
 func (x *CreateTaskRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_task_v1_task_proto_msgTypes[5]
+	mi := &file_api_task_v1_task_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -558,7 +558,7 @@ func (x *CreateTaskRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateTaskRequest.ProtoReflect.Descriptor instead.
 func (*CreateTaskRequest) Descriptor() ([]byte, []int) {
-	return file_task_v1_task_proto_rawDescGZIP(), []int{5}
+	return file_api_task_v1_task_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *CreateTaskRequest) GetTask() *Task {
@@ -577,7 +577,7 @@ type CreateTaskReply struct {
 
 func (x *CreateTaskReply) Reset() {
 	*x = CreateTaskReply{}
-	mi := &file_task_v1_task_proto_msgTypes[6]
+	mi := &file_api_task_v1_task_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -589,7 +589,7 @@ func (x *CreateTaskReply) String() string {
 func (*CreateTaskReply) ProtoMessage() {}
 
 func (x *CreateTaskReply) ProtoReflect() protoreflect.Message {
-	mi := &file_task_v1_task_proto_msgTypes[6]
+	mi := &file_api_task_v1_task_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -602,7 +602,7 @@ func (x *CreateTaskReply) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateTaskReply.ProtoReflect.Descriptor instead.
 func (*CreateTaskReply) Descriptor() ([]byte, []int) {
-	return file_task_v1_task_proto_rawDescGZIP(), []int{6}
+	return file_api_task_v1_task_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *CreateTaskReply) GetTask() *Task {
@@ -622,7 +622,7 @@ type UpdateTaskRequest struct {
 
 func (x *UpdateTaskRequest) Reset() {
 	*x = UpdateTaskRequest{}
-	mi := &file_task_v1_task_proto_msgTypes[7]
+	mi := &file_api_task_v1_task_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -634,7 +634,7 @@ func (x *UpdateTaskRequest) String() string {
 func (*UpdateTaskRequest) ProtoMessage() {}
 
 func (x *UpdateTaskRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_task_v1_task_proto_msgTypes[7]
+	mi := &file_api_task_v1_task_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -647,7 +647,7 @@ func (x *UpdateTaskRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateTaskRequest.ProtoReflect.Descriptor instead.
 func (*UpdateTaskRequest) Descriptor() ([]byte, []int) {
-	return file_task_v1_task_proto_rawDescGZIP(), []int{7}
+	return file_api_task_v1_task_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *UpdateTaskRequest) GetId() string {
@@ -673,7 +673,7 @@ type UpdateTaskReply struct {
 
 func (x *UpdateTaskReply) Reset() {
 	*x = UpdateTaskReply{}
-	mi := &file_task_v1_task_proto_msgTypes[8]
+	mi := &file_api_task_v1_task_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -685,7 +685,7 @@ func (x *UpdateTaskReply) String() string {
 func (*UpdateTaskReply) ProtoMessage() {}
 
 func (x *UpdateTaskReply) ProtoReflect() protoreflect.Message {
-	mi := &file_task_v1_task_proto_msgTypes[8]
+	mi := &file_api_task_v1_task_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -698,7 +698,7 @@ func (x *UpdateTaskReply) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateTaskReply.ProtoReflect.Descriptor instead.
 func (*UpdateTaskReply) Descriptor() ([]byte, []int) {
-	return file_task_v1_task_proto_rawDescGZIP(), []int{8}
+	return file_api_task_v1_task_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *UpdateTaskReply) GetTask() *Task {
@@ -717,7 +717,7 @@ type DeleteTaskRequest struct {
 
 func (x *DeleteTaskRequest) Reset() {
 	*x = DeleteTaskRequest{}
-	mi := &file_task_v1_task_proto_msgTypes[9]
+	mi := &file_api_task_v1_task_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -729,7 +729,7 @@ func (x *DeleteTaskRequest) String() string {
 func (*DeleteTaskRequest) ProtoMessage() {}
 
 func (x *DeleteTaskRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_task_v1_task_proto_msgTypes[9]
+	mi := &file_api_task_v1_task_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -742,7 +742,7 @@ func (x *DeleteTaskRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteTaskRequest.ProtoReflect.Descriptor instead.
 func (*DeleteTaskRequest) Descriptor() ([]byte, []int) {
-	return file_task_v1_task_proto_rawDescGZIP(), []int{9}
+	return file_api_task_v1_task_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *DeleteTaskRequest) GetId() string {
@@ -760,7 +760,7 @@ type DeleteTaskReply struct {
 
 func (x *DeleteTaskReply) Reset() {
 	*x = DeleteTaskReply{}
-	mi := &file_task_v1_task_proto_msgTypes[10]
+	mi := &file_api_task_v1_task_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -772,7 +772,7 @@ func (x *DeleteTaskReply) String() string {
 func (*DeleteTaskReply) ProtoMessage() {}
 
 func (x *DeleteTaskReply) ProtoReflect() protoreflect.Message {
-	mi := &file_task_v1_task_proto_msgTypes[10]
+	mi := &file_api_task_v1_task_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -785,7 +785,7 @@ func (x *DeleteTaskReply) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteTaskReply.ProtoReflect.Descriptor instead.
 func (*DeleteTaskReply) Descriptor() ([]byte, []int) {
-	return file_task_v1_task_proto_rawDescGZIP(), []int{10}
+	return file_api_task_v1_task_proto_rawDescGZIP(), []int{10}
 }
 
 type CompleteTaskRequest struct {
@@ -797,7 +797,7 @@ type CompleteTaskRequest struct {
 
 func (x *CompleteTaskRequest) Reset() {
 	*x = CompleteTaskRequest{}
-	mi := &file_task_v1_task_proto_msgTypes[11]
+	mi := &file_api_task_v1_task_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -809,7 +809,7 @@ func (x *CompleteTaskRequest) String() string {
 func (*CompleteTaskRequest) ProtoMessage() {}
 
 func (x *CompleteTaskRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_task_v1_task_proto_msgTypes[11]
+	mi := &file_api_task_v1_task_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -822,7 +822,7 @@ func (x *CompleteTaskRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CompleteTaskRequest.ProtoReflect.Descriptor instead.
 func (*CompleteTaskRequest) Descriptor() ([]byte, []int) {
-	return file_task_v1_task_proto_rawDescGZIP(), []int{11}
+	return file_api_task_v1_task_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *CompleteTaskRequest) GetId() string {
@@ -844,7 +844,7 @@ type CompleteTaskReply struct {
 
 func (x *CompleteTaskReply) Reset() {
 	*x = CompleteTaskReply{}
-	mi := &file_task_v1_task_proto_msgTypes[12]
+	mi := &file_api_task_v1_task_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -856,7 +856,7 @@ func (x *CompleteTaskReply) String() string {
 func (*CompleteTaskReply) ProtoMessage() {}
 
 func (x *CompleteTaskReply) ProtoReflect() protoreflect.Message {
-	mi := &file_task_v1_task_proto_msgTypes[12]
+	mi := &file_api_task_v1_task_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -869,7 +869,7 @@ func (x *CompleteTaskReply) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CompleteTaskReply.ProtoReflect.Descriptor instead.
 func (*CompleteTaskReply) Descriptor() ([]byte, []int) {
-	return file_task_v1_task_proto_rawDescGZIP(), []int{12}
+	return file_api_task_v1_task_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *CompleteTaskReply) GetTask() *Task {
@@ -900,11 +900,11 @@ func (x *CompleteTaskReply) GetHpChange() int32 {
 	return 0
 }
 
-var File_task_v1_task_proto protoreflect.FileDescriptor
+var File_api_task_v1_task_proto protoreflect.FileDescriptor
 
-const file_task_v1_task_proto_rawDesc = "" +
+const file_api_task_v1_task_proto_rawDesc = "" +
 	"\n" +
-	"\x12task/v1/task.proto\x12\vapi.task.v1\x1a\x1cgoogle/api/annotations.proto\"\x80\x05\n" +
+	"\x16api/task/v1/task.proto\x12\vapi.task.v1\x1a\x1cgoogle/api/annotations.proto\"\x80\x05\n" +
 	"\x04Task\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12 \n" +
@@ -990,20 +990,20 @@ const file_task_v1_task_proto_rawDesc = "" +
 	"\fCompleteTask\x12 .api.task.v1.CompleteTaskRequest\x1a\x1e.api.task.v1.CompleteTaskReply\"&\x82\xd3\xe4\x93\x02 :\x01*\"\x1b/api/v1/tasks/{id}/completeB.Z,github.com/habitforge/backend/api/task/v1;v1b\x06proto3"
 
 var (
-	file_task_v1_task_proto_rawDescOnce sync.Once
-	file_task_v1_task_proto_rawDescData []byte
+	file_api_task_v1_task_proto_rawDescOnce sync.Once
+	file_api_task_v1_task_proto_rawDescData []byte
 )
 
-func file_task_v1_task_proto_rawDescGZIP() []byte {
-	file_task_v1_task_proto_rawDescOnce.Do(func() {
-		file_task_v1_task_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_task_v1_task_proto_rawDesc), len(file_task_v1_task_proto_rawDesc)))
+func file_api_task_v1_task_proto_rawDescGZIP() []byte {
+	file_api_task_v1_task_proto_rawDescOnce.Do(func() {
+		file_api_task_v1_task_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_api_task_v1_task_proto_rawDesc), len(file_api_task_v1_task_proto_rawDesc)))
 	})
-	return file_task_v1_task_proto_rawDescData
+	return file_api_task_v1_task_proto_rawDescData
 }
 
-var file_task_v1_task_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_task_v1_task_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
-var file_task_v1_task_proto_goTypes = []any{
+var file_api_task_v1_task_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_api_task_v1_task_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
+var file_api_task_v1_task_proto_goTypes = []any{
 	(TaskType)(0),               // 0: api.task.v1.TaskType
 	(TaskDifficulty)(0),         // 1: api.task.v1.TaskDifficulty
 	(*Task)(nil),                // 2: api.task.v1.Task
@@ -1020,7 +1020,7 @@ var file_task_v1_task_proto_goTypes = []any{
 	(*CompleteTaskRequest)(nil), // 13: api.task.v1.CompleteTaskRequest
 	(*CompleteTaskReply)(nil),   // 14: api.task.v1.CompleteTaskReply
 }
-var file_task_v1_task_proto_depIdxs = []int32{
+var file_api_task_v1_task_proto_depIdxs = []int32{
 	0,  // 0: api.task.v1.Task.type:type_name -> api.task.v1.TaskType
 	1,  // 1: api.task.v1.Task.difficulty:type_name -> api.task.v1.TaskDifficulty
 	0,  // 2: api.task.v1.ListTasksRequest.type:type_name -> api.task.v1.TaskType
@@ -1051,27 +1051,27 @@ var file_task_v1_task_proto_depIdxs = []int32{
 	0,  // [0:11] is the sub-list for field type_name
 }
 
-func init() { file_task_v1_task_proto_init() }
-func file_task_v1_task_proto_init() {
-	if File_task_v1_task_proto != nil {
+func init() { file_api_task_v1_task_proto_init() }
+func file_api_task_v1_task_proto_init() {
+	if File_api_task_v1_task_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_task_v1_task_proto_rawDesc), len(file_task_v1_task_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_task_v1_task_proto_rawDesc), len(file_api_task_v1_task_proto_rawDesc)),
 			NumEnums:      2,
 			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_task_v1_task_proto_goTypes,
-		DependencyIndexes: file_task_v1_task_proto_depIdxs,
-		EnumInfos:         file_task_v1_task_proto_enumTypes,
-		MessageInfos:      file_task_v1_task_proto_msgTypes,
+		GoTypes:           file_api_task_v1_task_proto_goTypes,
+		DependencyIndexes: file_api_task_v1_task_proto_depIdxs,
+		EnumInfos:         file_api_task_v1_task_proto_enumTypes,
+		MessageInfos:      file_api_task_v1_task_proto_msgTypes,
 	}.Build()
-	File_task_v1_task_proto = out.File
-	file_task_v1_task_proto_goTypes = nil
-	file_task_v1_task_proto_depIdxs = nil
+	File_api_task_v1_task_proto = out.File
+	file_api_task_v1_task_proto_goTypes = nil
+	file_api_task_v1_task_proto_depIdxs = nil
 }

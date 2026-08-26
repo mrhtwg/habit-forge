@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.12
 // 	protoc        (unknown)
-// source: user/v1/user.proto
+// source: api/user/v1/user.proto
 
 package v1
 
@@ -39,7 +39,7 @@ type UserPrefs struct {
 
 func (x *UserPrefs) Reset() {
 	*x = UserPrefs{}
-	mi := &file_user_v1_user_proto_msgTypes[0]
+	mi := &file_api_user_v1_user_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -51,7 +51,7 @@ func (x *UserPrefs) String() string {
 func (*UserPrefs) ProtoMessage() {}
 
 func (x *UserPrefs) ProtoReflect() protoreflect.Message {
-	mi := &file_user_v1_user_proto_msgTypes[0]
+	mi := &file_api_user_v1_user_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -64,7 +64,7 @@ func (x *UserPrefs) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserPrefs.ProtoReflect.Descriptor instead.
 func (*UserPrefs) Descriptor() ([]byte, []int) {
-	return file_user_v1_user_proto_rawDescGZIP(), []int{0}
+	return file_api_user_v1_user_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *UserPrefs) GetOnboardingCompleted() bool {
@@ -138,7 +138,7 @@ type GetPrefsRequest struct {
 
 func (x *GetPrefsRequest) Reset() {
 	*x = GetPrefsRequest{}
-	mi := &file_user_v1_user_proto_msgTypes[1]
+	mi := &file_api_user_v1_user_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -150,7 +150,7 @@ func (x *GetPrefsRequest) String() string {
 func (*GetPrefsRequest) ProtoMessage() {}
 
 func (x *GetPrefsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_v1_user_proto_msgTypes[1]
+	mi := &file_api_user_v1_user_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -163,7 +163,7 @@ func (x *GetPrefsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetPrefsRequest.ProtoReflect.Descriptor instead.
 func (*GetPrefsRequest) Descriptor() ([]byte, []int) {
-	return file_user_v1_user_proto_rawDescGZIP(), []int{1}
+	return file_api_user_v1_user_proto_rawDescGZIP(), []int{1}
 }
 
 type GetPrefsReply struct {
@@ -175,7 +175,7 @@ type GetPrefsReply struct {
 
 func (x *GetPrefsReply) Reset() {
 	*x = GetPrefsReply{}
-	mi := &file_user_v1_user_proto_msgTypes[2]
+	mi := &file_api_user_v1_user_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -187,7 +187,7 @@ func (x *GetPrefsReply) String() string {
 func (*GetPrefsReply) ProtoMessage() {}
 
 func (x *GetPrefsReply) ProtoReflect() protoreflect.Message {
-	mi := &file_user_v1_user_proto_msgTypes[2]
+	mi := &file_api_user_v1_user_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -200,7 +200,7 @@ func (x *GetPrefsReply) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetPrefsReply.ProtoReflect.Descriptor instead.
 func (*GetPrefsReply) Descriptor() ([]byte, []int) {
-	return file_user_v1_user_proto_rawDescGZIP(), []int{2}
+	return file_api_user_v1_user_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *GetPrefsReply) GetPrefs() *UserPrefs {
@@ -219,7 +219,7 @@ type UpdatePrefsRequest struct {
 
 func (x *UpdatePrefsRequest) Reset() {
 	*x = UpdatePrefsRequest{}
-	mi := &file_user_v1_user_proto_msgTypes[3]
+	mi := &file_api_user_v1_user_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -231,7 +231,7 @@ func (x *UpdatePrefsRequest) String() string {
 func (*UpdatePrefsRequest) ProtoMessage() {}
 
 func (x *UpdatePrefsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_v1_user_proto_msgTypes[3]
+	mi := &file_api_user_v1_user_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -244,7 +244,7 @@ func (x *UpdatePrefsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdatePrefsRequest.ProtoReflect.Descriptor instead.
 func (*UpdatePrefsRequest) Descriptor() ([]byte, []int) {
-	return file_user_v1_user_proto_rawDescGZIP(), []int{3}
+	return file_api_user_v1_user_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *UpdatePrefsRequest) GetPrefs() *UserPrefs {
@@ -263,7 +263,7 @@ type UpdatePrefsReply struct {
 
 func (x *UpdatePrefsReply) Reset() {
 	*x = UpdatePrefsReply{}
-	mi := &file_user_v1_user_proto_msgTypes[4]
+	mi := &file_api_user_v1_user_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -275,7 +275,7 @@ func (x *UpdatePrefsReply) String() string {
 func (*UpdatePrefsReply) ProtoMessage() {}
 
 func (x *UpdatePrefsReply) ProtoReflect() protoreflect.Message {
-	mi := &file_user_v1_user_proto_msgTypes[4]
+	mi := &file_api_user_v1_user_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -288,7 +288,7 @@ func (x *UpdatePrefsReply) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdatePrefsReply.ProtoReflect.Descriptor instead.
 func (*UpdatePrefsReply) Descriptor() ([]byte, []int) {
-	return file_user_v1_user_proto_rawDescGZIP(), []int{4}
+	return file_api_user_v1_user_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *UpdatePrefsReply) GetPrefs() *UserPrefs {
@@ -298,11 +298,11 @@ func (x *UpdatePrefsReply) GetPrefs() *UserPrefs {
 	return nil
 }
 
-var File_user_v1_user_proto protoreflect.FileDescriptor
+var File_api_user_v1_user_proto protoreflect.FileDescriptor
 
-const file_user_v1_user_proto_rawDesc = "" +
+const file_api_user_v1_user_proto_rawDesc = "" +
 	"\n" +
-	"\x12user/v1/user.proto\x12\vapi.user.v1\x1a\x1cgoogle/api/annotations.proto\"\x93\x03\n" +
+	"\x16api/user/v1/user.proto\x12\vapi.user.v1\x1a\x1cgoogle/api/annotations.proto\"\x93\x03\n" +
 	"\tUserPrefs\x121\n" +
 	"\x14onboarding_completed\x18\x01 \x01(\bR\x13onboardingCompleted\x120\n" +
 	"\x14last_onboarding_step\x18\x02 \x01(\x05R\x12lastOnboardingStep\x12!\n" +
@@ -325,26 +325,26 @@ const file_user_v1_user_proto_rawDesc = "" +
 	"\vUpdatePrefs\x12\x1f.api.user.v1.UpdatePrefsRequest\x1a\x1d.api.user.v1.UpdatePrefsReply\"\x1d\x82\xd3\xe4\x93\x02\x17:\x01*\x1a\x12/api/v1/user/prefsB.Z,github.com/habitforge/backend/api/user/v1;v1b\x06proto3"
 
 var (
-	file_user_v1_user_proto_rawDescOnce sync.Once
-	file_user_v1_user_proto_rawDescData []byte
+	file_api_user_v1_user_proto_rawDescOnce sync.Once
+	file_api_user_v1_user_proto_rawDescData []byte
 )
 
-func file_user_v1_user_proto_rawDescGZIP() []byte {
-	file_user_v1_user_proto_rawDescOnce.Do(func() {
-		file_user_v1_user_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_user_v1_user_proto_rawDesc), len(file_user_v1_user_proto_rawDesc)))
+func file_api_user_v1_user_proto_rawDescGZIP() []byte {
+	file_api_user_v1_user_proto_rawDescOnce.Do(func() {
+		file_api_user_v1_user_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_api_user_v1_user_proto_rawDesc), len(file_api_user_v1_user_proto_rawDesc)))
 	})
-	return file_user_v1_user_proto_rawDescData
+	return file_api_user_v1_user_proto_rawDescData
 }
 
-var file_user_v1_user_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
-var file_user_v1_user_proto_goTypes = []any{
+var file_api_user_v1_user_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_api_user_v1_user_proto_goTypes = []any{
 	(*UserPrefs)(nil),          // 0: api.user.v1.UserPrefs
 	(*GetPrefsRequest)(nil),    // 1: api.user.v1.GetPrefsRequest
 	(*GetPrefsReply)(nil),      // 2: api.user.v1.GetPrefsReply
 	(*UpdatePrefsRequest)(nil), // 3: api.user.v1.UpdatePrefsRequest
 	(*UpdatePrefsReply)(nil),   // 4: api.user.v1.UpdatePrefsReply
 }
-var file_user_v1_user_proto_depIdxs = []int32{
+var file_api_user_v1_user_proto_depIdxs = []int32{
 	0, // 0: api.user.v1.GetPrefsReply.prefs:type_name -> api.user.v1.UserPrefs
 	0, // 1: api.user.v1.UpdatePrefsRequest.prefs:type_name -> api.user.v1.UserPrefs
 	0, // 2: api.user.v1.UpdatePrefsReply.prefs:type_name -> api.user.v1.UserPrefs
@@ -359,26 +359,26 @@ var file_user_v1_user_proto_depIdxs = []int32{
 	0, // [0:3] is the sub-list for field type_name
 }
 
-func init() { file_user_v1_user_proto_init() }
-func file_user_v1_user_proto_init() {
-	if File_user_v1_user_proto != nil {
+func init() { file_api_user_v1_user_proto_init() }
+func file_api_user_v1_user_proto_init() {
+	if File_api_user_v1_user_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_user_v1_user_proto_rawDesc), len(file_user_v1_user_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_user_v1_user_proto_rawDesc), len(file_api_user_v1_user_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_user_v1_user_proto_goTypes,
-		DependencyIndexes: file_user_v1_user_proto_depIdxs,
-		MessageInfos:      file_user_v1_user_proto_msgTypes,
+		GoTypes:           file_api_user_v1_user_proto_goTypes,
+		DependencyIndexes: file_api_user_v1_user_proto_depIdxs,
+		MessageInfos:      file_api_user_v1_user_proto_msgTypes,
 	}.Build()
-	File_user_v1_user_proto = out.File
-	file_user_v1_user_proto_goTypes = nil
-	file_user_v1_user_proto_depIdxs = nil
+	File_api_user_v1_user_proto = out.File
+	file_api_user_v1_user_proto_goTypes = nil
+	file_api_user_v1_user_proto_depIdxs = nil
 }

@@ -1,6 +1,9 @@
 analyzer:
   errors:
     invalid_annotation_target: ignore
+  exclude:
+    # Generated protobuf code (protoc-gen-dart) — do not lint
+    - lib/generated/protos/**
 
 linter:
   rules:

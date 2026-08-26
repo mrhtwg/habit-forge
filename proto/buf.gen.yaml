@@ -1,14 +1,16 @@
+# Generates Go code into ../server (the Go module). Source of truth: the
+# protos in this directory. See README.md for the full toolchain setup.
 version: v2
 plugins:
   - local: protoc-gen-go
-    out: api
+    out: ../server
     opt:
       - paths=source_relative
   - local: protoc-gen-go-http
-    out: api
+    out: ../server
     opt:
       - paths=source_relative
   - local: protoc-gen-go-grpc
-    out: api
+    out: ../server
     opt:
       - paths=source_relative

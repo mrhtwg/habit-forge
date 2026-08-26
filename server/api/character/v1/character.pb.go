@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.12
 // 	protoc        (unknown)
-// source: character/v1/character.proto
+// source: api/character/v1/character.proto
 
 package v1
 
@@ -68,11 +68,11 @@ func (x StatType) String() string {
 }
 
 func (StatType) Descriptor() protoreflect.EnumDescriptor {
-	return file_character_v1_character_proto_enumTypes[0].Descriptor()
+	return file_api_character_v1_character_proto_enumTypes[0].Descriptor()
 }
 
 func (StatType) Type() protoreflect.EnumType {
-	return &file_character_v1_character_proto_enumTypes[0]
+	return &file_api_character_v1_character_proto_enumTypes[0]
 }
 
 func (x StatType) Number() protoreflect.EnumNumber {
@@ -81,7 +81,7 @@ func (x StatType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use StatType.Descriptor instead.
 func (StatType) EnumDescriptor() ([]byte, []int) {
-	return file_character_v1_character_proto_rawDescGZIP(), []int{0}
+	return file_api_character_v1_character_proto_rawDescGZIP(), []int{0}
 }
 
 type CharacterStats struct {
@@ -98,7 +98,7 @@ type CharacterStats struct {
 
 func (x *CharacterStats) Reset() {
 	*x = CharacterStats{}
-	mi := &file_character_v1_character_proto_msgTypes[0]
+	mi := &file_api_character_v1_character_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -110,7 +110,7 @@ func (x *CharacterStats) String() string {
 func (*CharacterStats) ProtoMessage() {}
 
 func (x *CharacterStats) ProtoReflect() protoreflect.Message {
-	mi := &file_character_v1_character_proto_msgTypes[0]
+	mi := &file_api_character_v1_character_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -123,7 +123,7 @@ func (x *CharacterStats) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CharacterStats.ProtoReflect.Descriptor instead.
 func (*CharacterStats) Descriptor() ([]byte, []int) {
-	return file_character_v1_character_proto_rawDescGZIP(), []int{0}
+	return file_api_character_v1_character_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *CharacterStats) GetStrength() int32 {
@@ -186,7 +186,7 @@ type Character struct {
 
 func (x *Character) Reset() {
 	*x = Character{}
-	mi := &file_character_v1_character_proto_msgTypes[1]
+	mi := &file_api_character_v1_character_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -198,7 +198,7 @@ func (x *Character) String() string {
 func (*Character) ProtoMessage() {}
 
 func (x *Character) ProtoReflect() protoreflect.Message {
-	mi := &file_character_v1_character_proto_msgTypes[1]
+	mi := &file_api_character_v1_character_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -211,7 +211,7 @@ func (x *Character) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Character.ProtoReflect.Descriptor instead.
 func (*Character) Descriptor() ([]byte, []int) {
-	return file_character_v1_character_proto_rawDescGZIP(), []int{1}
+	return file_api_character_v1_character_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *Character) GetId() string {
@@ -292,7 +292,7 @@ type GetCharacterRequest struct {
 
 func (x *GetCharacterRequest) Reset() {
 	*x = GetCharacterRequest{}
-	mi := &file_character_v1_character_proto_msgTypes[2]
+	mi := &file_api_character_v1_character_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -304,7 +304,7 @@ func (x *GetCharacterRequest) String() string {
 func (*GetCharacterRequest) ProtoMessage() {}
 
 func (x *GetCharacterRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_character_v1_character_proto_msgTypes[2]
+	mi := &file_api_character_v1_character_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -317,7 +317,7 @@ func (x *GetCharacterRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCharacterRequest.ProtoReflect.Descriptor instead.
 func (*GetCharacterRequest) Descriptor() ([]byte, []int) {
-	return file_character_v1_character_proto_rawDescGZIP(), []int{2}
+	return file_api_character_v1_character_proto_rawDescGZIP(), []int{2}
 }
 
 type GetCharacterReply struct {
@@ -329,7 +329,7 @@ type GetCharacterReply struct {
 
 func (x *GetCharacterReply) Reset() {
 	*x = GetCharacterReply{}
-	mi := &file_character_v1_character_proto_msgTypes[3]
+	mi := &file_api_character_v1_character_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -341,7 +341,7 @@ func (x *GetCharacterReply) String() string {
 func (*GetCharacterReply) ProtoMessage() {}
 
 func (x *GetCharacterReply) ProtoReflect() protoreflect.Message {
-	mi := &file_character_v1_character_proto_msgTypes[3]
+	mi := &file_api_character_v1_character_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -354,7 +354,7 @@ func (x *GetCharacterReply) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCharacterReply.ProtoReflect.Descriptor instead.
 func (*GetCharacterReply) Descriptor() ([]byte, []int) {
-	return file_character_v1_character_proto_rawDescGZIP(), []int{3}
+	return file_api_character_v1_character_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *GetCharacterReply) GetCharacter() *Character {
@@ -373,7 +373,7 @@ type UpdateCharacterRequest struct {
 
 func (x *UpdateCharacterRequest) Reset() {
 	*x = UpdateCharacterRequest{}
-	mi := &file_character_v1_character_proto_msgTypes[4]
+	mi := &file_api_character_v1_character_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -385,7 +385,7 @@ func (x *UpdateCharacterRequest) String() string {
 func (*UpdateCharacterRequest) ProtoMessage() {}
 
 func (x *UpdateCharacterRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_character_v1_character_proto_msgTypes[4]
+	mi := &file_api_character_v1_character_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -398,7 +398,7 @@ func (x *UpdateCharacterRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateCharacterRequest.ProtoReflect.Descriptor instead.
 func (*UpdateCharacterRequest) Descriptor() ([]byte, []int) {
-	return file_character_v1_character_proto_rawDescGZIP(), []int{4}
+	return file_api_character_v1_character_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *UpdateCharacterRequest) GetCharacter() *Character {
@@ -417,7 +417,7 @@ type UpdateCharacterReply struct {
 
 func (x *UpdateCharacterReply) Reset() {
 	*x = UpdateCharacterReply{}
-	mi := &file_character_v1_character_proto_msgTypes[5]
+	mi := &file_api_character_v1_character_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -429,7 +429,7 @@ func (x *UpdateCharacterReply) String() string {
 func (*UpdateCharacterReply) ProtoMessage() {}
 
 func (x *UpdateCharacterReply) ProtoReflect() protoreflect.Message {
-	mi := &file_character_v1_character_proto_msgTypes[5]
+	mi := &file_api_character_v1_character_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -442,7 +442,7 @@ func (x *UpdateCharacterReply) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateCharacterReply.ProtoReflect.Descriptor instead.
 func (*UpdateCharacterReply) Descriptor() ([]byte, []int) {
-	return file_character_v1_character_proto_rawDescGZIP(), []int{5}
+	return file_api_character_v1_character_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *UpdateCharacterReply) GetCharacter() *Character {
@@ -461,7 +461,7 @@ type AllocateStatPointRequest struct {
 
 func (x *AllocateStatPointRequest) Reset() {
 	*x = AllocateStatPointRequest{}
-	mi := &file_character_v1_character_proto_msgTypes[6]
+	mi := &file_api_character_v1_character_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -473,7 +473,7 @@ func (x *AllocateStatPointRequest) String() string {
 func (*AllocateStatPointRequest) ProtoMessage() {}
 
 func (x *AllocateStatPointRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_character_v1_character_proto_msgTypes[6]
+	mi := &file_api_character_v1_character_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -486,7 +486,7 @@ func (x *AllocateStatPointRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AllocateStatPointRequest.ProtoReflect.Descriptor instead.
 func (*AllocateStatPointRequest) Descriptor() ([]byte, []int) {
-	return file_character_v1_character_proto_rawDescGZIP(), []int{6}
+	return file_api_character_v1_character_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *AllocateStatPointRequest) GetStat() StatType {
@@ -505,7 +505,7 @@ type AllocateStatPointReply struct {
 
 func (x *AllocateStatPointReply) Reset() {
 	*x = AllocateStatPointReply{}
-	mi := &file_character_v1_character_proto_msgTypes[7]
+	mi := &file_api_character_v1_character_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -517,7 +517,7 @@ func (x *AllocateStatPointReply) String() string {
 func (*AllocateStatPointReply) ProtoMessage() {}
 
 func (x *AllocateStatPointReply) ProtoReflect() protoreflect.Message {
-	mi := &file_character_v1_character_proto_msgTypes[7]
+	mi := &file_api_character_v1_character_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -530,7 +530,7 @@ func (x *AllocateStatPointReply) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AllocateStatPointReply.ProtoReflect.Descriptor instead.
 func (*AllocateStatPointReply) Descriptor() ([]byte, []int) {
-	return file_character_v1_character_proto_rawDescGZIP(), []int{7}
+	return file_api_character_v1_character_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *AllocateStatPointReply) GetCharacter() *Character {
@@ -548,7 +548,7 @@ type ReviveRequest struct {
 
 func (x *ReviveRequest) Reset() {
 	*x = ReviveRequest{}
-	mi := &file_character_v1_character_proto_msgTypes[8]
+	mi := &file_api_character_v1_character_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -560,7 +560,7 @@ func (x *ReviveRequest) String() string {
 func (*ReviveRequest) ProtoMessage() {}
 
 func (x *ReviveRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_character_v1_character_proto_msgTypes[8]
+	mi := &file_api_character_v1_character_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -573,7 +573,7 @@ func (x *ReviveRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReviveRequest.ProtoReflect.Descriptor instead.
 func (*ReviveRequest) Descriptor() ([]byte, []int) {
-	return file_character_v1_character_proto_rawDescGZIP(), []int{8}
+	return file_api_character_v1_character_proto_rawDescGZIP(), []int{8}
 }
 
 type ReviveReply struct {
@@ -585,7 +585,7 @@ type ReviveReply struct {
 
 func (x *ReviveReply) Reset() {
 	*x = ReviveReply{}
-	mi := &file_character_v1_character_proto_msgTypes[9]
+	mi := &file_api_character_v1_character_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -597,7 +597,7 @@ func (x *ReviveReply) String() string {
 func (*ReviveReply) ProtoMessage() {}
 
 func (x *ReviveReply) ProtoReflect() protoreflect.Message {
-	mi := &file_character_v1_character_proto_msgTypes[9]
+	mi := &file_api_character_v1_character_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -610,7 +610,7 @@ func (x *ReviveReply) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReviveReply.ProtoReflect.Descriptor instead.
 func (*ReviveReply) Descriptor() ([]byte, []int) {
-	return file_character_v1_character_proto_rawDescGZIP(), []int{9}
+	return file_api_character_v1_character_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *ReviveReply) GetCharacter() *Character {
@@ -620,11 +620,11 @@ func (x *ReviveReply) GetCharacter() *Character {
 	return nil
 }
 
-var File_character_v1_character_proto protoreflect.FileDescriptor
+var File_api_character_v1_character_proto protoreflect.FileDescriptor
 
-const file_character_v1_character_proto_rawDesc = "" +
+const file_api_character_v1_character_proto_rawDesc = "" +
 	"\n" +
-	"\x1ccharacter/v1/character.proto\x12\x10api.character.v1\x1a\x1cgoogle/api/annotations.proto\"\xb4\x01\n" +
+	" api/character/v1/character.proto\x12\x10api.character.v1\x1a\x1cgoogle/api/annotations.proto\"\xb4\x01\n" +
 	"\x0eCharacterStats\x12\x1a\n" +
 	"\bstrength\x18\x01 \x01(\x05R\bstrength\x12\"\n" +
 	"\fintelligence\x18\x02 \x01(\x05R\fintelligence\x12\x18\n" +
@@ -679,20 +679,20 @@ const file_character_v1_character_proto_rawDesc = "" +
 	"\x06Revive\x12\x1f.api.character.v1.ReviveRequest\x1a\x1d.api.character.v1.ReviveReply\"#\x82\xd3\xe4\x93\x02\x1d:\x01*\"\x18/api/v1/character/reviveB3Z1github.com/habitforge/backend/api/character/v1;v1b\x06proto3"
 
 var (
-	file_character_v1_character_proto_rawDescOnce sync.Once
-	file_character_v1_character_proto_rawDescData []byte
+	file_api_character_v1_character_proto_rawDescOnce sync.Once
+	file_api_character_v1_character_proto_rawDescData []byte
 )
 
-func file_character_v1_character_proto_rawDescGZIP() []byte {
-	file_character_v1_character_proto_rawDescOnce.Do(func() {
-		file_character_v1_character_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_character_v1_character_proto_rawDesc), len(file_character_v1_character_proto_rawDesc)))
+func file_api_character_v1_character_proto_rawDescGZIP() []byte {
+	file_api_character_v1_character_proto_rawDescOnce.Do(func() {
+		file_api_character_v1_character_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_api_character_v1_character_proto_rawDesc), len(file_api_character_v1_character_proto_rawDesc)))
 	})
-	return file_character_v1_character_proto_rawDescData
+	return file_api_character_v1_character_proto_rawDescData
 }
 
-var file_character_v1_character_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_character_v1_character_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
-var file_character_v1_character_proto_goTypes = []any{
+var file_api_character_v1_character_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_api_character_v1_character_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_api_character_v1_character_proto_goTypes = []any{
 	(StatType)(0),                    // 0: api.character.v1.StatType
 	(*CharacterStats)(nil),           // 1: api.character.v1.CharacterStats
 	(*Character)(nil),                // 2: api.character.v1.Character
@@ -706,7 +706,7 @@ var file_character_v1_character_proto_goTypes = []any{
 	(*ReviveReply)(nil),              // 10: api.character.v1.ReviveReply
 	nil,                              // 11: api.character.v1.Character.EquipmentEntry
 }
-var file_character_v1_character_proto_depIdxs = []int32{
+var file_api_character_v1_character_proto_depIdxs = []int32{
 	1,  // 0: api.character.v1.Character.base_stats:type_name -> api.character.v1.CharacterStats
 	11, // 1: api.character.v1.Character.equipment:type_name -> api.character.v1.Character.EquipmentEntry
 	2,  // 2: api.character.v1.GetCharacterReply.character:type_name -> api.character.v1.Character
@@ -730,27 +730,27 @@ var file_character_v1_character_proto_depIdxs = []int32{
 	0,  // [0:8] is the sub-list for field type_name
 }
 
-func init() { file_character_v1_character_proto_init() }
-func file_character_v1_character_proto_init() {
-	if File_character_v1_character_proto != nil {
+func init() { file_api_character_v1_character_proto_init() }
+func file_api_character_v1_character_proto_init() {
+	if File_api_character_v1_character_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_character_v1_character_proto_rawDesc), len(file_character_v1_character_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_character_v1_character_proto_rawDesc), len(file_api_character_v1_character_proto_rawDesc)),
 			NumEnums:      1,
 			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_character_v1_character_proto_goTypes,
-		DependencyIndexes: file_character_v1_character_proto_depIdxs,
-		EnumInfos:         file_character_v1_character_proto_enumTypes,
-		MessageInfos:      file_character_v1_character_proto_msgTypes,
+		GoTypes:           file_api_character_v1_character_proto_goTypes,
+		DependencyIndexes: file_api_character_v1_character_proto_depIdxs,
+		EnumInfos:         file_api_character_v1_character_proto_enumTypes,
+		MessageInfos:      file_api_character_v1_character_proto_msgTypes,
 	}.Build()
-	File_character_v1_character_proto = out.File
-	file_character_v1_character_proto_goTypes = nil
-	file_character_v1_character_proto_depIdxs = nil
+	File_api_character_v1_character_proto = out.File
+	file_api_character_v1_character_proto_goTypes = nil
+	file_api_character_v1_character_proto_depIdxs = nil
 }

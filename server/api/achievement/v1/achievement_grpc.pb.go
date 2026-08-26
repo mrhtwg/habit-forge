@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.2
 // - protoc             (unknown)
-// source: achievement/v1/achievement.proto
+// source: api/achievement/v1/achievement.proto
 
 package v1
 
@@ -163,5 +163,5 @@ var AchievementService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "achievement/v1/achievement.proto",
+	Metadata: "api/achievement/v1/achievement.proto",
 }

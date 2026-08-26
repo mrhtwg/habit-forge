@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.12
 // 	protoc        (unknown)
-// source: stats/v1/stats.proto
+// source: api/stats/v1/stats.proto
 
 package v1
 
@@ -62,11 +62,11 @@ func (x StatsRange) String() string {
 }
 
 func (StatsRange) Descriptor() protoreflect.EnumDescriptor {
-	return file_stats_v1_stats_proto_enumTypes[0].Descriptor()
+	return file_api_stats_v1_stats_proto_enumTypes[0].Descriptor()
 }
 
 func (StatsRange) Type() protoreflect.EnumType {
-	return &file_stats_v1_stats_proto_enumTypes[0]
+	return &file_api_stats_v1_stats_proto_enumTypes[0]
 }
 
 func (x StatsRange) Number() protoreflect.EnumNumber {
@@ -75,7 +75,7 @@ func (x StatsRange) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use StatsRange.Descriptor instead.
 func (StatsRange) EnumDescriptor() ([]byte, []int) {
-	return file_stats_v1_stats_proto_rawDescGZIP(), []int{0}
+	return file_api_stats_v1_stats_proto_rawDescGZIP(), []int{0}
 }
 
 type TimeSegment struct {
@@ -88,7 +88,7 @@ type TimeSegment struct {
 
 func (x *TimeSegment) Reset() {
 	*x = TimeSegment{}
-	mi := &file_stats_v1_stats_proto_msgTypes[0]
+	mi := &file_api_stats_v1_stats_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -100,7 +100,7 @@ func (x *TimeSegment) String() string {
 func (*TimeSegment) ProtoMessage() {}
 
 func (x *TimeSegment) ProtoReflect() protoreflect.Message {
-	mi := &file_stats_v1_stats_proto_msgTypes[0]
+	mi := &file_api_stats_v1_stats_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -113,7 +113,7 @@ func (x *TimeSegment) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TimeSegment.ProtoReflect.Descriptor instead.
 func (*TimeSegment) Descriptor() ([]byte, []int) {
-	return file_stats_v1_stats_proto_rawDescGZIP(), []int{0}
+	return file_api_stats_v1_stats_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *TimeSegment) GetLabel() string {
@@ -141,7 +141,7 @@ type StreakEntry struct {
 
 func (x *StreakEntry) Reset() {
 	*x = StreakEntry{}
-	mi := &file_stats_v1_stats_proto_msgTypes[1]
+	mi := &file_api_stats_v1_stats_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -153,7 +153,7 @@ func (x *StreakEntry) String() string {
 func (*StreakEntry) ProtoMessage() {}
 
 func (x *StreakEntry) ProtoReflect() protoreflect.Message {
-	mi := &file_stats_v1_stats_proto_msgTypes[1]
+	mi := &file_api_stats_v1_stats_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -166,7 +166,7 @@ func (x *StreakEntry) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StreakEntry.ProtoReflect.Descriptor instead.
 func (*StreakEntry) Descriptor() ([]byte, []int) {
-	return file_stats_v1_stats_proto_rawDescGZIP(), []int{1}
+	return file_api_stats_v1_stats_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *StreakEntry) GetTaskId() string {
@@ -204,7 +204,7 @@ type StatsReply struct {
 
 func (x *StatsReply) Reset() {
 	*x = StatsReply{}
-	mi := &file_stats_v1_stats_proto_msgTypes[2]
+	mi := &file_api_stats_v1_stats_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -216,7 +216,7 @@ func (x *StatsReply) String() string {
 func (*StatsReply) ProtoMessage() {}
 
 func (x *StatsReply) ProtoReflect() protoreflect.Message {
-	mi := &file_stats_v1_stats_proto_msgTypes[2]
+	mi := &file_api_stats_v1_stats_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -229,7 +229,7 @@ func (x *StatsReply) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StatsReply.ProtoReflect.Descriptor instead.
 func (*StatsReply) Descriptor() ([]byte, []int) {
-	return file_stats_v1_stats_proto_rawDescGZIP(), []int{2}
+	return file_api_stats_v1_stats_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *StatsReply) GetRange() StatsRange {
@@ -283,7 +283,7 @@ type GetStatsRequest struct {
 
 func (x *GetStatsRequest) Reset() {
 	*x = GetStatsRequest{}
-	mi := &file_stats_v1_stats_proto_msgTypes[3]
+	mi := &file_api_stats_v1_stats_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -295,7 +295,7 @@ func (x *GetStatsRequest) String() string {
 func (*GetStatsRequest) ProtoMessage() {}
 
 func (x *GetStatsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_stats_v1_stats_proto_msgTypes[3]
+	mi := &file_api_stats_v1_stats_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -308,7 +308,7 @@ func (x *GetStatsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetStatsRequest.ProtoReflect.Descriptor instead.
 func (*GetStatsRequest) Descriptor() ([]byte, []int) {
-	return file_stats_v1_stats_proto_rawDescGZIP(), []int{3}
+	return file_api_stats_v1_stats_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *GetStatsRequest) GetRange() StatsRange {
@@ -327,7 +327,7 @@ type GetStatsReply struct {
 
 func (x *GetStatsReply) Reset() {
 	*x = GetStatsReply{}
-	mi := &file_stats_v1_stats_proto_msgTypes[4]
+	mi := &file_api_stats_v1_stats_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -339,7 +339,7 @@ func (x *GetStatsReply) String() string {
 func (*GetStatsReply) ProtoMessage() {}
 
 func (x *GetStatsReply) ProtoReflect() protoreflect.Message {
-	mi := &file_stats_v1_stats_proto_msgTypes[4]
+	mi := &file_api_stats_v1_stats_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -352,7 +352,7 @@ func (x *GetStatsReply) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetStatsReply.ProtoReflect.Descriptor instead.
 func (*GetStatsReply) Descriptor() ([]byte, []int) {
-	return file_stats_v1_stats_proto_rawDescGZIP(), []int{4}
+	return file_api_stats_v1_stats_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *GetStatsReply) GetStats() *StatsReply {
@@ -362,11 +362,11 @@ func (x *GetStatsReply) GetStats() *StatsReply {
 	return nil
 }
 
-var File_stats_v1_stats_proto protoreflect.FileDescriptor
+var File_api_stats_v1_stats_proto protoreflect.FileDescriptor
 
-const file_stats_v1_stats_proto_rawDesc = "" +
+const file_api_stats_v1_stats_proto_rawDesc = "" +
 	"\n" +
-	"\x14stats/v1/stats.proto\x12\fapi.stats.v1\x1a\x1cgoogle/api/annotations.proto\"L\n" +
+	"\x18api/stats/v1/stats.proto\x12\fapi.stats.v1\x1a\x1cgoogle/api/annotations.proto\"L\n" +
 	"\vTimeSegment\x12\x14\n" +
 	"\x05label\x18\x01 \x01(\tR\x05label\x12'\n" +
 	"\x0fcompleted_count\x18\x02 \x01(\x03R\x0ecompletedCount\"T\n" +
@@ -397,20 +397,20 @@ const file_stats_v1_stats_proto_rawDesc = "" +
 	"\bGetStats\x12\x1d.api.stats.v1.GetStatsRequest\x1a\x1b.api.stats.v1.GetStatsReply\"\x15\x82\xd3\xe4\x93\x02\x0f\x12\r/api/v1/statsB/Z-github.com/habitforge/backend/api/stats/v1;v1b\x06proto3"
 
 var (
-	file_stats_v1_stats_proto_rawDescOnce sync.Once
-	file_stats_v1_stats_proto_rawDescData []byte
+	file_api_stats_v1_stats_proto_rawDescOnce sync.Once
+	file_api_stats_v1_stats_proto_rawDescData []byte
 )
 
-func file_stats_v1_stats_proto_rawDescGZIP() []byte {
-	file_stats_v1_stats_proto_rawDescOnce.Do(func() {
-		file_stats_v1_stats_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_stats_v1_stats_proto_rawDesc), len(file_stats_v1_stats_proto_rawDesc)))
+func file_api_stats_v1_stats_proto_rawDescGZIP() []byte {
+	file_api_stats_v1_stats_proto_rawDescOnce.Do(func() {
+		file_api_stats_v1_stats_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_api_stats_v1_stats_proto_rawDesc), len(file_api_stats_v1_stats_proto_rawDesc)))
 	})
-	return file_stats_v1_stats_proto_rawDescData
+	return file_api_stats_v1_stats_proto_rawDescData
 }
 
-var file_stats_v1_stats_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_stats_v1_stats_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
-var file_stats_v1_stats_proto_goTypes = []any{
+var file_api_stats_v1_stats_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_api_stats_v1_stats_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_api_stats_v1_stats_proto_goTypes = []any{
 	(StatsRange)(0),         // 0: api.stats.v1.StatsRange
 	(*TimeSegment)(nil),     // 1: api.stats.v1.TimeSegment
 	(*StreakEntry)(nil),     // 2: api.stats.v1.StreakEntry
@@ -418,7 +418,7 @@ var file_stats_v1_stats_proto_goTypes = []any{
 	(*GetStatsRequest)(nil), // 4: api.stats.v1.GetStatsRequest
 	(*GetStatsReply)(nil),   // 5: api.stats.v1.GetStatsReply
 }
-var file_stats_v1_stats_proto_depIdxs = []int32{
+var file_api_stats_v1_stats_proto_depIdxs = []int32{
 	0, // 0: api.stats.v1.StatsReply.range:type_name -> api.stats.v1.StatsRange
 	1, // 1: api.stats.v1.StatsReply.segments:type_name -> api.stats.v1.TimeSegment
 	2, // 2: api.stats.v1.StatsReply.streak_leaderboard:type_name -> api.stats.v1.StreakEntry
@@ -433,27 +433,27 @@ var file_stats_v1_stats_proto_depIdxs = []int32{
 	0, // [0:5] is the sub-list for field type_name
 }
 
-func init() { file_stats_v1_stats_proto_init() }
-func file_stats_v1_stats_proto_init() {
-	if File_stats_v1_stats_proto != nil {
+func init() { file_api_stats_v1_stats_proto_init() }
+func file_api_stats_v1_stats_proto_init() {
+	if File_api_stats_v1_stats_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_stats_v1_stats_proto_rawDesc), len(file_stats_v1_stats_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_stats_v1_stats_proto_rawDesc), len(file_api_stats_v1_stats_proto_rawDesc)),
 			NumEnums:      1,
 			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_stats_v1_stats_proto_goTypes,
-		DependencyIndexes: file_stats_v1_stats_proto_depIdxs,
-		EnumInfos:         file_stats_v1_stats_proto_enumTypes,
-		MessageInfos:      file_stats_v1_stats_proto_msgTypes,
+		GoTypes:           file_api_stats_v1_stats_proto_goTypes,
+		DependencyIndexes: file_api_stats_v1_stats_proto_depIdxs,
+		EnumInfos:         file_api_stats_v1_stats_proto_enumTypes,
+		MessageInfos:      file_api_stats_v1_stats_proto_msgTypes,
 	}.Build()
-	File_stats_v1_stats_proto = out.File
-	file_stats_v1_stats_proto_goTypes = nil
-	file_stats_v1_stats_proto_depIdxs = nil
+	File_api_stats_v1_stats_proto = out.File
+	file_api_stats_v1_stats_proto_goTypes = nil
+	file_api_stats_v1_stats_proto_depIdxs = nil
 }

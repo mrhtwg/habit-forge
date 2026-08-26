@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-http v2.9.2
 // - protoc             (unknown)
-// source: auth/v1/auth.proto
+// source: api/auth/v1/auth.proto
 
 package v1
 

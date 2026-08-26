@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-http v2.9.2
 // - protoc             (unknown)
-// source: character/v1/character.proto
+// source: api/character/v1/character.proto
 
 package v1
 

@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-http v2.9.2
 // - protoc             (unknown)
-// source: task/v1/task.proto
+// source: api/task/v1/task.proto
 
 package v1
 

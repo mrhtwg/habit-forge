@@ -38,42 +38,42 @@ service AuthService {
 }
 
 message RegisterRequest {
-  string email = 1;
+  string email    = 1;
   string password = 2; // min 8 characters
   string nickname = 3;
 }
 
 message LoginRequest {
-  string email = 1;
+  string email    = 1;
   string password = 2;
 }
 
 message OAuthLoginRequest {
-  string provider = 1; // "google" | "apple"
+  string provider    = 1; // "google" | "apple"
   string provider_id = 2;
-  string email = 3;
-  string nickname = 4;
+  string email       = 3;
+  string nickname    = 4;
 }
 
 message MeRequest {}
 
 message UserInfo {
-  string id = 1;
-  string email = 2;
-  string nickname = 3;
+  string id         = 1;
+  string email      = 2;
+  string nickname   = 3;
   string avatar_url = 4;
-  int64 created_at = 5; // unix millis
-  int64 updated_at = 6; // unix millis
+  int64  created_at = 5; // unix millis
+  int64  updated_at = 6; // unix millis
 }
 
 message RegisterReply {
-  string token = 1;
-  UserInfo user = 2;
+  string   token = 1;
+  UserInfo user  = 2;
 }
 
 message LoginReply {
-  string token = 1;
-  UserInfo user = 2;
+  string   token = 1;
+  UserInfo user  = 2;
 }
 
 message MeReply {

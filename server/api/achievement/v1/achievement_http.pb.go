@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-http v2.9.2
 // - protoc             (unknown)
-// source: achievement/v1/achievement.proto
+// source: api/achievement/v1/achievement.proto
 
 package v1
 

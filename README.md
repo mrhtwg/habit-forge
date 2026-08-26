@@ -8,7 +8,7 @@ This repository is a **full-stack monorepo**:
 
 - `app/` — Flutter client (GetX, Hive, Firebase Auth)
 - `server/` — Go backend (go-kratos, GORM, PostgreSQL, Wire DI)
-- `proto/` — shared API contract directory (planned evolution)
+- `proto/` — shared API contracts (protobuf source of truth for app + server)
 - `docs/` — product, design, and development docs
 
 > **Status:** MVP. The Flutter app is local-first and playable; the Go backend is a go-kratos skeleton with all route interfaces defined (auth, user, character, task, shop, achievement, stats) — implementations are pending. See [Roadmap](docs/roadmap.md).
@@ -28,7 +28,7 @@ HabitForge is not trying to clone Habitica. The goal is a modern, native, and **
 |---|---|
 | Mobile | Flutter, GetX, Hive, Firebase Auth |
 | Backend | Go, go-kratos, GORM, PostgreSQL, Wire |
-| Shared contract | proto (planned) |
+| Shared contract | proto (protobuf, app + server) |
 | Infra | Docker Compose |
 
 ## Repository Layout
@@ -43,11 +43,11 @@ habit-forge/
 │   │   └── widgets/      # shared UI widgets
 │   └── test/
 ├── server/               # Go backend
-│   ├── api/              # proto contracts + generated code (auth/user/character/task/shop/achievement/stats)
+│   ├── api/              # generated proto Go code (protos live in ../proto)
 │   ├── cmd/              # entrypoint + Wire
 │   ├── configs/          # config reference
 │   └── internal/         # conf / data / biz / service / server / middleware / model
-├── proto/                # shared API contracts (planned)
+├── proto/                # shared API contracts (protobuf source)
 ├── docs/                 # PRD, design docs, architecture
 ├── docker-compose.yml    # PostgreSQL for local development
 └── Makefile              # common developer commands
@@ -110,7 +110,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
 - [x] Flutter MVP core loop: tasks, character, forge, achievements
 - [x] Go auth backend
 - [ ] Move core game logic to the Go backend
-- [ ] Introduce Kratos + gRPC + shared proto contracts
+- [x] Introduce Kratos + gRPC + shared proto contracts
 - [ ] Cloud sync and multi-device support
 - [ ] Vue/React admin dashboard
 - [ ] iOS release

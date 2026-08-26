@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.12
 // 	protoc        (unknown)
-// source: achievement/v1/achievement.proto
+// source: api/achievement/v1/achievement.proto
 
 package v1
 
@@ -39,7 +39,7 @@ type Achievement struct {
 
 func (x *Achievement) Reset() {
 	*x = Achievement{}
-	mi := &file_achievement_v1_achievement_proto_msgTypes[0]
+	mi := &file_api_achievement_v1_achievement_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -51,7 +51,7 @@ func (x *Achievement) String() string {
 func (*Achievement) ProtoMessage() {}
 
 func (x *Achievement) ProtoReflect() protoreflect.Message {
-	mi := &file_achievement_v1_achievement_proto_msgTypes[0]
+	mi := &file_api_achievement_v1_achievement_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -64,7 +64,7 @@ func (x *Achievement) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Achievement.ProtoReflect.Descriptor instead.
 func (*Achievement) Descriptor() ([]byte, []int) {
-	return file_achievement_v1_achievement_proto_rawDescGZIP(), []int{0}
+	return file_api_achievement_v1_achievement_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *Achievement) GetId() string {
@@ -138,7 +138,7 @@ type ListAchievementsRequest struct {
 
 func (x *ListAchievementsRequest) Reset() {
 	*x = ListAchievementsRequest{}
-	mi := &file_achievement_v1_achievement_proto_msgTypes[1]
+	mi := &file_api_achievement_v1_achievement_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -150,7 +150,7 @@ func (x *ListAchievementsRequest) String() string {
 func (*ListAchievementsRequest) ProtoMessage() {}
 
 func (x *ListAchievementsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_achievement_v1_achievement_proto_msgTypes[1]
+	mi := &file_api_achievement_v1_achievement_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -163,7 +163,7 @@ func (x *ListAchievementsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListAchievementsRequest.ProtoReflect.Descriptor instead.
 func (*ListAchievementsRequest) Descriptor() ([]byte, []int) {
-	return file_achievement_v1_achievement_proto_rawDescGZIP(), []int{1}
+	return file_api_achievement_v1_achievement_proto_rawDescGZIP(), []int{1}
 }
 
 type ListAchievementsReply struct {
@@ -175,7 +175,7 @@ type ListAchievementsReply struct {
 
 func (x *ListAchievementsReply) Reset() {
 	*x = ListAchievementsReply{}
-	mi := &file_achievement_v1_achievement_proto_msgTypes[2]
+	mi := &file_api_achievement_v1_achievement_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -187,7 +187,7 @@ func (x *ListAchievementsReply) String() string {
 func (*ListAchievementsReply) ProtoMessage() {}
 
 func (x *ListAchievementsReply) ProtoReflect() protoreflect.Message {
-	mi := &file_achievement_v1_achievement_proto_msgTypes[2]
+	mi := &file_api_achievement_v1_achievement_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -200,7 +200,7 @@ func (x *ListAchievementsReply) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListAchievementsReply.ProtoReflect.Descriptor instead.
 func (*ListAchievementsReply) Descriptor() ([]byte, []int) {
-	return file_achievement_v1_achievement_proto_rawDescGZIP(), []int{2}
+	return file_api_achievement_v1_achievement_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *ListAchievementsReply) GetAchievements() []*Achievement {
@@ -219,7 +219,7 @@ type UnlockRequest struct {
 
 func (x *UnlockRequest) Reset() {
 	*x = UnlockRequest{}
-	mi := &file_achievement_v1_achievement_proto_msgTypes[3]
+	mi := &file_api_achievement_v1_achievement_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -231,7 +231,7 @@ func (x *UnlockRequest) String() string {
 func (*UnlockRequest) ProtoMessage() {}
 
 func (x *UnlockRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_achievement_v1_achievement_proto_msgTypes[3]
+	mi := &file_api_achievement_v1_achievement_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -244,7 +244,7 @@ func (x *UnlockRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UnlockRequest.ProtoReflect.Descriptor instead.
 func (*UnlockRequest) Descriptor() ([]byte, []int) {
-	return file_achievement_v1_achievement_proto_rawDescGZIP(), []int{3}
+	return file_api_achievement_v1_achievement_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *UnlockRequest) GetId() string {
@@ -264,7 +264,7 @@ type UnlockReply struct {
 
 func (x *UnlockReply) Reset() {
 	*x = UnlockReply{}
-	mi := &file_achievement_v1_achievement_proto_msgTypes[4]
+	mi := &file_api_achievement_v1_achievement_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -276,7 +276,7 @@ func (x *UnlockReply) String() string {
 func (*UnlockReply) ProtoMessage() {}
 
 func (x *UnlockReply) ProtoReflect() protoreflect.Message {
-	mi := &file_achievement_v1_achievement_proto_msgTypes[4]
+	mi := &file_api_achievement_v1_achievement_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -289,7 +289,7 @@ func (x *UnlockReply) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UnlockReply.ProtoReflect.Descriptor instead.
 func (*UnlockReply) Descriptor() ([]byte, []int) {
-	return file_achievement_v1_achievement_proto_rawDescGZIP(), []int{4}
+	return file_api_achievement_v1_achievement_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *UnlockReply) GetAchievement() *Achievement {
@@ -306,11 +306,11 @@ func (x *UnlockReply) GetGemReward() int32 {
 	return 0
 }
 
-var File_achievement_v1_achievement_proto protoreflect.FileDescriptor
+var File_api_achievement_v1_achievement_proto protoreflect.FileDescriptor
 
-const file_achievement_v1_achievement_proto_rawDesc = "" +
+const file_api_achievement_v1_achievement_proto_rawDesc = "" +
 	"\n" +
-	" achievement/v1/achievement.proto\x12\x12api.achievement.v1\x1a\x1cgoogle/api/annotations.proto\"\x97\x02\n" +
+	"$api/achievement/v1/achievement.proto\x12\x12api.achievement.v1\x1a\x1cgoogle/api/annotations.proto\"\x97\x02\n" +
 	"\vAchievement\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12 \n" +
@@ -338,26 +338,26 @@ const file_achievement_v1_achievement_proto_rawDesc = "" +
 	"\x06Unlock\x12!.api.achievement.v1.UnlockRequest\x1a\x1f.api.achievement.v1.UnlockReply\"+\x82\xd3\xe4\x93\x02%:\x01*\" /api/v1/achievements/{id}/unlockB5Z3github.com/habitforge/backend/api/achievement/v1;v1b\x06proto3"
 
 var (
-	file_achievement_v1_achievement_proto_rawDescOnce sync.Once
-	file_achievement_v1_achievement_proto_rawDescData []byte
+	file_api_achievement_v1_achievement_proto_rawDescOnce sync.Once
+	file_api_achievement_v1_achievement_proto_rawDescData []byte
 )
 
-func file_achievement_v1_achievement_proto_rawDescGZIP() []byte {
-	file_achievement_v1_achievement_proto_rawDescOnce.Do(func() {
-		file_achievement_v1_achievement_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_achievement_v1_achievement_proto_rawDesc), len(file_achievement_v1_achievement_proto_rawDesc)))
+func file_api_achievement_v1_achievement_proto_rawDescGZIP() []byte {
+	file_api_achievement_v1_achievement_proto_rawDescOnce.Do(func() {
+		file_api_achievement_v1_achievement_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_api_achievement_v1_achievement_proto_rawDesc), len(file_api_achievement_v1_achievement_proto_rawDesc)))
 	})
-	return file_achievement_v1_achievement_proto_rawDescData
+	return file_api_achievement_v1_achievement_proto_rawDescData
 }
 
-var file_achievement_v1_achievement_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
-var file_achievement_v1_achievement_proto_goTypes = []any{
+var file_api_achievement_v1_achievement_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_api_achievement_v1_achievement_proto_goTypes = []any{
 	(*Achievement)(nil),             // 0: api.achievement.v1.Achievement
 	(*ListAchievementsRequest)(nil), // 1: api.achievement.v1.ListAchievementsRequest
 	(*ListAchievementsReply)(nil),   // 2: api.achievement.v1.ListAchievementsReply
 	(*UnlockRequest)(nil),           // 3: api.achievement.v1.UnlockRequest
 	(*UnlockReply)(nil),             // 4: api.achievement.v1.UnlockReply
 }
-var file_achievement_v1_achievement_proto_depIdxs = []int32{
+var file_api_achievement_v1_achievement_proto_depIdxs = []int32{
 	0, // 0: api.achievement.v1.ListAchievementsReply.achievements:type_name -> api.achievement.v1.Achievement
 	0, // 1: api.achievement.v1.UnlockReply.achievement:type_name -> api.achievement.v1.Achievement
 	1, // 2: api.achievement.v1.AchievementService.ListAchievements:input_type -> api.achievement.v1.ListAchievementsRequest
@@ -371,26 +371,26 @@ var file_achievement_v1_achievement_proto_depIdxs = []int32{
 	0, // [0:2] is the sub-list for field type_name
 }
 
-func init() { file_achievement_v1_achievement_proto_init() }
-func file_achievement_v1_achievement_proto_init() {
-	if File_achievement_v1_achievement_proto != nil {
+func init() { file_api_achievement_v1_achievement_proto_init() }
+func file_api_achievement_v1_achievement_proto_init() {
+	if File_api_achievement_v1_achievement_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_achievement_v1_achievement_proto_rawDesc), len(file_achievement_v1_achievement_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_achievement_v1_achievement_proto_rawDesc), len(file_api_achievement_v1_achievement_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_achievement_v1_achievement_proto_goTypes,
-		DependencyIndexes: file_achievement_v1_achievement_proto_depIdxs,
-		MessageInfos:      file_achievement_v1_achievement_proto_msgTypes,
+		GoTypes:           file_api_achievement_v1_achievement_proto_goTypes,
+		DependencyIndexes: file_api_achievement_v1_achievement_proto_depIdxs,
+		MessageInfos:      file_api_achievement_v1_achievement_proto_msgTypes,
 	}.Build()
-	File_achievement_v1_achievement_proto = out.File
-	file_achievement_v1_achievement_proto_goTypes = nil
-	file_achievement_v1_achievement_proto_depIdxs = nil
+	File_api_achievement_v1_achievement_proto = out.File
+	file_api_achievement_v1_achievement_proto_goTypes = nil
+	file_api_achievement_v1_achievement_proto_depIdxs = nil
 }

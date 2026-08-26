@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.12
 // 	protoc        (unknown)
-// source: shop/v1/shop.proto
+// source: api/shop/v1/shop.proto
 
 package v1
 
@@ -56,11 +56,11 @@ func (x ShopCurrency) String() string {
 }
 
 func (ShopCurrency) Descriptor() protoreflect.EnumDescriptor {
-	return file_shop_v1_shop_proto_enumTypes[0].Descriptor()
+	return file_api_shop_v1_shop_proto_enumTypes[0].Descriptor()
 }
 
 func (ShopCurrency) Type() protoreflect.EnumType {
-	return &file_shop_v1_shop_proto_enumTypes[0]
+	return &file_api_shop_v1_shop_proto_enumTypes[0]
 }
 
 func (x ShopCurrency) Number() protoreflect.EnumNumber {
@@ -69,7 +69,7 @@ func (x ShopCurrency) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ShopCurrency.Descriptor instead.
 func (ShopCurrency) EnumDescriptor() ([]byte, []int) {
-	return file_shop_v1_shop_proto_rawDescGZIP(), []int{0}
+	return file_api_shop_v1_shop_proto_rawDescGZIP(), []int{0}
 }
 
 type ShopItem struct {
@@ -88,7 +88,7 @@ type ShopItem struct {
 
 func (x *ShopItem) Reset() {
 	*x = ShopItem{}
-	mi := &file_shop_v1_shop_proto_msgTypes[0]
+	mi := &file_api_shop_v1_shop_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -100,7 +100,7 @@ func (x *ShopItem) String() string {
 func (*ShopItem) ProtoMessage() {}
 
 func (x *ShopItem) ProtoReflect() protoreflect.Message {
-	mi := &file_shop_v1_shop_proto_msgTypes[0]
+	mi := &file_api_shop_v1_shop_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -113,7 +113,7 @@ func (x *ShopItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ShopItem.ProtoReflect.Descriptor instead.
 func (*ShopItem) Descriptor() ([]byte, []int) {
-	return file_shop_v1_shop_proto_rawDescGZIP(), []int{0}
+	return file_api_shop_v1_shop_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *ShopItem) GetId() string {
@@ -183,7 +183,7 @@ type DailyDeal struct {
 
 func (x *DailyDeal) Reset() {
 	*x = DailyDeal{}
-	mi := &file_shop_v1_shop_proto_msgTypes[1]
+	mi := &file_api_shop_v1_shop_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -195,7 +195,7 @@ func (x *DailyDeal) String() string {
 func (*DailyDeal) ProtoMessage() {}
 
 func (x *DailyDeal) ProtoReflect() protoreflect.Message {
-	mi := &file_shop_v1_shop_proto_msgTypes[1]
+	mi := &file_api_shop_v1_shop_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -208,7 +208,7 @@ func (x *DailyDeal) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DailyDeal.ProtoReflect.Descriptor instead.
 func (*DailyDeal) Descriptor() ([]byte, []int) {
-	return file_shop_v1_shop_proto_rawDescGZIP(), []int{1}
+	return file_api_shop_v1_shop_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *DailyDeal) GetItemId() string {
@@ -241,7 +241,7 @@ type ListShopItemsRequest struct {
 
 func (x *ListShopItemsRequest) Reset() {
 	*x = ListShopItemsRequest{}
-	mi := &file_shop_v1_shop_proto_msgTypes[2]
+	mi := &file_api_shop_v1_shop_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -253,7 +253,7 @@ func (x *ListShopItemsRequest) String() string {
 func (*ListShopItemsRequest) ProtoMessage() {}
 
 func (x *ListShopItemsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_shop_v1_shop_proto_msgTypes[2]
+	mi := &file_api_shop_v1_shop_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -266,7 +266,7 @@ func (x *ListShopItemsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListShopItemsRequest.ProtoReflect.Descriptor instead.
 func (*ListShopItemsRequest) Descriptor() ([]byte, []int) {
-	return file_shop_v1_shop_proto_rawDescGZIP(), []int{2}
+	return file_api_shop_v1_shop_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *ListShopItemsRequest) GetCategory() string {
@@ -285,7 +285,7 @@ type ListShopItemsReply struct {
 
 func (x *ListShopItemsReply) Reset() {
 	*x = ListShopItemsReply{}
-	mi := &file_shop_v1_shop_proto_msgTypes[3]
+	mi := &file_api_shop_v1_shop_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -297,7 +297,7 @@ func (x *ListShopItemsReply) String() string {
 func (*ListShopItemsReply) ProtoMessage() {}
 
 func (x *ListShopItemsReply) ProtoReflect() protoreflect.Message {
-	mi := &file_shop_v1_shop_proto_msgTypes[3]
+	mi := &file_api_shop_v1_shop_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -310,7 +310,7 @@ func (x *ListShopItemsReply) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListShopItemsReply.ProtoReflect.Descriptor instead.
 func (*ListShopItemsReply) Descriptor() ([]byte, []int) {
-	return file_shop_v1_shop_proto_rawDescGZIP(), []int{3}
+	return file_api_shop_v1_shop_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *ListShopItemsReply) GetItems() []*ShopItem {
@@ -328,7 +328,7 @@ type GetDailyDealRequest struct {
 
 func (x *GetDailyDealRequest) Reset() {
 	*x = GetDailyDealRequest{}
-	mi := &file_shop_v1_shop_proto_msgTypes[4]
+	mi := &file_api_shop_v1_shop_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -340,7 +340,7 @@ func (x *GetDailyDealRequest) String() string {
 func (*GetDailyDealRequest) ProtoMessage() {}
 
 func (x *GetDailyDealRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_shop_v1_shop_proto_msgTypes[4]
+	mi := &file_api_shop_v1_shop_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -353,7 +353,7 @@ func (x *GetDailyDealRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetDailyDealRequest.ProtoReflect.Descriptor instead.
 func (*GetDailyDealRequest) Descriptor() ([]byte, []int) {
-	return file_shop_v1_shop_proto_rawDescGZIP(), []int{4}
+	return file_api_shop_v1_shop_proto_rawDescGZIP(), []int{4}
 }
 
 type GetDailyDealReply struct {
@@ -365,7 +365,7 @@ type GetDailyDealReply struct {
 
 func (x *GetDailyDealReply) Reset() {
 	*x = GetDailyDealReply{}
-	mi := &file_shop_v1_shop_proto_msgTypes[5]
+	mi := &file_api_shop_v1_shop_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -377,7 +377,7 @@ func (x *GetDailyDealReply) String() string {
 func (*GetDailyDealReply) ProtoMessage() {}
 
 func (x *GetDailyDealReply) ProtoReflect() protoreflect.Message {
-	mi := &file_shop_v1_shop_proto_msgTypes[5]
+	mi := &file_api_shop_v1_shop_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -390,7 +390,7 @@ func (x *GetDailyDealReply) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetDailyDealReply.ProtoReflect.Descriptor instead.
 func (*GetDailyDealReply) Descriptor() ([]byte, []int) {
-	return file_shop_v1_shop_proto_rawDescGZIP(), []int{5}
+	return file_api_shop_v1_shop_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *GetDailyDealReply) GetDeal() *DailyDeal {
@@ -410,7 +410,7 @@ type BuyItemRequest struct {
 
 func (x *BuyItemRequest) Reset() {
 	*x = BuyItemRequest{}
-	mi := &file_shop_v1_shop_proto_msgTypes[6]
+	mi := &file_api_shop_v1_shop_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -422,7 +422,7 @@ func (x *BuyItemRequest) String() string {
 func (*BuyItemRequest) ProtoMessage() {}
 
 func (x *BuyItemRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_shop_v1_shop_proto_msgTypes[6]
+	mi := &file_api_shop_v1_shop_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -435,7 +435,7 @@ func (x *BuyItemRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BuyItemRequest.ProtoReflect.Descriptor instead.
 func (*BuyItemRequest) Descriptor() ([]byte, []int) {
-	return file_shop_v1_shop_proto_rawDescGZIP(), []int{6}
+	return file_api_shop_v1_shop_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *BuyItemRequest) GetItemId() string {
@@ -462,7 +462,7 @@ type BuyItemReply struct {
 
 func (x *BuyItemReply) Reset() {
 	*x = BuyItemReply{}
-	mi := &file_shop_v1_shop_proto_msgTypes[7]
+	mi := &file_api_shop_v1_shop_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -474,7 +474,7 @@ func (x *BuyItemReply) String() string {
 func (*BuyItemReply) ProtoMessage() {}
 
 func (x *BuyItemReply) ProtoReflect() protoreflect.Message {
-	mi := &file_shop_v1_shop_proto_msgTypes[7]
+	mi := &file_api_shop_v1_shop_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -487,7 +487,7 @@ func (x *BuyItemReply) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BuyItemReply.ProtoReflect.Descriptor instead.
 func (*BuyItemReply) Descriptor() ([]byte, []int) {
-	return file_shop_v1_shop_proto_rawDescGZIP(), []int{7}
+	return file_api_shop_v1_shop_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *BuyItemReply) GetItem() *ShopItem {
@@ -512,7 +512,7 @@ type ListOwnedItemsRequest struct {
 
 func (x *ListOwnedItemsRequest) Reset() {
 	*x = ListOwnedItemsRequest{}
-	mi := &file_shop_v1_shop_proto_msgTypes[8]
+	mi := &file_api_shop_v1_shop_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -524,7 +524,7 @@ func (x *ListOwnedItemsRequest) String() string {
 func (*ListOwnedItemsRequest) ProtoMessage() {}
 
 func (x *ListOwnedItemsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_shop_v1_shop_proto_msgTypes[8]
+	mi := &file_api_shop_v1_shop_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -537,7 +537,7 @@ func (x *ListOwnedItemsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListOwnedItemsRequest.ProtoReflect.Descriptor instead.
 func (*ListOwnedItemsRequest) Descriptor() ([]byte, []int) {
-	return file_shop_v1_shop_proto_rawDescGZIP(), []int{8}
+	return file_api_shop_v1_shop_proto_rawDescGZIP(), []int{8}
 }
 
 type ListOwnedItemsReply struct {
@@ -549,7 +549,7 @@ type ListOwnedItemsReply struct {
 
 func (x *ListOwnedItemsReply) Reset() {
 	*x = ListOwnedItemsReply{}
-	mi := &file_shop_v1_shop_proto_msgTypes[9]
+	mi := &file_api_shop_v1_shop_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -561,7 +561,7 @@ func (x *ListOwnedItemsReply) String() string {
 func (*ListOwnedItemsReply) ProtoMessage() {}
 
 func (x *ListOwnedItemsReply) ProtoReflect() protoreflect.Message {
-	mi := &file_shop_v1_shop_proto_msgTypes[9]
+	mi := &file_api_shop_v1_shop_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -574,7 +574,7 @@ func (x *ListOwnedItemsReply) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListOwnedItemsReply.ProtoReflect.Descriptor instead.
 func (*ListOwnedItemsReply) Descriptor() ([]byte, []int) {
-	return file_shop_v1_shop_proto_rawDescGZIP(), []int{9}
+	return file_api_shop_v1_shop_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *ListOwnedItemsReply) GetItemIds() []string {
@@ -584,11 +584,11 @@ func (x *ListOwnedItemsReply) GetItemIds() []string {
 	return nil
 }
 
-var File_shop_v1_shop_proto protoreflect.FileDescriptor
+var File_api_shop_v1_shop_proto protoreflect.FileDescriptor
 
-const file_shop_v1_shop_proto_rawDesc = "" +
+const file_api_shop_v1_shop_proto_rawDesc = "" +
 	"\n" +
-	"\x12shop/v1/shop.proto\x12\vapi.shop.v1\x1a\x1cgoogle/api/annotations.proto\"\xdb\x01\n" +
+	"\x16api/shop/v1/shop.proto\x12\vapi.shop.v1\x1a\x1cgoogle/api/annotations.proto\"\xdb\x01\n" +
 	"\bShopItem\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
@@ -630,20 +630,20 @@ const file_shop_v1_shop_proto_rawDesc = "" +
 	"\x0eListOwnedItems\x12\".api.shop.v1.ListOwnedItemsRequest\x1a .api.shop.v1.ListOwnedItemsReply\"\x1a\x82\xd3\xe4\x93\x02\x14\x12\x12/api/v1/shop/ownedB.Z,github.com/habitforge/backend/api/shop/v1;v1b\x06proto3"
 
 var (
-	file_shop_v1_shop_proto_rawDescOnce sync.Once
-	file_shop_v1_shop_proto_rawDescData []byte
+	file_api_shop_v1_shop_proto_rawDescOnce sync.Once
+	file_api_shop_v1_shop_proto_rawDescData []byte
 )
 
-func file_shop_v1_shop_proto_rawDescGZIP() []byte {
-	file_shop_v1_shop_proto_rawDescOnce.Do(func() {
-		file_shop_v1_shop_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_shop_v1_shop_proto_rawDesc), len(file_shop_v1_shop_proto_rawDesc)))
+func file_api_shop_v1_shop_proto_rawDescGZIP() []byte {
+	file_api_shop_v1_shop_proto_rawDescOnce.Do(func() {
+		file_api_shop_v1_shop_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_api_shop_v1_shop_proto_rawDesc), len(file_api_shop_v1_shop_proto_rawDesc)))
 	})
-	return file_shop_v1_shop_proto_rawDescData
+	return file_api_shop_v1_shop_proto_rawDescData
 }
 
-var file_shop_v1_shop_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_shop_v1_shop_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
-var file_shop_v1_shop_proto_goTypes = []any{
+var file_api_shop_v1_shop_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_api_shop_v1_shop_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_api_shop_v1_shop_proto_goTypes = []any{
 	(ShopCurrency)(0),             // 0: api.shop.v1.ShopCurrency
 	(*ShopItem)(nil),              // 1: api.shop.v1.ShopItem
 	(*DailyDeal)(nil),             // 2: api.shop.v1.DailyDeal
@@ -656,7 +656,7 @@ var file_shop_v1_shop_proto_goTypes = []any{
 	(*ListOwnedItemsRequest)(nil), // 9: api.shop.v1.ListOwnedItemsRequest
 	(*ListOwnedItemsReply)(nil),   // 10: api.shop.v1.ListOwnedItemsReply
 }
-var file_shop_v1_shop_proto_depIdxs = []int32{
+var file_api_shop_v1_shop_proto_depIdxs = []int32{
 	1,  // 0: api.shop.v1.ListShopItemsReply.items:type_name -> api.shop.v1.ShopItem
 	2,  // 1: api.shop.v1.GetDailyDealReply.deal:type_name -> api.shop.v1.DailyDeal
 	0,  // 2: api.shop.v1.BuyItemRequest.currency:type_name -> api.shop.v1.ShopCurrency
@@ -676,27 +676,27 @@ var file_shop_v1_shop_proto_depIdxs = []int32{
 	0,  // [0:4] is the sub-list for field type_name
 }
 
-func init() { file_shop_v1_shop_proto_init() }
-func file_shop_v1_shop_proto_init() {
-	if File_shop_v1_shop_proto != nil {
+func init() { file_api_shop_v1_shop_proto_init() }
+func file_api_shop_v1_shop_proto_init() {
+	if File_api_shop_v1_shop_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_shop_v1_shop_proto_rawDesc), len(file_shop_v1_shop_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_shop_v1_shop_proto_rawDesc), len(file_api_shop_v1_shop_proto_rawDesc)),
 			NumEnums:      1,
 			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_shop_v1_shop_proto_goTypes,
-		DependencyIndexes: file_shop_v1_shop_proto_depIdxs,
-		EnumInfos:         file_shop_v1_shop_proto_enumTypes,
-		MessageInfos:      file_shop_v1_shop_proto_msgTypes,
+		GoTypes:           file_api_shop_v1_shop_proto_goTypes,
+		DependencyIndexes: file_api_shop_v1_shop_proto_depIdxs,
+		EnumInfos:         file_api_shop_v1_shop_proto_enumTypes,
+		MessageInfos:      file_api_shop_v1_shop_proto_msgTypes,
 	}.Build()
-	File_shop_v1_shop_proto = out.File
-	file_shop_v1_shop_proto_goTypes = nil
-	file_shop_v1_shop_proto_depIdxs = nil
+	File_api_shop_v1_shop_proto = out.File
+	file_api_shop_v1_shop_proto_goTypes = nil
+	file_api_shop_v1_shop_proto_depIdxs = nil
 }

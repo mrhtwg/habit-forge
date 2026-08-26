@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-http v2.9.2
 // - protoc             (unknown)
-// source: stats/v1/stats.proto
+// source: api/stats/v1/stats.proto
 
 package v1
 

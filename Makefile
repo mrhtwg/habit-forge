@@ -15,9 +15,9 @@ test:
 	cd server && go test ./...
 	cd app && flutter test
 
-## Generate server proto contracts (Go) — requires buf + protoc-gen-go(+http/grpc) on PATH
+## Generate shared proto contracts (Go → server/api) — requires buf + protoc-gen-go(+http/grpc) on PATH
 proto:
-	cd server && buf generate --path api/auth/v1 --path api/user/v1 --path api/character/v1 --path api/task/v1 --path api/shop/v1 --path api/achievement/v1 --path api/stats/v1
+	cd proto && buf generate --path api/auth/v1 --path api/user/v1 --path api/character/v1 --path api/task/v1 --path api/shop/v1 --path api/achievement/v1 --path api/stats/v1
 
 ## Clean local build artifacts
 clean:

@@ -64,7 +64,7 @@ gRPC services mirror the HTTP API (`api.auth.v1.AuthService`, `api.task.v1.TaskS
 
 ```text
 server/
-├── api/                       # proto contracts + generated Go code
+├── api/                       # generated Go code (protos live in ../proto)
 │   ├── auth/v1/               # register / login / oauth / me
 │   ├── user/v1/               # preferences & wallet
 │   ├── character/v1/          # class / level / EXP / HP / stats / equipment
@@ -74,7 +74,6 @@ server/
 │   └── stats/v1/              # completion charts & streak leaderboard
 ├── cmd/server/                # entrypoint + Wire (wire.go / wire_gen.go)
 ├── configs/config.yaml        # configuration reference (env-based)
-├── third_party/google/api/    # minimal google.api.http annotations for codegen
 ├── internal/
 │   ├── conf/                  # env-based configuration
 │   ├── data/                  # data layer (PostgreSQL handle, TODO repositories)
@@ -83,15 +82,14 @@ server/
 │   ├── middleware/            # JWT auth middleware
 │   ├── model/                 # GORM models (user, character, task, shop, achievement)
 │   └── server/                # kratos HTTP + gRPC server assembly
-├── buf.yaml                   # buf module config (api + third_party)
-├── buf.gen.yaml               # codegen plugin config
 ├── go.mod / go.sum
 └── README.md
 ```
 
 ## Regenerating the proto code
 
-Install the toolchain once:
+The protos live in `../proto/` (shared contract with the app). Install the
+toolchain once:
 
 ```bash
 go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
@@ -104,6 +102,7 @@ Then regenerate (also available as `make proto` from the repository root):
 
 ```bash
 export PATH="$PATH:$(go env GOPATH)/bin"
+cd ../proto
 buf generate --path api/auth/v1 --path api/user/v1 --path api/character/v1 --path api/task/v1 --path api/shop/v1 --path api/achievement/v1 --path api/stats/v1
 ```
 
