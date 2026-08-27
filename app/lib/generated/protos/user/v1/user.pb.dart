@@ -8,9 +8,8 @@
 // ignore_for_file: constant_identifier_names
 // ignore_for_file: curly_braces_in_flow_control_structures
 // ignore_for_file: deprecated_member_use_from_same_package, library_prefixes
-// ignore_for_file: non_constant_identifier_names, prefer_relative_imports
+// ignore_for_file: non_constant_identifier_names
 
-import 'dart:async' as $async;
 import 'dart:core' as $core;
 
 import 'package:fixnum/fixnum.dart' as $fixnum;
@@ -378,25 +377,6 @@ class UpdatePrefsReply extends $pb.GeneratedMessage {
   void clearPrefs() => $_clearField(1);
   @$pb.TagNumber(1)
   UserPrefs ensurePrefs() => $_ensure(0);
-}
-
-/// UserService — user preferences, wallet and settings.
-class UserServiceApi {
-  final $pb.RpcClient _client;
-
-  UserServiceApi(this._client);
-
-  /// GetPrefs returns the current user's preferences and wallet.
-  $async.Future<GetPrefsReply> getPrefs(
-          $pb.ClientContext? ctx, GetPrefsRequest request) =>
-      _client.invoke<GetPrefsReply>(
-          ctx, 'UserService', 'GetPrefs', request, GetPrefsReply());
-
-  /// UpdatePrefs saves the current user's preferences and wallet.
-  $async.Future<UpdatePrefsReply> updatePrefs(
-          $pb.ClientContext? ctx, UpdatePrefsRequest request) =>
-      _client.invoke<UpdatePrefsReply>(
-          ctx, 'UserService', 'UpdatePrefs', request, UpdatePrefsReply());
 }
 
 const $core.bool _omitFieldNames =

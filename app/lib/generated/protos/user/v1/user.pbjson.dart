@@ -8,8 +8,7 @@
 // ignore_for_file: constant_identifier_names
 // ignore_for_file: curly_braces_in_flow_control_structures
 // ignore_for_file: deprecated_member_use_from_same_package, library_prefixes
-// ignore_for_file: non_constant_identifier_names, prefer_relative_imports
-// ignore_for_file: unused_import
+// ignore_for_file: non_constant_identifier_names, unused_import
 
 import 'dart:convert' as $convert;
 import 'dart:core' as $core;
@@ -134,38 +133,3 @@ const UpdatePrefsReply$json = {
 final $typed_data.Uint8List updatePrefsReplyDescriptor = $convert.base64Decode(
     'ChBVcGRhdGVQcmVmc1JlcGx5EiwKBXByZWZzGAEgASgLMhYuYXBpLnVzZXIudjEuVXNlclByZW'
     'ZzUgVwcmVmcw==');
-
-const $core.Map<$core.String, $core.dynamic> UserServiceBase$json = {
-  '1': 'UserService',
-  '2': [
-    {
-      '1': 'GetPrefs',
-      '2': '.api.user.v1.GetPrefsRequest',
-      '3': '.api.user.v1.GetPrefsReply',
-      '4': {}
-    },
-    {
-      '1': 'UpdatePrefs',
-      '2': '.api.user.v1.UpdatePrefsRequest',
-      '3': '.api.user.v1.UpdatePrefsReply',
-      '4': {}
-    },
-  ],
-};
-
-@$core.Deprecated('Use userServiceDescriptor instead')
-const $core.Map<$core.String, $core.Map<$core.String, $core.dynamic>>
-    UserServiceBase$messageJson = {
-  '.api.user.v1.GetPrefsRequest': GetPrefsRequest$json,
-  '.api.user.v1.GetPrefsReply': GetPrefsReply$json,
-  '.api.user.v1.UserPrefs': UserPrefs$json,
-  '.api.user.v1.UpdatePrefsRequest': UpdatePrefsRequest$json,
-  '.api.user.v1.UpdatePrefsReply': UpdatePrefsReply$json,
-};
-
-/// Descriptor for `UserService`. Decode as a `google.protobuf.ServiceDescriptorProto`.
-final $typed_data.Uint8List userServiceDescriptor = $convert.base64Decode(
-    'CgtVc2VyU2VydmljZRJgCghHZXRQcmVmcxIcLmFwaS51c2VyLnYxLkdldFByZWZzUmVxdWVzdB'
-    'oaLmFwaS51c2VyLnYxLkdldFByZWZzUmVwbHkiGoLT5JMCFBISL2FwaS92MS91c2VyL3ByZWZz'
-    'EmwKC1VwZGF0ZVByZWZzEh8uYXBpLnVzZXIudjEuVXBkYXRlUHJlZnNSZXF1ZXN0Gh0uYXBpLn'
-    'VzZXIudjEuVXBkYXRlUHJlZnNSZXBseSIdgtPkkwIXGhIvYXBpL3YxL3VzZXIvcHJlZnM6ASo=');

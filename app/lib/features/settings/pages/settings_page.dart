@@ -5,7 +5,7 @@ import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
 import 'package:habit_forge_app/core/services/audio_service.dart';
 import 'package:habit_forge_app/core/services/haptic_service.dart';
-import 'package:habit_forge_app/core/services/hive_service.dart';
+import 'package:habit_forge_app/core/storage/storage_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/auth/controllers/auth_controller.dart';
@@ -26,7 +26,7 @@ class SettingsPage extends GetView<SettingsController> {
         elevation: 0,
       ),
       body: Obx(() {
-        final prefs = HiveService.to.userPrefs.value;
+        final prefs = StorageService.to.userPrefs.value;
         if (prefs == null) return const SizedBox();
         return ListView(
           padding: const EdgeInsets.all(16),
@@ -40,7 +40,7 @@ class SettingsPage extends GetView<SettingsController> {
                     dense: true,
                     leading: const Icon(Icons.person_outline, color: AppColors.textSecondary),
                     title: Text(
-                      HiveService.to.authMethod.isEmpty ? LanKey.guest.tr : HiveService.to.authMethod.capitalizeFirst!,
+                      StorageService.to.authMethod.isEmpty ? LanKey.guest.tr : StorageService.to.authMethod.capitalizeFirst!,
                       style: textStyleRegular(color: AppColors.textPrimary),
                     ),
                     subtitle: Text(
@@ -84,7 +84,7 @@ class SettingsPage extends GetView<SettingsController> {
                     value: prefs.soundEnabled,
                     onChanged: (v) {
                       Get.find<AudioService>().setEnabled(v);
-                      HiveService.to.saveUserPrefs(prefs.rebuild((p) => p..soundEnabled = v));
+                      StorageService.to.saveUserPrefs(prefs.rebuild((p) => p..soundEnabled = v));
                     },
                   ),
                   const Divider(color: AppColors.elevated, height: 1, thickness: 1),
@@ -93,7 +93,7 @@ class SettingsPage extends GetView<SettingsController> {
                     value: prefs.hapticEnabled,
                     onChanged: (v) {
                       Get.find<HapticService>().setEnabled(v);
-                      HiveService.to.saveUserPrefs(prefs.rebuild((p) => p..hapticEnabled = v));
+                      StorageService.to.saveUserPrefs(prefs.rebuild((p) => p..hapticEnabled = v));
                     },
                   ),
                 ],
@@ -132,7 +132,7 @@ class SettingsPage extends GetView<SettingsController> {
                     isDestructive: true,
                   );
                   if (confirmed == true) {
-                    await HiveService.to.resetAllData();
+                    await StorageService.to.resetAllData();
                     Get.offAllNamed(Routers.splash);
                   }
                 },

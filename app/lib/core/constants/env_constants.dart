@@ -12,6 +12,9 @@ class EnvConstants {
   /// Base URL of the self-hosted backend (used when storage == 'server').
   static const String apiBaseUrl = String.fromEnvironment('apiUrl', defaultValue: 'http://localhost:8080');
 
+  /// gRPC endpoint of the self-hosted backend (server mode), host:port.
+  static const String grpcUrl = String.fromEnvironment('grpcUrl', defaultValue: 'localhost:9000');
+
   static const String hive = 'hive';
   static const String firebase = 'firebase';
   static const String server = 'server';

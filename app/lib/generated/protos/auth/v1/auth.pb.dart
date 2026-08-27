@@ -8,9 +8,8 @@
 // ignore_for_file: constant_identifier_names
 // ignore_for_file: curly_braces_in_flow_control_structures
 // ignore_for_file: deprecated_member_use_from_same_package, library_prefixes
-// ignore_for_file: non_constant_identifier_names, prefer_relative_imports
+// ignore_for_file: non_constant_identifier_names
 
-import 'dart:async' as $async;
 import 'dart:core' as $core;
 
 import 'package:fixnum/fixnum.dart' as $fixnum;
@@ -593,35 +592,6 @@ class MeReply extends $pb.GeneratedMessage {
   void clearUser() => $_clearField(1);
   @$pb.TagNumber(1)
   UserInfo ensureUser() => $_ensure(0);
-}
-
-/// AuthService — email/password register & login, OAuth login, current user.
-class AuthServiceApi {
-  final $pb.RpcClient _client;
-
-  AuthServiceApi(this._client);
-
-  /// Register a new email account. No email verification required.
-  $async.Future<RegisterReply> register(
-          $pb.ClientContext? ctx, RegisterRequest request) =>
-      _client.invoke<RegisterReply>(
-          ctx, 'AuthService', 'Register', request, RegisterReply());
-
-  /// Login with email and password.
-  $async.Future<LoginReply> login(
-          $pb.ClientContext? ctx, LoginRequest request) =>
-      _client.invoke<LoginReply>(
-          ctx, 'AuthService', 'Login', request, LoginReply());
-
-  /// OAuth login (google / apple), auto-creates the user when missing.
-  $async.Future<LoginReply> oAuthLogin(
-          $pb.ClientContext? ctx, OAuthLoginRequest request) =>
-      _client.invoke<LoginReply>(
-          ctx, 'AuthService', 'OAuthLogin', request, LoginReply());
-
-  /// Me returns the current authenticated user (JWT required).
-  $async.Future<MeReply> me($pb.ClientContext? ctx, MeRequest request) =>
-      _client.invoke<MeReply>(ctx, 'AuthService', 'Me', request, MeReply());
 }
 
 const $core.bool _omitFieldNames =

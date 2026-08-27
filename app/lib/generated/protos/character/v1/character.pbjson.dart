@@ -8,8 +8,7 @@
 // ignore_for_file: constant_identifier_names
 // ignore_for_file: curly_braces_in_flow_control_structures
 // ignore_for_file: deprecated_member_use_from_same_package, library_prefixes
-// ignore_for_file: non_constant_identifier_names, prefer_relative_imports
-// ignore_for_file: unused_import
+// ignore_for_file: non_constant_identifier_names, unused_import
 
 import 'dart:convert' as $convert;
 import 'dart:core' as $core;
@@ -287,62 +286,3 @@ const ReviveReply$json = {
 final $typed_data.Uint8List reviveReplyDescriptor = $convert.base64Decode(
     'CgtSZXZpdmVSZXBseRI5CgljaGFyYWN0ZXIYASABKAsyGy5hcGkuY2hhcmFjdGVyLnYxLkNoYX'
     'JhY3RlclIJY2hhcmFjdGVy');
-
-const $core.Map<$core.String, $core.dynamic> CharacterServiceBase$json = {
-  '1': 'CharacterService',
-  '2': [
-    {
-      '1': 'GetCharacter',
-      '2': '.api.character.v1.GetCharacterRequest',
-      '3': '.api.character.v1.GetCharacterReply',
-      '4': {}
-    },
-    {
-      '1': 'UpdateCharacter',
-      '2': '.api.character.v1.UpdateCharacterRequest',
-      '3': '.api.character.v1.UpdateCharacterReply',
-      '4': {}
-    },
-    {
-      '1': 'AllocateStatPoint',
-      '2': '.api.character.v1.AllocateStatPointRequest',
-      '3': '.api.character.v1.AllocateStatPointReply',
-      '4': {}
-    },
-    {
-      '1': 'Revive',
-      '2': '.api.character.v1.ReviveRequest',
-      '3': '.api.character.v1.ReviveReply',
-      '4': {}
-    },
-  ],
-};
-
-@$core.Deprecated('Use characterServiceDescriptor instead')
-const $core.Map<$core.String, $core.Map<$core.String, $core.dynamic>>
-    CharacterServiceBase$messageJson = {
-  '.api.character.v1.GetCharacterRequest': GetCharacterRequest$json,
-  '.api.character.v1.GetCharacterReply': GetCharacterReply$json,
-  '.api.character.v1.Character': Character$json,
-  '.api.character.v1.CharacterStats': CharacterStats$json,
-  '.api.character.v1.Character.EquipmentEntry': Character_EquipmentEntry$json,
-  '.api.character.v1.UpdateCharacterRequest': UpdateCharacterRequest$json,
-  '.api.character.v1.UpdateCharacterReply': UpdateCharacterReply$json,
-  '.api.character.v1.AllocateStatPointRequest': AllocateStatPointRequest$json,
-  '.api.character.v1.AllocateStatPointReply': AllocateStatPointReply$json,
-  '.api.character.v1.ReviveRequest': ReviveRequest$json,
-  '.api.character.v1.ReviveReply': ReviveReply$json,
-};
-
-/// Descriptor for `CharacterService`. Decode as a `google.protobuf.ServiceDescriptorProto`.
-final $typed_data.Uint8List characterServiceDescriptor = $convert.base64Decode(
-    'ChBDaGFyYWN0ZXJTZXJ2aWNlEnUKDEdldENoYXJhY3RlchIlLmFwaS5jaGFyYWN0ZXIudjEuR2'
-    'V0Q2hhcmFjdGVyUmVxdWVzdBojLmFwaS5jaGFyYWN0ZXIudjEuR2V0Q2hhcmFjdGVyUmVwbHki'
-    'GYLT5JMCExIRL2FwaS92MS9jaGFyYWN0ZXISgQEKD1VwZGF0ZUNoYXJhY3RlchIoLmFwaS5jaG'
-    'FyYWN0ZXIudjEuVXBkYXRlQ2hhcmFjdGVyUmVxdWVzdBomLmFwaS5jaGFyYWN0ZXIudjEuVXBk'
-    'YXRlQ2hhcmFjdGVyUmVwbHkiHILT5JMCFhoRL2FwaS92MS9jaGFyYWN0ZXI6ASoSlgEKEUFsbG'
-    '9jYXRlU3RhdFBvaW50EiouYXBpLmNoYXJhY3Rlci52MS5BbGxvY2F0ZVN0YXRQb2ludFJlcXVl'
-    'c3QaKC5hcGkuY2hhcmFjdGVyLnYxLkFsbG9jYXRlU3RhdFBvaW50UmVwbHkiK4LT5JMCJSIgL2'
-    'FwaS92MS9jaGFyYWN0ZXIvc3RhdHMvYWxsb2NhdGU6ASoSbQoGUmV2aXZlEh8uYXBpLmNoYXJh'
-    'Y3Rlci52MS5SZXZpdmVSZXF1ZXN0Gh0uYXBpLmNoYXJhY3Rlci52MS5SZXZpdmVSZXBseSIjgt'
-    'PkkwIdIhgvYXBpL3YxL2NoYXJhY3Rlci9yZXZpdmU6ASo=');

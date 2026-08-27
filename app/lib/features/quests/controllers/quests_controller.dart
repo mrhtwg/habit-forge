@@ -1,17 +1,12 @@
-import 'package:fixnum/fixnum.dart';
 import 'package:get/get.dart';
-import 'package:habit_forge_app/core/constants/game_constants.dart';
-import 'package:habit_forge_app/core/extensions/date_extensions.dart';
 import 'package:habit_forge_app/core/services/audio_service.dart';
 import 'package:habit_forge_app/core/services/haptic_service.dart';
-import 'package:habit_forge_app/core/services/hive_service.dart';
-import 'package:habit_forge_app/features/character/controllers/character_controller.dart';
+import 'package:habit_forge_app/core/storage/storage_service.dart';
 import 'package:habit_forge_app/features/rewards/reward_popup.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';
-import 'package:habit_forge_app/generated/protos/user/v1/user.pb.dart';
 
 class QuestsController extends GetxController {
-  final _hive = HiveService.to;
+  final _hive = StorageService.to;
   final activeType = TaskType.TASK_TYPE_HABIT.obs;
   final activeTag = 'all'.obs;
   final showAll = false.obs;
@@ -42,64 +37,12 @@ class QuestsController extends GetxController {
   }
 
   void onTaskPostpone(Task task) {
-    final tomorrow = DateTime.now().add(const Duration(days: 1));
-    final updated = task.rebuild(
-      (t) => t
-        ..isSkipped = true
-        ..dueDate = task.type == TaskType.TASK_TYPE_TODO ? Int64(tomorrow.millisecondsSinceEpoch) : task.dueDate,
-    );
-    _hive.updateTask(updated);
+    _hive.postponeTask(task);
   }
 
-  int taskRewardExp(Task task) {
-    if (task.customExpReward > 0) return task.customExpReward;
-    final base = GameConstants.baseExpReward(task.difficulty);
-    return (base * GameConstants.streakMultiplier(task.streak)).round();
-  }
-
-  int taskRewardGold(Task task) {
-    if (task.customGoldReward > 0) return task.customGoldReward;
-    return GameConstants.baseGoldReward(task.difficulty);
-  }
-
-  void toggleComplete(Task task) {
+  Future<void> toggleComplete(Task task) async {
     if (task.isCompleted) return;
-    final now = DateTime.now();
-    final expReward = taskRewardExp(task);
-    final goldReward = taskRewardGold(task);
-
-    // Update streak
-    int newStreak = task.streak;
-    if (DateTime(task.lastStreakDate.toInt()).isToday) {
-      // Already completed today, maintain streak
-    } else {
-      newStreak++;
-    }
-
-    final updated = task.rebuild(
-      (t) => t
-        ..isCompleted = true
-        ..streak = newStreak
-        ..lastStreakDate = Int64(now.millisecondsSinceEpoch),
-    );
-    _hive.updateTask(updated);
-
-    // Apply rewards
-    final prefs = _hive.userPrefs.value ?? UserPrefs();
-    _hive.saveUserPrefs(
-      prefs.rebuild(
-        (p) => p
-          ..currentGold = prefs.currentGold + goldReward
-          ..totalTasksCompleted = prefs.totalTasksCompleted + 1,
-      ),
-    );
-
-    // Apply exp to character
-    final char = _hive.character.value;
-    if (char != null) {
-      final newExp = char.currentExp + expReward;
-      _hive.saveCharacter(char.rebuild((c) => c..currentExp = newExp));
-    }
+    final result = await _hive.completeTask(task);
 
     // Trigger audio/haptic feedback
     final audio = Get.find<AudioService>();
@@ -107,23 +50,19 @@ class QuestsController extends GetxController {
     audio.playComplete();
     haptic.success();
 
-    // Check level-up and show reward popup
-    final charCtrl = Get.find<CharacterController>();
-    final newLevel = charCtrl.checkLevelUp();
     RewardPopup.show(
-      expGained: expReward,
-      goldGained: goldReward,
-      newLevel: newLevel > 0 ? newLevel : null,
+      expGained: result.expGained,
+      goldGained: result.goldGained,
+      newLevel: result.newLevel,
     );
-    if (newLevel > 0) {
+    if (result.newLevel != null) {
       audio.playLevelUp();
       haptic.heavy();
     }
   }
 
   void toggleSkip(Task task) {
-    final updated = task.rebuild((t) => t..isSkipped = !task.isSkipped);
-    _hive.updateTask(updated);
+    _hive.skipTask(task);
   }
 
   void updateTask(Task task) {

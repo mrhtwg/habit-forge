@@ -1,13 +1,12 @@
-import 'package:fixnum/fixnum.dart';
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/extensions/task_extensions.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
-import 'package:habit_forge_app/core/services/hive_service.dart';
+import 'package:habit_forge_app/core/storage/storage_service.dart';
 import 'package:habit_forge_app/features/main/controllers/main_controller.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';
 
 class HomeController extends GetxController {
-  final _hive = HiveService.to;
+  final _hive = StorageService.to;
 
   // Completed tasks stay in the list, rendered ticked — the checkmark is the only
   // completion feedback (no popup/message).
@@ -34,8 +33,7 @@ class HomeController extends GetxController {
   }
 
   void onTaskComplete(Task task) {
-    final updated = task.rebuild((t) => t..isCompleted = true);
-    _hive.updateTask(updated);
+    _hive.completeTask(task);
   }
 
   void onTaskDelete(String id) {
@@ -43,17 +41,10 @@ class HomeController extends GetxController {
   }
 
   void onTaskPostpone(Task task) {
-    final tomorrow = DateTime.now().add(const Duration(days: 1));
-    final updated = task.rebuild(
-      (t) => t
-        ..isSkipped = true
-        ..dueDate = task.type == TaskType.TASK_TYPE_TODO ? Int64(tomorrow.millisecondsSinceEpoch) : task.dueDate,
-    );
-    _hive.updateTask(updated);
+    _hive.postponeTask(task);
   }
 
   void onTaskSkip(Task task) {
-    final updated = task.rebuild((t) => t..isSkipped = true);
-    _hive.updateTask(updated);
+    _hive.skipTask(task);
   }
 }

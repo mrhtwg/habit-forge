@@ -1,7 +1,7 @@
 import 'package:carousel_slider/carousel_controller.dart';
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
-import 'package:habit_forge_app/core/services/hive_service.dart';
+import 'package:habit_forge_app/core/storage/storage_service.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';
 import 'package:habit_forge_app/generated/protos/user/v1/user.pb.dart';
@@ -19,13 +19,13 @@ class BoardingController extends GetxController {
 
   void complete() {
     final prefs = UserPrefs(onboardingCompleted: true);
-    HiveService.to.saveUserPrefs(prefs);
+    StorageService.to.saveUserPrefs(prefs);
 
     final character = Character(
       id: 'default',
       characterClass: selectedClass.value,
     );
-    HiveService.to.saveCharacter(character);
+    StorageService.to.createCharacter(character);
 
     if (firstHabitTitle.value.isNotEmpty) {
       final task = Task(
@@ -35,7 +35,7 @@ class BoardingController extends GetxController {
         difficulty: TaskDifficulty.TASK_DIFFICULTY_EASY,
         // createdAt: DateTime.now(),
       );
-      HiveService.to.createTask(task);
+      StorageService.to.createTask(task);
     }
 
     Get.offNamed(Routers.main);
@@ -59,13 +59,13 @@ class BoardingController extends GetxController {
 
   void skip() {
     final prefs = UserPrefs(onboardingCompleted: true);
-    HiveService.to.saveUserPrefs(prefs);
+    StorageService.to.saveUserPrefs(prefs);
 
     final character = Character(
       id: 'default',
       characterClass: selectedClass.value,
     );
-    HiveService.to.saveCharacter(character);
+    StorageService.to.createCharacter(character);
 
     Get.offNamed(Routers.main);
   }

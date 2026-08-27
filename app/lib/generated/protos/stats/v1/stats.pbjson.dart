@@ -8,8 +8,7 @@
 // ignore_for_file: constant_identifier_names
 // ignore_for_file: curly_braces_in_flow_control_structures
 // ignore_for_file: deprecated_member_use_from_same_package, library_prefixes
-// ignore_for_file: non_constant_identifier_names, prefer_relative_imports
-// ignore_for_file: unused_import
+// ignore_for_file: non_constant_identifier_names, unused_import
 
 import 'dart:convert' as $convert;
 import 'dart:core' as $core;
@@ -150,30 +149,3 @@ const GetStatsReply$json = {
 final $typed_data.Uint8List getStatsReplyDescriptor = $convert.base64Decode(
     'Cg1HZXRTdGF0c1JlcGx5Ei4KBXN0YXRzGAEgASgLMhguYXBpLnN0YXRzLnYxLlN0YXRzUmVwbH'
     'lSBXN0YXRz');
-
-const $core.Map<$core.String, $core.dynamic> StatsServiceBase$json = {
-  '1': 'StatsService',
-  '2': [
-    {
-      '1': 'GetStats',
-      '2': '.api.stats.v1.GetStatsRequest',
-      '3': '.api.stats.v1.GetStatsReply',
-      '4': {}
-    },
-  ],
-};
-
-@$core.Deprecated('Use statsServiceDescriptor instead')
-const $core.Map<$core.String, $core.Map<$core.String, $core.dynamic>>
-    StatsServiceBase$messageJson = {
-  '.api.stats.v1.GetStatsRequest': GetStatsRequest$json,
-  '.api.stats.v1.GetStatsReply': GetStatsReply$json,
-  '.api.stats.v1.StatsReply': StatsReply$json,
-  '.api.stats.v1.TimeSegment': TimeSegment$json,
-  '.api.stats.v1.StreakEntry': StreakEntry$json,
-};
-
-/// Descriptor for `StatsService`. Decode as a `google.protobuf.ServiceDescriptorProto`.
-final $typed_data.Uint8List statsServiceDescriptor = $convert.base64Decode(
-    'CgxTdGF0c1NlcnZpY2USXQoIR2V0U3RhdHMSHS5hcGkuc3RhdHMudjEuR2V0U3RhdHNSZXF1ZX'
-    'N0GhsuYXBpLnN0YXRzLnYxLkdldFN0YXRzUmVwbHkiFYLT5JMCDxINL2FwaS92MS9zdGF0cw==');

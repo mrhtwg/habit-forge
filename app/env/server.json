@@ -2,5 +2,6 @@
   "env": "server",
   "storage": "server",
   "auth": "server",
-  "apiUrl": "http://localhost:8080"
+  "apiUrl": "http://localhost:8080",
+  "grpcUrl": "localhost:9000"
 }

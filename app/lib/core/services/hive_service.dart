@@ -1,6 +1,9 @@
 import 'dart:convert';
 
+import 'package:fixnum/fixnum.dart';
 import 'package:get/get.dart';
+import 'package:habit_forge_app/core/storage/game_logic.dart';
+import 'package:habit_forge_app/core/storage/storage_service.dart';
 import 'package:habit_forge_app/generated/protos/achievement/v1/achievement.pb.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart';
 import 'package:habit_forge_app/generated/protos/shop/v1/shop.pb.dart';
@@ -9,7 +12,11 @@ import 'package:habit_forge_app/generated/protos/user/v1/user.pb.dart';
 import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 
-class HiveService extends GetxService {
+/// Local on-device storage (hive mode).
+///
+/// Game logic runs locally through [GameLogic] and the results are persisted
+/// in Hive boxes.
+class HiveService extends GetxService implements StorageService {
   static HiveService get to => Get.find();
 
   late Box _userBox;
@@ -37,27 +44,7 @@ class HiveService extends GetxService {
   // ── Auth ──
   bool get isLoggedIn => _userBox.get('isLoggedIn', defaultValue: false);
 
-  // ── Shop ──
-  void addOwnedItem(String itemId) {
-    if (!ownedItemIds.contains(itemId)) {
-      ownedItemIds.add(itemId);
-      _shopBox.put('ownedItems', ownedItemIds.toList());
-    }
-  }
-
-  String createTask(Task task) {
-    final id = _uuid.v4();
-    final t = task..id = id;
-    _tasksBox.put('task_$id', _json.encode(t.writeToJson()));
-    _loadTasks();
-    return id;
-  }
-
-  void deleteTask(String id) {
-    _tasksBox.delete('task_$id');
-    _loadTasks();
-  }
-
+  // ── Lifecycle ──
   Future<HiveService> init() async {
     _userBox = await Hive.openBox('userBox');
     _characterBox = await Hive.openBox('characterBox');
@@ -65,13 +52,18 @@ class HiveService extends GetxService {
     _shopBox = await Hive.openBox('shopBox');
     _achievementBox = await Hive.openBox('achievementBox');
 
+    await refreshAll();
+    return this;
+  }
+
+  @override
+  Future<void> refreshAll() async {
     userPrefs.value = _readJson(_userBox, 'userPrefs', (m) => UserPrefs()..mergeFromJsonMap(m));
     character.value = _readJson(_characterBox, 'character', (m) => Character.fromJson(m.toString()));
     _loadTasks();
     ownedItemIds.value = _shopBox.get('ownedItems', defaultValue: <String>[]).cast<String>();
     _loadAchievements();
     dailyDeal.value = _readJson(_shopBox, 'dailyDeal', (m) => DailyDeal()..mergeFromJsonMap(m));
-    return this;
   }
 
   Future<void> resetAllData() async {
@@ -88,9 +80,138 @@ class HiveService extends GetxService {
     dailyDeal.value = null;
   }
 
-  void saveAchievement(Achievement a) {
-    _achievementBox.put('ach_${a.id}', _json.encode(a.writeToJson()));
-    _loadAchievements();
+  // ── Task operations ──
+  String createTask(Task task) {
+    final id = _uuid.v4();
+    final t = task..id = id;
+    _tasksBox.put('task_$id', _json.encode(t.writeToJson()));
+    _loadTasks();
+    return id;
+  }
+
+  void updateTask(Task task) {
+    _tasksBox.put('task_${task.id}', _json.encode(task.writeToJson()));
+    _loadTasks();
+  }
+
+  void deleteTask(String id) {
+    _tasksBox.delete('task_$id');
+    _loadTasks();
+  }
+
+  void skipTask(Task task) => updateTask(task.rebuild((t) => t..isSkipped = !task.isSkipped));
+
+  void postponeTask(Task task) {
+    final tomorrow = DateTime.now().add(const Duration(days: 1));
+    updateTask(task.rebuild((t) => t
+      ..isSkipped = true
+      ..dueDate = task.type == TaskType.TASK_TYPE_TODO ? Int64(tomorrow.millisecondsSinceEpoch) : task.dueDate,
+    ),
+    );
+  }
+
+  Future<TaskCompleteResult> completeTask(Task task) async {
+    final completed = GameLogic.completeTask(task);
+    updateTask(completed);
+
+    final exp = GameLogic.expReward(task);
+    final gold = GameLogic.goldReward(task);
+
+    final prefs = userPrefs.value ?? UserPrefs();
+    saveUserPrefs(GameLogic.addGold(GameLogic.addCompletedTask(prefs), gold));
+
+    var newLevel = -1;
+    final char = character.value;
+    if (char != null) {
+      final (updated, level) = GameLogic.gainExp(char, exp);
+      saveCharacter(updated);
+      newLevel = level;
+    }
+    return TaskCompleteResult(expGained: exp, goldGained: gold, newLevel: newLevel > 0 ? newLevel : null);
+  }
+
+  // ── Character operations ──
+  Future<void> createCharacter(Character c) async {
+    saveCharacter(c);
+  }
+
+  Future<bool> allocateStatPoint(StatType stat) async {
+    final char = character.value;
+    if (char == null || char.availableStatPoints <= 0) return false;
+    saveCharacter(GameLogic.allocateStat(char, stat));
+    return true;
+  }
+
+  Future<void> takeDamage(int amount) async {
+    final char = character.value;
+    if (char != null) saveCharacter(GameLogic.takeDamage(char, amount));
+  }
+
+  Future<void> reviveCharacter() async {
+    final char = character.value;
+    if (char != null && char.isDead) saveCharacter(GameLogic.revive(char));
+  }
+
+  void equipItem(String itemId, {String slot = 'weapon'}) {
+    final char = character.value;
+    if (char != null) saveCharacter(GameLogic.equip(char, slot, itemId));
+  }
+
+  // ── Character persistence (used by the operations above) ──
+  void saveCharacter(Character c) {
+    character.value = c;
+    _writeJson(_characterBox, 'character', c.writeToJson());
+  }
+
+  // ── Economy ──
+  Future<bool> purchaseItem(String itemId, int price, {ShopCurrency currency = ShopCurrency.SHOP_CURRENCY_GOLD}) async {
+    final prefs = userPrefs.value ?? UserPrefs();
+    if (prefs.currentGold < price) return false;
+    if (ownedItemIds.contains(itemId)) return false;
+    saveUserPrefs(GameLogic.addGold(prefs, -price));
+    _addOwnedItem(itemId);
+    return true;
+  }
+
+  Future<void> addGold(int amount) async {
+    final prefs = userPrefs.value ?? UserPrefs();
+    saveUserPrefs(GameLogic.addGold(prefs, amount));
+  }
+
+  Future<void> addGems(int amount) async {
+    final prefs = userPrefs.value ?? UserPrefs();
+    saveUserPrefs(GameLogic.addGems(prefs, amount));
+  }
+
+  // ── Achievements ──
+  Future<bool> unlockAchievement(Achievement def) async {
+    if (achievements.any((a) => a.id == def.id && a.isUnlocked)) return false;
+    final unlocked = def.rebuild((a) => a
+      ..isUnlocked = true
+      ..unlockedAt = Int64(DateTime.now().millisecondsSinceEpoch),
+    );
+    _saveAchievement(unlocked);
+    if (unlocked.gemReward > 0) {
+      await addGems(unlocked.gemReward.toInt());
+    }
+    return true;
+  }
+
+  // ── User prefs ──
+  void saveUserPrefs(UserPrefs prefs) {
+    userPrefs.value = prefs;
+    _writeJson(_userBox, 'userPrefs', prefs.writeToJson());
+  }
+
+  void saveDailyDeal(DailyDeal deal) {
+    dailyDeal.value = deal;
+    _shopBox.put('dailyDeal', _json.encode(deal.writeToJson()));
+  }
+
+  // ── Auth ──
+  void setLoggedIn(bool value, {String method = ''}) {
+    _userBox.put('isLoggedIn', value);
+    if (method.isNotEmpty) _userBox.put('authMethod', method);
   }
 
   void saveAuthToken(String? token) {
@@ -101,34 +222,19 @@ class HiveService extends GetxService {
     }
   }
 
-  // ── Character ──
-  void saveCharacter(Character c) {
-    character.value = c;
-    _writeJson(_characterBox, 'character', c.writeToJson());
+  // ── Internal ──
+  void _addOwnedItem(String itemId) {
+    if (!ownedItemIds.contains(itemId)) {
+      ownedItemIds.add(itemId);
+      _shopBox.put('ownedItems', ownedItemIds.toList());
+    }
   }
 
-  void saveDailyDeal(DailyDeal deal) {
-    dailyDeal.value = deal;
-    _shopBox.put('dailyDeal', _json.encode(deal.writeToJson()));
+  void _saveAchievement(Achievement a) {
+    _achievementBox.put('ach_${a.id}', _json.encode(a.writeToJson()));
+    _loadAchievements();
   }
 
-  // ── User Prefs ──
-  void saveUserPrefs(UserPrefs prefs) {
-    userPrefs.value = prefs;
-    _writeJson(_userBox, 'userPrefs', prefs.writeToJson());
-  }
-
-  void setLoggedIn(bool value, {String method = ''}) {
-    _userBox.put('isLoggedIn', value);
-    if (method.isNotEmpty) _userBox.put('authMethod', method);
-  }
-
-  void updateTask(Task task) {
-    _tasksBox.put('task_${task.id}', _json.encode(task.writeToJson()));
-    _loadTasks();
-  }
-
-  // ── Achievements ──
   void _loadAchievements() {
     final all = <Achievement>[];
     for (final key in _achievementBox.keys) {
@@ -142,7 +248,6 @@ class HiveService extends GetxService {
     achievements.value = all;
   }
 
-  // ── Tasks ──
   void _loadTasks() {
     final all = <Task>[];
     for (final key in _tasksBox.keys) {

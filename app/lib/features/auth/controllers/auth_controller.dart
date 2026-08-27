@@ -3,7 +3,7 @@ import 'package:habit_forge_app/core/constants/env_constants.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
 import 'package:habit_forge_app/core/services/firebase_auth_service.dart';
-import 'package:habit_forge_app/core/services/hive_service.dart';
+import 'package:habit_forge_app/core/storage/storage_service.dart';
 import 'package:habit_forge_app/core/services/server_auth_service.dart';
 
 class AuthController extends GetxController {
@@ -21,7 +21,7 @@ class AuthController extends GetxController {
         Get.snackbar(LanKey.appleLoginFailed.tr, error);
         return false;
       }
-      HiveService.to.setLoggedIn(true, method: 'apple');
+      StorageService.to.setLoggedIn(true, method: 'apple');
       isLoggedIn.value = true;
       _checkOnboardingAndRoute();
       return true;
@@ -45,7 +45,7 @@ class AuthController extends GetxController {
         Get.snackbar(LanKey.loginFailed.tr, error);
         return false;
       }
-      HiveService.to.setLoggedIn(true, method: 'email');
+      StorageService.to.setLoggedIn(true, method: 'email');
       isLoggedIn.value = true;
       _checkOnboardingAndRoute();
       return true;
@@ -63,7 +63,7 @@ class AuthController extends GetxController {
         Get.snackbar(LanKey.googleLoginFailed.tr, error);
         return false;
       }
-      HiveService.to.setLoggedIn(true, method: 'google');
+      StorageService.to.setLoggedIn(true, method: 'google');
       isLoggedIn.value = true;
       _checkOnboardingAndRoute();
       return true;
@@ -79,7 +79,7 @@ class AuthController extends GetxController {
     } else {
       await FirebaseAuthService.to.signOut();
     }
-    HiveService.to.setLoggedIn(false);
+    StorageService.to.setLoggedIn(false);
     isLoggedIn.value = false;
     // Hive (local) mode has no real login — return to onboarding instead of the login page.
     Get.offAllNamed(EnvConstants.isHive() ? Routers.boarding : Routers.login);
@@ -107,7 +107,7 @@ class AuthController extends GetxController {
         Get.snackbar(LanKey.registrationFailed.tr, error);
         return false;
       }
-      HiveService.to.setLoggedIn(true, method: 'email');
+      StorageService.to.setLoggedIn(true, method: 'email');
       isLoggedIn.value = true;
       Get.offAllNamed(Routers.boarding);
       return true;
@@ -118,20 +118,20 @@ class AuthController extends GetxController {
 
   /// Skip login as guest
   void skipLogin() {
-    HiveService.to.setLoggedIn(true, method: 'guest');
+    StorageService.to.setLoggedIn(true, method: 'guest');
     isLoggedIn.value = true;
     Get.offAllNamed(Routers.boarding);
   }
 
   void _checkLoginState() {
     // Check persisted Hive state
-    if (HiveService.to.isLoggedIn) {
+    if (StorageService.to.isLoggedIn) {
       isLoggedIn.value = true;
     }
   }
 
   void _checkOnboardingAndRoute() {
-    final prefs = HiveService.to.userPrefs.value;
+    final prefs = StorageService.to.userPrefs.value;
     if (prefs == null || !prefs.onboardingCompleted) {
       Get.offAllNamed(Routers.boarding);
     } else {

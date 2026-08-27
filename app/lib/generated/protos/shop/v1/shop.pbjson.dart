@@ -8,8 +8,7 @@
 // ignore_for_file: constant_identifier_names
 // ignore_for_file: curly_braces_in_flow_control_structures
 // ignore_for_file: deprecated_member_use_from_same_package, library_prefixes
-// ignore_for_file: non_constant_identifier_names, prefer_relative_imports
-// ignore_for_file: unused_import
+// ignore_for_file: non_constant_identifier_names, unused_import
 
 import 'dart:convert' as $convert;
 import 'dart:core' as $core;
@@ -192,60 +191,3 @@ const ListOwnedItemsReply$json = {
 final $typed_data.Uint8List listOwnedItemsReplyDescriptor =
     $convert.base64Decode(
         'ChNMaXN0T3duZWRJdGVtc1JlcGx5EhkKCGl0ZW1faWRzGAEgAygJUgdpdGVtSWRz');
-
-const $core.Map<$core.String, $core.dynamic> ShopServiceBase$json = {
-  '1': 'ShopService',
-  '2': [
-    {
-      '1': 'ListShopItems',
-      '2': '.api.shop.v1.ListShopItemsRequest',
-      '3': '.api.shop.v1.ListShopItemsReply',
-      '4': {}
-    },
-    {
-      '1': 'GetDailyDeal',
-      '2': '.api.shop.v1.GetDailyDealRequest',
-      '3': '.api.shop.v1.GetDailyDealReply',
-      '4': {}
-    },
-    {
-      '1': 'BuyItem',
-      '2': '.api.shop.v1.BuyItemRequest',
-      '3': '.api.shop.v1.BuyItemReply',
-      '4': {}
-    },
-    {
-      '1': 'ListOwnedItems',
-      '2': '.api.shop.v1.ListOwnedItemsRequest',
-      '3': '.api.shop.v1.ListOwnedItemsReply',
-      '4': {}
-    },
-  ],
-};
-
-@$core.Deprecated('Use shopServiceDescriptor instead')
-const $core.Map<$core.String, $core.Map<$core.String, $core.dynamic>>
-    ShopServiceBase$messageJson = {
-  '.api.shop.v1.ListShopItemsRequest': ListShopItemsRequest$json,
-  '.api.shop.v1.ListShopItemsReply': ListShopItemsReply$json,
-  '.api.shop.v1.ShopItem': ShopItem$json,
-  '.api.shop.v1.GetDailyDealRequest': GetDailyDealRequest$json,
-  '.api.shop.v1.GetDailyDealReply': GetDailyDealReply$json,
-  '.api.shop.v1.DailyDeal': DailyDeal$json,
-  '.api.shop.v1.BuyItemRequest': BuyItemRequest$json,
-  '.api.shop.v1.BuyItemReply': BuyItemReply$json,
-  '.api.shop.v1.ListOwnedItemsRequest': ListOwnedItemsRequest$json,
-  '.api.shop.v1.ListOwnedItemsReply': ListOwnedItemsReply$json,
-};
-
-/// Descriptor for `ShopService`. Decode as a `google.protobuf.ServiceDescriptorProto`.
-final $typed_data.Uint8List shopServiceDescriptor = $convert.base64Decode(
-    'CgtTaG9wU2VydmljZRJvCg1MaXN0U2hvcEl0ZW1zEiEuYXBpLnNob3AudjEuTGlzdFNob3BJdG'
-    'Vtc1JlcXVlc3QaHy5hcGkuc2hvcC52MS5MaXN0U2hvcEl0ZW1zUmVwbHkiGoLT5JMCFBISL2Fw'
-    'aS92MS9zaG9wL2l0ZW1zEnEKDEdldERhaWx5RGVhbBIgLmFwaS5zaG9wLnYxLkdldERhaWx5RG'
-    'VhbFJlcXVlc3QaHi5hcGkuc2hvcC52MS5HZXREYWlseURlYWxSZXBseSIfgtPkkwIZEhcvYXBp'
-    'L3YxL3Nob3AvZGFpbHktZGVhbBJuCgdCdXlJdGVtEhsuYXBpLnNob3AudjEuQnV5SXRlbVJlcX'
-    'Vlc3QaGS5hcGkuc2hvcC52MS5CdXlJdGVtUmVwbHkiK4LT5JMCJSIgL2FwaS92MS9zaG9wL2l0'
-    'ZW1zL3tpdGVtX2lkfS9idXk6ASoScgoOTGlzdE93bmVkSXRlbXMSIi5hcGkuc2hvcC52MS5MaX'
-    'N0T3duZWRJdGVtc1JlcXVlc3QaIC5hcGkuc2hvcC52MS5MaXN0T3duZWRJdGVtc1JlcGx5IhqC'
-    '0+STAhQSEi9hcGkvdjEvc2hvcC9vd25lZA==');

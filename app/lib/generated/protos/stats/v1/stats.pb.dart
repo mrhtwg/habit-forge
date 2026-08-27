@@ -8,9 +8,8 @@
 // ignore_for_file: constant_identifier_names
 // ignore_for_file: curly_braces_in_flow_control_structures
 // ignore_for_file: deprecated_member_use_from_same_package, library_prefixes
-// ignore_for_file: non_constant_identifier_names, prefer_relative_imports
+// ignore_for_file: non_constant_identifier_names
 
-import 'dart:async' as $async;
 import 'dart:core' as $core;
 
 import 'package:fixnum/fixnum.dart' as $fixnum;
@@ -382,19 +381,6 @@ class GetStatsReply extends $pb.GeneratedMessage {
   void clearStats() => $_clearField(1);
   @$pb.TagNumber(1)
   StatsReply ensureStats() => $_ensure(0);
-}
-
-/// StatsService — completion statistics and streak leaderboard.
-class StatsServiceApi {
-  final $pb.RpcClient _client;
-
-  StatsServiceApi(this._client);
-
-  /// GetStats returns task statistics over a time range.
-  $async.Future<GetStatsReply> getStats(
-          $pb.ClientContext? ctx, GetStatsRequest request) =>
-      _client.invoke<GetStatsReply>(
-          ctx, 'StatsService', 'GetStats', request, GetStatsReply());
 }
 
 const $core.bool _omitFieldNames =

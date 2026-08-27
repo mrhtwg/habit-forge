@@ -1,8 +1,8 @@
 import 'package:get/get.dart';
-import 'package:habit_forge_app/core/services/hive_service.dart';
+import 'package:habit_forge_app/core/storage/storage_service.dart';
 
 class ProfileController extends GetxController {
-  final _hive = HiveService.to;
+  final _hive = StorageService.to;
 
   double get completionRate {
     final total = _hive.tasks.length;

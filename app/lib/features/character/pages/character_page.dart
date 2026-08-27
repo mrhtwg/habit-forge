@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:habit_forge_app/core/common/animation/frame_sequence_player.dart';
 import 'package:habit_forge_app/core/constants/game_constants.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
-import 'package:habit_forge_app/core/services/hive_service.dart';
+import 'package:habit_forge_app/core/storage/storage_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_spacing.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
@@ -21,7 +21,7 @@ class CharacterPage extends GetView<CharacterController> {
       backgroundColor: AppColors.scaffold,
       body: SafeArea(
         child: Obx(() {
-          final char = HiveService.to.character.value;
+          final char = StorageService.to.character.value;
           if (char == null) return const SizedBox();
           return Column(
             children: [
@@ -293,7 +293,7 @@ class CharacterPage extends GetView<CharacterController> {
   }
 
   void _showEquipSheet(BuildContext context, String slot) {
-    final hive = HiveService.to;
+    final hive = StorageService.to;
     final char = hive.character.value;
     if (char == null) return;
 
@@ -334,7 +334,7 @@ class CharacterPage extends GetView<CharacterController> {
               leading: Icon(Icons.close_rounded, color: AppColors.textMuted, size: 20),
               title: Text(LanKey.noneUnequip.tr, style: textStyleRegular(color: AppColors.textMuted)),
               onTap: () {
-                hive.saveCharacter(char.rebuild((c) => c..equipment.remove(slot)));
+                hive.equipItem('', slot: slot);
                 Get.back();
               },
             ),
@@ -349,7 +349,7 @@ class CharacterPage extends GetView<CharacterController> {
                     ? const Icon(Icons.check_circle_rounded, color: AppColors.green, size: 20)
                     : null,
                 onTap: () {
-                  hive.saveCharacter(char.rebuild((c) => c..equipment[slot] = itemId));
+                  hive.equipItem(itemId, slot: slot);
                   Get.back();
                 },
               ),

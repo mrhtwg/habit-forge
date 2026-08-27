@@ -2,12 +2,12 @@ import 'dart:async';
 
 import 'package:fixnum/fixnum.dart';
 import 'package:get/get.dart';
-import 'package:habit_forge_app/core/services/hive_service.dart';
+import 'package:habit_forge_app/core/storage/storage_service.dart';
 import 'package:habit_forge_app/generated/protos/shop/v1/shop.pb.dart';
 import 'package:habit_forge_app/generated/protos/user/v1/user.pb.dart';
 
 class ForgeController extends GetxController {
-  final _hive = HiveService.to;
+  final _hive = StorageService.to;
 
   final activeCategory = 'appearance'.obs;
   // Daily deal
@@ -93,15 +93,7 @@ class ForgeController extends GetxController {
   }
 
   void equip(String itemId) {
-    final char = _hive.character.value;
-    if (char == null) return;
-    final equipment = Map<String, String>.from(char.equipment);
-    if (equipment['weapon'] == itemId) {
-      _hive.saveCharacter(char.rebuild((c) => c..equipment.remove('weapon')));
-    } else {
-      equipment['weapon'] = itemId;
-      _hive.saveCharacter(char.rebuild((c) => c..equipment['weapon'] = itemId));
-    }
+    _hive.equipItem(itemId);
   }
 
   int goldShortfall(int price) {
@@ -126,15 +118,9 @@ class ForgeController extends GetxController {
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (_) => _updateCountdown());
   }
 
-  /// Returns true if the purchase was successful.
-  bool purchase(ShopItem item) {
-    final prefs = _hive.userPrefs.value ?? UserPrefs();
-    if (prefs.currentGold < item.price.toInt()) return false;
-    if (isOwned(item.id)) return false;
-
-    _hive.saveUserPrefs(prefs.rebuild((p) => p..currentGold = prefs.currentGold - item.price.toInt()));
-    _hive.addOwnedItem(item.id);
-    return true;
+  /// Returns true if the purchase was successful (delegated to the storage layer).
+  Future<bool> purchase(ShopItem item) {
+    return _hive.purchaseItem(item.id, item.price.toInt(), currency: ShopCurrency.SHOP_CURRENCY_GOLD);
   }
 
   void _initDailyDeal() {

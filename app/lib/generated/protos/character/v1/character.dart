@@ -2,3 +2,4 @@
 // Exports all protobuf generated files for simpler imports.
 
 export 'character.pb.dart';
+export 'character.pbgrpc.dart';

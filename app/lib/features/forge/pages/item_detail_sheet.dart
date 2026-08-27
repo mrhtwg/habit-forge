@@ -126,8 +126,8 @@ class ItemDetailSheet extends StatelessWidget {
       label = LanKey.needMoreGold.trParams({'shortfall': '$shortfall'});
       showPrice = false;
     } else {
-      onTap = () {
-        final success = controller.purchase(item);
+      onTap = () async {
+        final success = await controller.purchase(item);
         if (success) Get.back();
       };
       bg = AppColors.gold;
