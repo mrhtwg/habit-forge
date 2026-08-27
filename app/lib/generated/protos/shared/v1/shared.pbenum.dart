@@ -20,17 +20,14 @@ class SysMaterial extends $pb.ProtobufEnum {
       SysMaterial._(0, _omitEnumNames ? '' : 'SYSMATERIAL_GOLD');
   static const SysMaterial SYSMATERIAL_DIAMOND =
       SysMaterial._(1, _omitEnumNames ? '' : 'SYSMATERIAL_DIAMOND');
-  static const SysMaterial SYSMATERIAL_EXP =
-      SysMaterial._(2, _omitEnumNames ? '' : 'SYSMATERIAL_EXP');
 
   static const $core.List<SysMaterial> values = <SysMaterial>[
     SYSMATERIAL_GOLD,
     SYSMATERIAL_DIAMOND,
-    SYSMATERIAL_EXP,
   ];
 
   static final $core.List<SysMaterial?> _byValue =
-      $pb.ProtobufEnum.$_initByValueList(values, 2);
+      $pb.ProtobufEnum.$_initByValueList(values, 1);
   static SysMaterial? valueOf($core.int value) =>
       value < 0 || value >= _byValue.length ? null : _byValue[value];
 

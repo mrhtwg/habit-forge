@@ -10,6 +10,7 @@ import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/quests/controllers/quests_controller.dart';
 import 'package:habit_forge_app/features/quests/pages/task_form_sheet.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';
+import 'package:habit_forge_app/widgets/pressable_button.dart';
 import 'package:habit_forge_app/widgets/task_ticket.dart';
 
 class QuestsPage extends GetView<QuestsController> {
@@ -33,19 +34,12 @@ class QuestsPage extends GetView<QuestsController> {
           Positioned(
             bottom: 24.h,
             right: 20.w,
-            child: GestureDetector(
+            child: PressableButton(
               onTap: () => TaskFormSheet.show(context),
-              child: Container(
-                width: 56.w,
-                height: 56.w,
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: AppColors.border, width: 2.5),
-                  boxShadow: const [BoxShadow(color: AppColors.primaryDark, offset: Offset(0, 4))],
-                ),
-                child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
-              ),
+              // 14 + 28 icon + 14 = 56 (circular)
+              padding: EdgeInsets.all(14.w),
+              borderWidth: 2.5,
+              child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
             ),
           ),
         ],

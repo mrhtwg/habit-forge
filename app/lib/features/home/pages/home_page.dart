@@ -10,6 +10,7 @@ import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/home/controllers/home_controller.dart';
 import 'package:habit_forge_app/features/quests/pages/task_form_sheet.dart';
 import 'package:habit_forge_app/generated/assets.dart';
+import 'package:habit_forge_app/widgets/pressable_button.dart';
 import 'package:habit_forge_app/widgets/task_ticket.dart';
 
 class HomePage extends GetView<HomeController> {
@@ -211,24 +212,16 @@ class HomePage extends GetView<HomeController> {
             ),
           ),
           SizedBox(height: 18.h),
-          GestureDetector(
+          PressableButton(
             onTap: () => TaskFormSheet.show(Get.context!),
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
-              decoration: BoxDecoration(
-                color: AppColors.primary,
-                borderRadius: BorderRadius.circular(999),
-                border: Border.all(color: AppColors.border, width: 2),
-                boxShadow: const [BoxShadow(color: AppColors.primaryDark, offset: Offset(0, 4))],
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.add_rounded, color: Colors.white, size: 20),
-                  SizedBox(width: 6.w),
-                  Text(LanKey.createQuest.tr, style: textStyleBold(fontSize: 15.sp, color: Colors.white)),
-                ],
-              ),
+            padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.add_rounded, color: Colors.white, size: 20),
+                SizedBox(width: 6.w),
+                Text(LanKey.createQuest.tr, style: textStyleBold(fontSize: 15.sp, color: Colors.white)),
+              ],
             ),
           ),
         ],
