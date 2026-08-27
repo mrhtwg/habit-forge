@@ -22,6 +22,59 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// CharacterType - character class.
+type CharacterClass int32
+
+const (
+	CharacterClass_CHARACTER_CLASS_UNSPECIFIED CharacterClass = 0
+	CharacterClass_CHARACTER_CLASS_WARRIOR     CharacterClass = 1
+	CharacterClass_CHARACTER_CLASS_MAGE        CharacterClass = 2
+	CharacterClass_CHARACTER_CLASS_RANGER      CharacterClass = 3
+)
+
+// Enum value maps for CharacterClass.
+var (
+	CharacterClass_name = map[int32]string{
+		0: "CHARACTER_CLASS_UNSPECIFIED",
+		1: "CHARACTER_CLASS_WARRIOR",
+		2: "CHARACTER_CLASS_MAGE",
+		3: "CHARACTER_CLASS_RANGER",
+	}
+	CharacterClass_value = map[string]int32{
+		"CHARACTER_CLASS_UNSPECIFIED": 0,
+		"CHARACTER_CLASS_WARRIOR":     1,
+		"CHARACTER_CLASS_MAGE":        2,
+		"CHARACTER_CLASS_RANGER":      3,
+	}
+)
+
+func (x CharacterClass) Enum() *CharacterClass {
+	p := new(CharacterClass)
+	*p = x
+	return p
+}
+
+func (x CharacterClass) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (CharacterClass) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_character_v1_character_proto_enumTypes[0].Descriptor()
+}
+
+func (CharacterClass) Type() protoreflect.EnumType {
+	return &file_api_character_v1_character_proto_enumTypes[0]
+}
+
+func (x CharacterClass) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use CharacterClass.Descriptor instead.
+func (CharacterClass) EnumDescriptor() ([]byte, []int) {
+	return file_api_character_v1_character_proto_rawDescGZIP(), []int{0}
+}
+
 // StatType — character attributes.
 type StatType int32
 
@@ -68,11 +121,11 @@ func (x StatType) String() string {
 }
 
 func (StatType) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_character_v1_character_proto_enumTypes[0].Descriptor()
+	return file_api_character_v1_character_proto_enumTypes[1].Descriptor()
 }
 
 func (StatType) Type() protoreflect.EnumType {
-	return &file_api_character_v1_character_proto_enumTypes[0]
+	return &file_api_character_v1_character_proto_enumTypes[1]
 }
 
 func (x StatType) Number() protoreflect.EnumNumber {
@@ -81,7 +134,7 @@ func (x StatType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use StatType.Descriptor instead.
 func (StatType) EnumDescriptor() ([]byte, []int) {
-	return file_api_character_v1_character_proto_rawDescGZIP(), []int{0}
+	return file_api_character_v1_character_proto_rawDescGZIP(), []int{1}
 }
 
 type CharacterStats struct {
@@ -171,7 +224,7 @@ func (x *CharacterStats) GetLuck() int32 {
 type Character struct {
 	state               protoimpl.MessageState `protogen:"open.v1"`
 	Id                  string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Class               string                 `protobuf:"bytes,2,opt,name=class,proto3" json:"class,omitempty"` // "warrior" | "mage" | "ranger"
+	Character_Class     CharacterClass         `protobuf:"varint,2,opt,name=character_Class,json=characterClass,proto3,enum=api.character.v1.CharacterClass" json:"character_Class,omitempty"`
 	Level               int32                  `protobuf:"varint,3,opt,name=level,proto3" json:"level,omitempty"`
 	CurrentExp          int64                  `protobuf:"varint,4,opt,name=current_exp,json=currentExp,proto3" json:"current_exp,omitempty"`
 	CurrentHp           int32                  `protobuf:"varint,5,opt,name=current_hp,json=currentHp,proto3" json:"current_hp,omitempty"`
@@ -221,11 +274,11 @@ func (x *Character) GetId() string {
 	return ""
 }
 
-func (x *Character) GetClass() string {
+func (x *Character) GetCharacter_Class() CharacterClass {
 	if x != nil {
-		return x.Class
+		return x.Character_Class
 	}
-	return ""
+	return CharacterClass_CHARACTER_CLASS_UNSPECIFIED
 }
 
 func (x *Character) GetLevel() int32 {
@@ -631,10 +684,10 @@ const file_api_character_v1_character_proto_rawDesc = "" +
 	"\aagility\x18\x03 \x01(\x05R\aagility\x12\x18\n" +
 	"\adefense\x18\x04 \x01(\x05R\adefense\x12\x1a\n" +
 	"\bvitality\x18\x05 \x01(\x05R\bvitality\x12\x12\n" +
-	"\x04luck\x18\x06 \x01(\x05R\x04luck\"\xcf\x03\n" +
+	"\x04luck\x18\x06 \x01(\x05R\x04luck\"\x84\x04\n" +
 	"\tCharacter\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
-	"\x05class\x18\x02 \x01(\tR\x05class\x12\x14\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12I\n" +
+	"\x0fcharacter_Class\x18\x02 \x01(\x0e2 .api.character.v1.CharacterClassR\x0echaracterClass\x12\x14\n" +
 	"\x05level\x18\x03 \x01(\x05R\x05level\x12\x1f\n" +
 	"\vcurrent_exp\x18\x04 \x01(\x03R\n" +
 	"currentExp\x12\x1d\n" +
@@ -663,7 +716,12 @@ const file_api_character_v1_character_proto_rawDesc = "" +
 	"\tcharacter\x18\x01 \x01(\v2\x1b.api.character.v1.CharacterR\tcharacter\"\x0f\n" +
 	"\rReviveRequest\"H\n" +
 	"\vReviveReply\x129\n" +
-	"\tcharacter\x18\x01 \x01(\v2\x1b.api.character.v1.CharacterR\tcharacter*\xb3\x01\n" +
+	"\tcharacter\x18\x01 \x01(\v2\x1b.api.character.v1.CharacterR\tcharacter*\x84\x01\n" +
+	"\x0eCharacterClass\x12\x1f\n" +
+	"\x1bCHARACTER_CLASS_UNSPECIFIED\x10\x00\x12\x1b\n" +
+	"\x17CHARACTER_CLASS_WARRIOR\x10\x01\x12\x18\n" +
+	"\x14CHARACTER_CLASS_MAGE\x10\x02\x12\x1a\n" +
+	"\x16CHARACTER_CLASS_RANGER\x10\x03*\xb3\x01\n" +
 	"\bStatType\x12\x19\n" +
 	"\x15STAT_TYPE_UNSPECIFIED\x10\x00\x12\x16\n" +
 	"\x12STAT_TYPE_STRENGTH\x10\x01\x12\x1a\n" +
@@ -690,44 +748,46 @@ func file_api_character_v1_character_proto_rawDescGZIP() []byte {
 	return file_api_character_v1_character_proto_rawDescData
 }
 
-var file_api_character_v1_character_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_api_character_v1_character_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
 var file_api_character_v1_character_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_api_character_v1_character_proto_goTypes = []any{
-	(StatType)(0),                    // 0: api.character.v1.StatType
-	(*CharacterStats)(nil),           // 1: api.character.v1.CharacterStats
-	(*Character)(nil),                // 2: api.character.v1.Character
-	(*GetCharacterRequest)(nil),      // 3: api.character.v1.GetCharacterRequest
-	(*GetCharacterReply)(nil),        // 4: api.character.v1.GetCharacterReply
-	(*UpdateCharacterRequest)(nil),   // 5: api.character.v1.UpdateCharacterRequest
-	(*UpdateCharacterReply)(nil),     // 6: api.character.v1.UpdateCharacterReply
-	(*AllocateStatPointRequest)(nil), // 7: api.character.v1.AllocateStatPointRequest
-	(*AllocateStatPointReply)(nil),   // 8: api.character.v1.AllocateStatPointReply
-	(*ReviveRequest)(nil),            // 9: api.character.v1.ReviveRequest
-	(*ReviveReply)(nil),              // 10: api.character.v1.ReviveReply
-	nil,                              // 11: api.character.v1.Character.EquipmentEntry
+	(CharacterClass)(0),              // 0: api.character.v1.CharacterClass
+	(StatType)(0),                    // 1: api.character.v1.StatType
+	(*CharacterStats)(nil),           // 2: api.character.v1.CharacterStats
+	(*Character)(nil),                // 3: api.character.v1.Character
+	(*GetCharacterRequest)(nil),      // 4: api.character.v1.GetCharacterRequest
+	(*GetCharacterReply)(nil),        // 5: api.character.v1.GetCharacterReply
+	(*UpdateCharacterRequest)(nil),   // 6: api.character.v1.UpdateCharacterRequest
+	(*UpdateCharacterReply)(nil),     // 7: api.character.v1.UpdateCharacterReply
+	(*AllocateStatPointRequest)(nil), // 8: api.character.v1.AllocateStatPointRequest
+	(*AllocateStatPointReply)(nil),   // 9: api.character.v1.AllocateStatPointReply
+	(*ReviveRequest)(nil),            // 10: api.character.v1.ReviveRequest
+	(*ReviveReply)(nil),              // 11: api.character.v1.ReviveReply
+	nil,                              // 12: api.character.v1.Character.EquipmentEntry
 }
 var file_api_character_v1_character_proto_depIdxs = []int32{
-	1,  // 0: api.character.v1.Character.base_stats:type_name -> api.character.v1.CharacterStats
-	11, // 1: api.character.v1.Character.equipment:type_name -> api.character.v1.Character.EquipmentEntry
-	2,  // 2: api.character.v1.GetCharacterReply.character:type_name -> api.character.v1.Character
-	2,  // 3: api.character.v1.UpdateCharacterRequest.character:type_name -> api.character.v1.Character
-	2,  // 4: api.character.v1.UpdateCharacterReply.character:type_name -> api.character.v1.Character
-	0,  // 5: api.character.v1.AllocateStatPointRequest.stat:type_name -> api.character.v1.StatType
-	2,  // 6: api.character.v1.AllocateStatPointReply.character:type_name -> api.character.v1.Character
-	2,  // 7: api.character.v1.ReviveReply.character:type_name -> api.character.v1.Character
-	3,  // 8: api.character.v1.CharacterService.GetCharacter:input_type -> api.character.v1.GetCharacterRequest
-	5,  // 9: api.character.v1.CharacterService.UpdateCharacter:input_type -> api.character.v1.UpdateCharacterRequest
-	7,  // 10: api.character.v1.CharacterService.AllocateStatPoint:input_type -> api.character.v1.AllocateStatPointRequest
-	9,  // 11: api.character.v1.CharacterService.Revive:input_type -> api.character.v1.ReviveRequest
-	4,  // 12: api.character.v1.CharacterService.GetCharacter:output_type -> api.character.v1.GetCharacterReply
-	6,  // 13: api.character.v1.CharacterService.UpdateCharacter:output_type -> api.character.v1.UpdateCharacterReply
-	8,  // 14: api.character.v1.CharacterService.AllocateStatPoint:output_type -> api.character.v1.AllocateStatPointReply
-	10, // 15: api.character.v1.CharacterService.Revive:output_type -> api.character.v1.ReviveReply
-	12, // [12:16] is the sub-list for method output_type
-	8,  // [8:12] is the sub-list for method input_type
-	8,  // [8:8] is the sub-list for extension type_name
-	8,  // [8:8] is the sub-list for extension extendee
-	0,  // [0:8] is the sub-list for field type_name
+	0,  // 0: api.character.v1.Character.character_Class:type_name -> api.character.v1.CharacterClass
+	2,  // 1: api.character.v1.Character.base_stats:type_name -> api.character.v1.CharacterStats
+	12, // 2: api.character.v1.Character.equipment:type_name -> api.character.v1.Character.EquipmentEntry
+	3,  // 3: api.character.v1.GetCharacterReply.character:type_name -> api.character.v1.Character
+	3,  // 4: api.character.v1.UpdateCharacterRequest.character:type_name -> api.character.v1.Character
+	3,  // 5: api.character.v1.UpdateCharacterReply.character:type_name -> api.character.v1.Character
+	1,  // 6: api.character.v1.AllocateStatPointRequest.stat:type_name -> api.character.v1.StatType
+	3,  // 7: api.character.v1.AllocateStatPointReply.character:type_name -> api.character.v1.Character
+	3,  // 8: api.character.v1.ReviveReply.character:type_name -> api.character.v1.Character
+	4,  // 9: api.character.v1.CharacterService.GetCharacter:input_type -> api.character.v1.GetCharacterRequest
+	6,  // 10: api.character.v1.CharacterService.UpdateCharacter:input_type -> api.character.v1.UpdateCharacterRequest
+	8,  // 11: api.character.v1.CharacterService.AllocateStatPoint:input_type -> api.character.v1.AllocateStatPointRequest
+	10, // 12: api.character.v1.CharacterService.Revive:input_type -> api.character.v1.ReviveRequest
+	5,  // 13: api.character.v1.CharacterService.GetCharacter:output_type -> api.character.v1.GetCharacterReply
+	7,  // 14: api.character.v1.CharacterService.UpdateCharacter:output_type -> api.character.v1.UpdateCharacterReply
+	9,  // 15: api.character.v1.CharacterService.AllocateStatPoint:output_type -> api.character.v1.AllocateStatPointReply
+	11, // 16: api.character.v1.CharacterService.Revive:output_type -> api.character.v1.ReviveReply
+	13, // [13:17] is the sub-list for method output_type
+	9,  // [9:13] is the sub-list for method input_type
+	9,  // [9:9] is the sub-list for extension type_name
+	9,  // [9:9] is the sub-list for extension extendee
+	0,  // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_api_character_v1_character_proto_init() }
@@ -740,7 +800,7 @@ func file_api_character_v1_character_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_character_v1_character_proto_rawDesc), len(file_api_character_v1_character_proto_rawDesc)),
-			NumEnums:      1,
+			NumEnums:      2,
 			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   1,

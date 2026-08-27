@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:habit_forge_app/core/constants/app_constants.dart';
 import 'package:habit_forge_app/core/constants/game_constants.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
-import 'package:habit_forge_app/models/task/task_model.dart';
+import 'package:habit_forge_app/generated/protos/task/v1/task.dart';
 
 /// Bright cartoon "task ticket" card (shared by the home / tasks pages).
 class TaskTicket extends StatelessWidget {
-  final TaskModel task;
+  final Task task;
   final VoidCallback onComplete;
   final VoidCallback? onLongPress;
 
@@ -128,9 +127,9 @@ class TaskTicket extends StatelessWidget {
 
   (Color, Color) _tagColors() {
     switch (task.type) {
-      case TaskType.daily:
+      case TaskType.TASK_TYPE_DAILY:
         return (const Color(0xFFD9F0FF), const Color(0xFF2673C9));
-      case TaskType.todo:
+      case TaskType.TASK_TYPE_TODO:
         return (const Color(0xFFFFE3E3), const Color(0xFFD34F4F));
       default:
         return (AppColors.violetLight, AppColors.primaryDark);
@@ -139,9 +138,9 @@ class TaskTicket extends StatelessWidget {
 
   String _typeLabel() {
     switch (task.type) {
-      case TaskType.daily:
+      case TaskType.TASK_TYPE_DAILY:
         return LanKey.dailyBadge.tr;
-      case TaskType.todo:
+      case TaskType.TASK_TYPE_TODO:
         return LanKey.todoBadge.tr;
       default:
         return LanKey.habitBadge.tr;

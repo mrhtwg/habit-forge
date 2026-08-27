@@ -37,6 +37,14 @@ service CharacterService {
   }
 }
 
+// CharacterType - character class.
+enum CharacterClass {
+  CHARACTER_CLASS_UNSPECIFIED = 0;
+  CHARACTER_CLASS_WARRIOR = 1;
+  CHARACTER_CLASS_MAGE = 2;
+  CHARACTER_CLASS_RANGER = 3;
+}
+
 // StatType — character attributes.
 enum StatType {
   STAT_TYPE_UNSPECIFIED = 0;
@@ -59,7 +67,7 @@ message CharacterStats {
 
 message Character {
   string id = 1;
-  string class = 2; // "warrior" | "mage" | "ranger"
+  CharacterClass character_Class = 2;
   int32 level = 3;
   int64 current_exp = 4;
   int32 current_hp = 5;

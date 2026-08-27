@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package api.user.v1;
+
+
+option go_package = "github.com/habitforge/backend/api/user/v1;v1";
+
+// SysMaterial — gold, diamond, exp.
+enum SysMaterial {
+  SYSMATERIAL_GOLD = 0;
+  SYSMATERIAL_DIAMOND = 1;
+  SYSMATERIAL_EXP = 2;
+}

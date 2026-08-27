@@ -1,3 +1,4 @@
+import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -7,17 +8,17 @@ import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/quests/controllers/quests_controller.dart';
-import 'package:habit_forge_app/models/task/task_model.dart';
+import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';
 import 'package:intl/intl.dart';
 
 class TaskFormSheet extends StatefulWidget {
-  final TaskModel? task;
+  final Task? task;
   const TaskFormSheet({super.key, this.task});
 
   @override
   State<TaskFormSheet> createState() => _TaskFormSheetState();
 
-  static void show(BuildContext context, {TaskModel? task}) {
+  static void show(BuildContext context, {Task? task}) {
     Get.bottomSheet(
       TaskFormSheet(task: task),
       backgroundColor: AppColors.surface,
@@ -41,10 +42,10 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
   ];
   late TextEditingController _titleCtrl;
   late TextEditingController _descCtrl;
-  TaskType _type = TaskType.habit;
-  String _difficulty = 'medium';
+  TaskType _type = TaskType.TASK_TYPE_HABIT;
+  TaskDifficulty _difficulty = TaskDifficulty.TASK_DIFFICULTY_MEDIUM;
   List<String> _tags = [];
-  DateTime? _dueDate;
+  Int64? _dueDate;
   final _tagCtrl = TextEditingController();
   List<int> _repeatDays = [];
   String _priority = '';
@@ -137,8 +138,8 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
               ),
             ),
             // Type-specific fields
-            if (_type == TaskType.daily) ..._buildDailyFields(),
-            if (_type == TaskType.todo) ..._buildTodoFields(),
+            if (_type == TaskType.TASK_TYPE_DAILY) ..._buildDailyFields(),
+            if (_type == TaskType.TASK_TYPE_TODO) ..._buildTodoFields(),
             SizedBox(height: 14.h),
             // Difficulty
             _buildSectionLabel(LanKey.difficulty.tr),
@@ -183,20 +184,20 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
               child: GestureDetector(
                 onTap: () {
                   if (_titleCtrl.text.trim().isEmpty) return;
-                  final now = DateTime.now();
-                  final task = TaskModel(
+                  // final now = DateTime.now();
+                  final task = Task(
                     id: widget.task?.id ?? '',
                     title: _titleCtrl.text.trim(),
                     description: _descCtrl.text.trim().isNotEmpty ? _descCtrl.text.trim() : null,
                     type: _type,
                     difficulty: _difficulty,
                     tags: _tags,
-                    dueDate: _type == TaskType.todo ? _dueDate : null,
-                    repeatDays: _type == TaskType.daily ? _repeatDays : [],
-                    priority: _type == TaskType.todo ? _priority : '',
-                    hpPenalty: _type == TaskType.daily ? _hpPenalty : 10,
-                    createdAt: widget.task?.createdAt ?? now,
-                    updatedAt: isEdit ? now : null,
+                    dueDate: _type == TaskType.TASK_TYPE_TODO ? _dueDate : null,
+                    repeatDays: _type == TaskType.TASK_TYPE_DAILY ? _repeatDays : [],
+                    priority: _type == TaskType.TASK_TYPE_TODO ? _priority : '',
+                    hpPenalty: _type == TaskType.TASK_TYPE_DAILY ? _hpPenalty : 10,
+                    // createdAt: widget.task?.createdAt ?? now,
+                    // updatedAt: isEdit ? now : null,
                   );
                   if (isEdit) {
                     ctrl.updateTask(task);
@@ -242,8 +243,8 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
     super.initState();
     _titleCtrl = TextEditingController(text: widget.task?.title ?? '');
     _descCtrl = TextEditingController(text: widget.task?.description ?? '');
-    _type = widget.task?.type ?? TaskType.habit;
-    _difficulty = widget.task?.difficulty ?? 'medium';
+    _type = widget.task?.type ?? TaskType.TASK_TYPE_HABIT;
+    _difficulty = widget.task?.difficulty ?? TaskDifficulty.TASK_DIFFICULTY_MEDIUM;
     _tags = widget.task?.tags ?? [];
     _dueDate = widget.task?.dueDate;
     _repeatDays = List.from(widget.task?.repeatDays ?? []);
@@ -352,7 +353,9 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
                     Icon(Icons.calendar_today_rounded, size: 15.w, color: AppColors.textSecondary),
                     SizedBox(width: 8.w),
                     Text(
-                      _dueDate != null ? DateFormat('MMM d, yyyy').format(_dueDate!) : LanKey.pickDate.tr,
+                      _dueDate != null
+                          ? DateFormat('MMM d, yyyy').format((DateTime(_dueDate!.toInt())))
+                          : LanKey.pickDate.tr,
                       style: textStyleRegular(
                         fontSize: 12.sp,
                         color: _dueDate != null ? AppColors.textPrimary : AppColors.textMuted,
@@ -396,13 +399,13 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
     ];
   }
 
-  Color _diffColor(String d) {
+  Color _diffColor(TaskDifficulty d) {
     switch (d) {
-      case 'easy':
+      case TaskDifficulty.TASK_DIFFICULTY_EASY:
         return AppColors.green;
-      case 'medium':
+      case TaskDifficulty.TASK_DIFFICULTY_MEDIUM:
         return AppColors.warning;
-      case 'hard':
+      case TaskDifficulty.TASK_DIFFICULTY_HARD:
         return AppColors.coral;
       default:
         return AppColors.primary;
@@ -412,7 +415,11 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
   // ── Difficulty pills ──
   Widget _difficultySelector() {
     return Row(
-      children: ['easy', 'medium', 'hard'].map((d) {
+      children: [
+        TaskDifficulty.TASK_DIFFICULTY_EASY,
+        TaskDifficulty.TASK_DIFFICULTY_MEDIUM,
+        TaskDifficulty.TASK_DIFFICULTY_HARD,
+      ].map((d) {
         final active = _difficulty == d;
         return Expanded(
           child: Padding(
@@ -439,12 +446,12 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
   Future<void> _pickDate() async {
     final dt = await showDatePicker(
       context: context,
-      initialDate: _dueDate ?? DateTime.now().add(const Duration(days: 1)),
+      initialDate: _dueDate == null ? DateTime(_dueDate!.toInt()) : DateTime.now().add(const Duration(days: 1)),
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 365)),
     );
     if (dt != null) {
-      setState(() => _dueDate = dt);
+      setState(() => _dueDate = Int64(dt.millisecondsSinceEpoch));
     }
   }
 

@@ -186,7 +186,6 @@ Verify: `cd server && go build ./... && go vet ./...`
 
 ## 3. Generating Frontend (Dart) Code
 
-> Reference: `tata_project/tata/generate_proto.sh` (protoc + protoc-gen-dart + barrel).
 > This repo's script: **`app/generate_proto.sh`** (simplified for this layout).
 
 ### 3.1 Generate
@@ -271,8 +270,6 @@ plugins:
   - local: protoc-gen-dart
     out: ../app/lib/generated/protos
 ```
-
-(`protoc-gen-dart` must be on PATH; pick either approach — the script matches tata.)
 
 ---
 

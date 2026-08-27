@@ -11,9 +11,9 @@ class ProfileController extends GetxController {
     return completed / total;
   }
 
-  int get currentGold => _hive.userPrefs.value?.currentGold ?? 0;
+  int get currentGold => _hive.userPrefs.value?.currentGold.toInt() ?? 0;
   int get currentLevel => _hive.character.value?.level ?? 1;
   int get maxStreak => _hive.tasks.fold(0, (max, t) => t.streak > max ? t.streak : max);
 
-  int get totalTasksCompleted => _hive.userPrefs.value?.totalTasksCompleted ?? 0;
+  int get totalTasksCompleted => _hive.userPrefs.value?.totalTasksCompleted.toInt() ?? 0;
 }

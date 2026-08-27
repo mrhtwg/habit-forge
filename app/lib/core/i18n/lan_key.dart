@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:habit_forge_app/generated/protos/task/v1/task.pbenum.dart';
 
 /// Translation keys for the app (see en_us.dart / zh_cn.dart).
 /// Usage: `LanKey.done.tr`, `LanKey.priorityLabel.trParams({'value': x})`.
@@ -253,9 +254,9 @@ enum LanKey {
       };
 
   /// Difficulty label by raw value (easy | medium | hard).
-  static LanKey difficultyFor(String value) => switch (value) {
-        'easy' => difficultyEasy,
-        'medium' => difficultyMedium,
+  static LanKey difficultyFor(TaskDifficulty value) => switch (value) {
+        TaskDifficulty.TASK_DIFFICULTY_EASY => difficultyEasy,
+        TaskDifficulty.TASK_DIFFICULTY_MEDIUM => difficultyMedium,
         _ => difficultyHard,
       };
 

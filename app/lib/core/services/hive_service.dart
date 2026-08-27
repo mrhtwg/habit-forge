@@ -1,11 +1,11 @@
 import 'dart:convert';
 
 import 'package:get/get.dart';
-import 'package:habit_forge_app/models/achievement/achievement.dart';
-import 'package:habit_forge_app/models/character/character_model.dart';
-import 'package:habit_forge_app/models/shop/daily_deal.dart';
-import 'package:habit_forge_app/models/task/task_model.dart';
-import 'package:habit_forge_app/models/user/user_prefs.dart';
+import 'package:habit_forge_app/generated/protos/achievement/v1/achievement.pb.dart';
+import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart';
+import 'package:habit_forge_app/generated/protos/shop/v1/shop.pb.dart';
+import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';
+import 'package:habit_forge_app/generated/protos/user/v1/user.pb.dart';
 import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 
@@ -20,8 +20,8 @@ class HiveService extends GetxService {
 
   // Observable state
   final userPrefs = Rxn<UserPrefs>();
-  final character = Rxn<CharacterModel>();
-  final tasks = <TaskModel>[].obs;
+  final character = Rxn<Character>();
+  final tasks = <Task>[].obs;
   final ownedItemIds = <String>[].obs;
   final achievements = <Achievement>[].obs;
   final dailyDeal = Rxn<DailyDeal>();
@@ -45,10 +45,10 @@ class HiveService extends GetxService {
     }
   }
 
-  String createTask(TaskModel task) {
+  String createTask(Task task) {
     final id = _uuid.v4();
-    final t = task.copyWith(id: id);
-    _tasksBox.put('task_$id', _json.encode(t.toJson()));
+    final t = task..id = id;
+    _tasksBox.put('task_$id', _json.encode(t.writeToJson()));
     _loadTasks();
     return id;
   }
@@ -65,12 +65,12 @@ class HiveService extends GetxService {
     _shopBox = await Hive.openBox('shopBox');
     _achievementBox = await Hive.openBox('achievementBox');
 
-    userPrefs.value = _readJson(_userBox, 'userPrefs', (m) => UserPrefs.fromJson(m));
-    character.value = _readJson(_characterBox, 'character', (m) => CharacterModel.fromJson(m));
+    userPrefs.value = _readJson(_userBox, 'userPrefs', (m) => UserPrefs()..mergeFromJsonMap(m));
+    character.value = _readJson(_characterBox, 'character', (m) => Character.fromJson(m.toString()));
     _loadTasks();
     ownedItemIds.value = _shopBox.get('ownedItems', defaultValue: <String>[]).cast<String>();
     _loadAchievements();
-    dailyDeal.value = _readJson(_shopBox, 'dailyDeal', (m) => DailyDeal.fromJson(m));
+    dailyDeal.value = _readJson(_shopBox, 'dailyDeal', (m) => DailyDeal()..mergeFromJsonMap(m));
     return this;
   }
 
@@ -89,7 +89,7 @@ class HiveService extends GetxService {
   }
 
   void saveAchievement(Achievement a) {
-    _achievementBox.put('ach_${a.id}', _json.encode(a.toJson()));
+    _achievementBox.put('ach_${a.id}', _json.encode(a.writeToJson()));
     _loadAchievements();
   }
 
@@ -102,20 +102,20 @@ class HiveService extends GetxService {
   }
 
   // ── Character ──
-  void saveCharacter(CharacterModel c) {
+  void saveCharacter(Character c) {
     character.value = c;
-    _writeJson(_characterBox, 'character', c.toJson());
+    _writeJson(_characterBox, 'character', c.writeToJson());
   }
 
   void saveDailyDeal(DailyDeal deal) {
     dailyDeal.value = deal;
-    _shopBox.put('dailyDeal', _json.encode(deal.toJson()));
+    _shopBox.put('dailyDeal', _json.encode(deal.writeToJson()));
   }
 
   // ── User Prefs ──
   void saveUserPrefs(UserPrefs prefs) {
     userPrefs.value = prefs;
-    _writeJson(_userBox, 'userPrefs', prefs.toJson());
+    _writeJson(_userBox, 'userPrefs', prefs.writeToJson());
   }
 
   void setLoggedIn(bool value, {String method = ''}) {
@@ -123,8 +123,8 @@ class HiveService extends GetxService {
     if (method.isNotEmpty) _userBox.put('authMethod', method);
   }
 
-  void updateTask(TaskModel task) {
-    _tasksBox.put('task_${task.id}', _json.encode(task.toJson()));
+  void updateTask(Task task) {
+    _tasksBox.put('task_${task.id}', _json.encode(task.writeToJson()));
     _loadTasks();
   }
 
@@ -136,7 +136,7 @@ class HiveService extends GetxService {
       if (raw == null) continue;
       try {
         final map = _json.decode(raw) as Map<String, dynamic>;
-        all.add(Achievement.fromJson(map));
+        all.add(Achievement()..mergeFromJsonMap(map));
       } catch (_) {}
     }
     achievements.value = all;
@@ -144,13 +144,13 @@ class HiveService extends GetxService {
 
   // ── Tasks ──
   void _loadTasks() {
-    final all = <TaskModel>[];
+    final all = <Task>[];
     for (final key in _tasksBox.keys) {
       final raw = _tasksBox.get(key) as String?;
       if (raw == null) continue;
       try {
         final map = _json.decode(raw) as Map<String, dynamic>;
-        all.add(TaskModel.fromJson(map));
+        all.add(Task()..mergeFromJsonMap(map));
       } catch (_) {}
     }
     all.sort((a, b) => b.createdAt.compareTo(a.createdAt));

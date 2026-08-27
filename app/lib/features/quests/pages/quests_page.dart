@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/constants/app_constants.dart';
+import 'package:habit_forge_app/core/extensions/task_extensions.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/services/hive_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/quests/controllers/quests_controller.dart';
 import 'package:habit_forge_app/features/quests/pages/task_form_sheet.dart';
-import 'package:habit_forge_app/models/task/task_model.dart';
+import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';
 import 'package:habit_forge_app/widgets/task_ticket.dart';
 
 class QuestsPage extends GetView<QuestsController> {
@@ -83,9 +84,9 @@ class QuestsPage extends GetView<QuestsController> {
   Widget _buildSegmentedFilter() {
     final options = <(String, TaskType?)>[
       (LanKey.all.tr, null),
-      (LanKey.habit.tr, TaskType.habit),
-      (LanKey.daily.tr, TaskType.daily),
-      (LanKey.todoFilter.tr, TaskType.todo),
+      (LanKey.habit.tr, TaskType.TASK_TYPE_HABIT),
+      (LanKey.daily.tr, TaskType.TASK_TYPE_DAILY),
+      (LanKey.todoFilter.tr, TaskType.TASK_TYPE_TODO),
     ];
     return Padding(
       padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 0),
@@ -258,7 +259,7 @@ class QuestsPage extends GetView<QuestsController> {
     );
   }
 
-  void _showTaskMenu(BuildContext context, TaskModel task) {
+  void _showTaskMenu(BuildContext context, Task task) {
     Get.bottomSheet(
       Container(
         padding: EdgeInsets.all(20.w),

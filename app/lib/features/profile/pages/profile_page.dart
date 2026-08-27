@@ -161,9 +161,9 @@ class ProfilePage extends GetView<ProfileController> {
                   SizedBox(height: 8.h),
                   Row(
                     children: [
-                      _miniWallet(color: AppColors.gold, value: prefs?.currentGold ?? 0),
+                      _miniWallet(color: AppColors.gold, value: prefs?.currentGold.toInt() ?? 0),
                       SizedBox(width: 8.w),
-                      _miniWallet(color: const Color(0xFF7ED0FF), value: prefs?.currentGems ?? 0),
+                      _miniWallet(color: const Color(0xFF7ED0FF), value: prefs?.currentGems.toInt() ?? 0),
                     ],
                   ),
                 ],

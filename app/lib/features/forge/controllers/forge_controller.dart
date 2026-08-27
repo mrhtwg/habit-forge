@@ -1,21 +1,12 @@
 import 'dart:async';
 
+import 'package:fixnum/fixnum.dart';
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/services/hive_service.dart';
-import 'package:habit_forge_app/models/shop/daily_deal.dart';
-import 'package:habit_forge_app/models/shop/shop_item.dart';
-import 'package:habit_forge_app/models/user/user_prefs.dart';
+import 'package:habit_forge_app/generated/protos/shop/v1/shop.pb.dart';
+import 'package:habit_forge_app/generated/protos/user/v1/user.pb.dart';
 
 class ForgeController extends GetxController {
-  /// Emoji icon mapping per item id.
-  static const _itemEmojis = <String, String>{
-    'sword_flame': '🗡️',
-    'armor_golden': '🛡️',
-    'helm_dragon': '👑',
-    'cloak_shadow': '🧙',
-    'amulet_star': '⭐',
-    'staff_arcane': '🔮',
-  };
   final _hive = HiveService.to;
 
   final activeCategory = 'appearance'.obs;
@@ -28,56 +19,62 @@ class ForgeController extends GetxController {
   // All available shop items (hardcoded MVP items)
   final allItems = <ShopItem>[
     ShopItem(
-        id: 'sword_flame',
-        name: 'Flame Sword',
-        description: 'A sword wreathed in eternal flame',
-        price: 500,
-        category: 'equipment',
-        rarity: 'epic',
-        glbAssetPath: null,),
+      id: 'sword_flame',
+      name: 'Flame Sword',
+      description: 'A sword wreathed in eternal flame',
+      price: Int64(500),
+      category: 'equipment',
+      rarity: 'epic',
+      glbAssetPath: null,
+    ),
     ShopItem(
-        id: 'armor_golden',
-        name: 'Golden Armor',
-        description: 'Shining golden plate armor',
-        price: 300,
-        category: 'equipment',
-        rarity: 'rare',
-        glbAssetPath: null,),
+      id: 'armor_golden',
+      name: 'Golden Armor',
+      description: 'Shining golden plate armor',
+      price: Int64(300),
+      category: 'equipment',
+      rarity: 'rare',
+      glbAssetPath: null,
+    ),
     ShopItem(
-        id: 'helm_dragon',
-        name: 'Dragon Helm',
-        description: 'Helm forged from dragon scales',
-        price: 250,
-        category: 'equipment',
-        rarity: 'rare',
-        glbAssetPath: null,),
+      id: 'helm_dragon',
+      name: 'Dragon Helm',
+      description: 'Helm forged from dragon scales',
+      price: Int64(250),
+      category: 'equipment',
+      rarity: 'rare',
+      glbAssetPath: null,
+    ),
     ShopItem(
-        id: 'cloak_shadow',
-        name: 'Shadow Cloak',
-        description: 'Cloak woven from shadow',
-        price: 150,
-        category: 'appearance',
-        rarity: 'common',
-        glbAssetPath: null,),
+      id: 'cloak_shadow',
+      name: 'Shadow Cloak',
+      description: 'Cloak woven from shadow',
+      price: Int64(150),
+      category: 'appearance',
+      rarity: 'common',
+      glbAssetPath: null,
+    ),
     ShopItem(
-        id: 'amulet_star',
-        name: 'Star Amulet',
-        description: 'Amulet that glows like starlight',
-        price: 200,
-        category: 'appearance',
-        rarity: 'common',
-        glbAssetPath: null,),
+      id: 'amulet_star',
+      name: 'Star Amulet',
+      description: 'Amulet that glows like starlight',
+      price: Int64(200),
+      category: 'appearance',
+      rarity: 'common',
+      glbAssetPath: null,
+    ),
     ShopItem(
-        id: 'staff_arcane',
-        name: 'Arcane Staff',
-        description: 'A staff crackling with arcane energy',
-        price: 350,
-        category: 'equipment',
-        rarity: 'epic',
-        glbAssetPath: null,),
+      id: 'staff_arcane',
+      name: 'Arcane Staff',
+      description: 'A staff crackling with arcane energy',
+      price: Int64(350),
+      category: 'equipment',
+      rarity: 'epic',
+      glbAssetPath: null,
+    ),
   ];
 
-  int get currentGold => _hive.userPrefs.value?.currentGold ?? 0;
+  int get currentGold => _hive.userPrefs.value?.currentGold.toInt() ?? 0;
 
   ShopItem? get dailyDealItem {
     final deal = dailyDeal.value;
@@ -91,27 +88,25 @@ class ForgeController extends GetxController {
   }
 
   bool canAfford(int price) {
-    final prefs = _hive.userPrefs.value ?? const UserPrefs();
+    final prefs = _hive.userPrefs.value ?? UserPrefs();
     return prefs.currentGold >= price;
   }
-
-  String emojiFor(String itemId) => _itemEmojis[itemId] ?? '📦';
 
   void equip(String itemId) {
     final char = _hive.character.value;
     if (char == null) return;
     final equipment = Map<String, String>.from(char.equipment);
     if (equipment['weapon'] == itemId) {
-      equipment.remove('weapon');
+      _hive.saveCharacter(char.rebuild((c) => c..equipment.remove('weapon')));
     } else {
       equipment['weapon'] = itemId;
+      _hive.saveCharacter(char.rebuild((c) => c..equipment['weapon'] = itemId));
     }
-    _hive.saveCharacter(char.copyWith(equipment: equipment));
   }
 
   int goldShortfall(int price) {
-    final prefs = _hive.userPrefs.value ?? const UserPrefs();
-    final needed = price - prefs.currentGold;
+    final prefs = _hive.userPrefs.value ?? UserPrefs();
+    final needed = price - prefs.currentGold.toInt();
     return needed > 0 ? needed : 0;
   }
 
@@ -133,18 +128,18 @@ class ForgeController extends GetxController {
 
   /// Returns true if the purchase was successful.
   bool purchase(ShopItem item) {
-    final prefs = _hive.userPrefs.value ?? const UserPrefs();
-    if (prefs.currentGold < item.price) return false;
+    final prefs = _hive.userPrefs.value ?? UserPrefs();
+    if (prefs.currentGold < item.price.toInt()) return false;
     if (isOwned(item.id)) return false;
 
-    _hive.saveUserPrefs(prefs.copyWith(currentGold: prefs.currentGold - item.price));
+    _hive.saveUserPrefs(prefs.rebuild((p) => p..currentGold = prefs.currentGold - item.price.toInt()));
     _hive.addOwnedItem(item.id);
     return true;
   }
 
   void _initDailyDeal() {
     final saved = _hive.dailyDeal.value;
-    if (saved != null && saved.expiresAt.isAfter(DateTime.now())) {
+    if (saved != null && DateTime(saved.expiresAt.toInt()).isAfter(DateTime.now())) {
       dailyDeal.value = saved;
       return;
     }
@@ -156,7 +151,7 @@ class ForgeController extends GetxController {
     final deal = DailyDeal(
       itemId: 'staff_arcane',
       discountPercent: 40,
-      expiresAt: expiresAt,
+      expiresAt: Int64(expiresAt.millisecondsSinceEpoch),
     );
     dailyDeal.value = deal;
     _hive.saveDailyDeal(deal);
@@ -168,7 +163,7 @@ class ForgeController extends GetxController {
       countdown.value = '00:00:00';
       return;
     }
-    final remaining = deal.expiresAt.difference(DateTime.now());
+    final remaining = DateTime(deal.expiresAt.toInt()).difference(DateTime.now());
     if (remaining.isNegative) {
       countdown.value = '00:00:00';
       return;

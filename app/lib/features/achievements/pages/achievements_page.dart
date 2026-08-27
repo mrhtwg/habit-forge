@@ -6,7 +6,7 @@ import 'package:habit_forge_app/core/services/hive_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/achievements/controllers/achievements_controller.dart';
-import 'package:habit_forge_app/models/achievement/achievement.dart';
+import 'package:habit_forge_app/generated/protos/achievement/v1/achievement.pb.dart';
 
 class AchievementsPage extends GetView<AchievementsController> {
   const AchievementsPage({super.key});

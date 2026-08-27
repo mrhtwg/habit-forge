@@ -110,7 +110,7 @@ app/
 
 ## Internationalization
 
-The app supports **English** and **中文** (Simplified Chinese), following the tata-project pattern (enum keys):
+The app supports **English** and **中文** (Simplified Chinese):
 
 - Keys are defined as an enum in `lib/core/i18n/lan_key.dart` and used as `LanKey.save.tr` (with `trParams(...)` for placeholders).
 - Per-language copy lives in `lib/core/i18n/en_us.dart` and `lib/core/i18n/zh_cn.dart`; `lib/core/i18n/app_translations.dart` wires them into GetX.

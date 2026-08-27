@@ -284,7 +284,7 @@ class HomePage extends GetView<HomeController> {
     }
     final level = char?.level ?? 1;
     final needed = GameConstants.expForLevel(level).toDouble();
-    return ((char?.currentExp ?? 0) / needed).clamp(0.0, 1.0).toDouble();
+    return ((char?.currentExp.toInt() ?? 0) / needed).clamp(0.0, 1.0).toDouble();
   }
 
   Widget _walletChip({required bool gold}) {

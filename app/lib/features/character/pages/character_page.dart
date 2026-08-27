@@ -9,7 +9,7 @@ import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_spacing.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/character/controllers/character_controller.dart';
-import 'package:habit_forge_app/models/character/character_model.dart';
+import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart';
 import 'package:habit_forge_app/widgets/toast_widget.dart';
 
 class CharacterPage extends GetView<CharacterController> {
@@ -44,7 +44,7 @@ class CharacterPage extends GetView<CharacterController> {
   }
 
   // ─────────── Equipment ───────────
-  Widget _buildEquipmentSection(BuildContext context, CharacterModel char) {
+  Widget _buildEquipmentSection(BuildContext context, Character char) {
     const slots = ['weapon', 'helmet', 'armor', 'accessory'];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -89,7 +89,7 @@ class CharacterPage extends GetView<CharacterController> {
   }
 
   // ─────────── Header: back + name + hero circular frame + idle animation ───────────
-  Widget _buildHeader(CharacterModel char) {
+  Widget _buildHeader(Character char) {
     return Container(
       width: double.infinity,
       decoration: const BoxDecoration(
@@ -202,7 +202,8 @@ class CharacterPage extends GetView<CharacterController> {
                   ),
                   child: FractionallySizedBox(
                     alignment: Alignment.centerLeft,
-                    widthFactor: (char.currentExp / GameConstants.expForLevel(char.level)).clamp(0.0, 1.0).toDouble(),
+                    widthFactor:
+                        (char.currentExp.toInt() / GameConstants.expForLevel(char.level)).clamp(0.0, 1.0).toDouble(),
                     child: Container(
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(colors: [AppColors.gold, AppColors.goldDark]),
@@ -220,7 +221,7 @@ class CharacterPage extends GetView<CharacterController> {
   }
 
   // ─────────── Attributes ───────────
-  Widget _buildStatsSection(CharacterModel char) {
+  Widget _buildStatsSection(Character char) {
     final stats = char.baseStats;
     final items = <(LanKey, int)>[
       (LanKey.statStr, stats.strength),
@@ -333,8 +334,7 @@ class CharacterPage extends GetView<CharacterController> {
               leading: Icon(Icons.close_rounded, color: AppColors.textMuted, size: 20),
               title: Text(LanKey.noneUnequip.tr, style: textStyleRegular(color: AppColors.textMuted)),
               onTap: () {
-                final updated = Map<String, String>.from(char.equipment)..remove(slot);
-                hive.saveCharacter(char.copyWith(equipment: updated));
+                hive.saveCharacter(char.rebuild((c) => c..equipment.remove(slot)));
                 Get.back();
               },
             ),
@@ -349,8 +349,7 @@ class CharacterPage extends GetView<CharacterController> {
                     ? const Icon(Icons.check_circle_rounded, color: AppColors.green, size: 20)
                     : null,
                 onTap: () {
-                  final updated = Map<String, String>.from(char.equipment)..[slot] = itemId;
-                  hive.saveCharacter(char.copyWith(equipment: updated));
+                  hive.saveCharacter(char.rebuild((c) => c..equipment[slot] = itemId));
                   Get.back();
                 },
               ),

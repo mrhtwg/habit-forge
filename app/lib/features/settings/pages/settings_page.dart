@@ -11,6 +11,7 @@ import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/auth/controllers/auth_controller.dart';
 import 'package:habit_forge_app/features/settings/controllers/settings_controller.dart';
 import 'package:habit_forge_app/widgets/confirm_dialog.dart';
+import 'package:protobuf/protobuf.dart';
 
 class SettingsPage extends GetView<SettingsController> {
   const SettingsPage({super.key});
@@ -83,7 +84,7 @@ class SettingsPage extends GetView<SettingsController> {
                     value: prefs.soundEnabled,
                     onChanged: (v) {
                       Get.find<AudioService>().setEnabled(v);
-                      HiveService.to.saveUserPrefs(prefs.copyWith(soundEnabled: v));
+                      HiveService.to.saveUserPrefs(prefs.rebuild((p) => p..soundEnabled = v));
                     },
                   ),
                   const Divider(color: AppColors.elevated, height: 1, thickness: 1),
@@ -92,7 +93,7 @@ class SettingsPage extends GetView<SettingsController> {
                     value: prefs.hapticEnabled,
                     onChanged: (v) {
                       Get.find<HapticService>().setEnabled(v);
-                      HiveService.to.saveUserPrefs(prefs.copyWith(hapticEnabled: v));
+                      HiveService.to.saveUserPrefs(prefs.rebuild((p) => p..hapticEnabled = v));
                     },
                   ),
                 ],

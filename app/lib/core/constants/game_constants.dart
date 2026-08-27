@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'package:habit_forge_app/generated/protos/task/v1/task.pbenum.dart';
+
 class GameConstants {
   static const int maxLevel = 50;
 
@@ -10,26 +12,26 @@ class GameConstants {
   static const int statPointsPerLevel = 1;
   GameConstants._();
 
-  static int baseExpReward(String difficulty) {
+  static int baseExpReward(TaskDifficulty difficulty) {
     switch (difficulty) {
-      case 'easy':
+      case TaskDifficulty.TASK_DIFFICULTY_EASY:
         return 15;
-      case 'medium':
+      case TaskDifficulty.TASK_DIFFICULTY_MEDIUM:
         return 30;
-      case 'hard':
+      case TaskDifficulty.TASK_DIFFICULTY_HARD:
         return 50;
       default:
         return 15;
     }
   }
 
-  static int baseGoldReward(String difficulty) {
+  static int baseGoldReward(TaskDifficulty difficulty) {
     switch (difficulty) {
-      case 'easy':
+      case TaskDifficulty.TASK_DIFFICULTY_EASY:
         return 5;
-      case 'medium':
+      case TaskDifficulty.TASK_DIFFICULTY_MEDIUM:
         return 10;
-      case 'hard':
+      case TaskDifficulty.TASK_DIFFICULTY_HARD:
         return 20;
       default:
         return 5;

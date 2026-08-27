@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:habit_forge_app/models/achievement/achievement.dart';
+import 'package:habit_forge_app/generated/protos/achievement/v1/achievement.pb.dart';
 
 class AchievementsController extends GetxController {
   // Achievement definitions

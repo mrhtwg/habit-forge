@@ -32,7 +32,7 @@ func main() {
 func newApp(logger log.Logger, hs *http.Server, gs *grpc.Server) *kratos.App {
 	return kratos.New(
 		kratos.Name("habitforge"),
-		kratos.Version("v0.1.0"),
+		kratos.Version("v0.0.1"),
 		kratos.Logger(logger),
 		kratos.Server(hs, gs),
 	)

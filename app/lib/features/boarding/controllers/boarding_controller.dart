@@ -1,16 +1,15 @@
 import 'package:carousel_slider/carousel_controller.dart';
 import 'package:get/get.dart';
-import 'package:habit_forge_app/core/constants/app_constants.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
 import 'package:habit_forge_app/core/services/hive_service.dart';
-import 'package:habit_forge_app/models/character/character_model.dart';
-import 'package:habit_forge_app/models/task/task_model.dart';
-import 'package:habit_forge_app/models/user/user_prefs.dart';
+import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart';
+import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';
+import 'package:habit_forge_app/generated/protos/user/v1/user.pb.dart';
 
 class BoardingController extends GetxController {
   final totalStepsCount = 4;
   final _step = 0.obs;
-  final selectedClass = CharacterClass.warrior.obs;
+  final selectedClass = CharacterClass.CHARACTER_CLASS_WARRIOR.obs;
   final firstHabitTitle = ''.obs;
   final CarouselSliderController carouselController = CarouselSliderController();
 
@@ -22,20 +21,19 @@ class BoardingController extends GetxController {
     final prefs = UserPrefs(onboardingCompleted: true);
     HiveService.to.saveUserPrefs(prefs);
 
-    final character = CharacterModel(
+    final character = Character(
       id: 'default',
       characterClass: selectedClass.value,
-      baseStats: _classStats(selectedClass.value.name),
     );
     HiveService.to.saveCharacter(character);
 
     if (firstHabitTitle.value.isNotEmpty) {
-      final task = TaskModel(
+      final task = Task(
         id: '',
         title: firstHabitTitle.value,
-        type: TaskType.habit,
-        difficulty: 'easy',
-        createdAt: DateTime.now(),
+        type: TaskType.TASK_TYPE_HABIT,
+        difficulty: TaskDifficulty.TASK_DIFFICULTY_EASY,
+        // createdAt: DateTime.now(),
       );
       HiveService.to.createTask(task);
     }
@@ -63,47 +61,12 @@ class BoardingController extends GetxController {
     final prefs = UserPrefs(onboardingCompleted: true);
     HiveService.to.saveUserPrefs(prefs);
 
-    final character = CharacterModel(
+    final character = Character(
       id: 'default',
       characterClass: selectedClass.value,
-      baseStats: _classStats(selectedClass.value.name),
     );
     HiveService.to.saveCharacter(character);
 
     Get.offNamed(Routers.main);
-  }
-
-  CharacterStats _classStats(String cls) {
-    switch (cls) {
-      case 'warrior':
-        return const CharacterStats(
-          strength: 15,
-          defense: 13,
-          vitality: 12,
-          intelligence: 8,
-          agility: 10,
-          luck: 8,
-        );
-      case 'mage':
-        return const CharacterStats(
-          strength: 7,
-          defense: 8,
-          vitality: 9,
-          intelligence: 16,
-          agility: 10,
-          luck: 12,
-        );
-      case 'ranger':
-        return const CharacterStats(
-          strength: 10,
-          defense: 9,
-          vitality: 10,
-          intelligence: 10,
-          agility: 15,
-          luck: 12,
-        );
-      default:
-        return const CharacterStats();
-    }
   }
 }

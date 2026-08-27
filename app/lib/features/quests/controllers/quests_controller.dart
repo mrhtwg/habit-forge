@@ -1,5 +1,5 @@
+import 'package:fixnum/fixnum.dart';
 import 'package:get/get.dart';
-import 'package:habit_forge_app/core/constants/app_constants.dart';
 import 'package:habit_forge_app/core/constants/game_constants.dart';
 import 'package:habit_forge_app/core/extensions/date_extensions.dart';
 import 'package:habit_forge_app/core/services/audio_service.dart';
@@ -7,15 +7,15 @@ import 'package:habit_forge_app/core/services/haptic_service.dart';
 import 'package:habit_forge_app/core/services/hive_service.dart';
 import 'package:habit_forge_app/features/character/controllers/character_controller.dart';
 import 'package:habit_forge_app/features/rewards/reward_popup.dart';
-import 'package:habit_forge_app/models/task/task_model.dart';
-import 'package:habit_forge_app/models/user/user_prefs.dart';
+import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';
+import 'package:habit_forge_app/generated/protos/user/v1/user.pb.dart';
 
 class QuestsController extends GetxController {
   final _hive = HiveService.to;
-  final activeType = TaskType.habit.obs; // 'habit' | 'daily' | 'todo'
+  final activeType = TaskType.TASK_TYPE_HABIT.obs;
   final activeTag = 'all'.obs;
   final showAll = false.obs;
-  final selectedTask = Rxn<TaskModel>();
+  final selectedTask = Rxn<Task>();
 
   List<String> get availableTags {
     final tags = <String>{};
@@ -25,16 +25,15 @@ class QuestsController extends GetxController {
     return tags.toList()..sort();
   }
 
-  List<TaskModel> get filteredTasks {
-    Iterable<TaskModel> list =
-        showAll.value ? _hive.tasks : _hive.tasks.where((t) => t.type == activeType.value);
+  List<Task> get filteredTasks {
+    Iterable<Task> list = showAll.value ? _hive.tasks : _hive.tasks.where((t) => t.type == activeType.value);
     if (activeTag.value != 'all') {
       list = list.where((t) => t.tags.contains(activeTag.value));
     }
     return list.toList();
   }
 
-  void createTask(TaskModel task) {
+  void createTask(Task task) {
     _hive.createTask(task);
   }
 
@@ -42,28 +41,28 @@ class QuestsController extends GetxController {
     _hive.deleteTask(id);
   }
 
-  void onTaskPostpone(TaskModel task) {
+  void onTaskPostpone(Task task) {
     final tomorrow = DateTime.now().add(const Duration(days: 1));
-    final updated = task.copyWith(
-      isSkipped: true,
-      dueDate: task.type == 'todo' ? tomorrow : task.dueDate,
-      updatedAt: DateTime.now(),
+    final updated = task.rebuild(
+      (t) => t
+        ..isSkipped = true
+        ..dueDate = task.type == TaskType.TASK_TYPE_TODO ? Int64(tomorrow.millisecondsSinceEpoch) : task.dueDate,
     );
     _hive.updateTask(updated);
   }
 
-  int taskRewardExp(TaskModel task) {
+  int taskRewardExp(Task task) {
     if (task.customExpReward > 0) return task.customExpReward;
     final base = GameConstants.baseExpReward(task.difficulty);
     return (base * GameConstants.streakMultiplier(task.streak)).round();
   }
 
-  int taskRewardGold(TaskModel task) {
+  int taskRewardGold(Task task) {
     if (task.customGoldReward > 0) return task.customGoldReward;
     return GameConstants.baseGoldReward(task.difficulty);
   }
 
-  void toggleComplete(TaskModel task) {
+  void toggleComplete(Task task) {
     if (task.isCompleted) return;
     final now = DateTime.now();
     final expReward = taskRewardExp(task);
@@ -71,26 +70,27 @@ class QuestsController extends GetxController {
 
     // Update streak
     int newStreak = task.streak;
-    if (task.lastStreakDate != null && task.lastStreakDate!.isToday) {
+    if (DateTime(task.lastStreakDate.toInt()).isToday) {
       // Already completed today, maintain streak
     } else {
       newStreak++;
     }
 
-    final updated = task.copyWith(
-      isCompleted: true,
-      completedAt: now,
-      streak: newStreak,
-      lastStreakDate: now,
+    final updated = task.rebuild(
+      (t) => t
+        ..isCompleted = true
+        ..streak = newStreak
+        ..lastStreakDate = Int64(now.millisecondsSinceEpoch),
     );
     _hive.updateTask(updated);
 
     // Apply rewards
-    final prefs = _hive.userPrefs.value ?? const UserPrefs();
+    final prefs = _hive.userPrefs.value ?? UserPrefs();
     _hive.saveUserPrefs(
-      prefs.copyWith(
-        currentGold: prefs.currentGold + goldReward,
-        totalTasksCompleted: prefs.totalTasksCompleted + 1,
+      prefs.rebuild(
+        (p) => p
+          ..currentGold = prefs.currentGold + goldReward
+          ..totalTasksCompleted = prefs.totalTasksCompleted + 1,
       ),
     );
 
@@ -98,7 +98,7 @@ class QuestsController extends GetxController {
     final char = _hive.character.value;
     if (char != null) {
       final newExp = char.currentExp + expReward;
-      _hive.saveCharacter(char.copyWith(currentExp: newExp));
+      _hive.saveCharacter(char.rebuild((c) => c..currentExp = newExp));
     }
 
     // Trigger audio/haptic feedback
@@ -121,12 +121,12 @@ class QuestsController extends GetxController {
     }
   }
 
-  void toggleSkip(TaskModel task) {
-    final updated = task.copyWith(isSkipped: !task.isSkipped, updatedAt: DateTime.now());
+  void toggleSkip(Task task) {
+    final updated = task.rebuild((t) => t..isSkipped = !task.isSkipped);
     _hive.updateTask(updated);
   }
 
-  void updateTask(TaskModel task) {
+  void updateTask(Task task) {
     _hive.updateTask(task);
   }
 }

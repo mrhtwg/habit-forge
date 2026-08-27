@@ -5,7 +5,7 @@ import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/forge/controllers/forge_controller.dart';
-import 'package:habit_forge_app/models/shop/shop_item.dart';
+import 'package:habit_forge_app/generated/protos/shop/v1/shop.pb.dart';
 import 'package:habit_forge_app/widgets/shop_item_icon.dart';
 
 class ItemDetailSheet extends StatelessWidget {
@@ -16,8 +16,8 @@ class ItemDetailSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<ForgeController>();
     final owned = controller.isOwned(item.id);
-    final affordable = controller.canAfford(item.price);
-    final shortfall = controller.goldShortfall(item.price);
+    final affordable = controller.canAfford(item.price.toInt());
+    final shortfall = controller.goldShortfall(item.price.toInt());
     final rarityColor = _rarityColor(item.rarity);
 
     return Padding(
@@ -68,15 +68,14 @@ class ItemDetailSheet extends StatelessWidget {
           ),
           SizedBox(height: 14.h),
           // Description
-          if (item.description != null)
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.w),
-              child: Text(
-                item.description!,
-                textAlign: TextAlign.center,
-                style: textStyleRegular(fontSize: 14.sp, color: AppColors.textSecondary).copyWith(height: 1.4),
-              ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 24.w),
+            child: Text(
+              item.description,
+              textAlign: TextAlign.center,
+              style: textStyleRegular(fontSize: 14.sp, color: AppColors.textSecondary).copyWith(height: 1.4),
             ),
+          ),
           SizedBox(height: 24.h),
           // Action button
           Padding(

@@ -59,6 +59,4 @@ flutter:
     - assets/animations/knight_idle/
     - assets/animations/mage_idle/
     - assets/animations/ranger_idle/
-    - assets/images/characters/
-    - assets/images/home/
     - assets/images/shared/

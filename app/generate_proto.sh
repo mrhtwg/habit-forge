@@ -3,8 +3,6 @@
 ###############################################################################
 # HabitForge · Proto → Dart code generator
 #
-# Reference: tata_project/tata/generate_proto.sh (protoc + protoc-gen-dart + barrel)
-#
 # Source:   ../proto/                 # shared contracts (app + server)
 #   ├── api/<service>/v1/*.proto
 #   └── third_party/google/api/       # google.api.http annotations

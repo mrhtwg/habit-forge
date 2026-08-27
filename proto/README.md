@@ -41,7 +41,6 @@ proto/
   ./generate_proto.sh              # messages only (REST mode); --grpc for gRPC client
   ```
 
-  The script is adapted from `tata_project/tata/generate_proto.sh`
   (`protoc` + `protoc-gen-dart` + barrel files). Full guide: `docs/proto-guide.md`.
 
 ## Toolchain

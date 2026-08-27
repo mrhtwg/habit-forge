@@ -8,7 +8,7 @@ import 'package:habit_forge_app/core/routes/app_routes.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/boarding/controllers/boarding_controller.dart';
-import 'package:habit_forge_app/models/character/character_model.dart';
+import 'package:habit_forge_app/generated/protos/character/v1/character.pbenum.dart';
 
 class BoardingPage extends GetView<BoardingController> {
   static const _totalSteps = 4;
@@ -188,21 +188,21 @@ class BoardingPage extends GetView<BoardingController> {
   Widget _classContent() {
     final classes = <(CharacterClass, LanKey, LanKey, List<double>, Color)>[
       (
-        CharacterClass.warrior,
+        CharacterClass.CHARACTER_CLASS_WARRIOR,
         LanKey.warrior,
         LanKey.braveAndTough,
         [0.92, 0.7, 0.45],
         AppColors.primary,
       ),
       (
-        CharacterClass.mage,
+        CharacterClass.CHARACTER_CLASS_MAGE,
         LanKey.mage,
         LanKey.cleverAndCurious,
         [0.45, 0.7, 0.95],
         AppColors.primaryDark,
       ),
       (
-        CharacterClass.ranger,
+        CharacterClass.CHARACTER_CLASS_RANGER,
         LanKey.ranger,
         LanKey.swiftAndSteady,
         [0.65, 0.7, 0.85],
@@ -256,11 +256,11 @@ class BoardingPage extends GetView<BoardingController> {
                           ),
                           child: ClipOval(
                             child: switch (cls.$1) {
-                              CharacterClass.warrior => FrameSequencePlayer(
+                              CharacterClass.CHARACTER_CLASS_WARRIOR => FrameSequencePlayer(
                                   frames: FrameSequencePlayer.knightIdleFrames(),
                                   preferredSize: Size(48.w, 60.h),
                                 ),
-                              CharacterClass.mage => FrameSequencePlayer(
+                              CharacterClass.CHARACTER_CLASS_MAGE => FrameSequencePlayer(
                                   frames: FrameSequencePlayer.mageIdleFrames(),
                                   preferredSize: Size(48.w, 60.h),
                                 ),
@@ -433,9 +433,9 @@ class BoardingPage extends GetView<BoardingController> {
         _skySceneCard(
           child: FrameSequencePlayer(
             frames: switch (controller.selectedClass.value) {
-              CharacterClass.warrior => FrameSequencePlayer.knightIdleFrames(),
-              CharacterClass.mage => FrameSequencePlayer.mageIdleFrames(),
-              CharacterClass.ranger => FrameSequencePlayer.rangerIdleFrames(),
+              CharacterClass.CHARACTER_CLASS_WARRIOR => FrameSequencePlayer.knightIdleFrames(),
+              CharacterClass.CHARACTER_CLASS_MAGE => FrameSequencePlayer.mageIdleFrames(),
+              CharacterClass.CHARACTER_CLASS_RANGER => FrameSequencePlayer.rangerIdleFrames(),
               _ => FrameSequencePlayer.knightIdleFrames(),
             },
             preferredSize: Size(160.h, 180.h),

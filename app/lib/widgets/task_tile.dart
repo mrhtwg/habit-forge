@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:habit_forge_app/core/constants/app_constants.dart';
 import 'package:habit_forge_app/core/i18n/app_locale.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_spacing.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/generated/assets.dart';
-import 'package:habit_forge_app/models/task/task_model.dart';
+import 'package:habit_forge_app/generated/protos/task/v1/task.dart';
 import 'package:intl/intl.dart';
 
 class TaskTile extends StatelessWidget {
-  final TaskModel task;
+  final Task task;
   final VoidCallback? onComplete;
   final VoidCallback? onSkip;
   final VoidCallback? onPostpone;
@@ -103,26 +102,26 @@ class TaskTile extends StatelessWidget {
     );
   }
 
-  int _baseExp(String diff) {
+  int _baseExp(TaskDifficulty diff) {
     switch (diff) {
-      case 'easy':
+      case TaskDifficulty.TASK_DIFFICULTY_EASY:
         return 15;
-      case 'medium':
+      case TaskDifficulty.TASK_DIFFICULTY_MEDIUM:
         return 30;
-      case 'hard':
+      case TaskDifficulty.TASK_DIFFICULTY_HARD:
         return 50;
       default:
         return 15;
     }
   }
 
-  int _baseGold(String diff) {
+  int _baseGold(TaskDifficulty diff) {
     switch (diff) {
-      case 'easy':
+      case TaskDifficulty.TASK_DIFFICULTY_EASY:
         return 5;
-      case 'medium':
+      case TaskDifficulty.TASK_DIFFICULTY_MEDIUM:
         return 10;
-      case 'hard':
+      case TaskDifficulty.TASK_DIFFICULTY_HARD:
         return 20;
       default:
         return 5;
@@ -135,15 +134,15 @@ class TaskTile extends StatelessWidget {
     }
 
     switch (task.difficulty) {
-      case 'easy':
+      case TaskDifficulty.TASK_DIFFICULTY_EASY:
         return _dotRow(AppColors.green.withValues(alpha: 0.8), AppColors.border, AppColors.border);
-      case 'medium':
+      case TaskDifficulty.TASK_DIFFICULTY_MEDIUM:
         return _dotRow(
           AppColors.warning.withValues(alpha: 0.8),
           AppColors.warning.withValues(alpha: 0.8),
           AppColors.border,
         );
-      case 'hard':
+      case TaskDifficulty.TASK_DIFFICULTY_HARD:
         return _dotRow(
           AppColors.red.withValues(alpha: 0.8),
           AppColors.red.withValues(alpha: 0.8),
@@ -253,11 +252,11 @@ class TaskTile extends StatelessWidget {
       children.add(_buildPriorityChip());
     }
 
-    if (task.type != 'habit' && task.dueDate != null) {
+    if (task.type != 'habit') {
       children.add(const SizedBox(width: 8));
       children.add(
         Text(
-          '📅 ${DateFormat('MMM d', AppLocale.languageCode()).format(task.dueDate!)}',
+          '📅 ${DateFormat('MMM d', AppLocale.languageCode()).format(DateTime(task.dueDate.toInt()))}',
           style: textStyleRegular(fontSize: 10, color: AppColors.textMuted),
         ),
       );
@@ -383,7 +382,7 @@ class TaskTile extends StatelessWidget {
 }
 
 class _TaskDetailSheet extends StatelessWidget {
-  final TaskModel task;
+  final Task task;
   final VoidCallback? onDelete;
 
   const _TaskDetailSheet({
@@ -432,10 +431,10 @@ class _TaskDetailSheet extends StatelessWidget {
           ),
 
           // Description
-          if (task.description != null && task.description!.isNotEmpty) ...[
+          if (task.description.isNotEmpty) ...[
             const SizedBox(height: 12),
             Text(
-              task.description!,
+              task.description,
               style: textStyleRegular(fontSize: 14, color: AppColors.textSecondary).copyWith(height: 1.4),
             ),
           ],
@@ -458,16 +457,16 @@ class _TaskDetailSheet extends StatelessWidget {
                 LanKey.difficultyFor(task.difficulty).tr,
                 Icons.speed_rounded,
               ),
-              if (task.type != TaskType.habit && task.dueDate != null)
+              if (task.type != TaskType.TASK_TYPE_HABIT)
                 _detailChip(
                   AppColors.info,
-                  DateFormat('MMM d, yyyy', AppLocale.languageCode()).format(task.dueDate!),
+                  DateFormat('MMM d, yyyy', AppLocale.languageCode()).format(DateTime(task.dueDate.toInt())),
                   Icons.calendar_today_rounded,
                 ),
               _detailChip(
                 AppColors.textMuted,
                 LanKey.taskType(task.type.name).tr,
-                task.type == TaskType.habit ? Icons.loop_rounded : Icons.task_alt_rounded,
+                task.type == TaskType.TASK_TYPE_HABIT ? Icons.loop_rounded : Icons.task_alt_rounded,
               ),
             ],
           ),
@@ -554,28 +553,28 @@ class _TaskDetailSheet extends StatelessWidget {
     );
   }
 
-  int _calcExp(TaskModel t) {
+  int _calcExp(Task t) {
     if (t.customExpReward > 0) return t.customExpReward;
     switch (t.difficulty) {
-      case 'easy':
+      case TaskDifficulty.TASK_DIFFICULTY_EASY:
         return 15;
-      case 'medium':
+      case TaskDifficulty.TASK_DIFFICULTY_MEDIUM:
         return 30;
-      case 'hard':
+      case TaskDifficulty.TASK_DIFFICULTY_HARD:
         return 50;
       default:
         return 15;
     }
   }
 
-  int _calcGold(TaskModel t) {
+  int _calcGold(Task t) {
     if (t.customGoldReward > 0) return t.customGoldReward;
     switch (t.difficulty) {
-      case 'easy':
+      case TaskDifficulty.TASK_DIFFICULTY_EASY:
         return 5;
-      case 'medium':
+      case TaskDifficulty.TASK_DIFFICULTY_MEDIUM:
         return 10;
-      case 'hard':
+      case TaskDifficulty.TASK_DIFFICULTY_HARD:
         return 20;
       default:
         return 5;
@@ -631,13 +630,13 @@ class _TaskDetailSheet extends StatelessWidget {
     );
   }
 
-  Color _difficultyColor(String diff) {
+  Color _difficultyColor(TaskDifficulty diff) {
     switch (diff) {
-      case 'easy':
+      case TaskDifficulty.TASK_DIFFICULTY_EASY:
         return AppColors.green;
-      case 'medium':
+      case TaskDifficulty.TASK_DIFFICULTY_MEDIUM:
         return AppColors.warning;
-      case 'hard':
+      case TaskDifficulty.TASK_DIFFICULTY_HARD:
         return AppColors.red;
       default:
         return AppColors.textMuted;
