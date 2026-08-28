@@ -1,6 +1,6 @@
 // This is a generated file - do not edit.
 //
-// Generated from task/v1/task.proto.
+// Generated from api/task/v1/task.proto.
 
 // @dart = 3.3
 
@@ -10,7 +10,6 @@
 // ignore_for_file: deprecated_member_use_from_same_package, library_prefixes
 // ignore_for_file: non_constant_identifier_names, prefer_relative_imports
 
-import 'dart:async' as $async;
 import 'dart:core' as $core;
 
 import 'package:fixnum/fixnum.dart' as $fixnum;
@@ -1060,49 +1059,6 @@ class CompleteTaskReply extends $pb.GeneratedMessage {
   $core.bool hasHpChange() => $_has(3);
   @$pb.TagNumber(4)
   void clearHpChange() => $_clearField(4);
-}
-
-/// TaskService — Habit / Daily / ToDo task management with RPG rewards.
-class TaskServiceApi {
-  final $pb.RpcClient _client;
-
-  TaskServiceApi(this._client);
-
-  /// ListTasks lists tasks for the current user with optional filters.
-  $async.Future<ListTasksReply> listTasks(
-          $pb.ClientContext? ctx, ListTasksRequest request) =>
-      _client.invoke<ListTasksReply>(
-          ctx, 'TaskService', 'ListTasks', request, ListTasksReply());
-
-  /// GetTask returns one task by id.
-  $async.Future<GetTaskReply> getTask(
-          $pb.ClientContext? ctx, GetTaskRequest request) =>
-      _client.invoke<GetTaskReply>(
-          ctx, 'TaskService', 'GetTask', request, GetTaskReply());
-
-  /// CreateTask creates a new task.
-  $async.Future<CreateTaskReply> createTask(
-          $pb.ClientContext? ctx, CreateTaskRequest request) =>
-      _client.invoke<CreateTaskReply>(
-          ctx, 'TaskService', 'CreateTask', request, CreateTaskReply());
-
-  /// UpdateTask updates an existing task (title, difficulty, tags, skip, etc.).
-  $async.Future<UpdateTaskReply> updateTask(
-          $pb.ClientContext? ctx, UpdateTaskRequest request) =>
-      _client.invoke<UpdateTaskReply>(
-          ctx, 'TaskService', 'UpdateTask', request, UpdateTaskReply());
-
-  /// DeleteTask removes a task.
-  $async.Future<DeleteTaskReply> deleteTask(
-          $pb.ClientContext? ctx, DeleteTaskRequest request) =>
-      _client.invoke<DeleteTaskReply>(
-          ctx, 'TaskService', 'DeleteTask', request, DeleteTaskReply());
-
-  /// CompleteTask marks a task completed and grants EXP/gold rewards.
-  $async.Future<CompleteTaskReply> completeTask(
-          $pb.ClientContext? ctx, CompleteTaskRequest request) =>
-      _client.invoke<CompleteTaskReply>(
-          ctx, 'TaskService', 'CompleteTask', request, CompleteTaskReply());
 }
 
 const $core.bool _omitFieldNames =

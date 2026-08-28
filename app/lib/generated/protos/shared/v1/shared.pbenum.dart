@@ -1,6 +1,6 @@
 // This is a generated file - do not edit.
 //
-// Generated from shared/v1/shared.proto.
+// Generated from api/shared/v1/shared.proto.
 
 // @dart = 3.3
 

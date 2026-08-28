@@ -3,8 +3,8 @@ import 'package:habit_forge_app/core/constants/env_constants.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
 import 'package:habit_forge_app/core/services/firebase_auth_service.dart';
-import 'package:habit_forge_app/core/storage/storage_service.dart';
 import 'package:habit_forge_app/core/services/server_auth_service.dart';
+import 'package:habit_forge_app/core/storage/storage_service.dart';
 
 class AuthController extends GetxController {
   static AuthController get to => Get.find();
@@ -132,7 +132,7 @@ class AuthController extends GetxController {
 
   void _checkOnboardingAndRoute() {
     final prefs = StorageService.to.userPrefs.value;
-    if (prefs == null || !prefs.onboardingCompleted) {
+    if (prefs == null) {
       Get.offAllNamed(Routers.boarding);
     } else {
       Get.offAllNamed(Routers.main);

@@ -201,10 +201,11 @@ Core protoc invocation:
 
 ```
 protoc \
-  --proto_path=../proto/api \            # rooted at api/ → output has no api/ prefix
+  --proto_path=../proto \                # module root (matches buf) so api/... imports resolve
   --proto_path=../proto/third_party \    # google.api annotations compiled only, not generated
   --dart_out[=grpc]:lib/generated/protos \
   ../proto/api/*/v1/*.proto
+# then flatten api/<svc>/v1 → <svc>/v1 (the script does this automatically)
 ```
 
 - `--dart_out` (default) generates messages: `xxx.pb.dart` (messages),

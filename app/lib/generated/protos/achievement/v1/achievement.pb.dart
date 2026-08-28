@@ -1,6 +1,6 @@
 // This is a generated file - do not edit.
 //
-// Generated from achievement/v1/achievement.proto.
+// Generated from api/achievement/v1/achievement.proto.
 
 // @dart = 3.3
 
@@ -10,7 +10,6 @@
 // ignore_for_file: deprecated_member_use_from_same_package, library_prefixes
 // ignore_for_file: non_constant_identifier_names, prefer_relative_imports
 
-import 'dart:async' as $async;
 import 'dart:core' as $core;
 
 import 'package:fixnum/fixnum.dart' as $fixnum;
@@ -401,25 +400,6 @@ class UnlockReply extends $pb.GeneratedMessage {
   $core.bool hasGemReward() => $_has(1);
   @$pb.TagNumber(2)
   void clearGemReward() => $_clearField(2);
-}
-
-/// AchievementService — achievement definitions, progress and unlock claiming.
-class AchievementServiceApi {
-  final $pb.RpcClient _client;
-
-  AchievementServiceApi(this._client);
-
-  /// ListAchievements lists all achievements with unlock state.
-  $async.Future<ListAchievementsReply> listAchievements(
-          $pb.ClientContext? ctx, ListAchievementsRequest request) =>
-      _client.invoke<ListAchievementsReply>(ctx, 'AchievementService',
-          'ListAchievements', request, ListAchievementsReply());
-
-  /// Unlock claims an achievement and grants its gem reward.
-  $async.Future<UnlockReply> unlock(
-          $pb.ClientContext? ctx, UnlockRequest request) =>
-      _client.invoke<UnlockReply>(
-          ctx, 'AchievementService', 'Unlock', request, UnlockReply());
 }
 
 const $core.bool _omitFieldNames =

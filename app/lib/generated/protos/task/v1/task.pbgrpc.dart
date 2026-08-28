@@ -1,6 +1,6 @@
 // This is a generated file - do not edit.
 //
-// Generated from task/v1/task.proto.
+// Generated from api/task/v1/task.proto.
 
 // @dart = 3.3
 

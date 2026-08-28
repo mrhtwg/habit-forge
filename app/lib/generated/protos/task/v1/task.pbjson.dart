@@ -1,6 +1,6 @@
 // This is a generated file - do not edit.
 //
-// Generated from task/v1/task.proto.
+// Generated from api/task/v1/task.proto.
 
 // @dart = 3.3
 
@@ -343,78 +343,3 @@ final $typed_data.Uint8List completeTaskReplyDescriptor = $convert.base64Decode(
     'ChFDb21wbGV0ZVRhc2tSZXBseRIlCgR0YXNrGAEgASgLMhEuYXBpLnRhc2sudjEuVGFza1IEdG'
     'FzaxIdCgpleHBfcmV3YXJkGAIgASgFUglleHBSZXdhcmQSHwoLZ29sZF9yZXdhcmQYAyABKAVS'
     'CmdvbGRSZXdhcmQSGwoJaHBfY2hhbmdlGAQgASgFUghocENoYW5nZQ==');
-
-const $core.Map<$core.String, $core.dynamic> TaskServiceBase$json = {
-  '1': 'TaskService',
-  '2': [
-    {
-      '1': 'ListTasks',
-      '2': '.api.task.v1.ListTasksRequest',
-      '3': '.api.task.v1.ListTasksReply',
-      '4': {}
-    },
-    {
-      '1': 'GetTask',
-      '2': '.api.task.v1.GetTaskRequest',
-      '3': '.api.task.v1.GetTaskReply',
-      '4': {}
-    },
-    {
-      '1': 'CreateTask',
-      '2': '.api.task.v1.CreateTaskRequest',
-      '3': '.api.task.v1.CreateTaskReply',
-      '4': {}
-    },
-    {
-      '1': 'UpdateTask',
-      '2': '.api.task.v1.UpdateTaskRequest',
-      '3': '.api.task.v1.UpdateTaskReply',
-      '4': {}
-    },
-    {
-      '1': 'DeleteTask',
-      '2': '.api.task.v1.DeleteTaskRequest',
-      '3': '.api.task.v1.DeleteTaskReply',
-      '4': {}
-    },
-    {
-      '1': 'CompleteTask',
-      '2': '.api.task.v1.CompleteTaskRequest',
-      '3': '.api.task.v1.CompleteTaskReply',
-      '4': {}
-    },
-  ],
-};
-
-@$core.Deprecated('Use taskServiceDescriptor instead')
-const $core.Map<$core.String, $core.Map<$core.String, $core.dynamic>>
-    TaskServiceBase$messageJson = {
-  '.api.task.v1.ListTasksRequest': ListTasksRequest$json,
-  '.api.task.v1.ListTasksReply': ListTasksReply$json,
-  '.api.task.v1.Task': Task$json,
-  '.api.task.v1.GetTaskRequest': GetTaskRequest$json,
-  '.api.task.v1.GetTaskReply': GetTaskReply$json,
-  '.api.task.v1.CreateTaskRequest': CreateTaskRequest$json,
-  '.api.task.v1.CreateTaskReply': CreateTaskReply$json,
-  '.api.task.v1.UpdateTaskRequest': UpdateTaskRequest$json,
-  '.api.task.v1.UpdateTaskReply': UpdateTaskReply$json,
-  '.api.task.v1.DeleteTaskRequest': DeleteTaskRequest$json,
-  '.api.task.v1.DeleteTaskReply': DeleteTaskReply$json,
-  '.api.task.v1.CompleteTaskRequest': CompleteTaskRequest$json,
-  '.api.task.v1.CompleteTaskReply': CompleteTaskReply$json,
-};
-
-/// Descriptor for `TaskService`. Decode as a `google.protobuf.ServiceDescriptorProto`.
-final $typed_data.Uint8List taskServiceDescriptor = $convert.base64Decode(
-    'CgtUYXNrU2VydmljZRJeCglMaXN0VGFza3MSHS5hcGkudGFzay52MS5MaXN0VGFza3NSZXF1ZX'
-    'N0GhsuYXBpLnRhc2sudjEuTGlzdFRhc2tzUmVwbHkiFYLT5JMCDxINL2FwaS92MS90YXNrcxJd'
-    'CgdHZXRUYXNrEhsuYXBpLnRhc2sudjEuR2V0VGFza1JlcXVlc3QaGS5hcGkudGFzay52MS5HZX'
-    'RUYXNrUmVwbHkiGoLT5JMCFBISL2FwaS92MS90YXNrcy97aWR9EmQKCkNyZWF0ZVRhc2sSHi5h'
-    'cGkudGFzay52MS5DcmVhdGVUYXNrUmVxdWVzdBocLmFwaS50YXNrLnYxLkNyZWF0ZVRhc2tSZX'
-    'BseSIYgtPkkwISIg0vYXBpL3YxL3Rhc2tzOgEqEmkKClVwZGF0ZVRhc2sSHi5hcGkudGFzay52'
-    'MS5VcGRhdGVUYXNrUmVxdWVzdBocLmFwaS50YXNrLnYxLlVwZGF0ZVRhc2tSZXBseSIdgtPkkw'
-    'IXGhIvYXBpL3YxL3Rhc2tzL3tpZH06ASoSZgoKRGVsZXRlVGFzaxIeLmFwaS50YXNrLnYxLkRl'
-    'bGV0ZVRhc2tSZXF1ZXN0GhwuYXBpLnRhc2sudjEuRGVsZXRlVGFza1JlcGx5IhqC0+STAhQqEi'
-    '9hcGkvdjEvdGFza3Mve2lkfRJ4CgxDb21wbGV0ZVRhc2sSIC5hcGkudGFzay52MS5Db21wbGV0'
-    'ZVRhc2tSZXF1ZXN0Gh4uYXBpLnRhc2sudjEuQ29tcGxldGVUYXNrUmVwbHkiJoLT5JMCICIbL2'
-    'FwaS92MS90YXNrcy97aWR9L2NvbXBsZXRlOgEq');

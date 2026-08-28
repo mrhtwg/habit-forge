@@ -15,9 +15,9 @@ class Assets {
 
   static const String fontsNunitoRegular = "assets/fonts/Nunito-Regular.ttf";
 
-  static const String imagesSharedIcDiamand = "assets/images/shared/ic_diamand.png";
-
   static const String imagesSharedIcExp = "assets/images/shared/ic_exp.png";
+
+  static const String imagesSharedIcGem = "assets/images/shared/ic_gem.png";
 
   static const String imagesSharedIcGold = "assets/images/shared/ic_gold.png";
 }

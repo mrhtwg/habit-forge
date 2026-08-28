@@ -130,6 +130,9 @@ if [ ! -d "$PROTOCOL_DIR" ]; then
   exit 1
 fi
 
+# The output is fully generated — wipe it first to avoid stale files
+# (e.g. leftover api/ levels or removed services).
+rm -rf "$DART_OUT_DIR"
 mkdir -p "$DART_OUT_DIR"
 
 DART_OPT="$DART_OUT_DIR"
@@ -138,13 +141,22 @@ DART_OPT="$DART_OUT_DIR"
 info "Proto directory: $PROTOCOL_DIR"
 info "Output directory: $DART_OUT_DIR"
 
-# Generate: proto_path rooted at api/ (output has no api/ prefix); third_party
-# provides the google.api annotations (compiled only, not generated into Dart)
+# Generate: proto_path rooted at ../proto (matches the buf/Go module root, so
+# cross-proto imports like "api/character/v1/character.proto" resolve);
+# third_party provides the google.api annotations (compiled only).
+# protoc emits an "api/" prefix in the output — flattened below.
 protoc \
-  --proto_path="$PROTOCOL_DIR/api" \
+  --proto_path="$PROTOCOL_DIR" \
   --proto_path="$PROTOCOL_DIR/third_party" \
   --dart_out="$DART_OPT" \
   "$PROTOCOL_DIR"/api/*/v1/*.proto
+
+# Flatten "api/<svc>/v1" → "<svc>/v1" so imports stay
+# `generated/protos/<svc>/v1/<svc>.dart`.
+if [ -d "$DART_OUT_DIR/api" ]; then
+  mv "$DART_OUT_DIR"/api/* "$DART_OUT_DIR"/
+  rmdir "$DART_OUT_DIR/api"
+fi
 
 generate_barrels
 

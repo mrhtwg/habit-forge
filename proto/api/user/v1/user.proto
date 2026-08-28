@@ -3,6 +3,7 @@ syntax = "proto3";
 package api.user.v1;
 
 import "google/api/annotations.proto";
+import "api/character/v1/character.proto";
 
 option go_package = "github.com/habitforge/backend/api/user/v1;v1";
 
@@ -17,7 +18,7 @@ service UserService {
   // UpdatePrefs saves the current user's preferences and wallet.
   rpc UpdatePrefs(UpdatePrefsRequest) returns (UpdatePrefsReply) {
     option (google.api.http) = {
-      put: "/api/v1/user/prefs"
+      put : "/api/v1/user/prefs"
       body: "*"
     };
   }
@@ -25,24 +26,18 @@ service UserService {
 
 // UserPrefs — per-user preferences, wallet balances and onboarding state.
 message UserPrefs {
-  // Whether the onboarding flow has been completed.
-  bool onboarding_completed = 1;
-  // Last onboarding step reached (used to resume the flow).
-  int32 last_onboarding_step = 2;
+  // Chosen character class.
+  api.character.v1.CharacterClass charactor_class = 1;
   // Current gold balance.
-  int64 current_gold = 3;
+  int64 current_gold = 2;
   // Current gem balance.
-  int64 current_gems = 4;
-  // Whether sound effects are enabled.
-  bool sound_enabled = 5;
-  // Whether haptic feedback is enabled.
-  bool haptic_enabled = 6;
+  int64 current_gems = 3;
   // Whether push notifications are enabled.
-  bool notifications_enabled = 7;
+  bool notifications_enabled = 4;
   // Lifetime count of completed tasks.
-  int64 total_tasks_completed = 8;
+  int64 total_tasks_completed = 5;
   // Date of the first completed task, unix millis.
-  int64 first_task_date = 9;
+  int64 first_task_date = 6;
 }
 
 // GetPrefsRequest — no parameters.

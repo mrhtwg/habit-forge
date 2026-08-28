@@ -23,15 +23,15 @@ class CharacterController extends GetxController {
     }
   }
 
-  /// Applies damage to the character (delegated to the storage layer).
-  void takeDamage(int amount) {
-    _hive.takeDamage(amount);
-  }
-
   @override
   void dispose() {
     _deathTimer?.cancel();
     super.dispose();
+  }
+
+  /// Applies damage to the character (delegated to the storage layer).
+  void takeDamage(int amount) {
+    _hive.takeDamage(amount);
   }
 
   void updateAnimation(String animation) {

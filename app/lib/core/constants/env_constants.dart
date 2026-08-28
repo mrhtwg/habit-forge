@@ -19,21 +19,21 @@ class EnvConstants {
   static const String firebase = 'firebase';
   static const String server = 'server';
 
-  /// Whether game data lives in local Hive storage.
-  static bool isHive() => storageMode == hive;
-
-  /// Whether Firebase is used for cloud data and auth.
-  static bool isFirebase() => storageMode == firebase;
-
-  /// Whether the self-hosted backend is used for data and auth.
-  static bool isServer() => storageMode == server;
+  /// Whether auth runs against Firebase.
+  static bool isAuthFirebase() => authMode == firebase;
 
   /// Whether auth runs against the local mock (guest mode).
   static bool isAuthLocal() => authMode == 'local';
 
-  /// Whether auth runs against Firebase.
-  static bool isAuthFirebase() => authMode == firebase;
-
   /// Whether auth runs against the self-hosted backend.
   static bool isAuthServer() => authMode == server;
+
+  /// Whether Firebase is used for cloud data and auth.
+  static bool isFirebase() => storageMode == firebase;
+
+  /// Whether game data lives in local Hive storage.
+  static bool isHive() => storageMode == hive;
+
+  /// Whether the self-hosted backend is used for data and auth.
+  static bool isServer() => storageMode == server;
 }

@@ -39,13 +39,75 @@ class ServerStorage extends GetxService implements StorageService {
   bool _loggedIn = false;
 
   @override
-  bool get isLoggedIn => _loggedIn;
-
-  @override
   String get authMethod => 'server';
 
   @override
   String? get authToken => _token;
+
+  @override
+  bool get isLoggedIn => _loggedIn;
+
+  @override
+  Future<void> addGems(int amount) async {
+    final prefs = userPrefs.value ?? UserPrefs();
+    saveUserPrefs(GameLogic.addGems(prefs, amount));
+  }
+
+  @override
+  Future<void> addGold(int amount) async {
+    final prefs = userPrefs.value ?? UserPrefs();
+    saveUserPrefs(GameLogic.addGold(prefs, amount));
+  }
+
+  @override
+  Future<bool> allocateStatPoint(StatType stat) async {
+    final reply = await _character.allocateStatPoint(AllocateStatPointRequest(stat: stat));
+    character.value = reply.character;
+    return true;
+  }
+
+  @override
+  Future<TaskCompleteResult> completeTask(Task task) async {
+    final reply = await _task.completeTask(CompleteTaskRequest(id: task.id));
+    tasks.value = [for (final t in tasks) t.id == reply.task.id ? reply.task : t];
+    // Sync wallet / character from the backend (the reply carries the rewards).
+    await refreshAll();
+    return TaskCompleteResult(
+      expGained: reply.expReward.toInt(),
+      goldGained: reply.goldReward.toInt(),
+      newLevel: null, // TODO(server): detect level-up from the synced character.
+    );
+  }
+
+  // ── Character operations ──
+  @override
+  Future<void> createCharacter(Character c) async {
+    character.value = c;
+    _character.updateCharacter(UpdateCharacterRequest(character: c)).ignore();
+  }
+
+  // ── Task operations ──
+  @override
+  String createTask(Task task) {
+    final id = task.id.isEmpty ? const Uuid().v4() : task.id;
+    _task.createTask(CreateTaskRequest(task: task..id = id)).ignore();
+    return id;
+  }
+
+  @override
+  void deleteTask(String id) {
+    _task.deleteTask(DeleteTaskRequest(id: id)).ignore();
+  }
+
+  @override
+  void equipItem(String itemId, {String slot = 'weapon'}) {
+    final char = character.value;
+    if (char == null) return;
+    // TODO(server): add an Equip RPC; client-side for now.
+    final updated = GameLogic.equip(char, slot, itemId);
+    character.value = updated;
+    _character.updateCharacter(UpdateCharacterRequest(character: updated)).ignore();
+  }
 
   @override
   Future<StorageService> init() async {
@@ -73,6 +135,21 @@ class ServerStorage extends GetxService implements StorageService {
   }
 
   @override
+  void postponeTask(Task task) => updateTask(GameLogic.postpone(task));
+
+  // ── Economy ──
+  @override
+  Future<bool> purchaseItem(String itemId, int price, {ShopCurrency currency = ShopCurrency.SHOP_CURRENCY_GOLD}) async {
+    try {
+      final reply = await _shop.buyItem(BuyItemRequest(itemId: itemId, currency: currency));
+      await refreshAll();
+      return reply.item.id.isNotEmpty;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  @override
   Future<void> refreshAll() async {
     if (!_loggedIn) return;
     // TODO(server): the backend business methods are not implemented yet (501);
@@ -91,145 +168,6 @@ class ServerStorage extends GetxService implements StorageService {
     dailyDeal.value = deal.deal;
   }
 
-  // ── Task operations ──
-  @override
-  String createTask(Task task) {
-    final id = task.id.isEmpty ? const Uuid().v4() : task.id;
-    _task.createTask(CreateTaskRequest(task: task..id = id)).ignore();
-    return id;
-  }
-
-  @override
-  void updateTask(Task task) {
-    _task.updateTask(UpdateTaskRequest(id: task.id, task: task)).ignore();
-  }
-
-  @override
-  void deleteTask(String id) {
-    _task.deleteTask(DeleteTaskRequest(id: id)).ignore();
-  }
-
-  @override
-  void skipTask(Task task) => updateTask(GameLogic.skip(task));
-
-  @override
-  void postponeTask(Task task) => updateTask(GameLogic.postpone(task));
-
-  @override
-  Future<TaskCompleteResult> completeTask(Task task) async {
-    final reply = await _task.completeTask(CompleteTaskRequest(id: task.id));
-    tasks.value = [for (final t in tasks) t.id == reply.task.id ? reply.task : t];
-    // Sync wallet / character from the backend (the reply carries the rewards).
-    await refreshAll();
-    return TaskCompleteResult(
-      expGained: reply.expReward.toInt(),
-      goldGained: reply.goldReward.toInt(),
-      newLevel: null, // TODO(server): detect level-up from the synced character.
-    );
-  }
-
-  // ── Character operations ──
-  @override
-  Future<void> createCharacter(Character c) async {
-    character.value = c;
-    _character.updateCharacter(UpdateCharacterRequest(character: c)).ignore();
-  }
-
-  @override
-  Future<bool> allocateStatPoint(StatType stat) async {
-    final reply = await _character.allocateStatPoint(AllocateStatPointRequest(stat: stat));
-    character.value = reply.character;
-    return true;
-  }
-
-  @override
-  Future<void> takeDamage(int amount) async {
-    final char = character.value;
-    if (char == null) return;
-    // TODO(server): add a dedicated TakeDamage RPC to the contract once the
-    // backend owns combat; for now the client computes and pushes the state.
-    final updated = GameLogic.takeDamage(char, amount);
-    character.value = updated;
-    _character.updateCharacter(UpdateCharacterRequest(character: updated)).ignore();
-  }
-
-  @override
-  Future<void> reviveCharacter() async {
-    await _character.revive(ReviveRequest());
-    final char = await _character.getCharacter(GetCharacterRequest());
-    character.value = char.character;
-  }
-
-  @override
-  void equipItem(String itemId, {String slot = 'weapon'}) {
-    final char = character.value;
-    if (char == null) return;
-    // TODO(server): add an Equip RPC; client-side for now.
-    final updated = GameLogic.equip(char, slot, itemId);
-    character.value = updated;
-    _character.updateCharacter(UpdateCharacterRequest(character: updated)).ignore();
-  }
-
-  // ── Economy ──
-  @override
-  Future<bool> purchaseItem(String itemId, int price, {ShopCurrency currency = ShopCurrency.SHOP_CURRENCY_GOLD}) async {
-    try {
-      final reply = await _shop.buyItem(BuyItemRequest(itemId: itemId, currency: currency));
-      await refreshAll();
-      return reply.item.id.isNotEmpty;
-    } catch (_) {
-      return false;
-    }
-  }
-
-  @override
-  Future<void> addGold(int amount) async {
-    final prefs = userPrefs.value ?? UserPrefs();
-    saveUserPrefs(GameLogic.addGold(prefs, amount));
-  }
-
-  @override
-  Future<void> addGems(int amount) async {
-    final prefs = userPrefs.value ?? UserPrefs();
-    saveUserPrefs(GameLogic.addGems(prefs, amount));
-  }
-
-  // ── Achievements ──
-  @override
-  Future<bool> unlockAchievement(Achievement def) async {
-    final reply = await _achievement.unlock(UnlockRequest(id: def.id));
-    await refreshAll();
-    return reply.achievement.isUnlocked;
-  }
-
-  // ── User prefs / deal ──
-  @override
-  void saveUserPrefs(UserPrefs prefs) {
-    userPrefs.value = prefs;
-    _user.updatePrefs(UpdatePrefsRequest(prefs: prefs)).ignore();
-  }
-
-  @override
-  void saveDailyDeal(DailyDeal deal) {
-    dailyDeal.value = deal;
-    // TODO(server): daily deals are server-owned; a local override is not supported.
-  }
-
-  // ── Auth ──
-  @override
-  void saveAuthToken(String? token) {
-    _token = token;
-    Hive.box('userBox').put('serverToken', token);
-  }
-
-  @override
-  void setLoggedIn(bool value, {String method = ''}) {
-    _loggedIn = value;
-    if (value) {
-      refreshAll();
-    }
-  }
-
   @override
   Future<void> resetAllData() async {
     _token = null;
@@ -244,6 +182,68 @@ class ServerStorage extends GetxService implements StorageService {
     dailyDeal.value = null;
   }
 
+  @override
+  Future<void> reviveCharacter() async {
+    await _character.revive(ReviveRequest());
+    final char = await _character.getCharacter(GetCharacterRequest());
+    character.value = char.character;
+  }
+
+  // ── Auth ──
+  @override
+  void saveAuthToken(String? token) {
+    _token = token;
+    Hive.box('userBox').put('serverToken', token);
+  }
+
+  @override
+  void saveDailyDeal(DailyDeal deal) {
+    dailyDeal.value = deal;
+    // TODO(server): daily deals are server-owned; a local override is not supported.
+  }
+
+  // ── User prefs / deal ──
+  @override
+  void saveUserPrefs(UserPrefs prefs) {
+    userPrefs.value = prefs;
+    _user.updatePrefs(UpdatePrefsRequest(prefs: prefs)).ignore();
+  }
+
+  @override
+  void setLoggedIn(bool value, {String method = ''}) {
+    _loggedIn = value;
+    if (value) {
+      refreshAll();
+    }
+  }
+
+  @override
+  void skipTask(Task task) => updateTask(GameLogic.skip(task));
+
+  @override
+  Future<void> takeDamage(int amount) async {
+    final char = character.value;
+    if (char == null) return;
+    // TODO(server): add a dedicated TakeDamage RPC to the contract once the
+    // backend owns combat; for now the client computes and pushes the state.
+    final updated = GameLogic.takeDamage(char, amount);
+    character.value = updated;
+    _character.updateCharacter(UpdateCharacterRequest(character: updated)).ignore();
+  }
+
+  // ── Achievements ──
+  @override
+  Future<bool> unlockAchievement(Achievement def) async {
+    final reply = await _achievement.unlock(UnlockRequest(id: def.id));
+    await refreshAll();
+    return reply.achievement.isUnlocked;
+  }
+
+  @override
+  void updateTask(Task task) {
+    _task.updateTask(UpdateTaskRequest(id: task.id, task: task)).ignore();
+  }
+
   /// Parses "host:port" (or "http://host:port") into a (host, port) record.
   (String, int) _parseEndpoint(String url) {
     final cleaned = url.replaceAll(RegExp(r'^https?://'), '');
@@ -256,9 +256,9 @@ class ServerStorage extends GetxService implements StorageService {
 
 /// Attaches the current JWT to every outgoing gRPC call.
 class _AuthInterceptor extends ClientInterceptor {
-  _AuthInterceptor(this._token);
-
   final String? Function() _token;
+
+  _AuthInterceptor(this._token);
 
   @override
   ResponseFuture<R> interceptUnary<Q, R>(

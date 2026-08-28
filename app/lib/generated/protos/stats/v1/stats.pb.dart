@@ -1,6 +1,6 @@
 // This is a generated file - do not edit.
 //
-// Generated from stats/v1/stats.proto.
+// Generated from api/stats/v1/stats.proto.
 
 // @dart = 3.3
 
@@ -10,7 +10,6 @@
 // ignore_for_file: deprecated_member_use_from_same_package, library_prefixes
 // ignore_for_file: non_constant_identifier_names, prefer_relative_imports
 
-import 'dart:async' as $async;
 import 'dart:core' as $core;
 
 import 'package:fixnum/fixnum.dart' as $fixnum;
@@ -400,19 +399,6 @@ class GetStatsReply extends $pb.GeneratedMessage {
   void clearStats() => $_clearField(1);
   @$pb.TagNumber(1)
   StatsReply ensureStats() => $_ensure(0);
-}
-
-/// StatsService — completion statistics and streak leaderboard.
-class StatsServiceApi {
-  final $pb.RpcClient _client;
-
-  StatsServiceApi(this._client);
-
-  /// GetStats returns task statistics over a time range.
-  $async.Future<GetStatsReply> getStats(
-          $pb.ClientContext? ctx, GetStatsRequest request) =>
-      _client.invoke<GetStatsReply>(
-          ctx, 'StatsService', 'GetStats', request, GetStatsReply());
 }
 
 const $core.bool _omitFieldNames =

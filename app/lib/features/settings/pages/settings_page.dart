@@ -3,15 +3,12 @@ import 'package:get/get.dart';
 import 'package:habit_forge_app/core/i18n/app_locale.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
-import 'package:habit_forge_app/core/services/audio_service.dart';
-import 'package:habit_forge_app/core/services/haptic_service.dart';
 import 'package:habit_forge_app/core/storage/storage_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/auth/controllers/auth_controller.dart';
 import 'package:habit_forge_app/features/settings/controllers/settings_controller.dart';
 import 'package:habit_forge_app/widgets/confirm_dialog.dart';
-import 'package:protobuf/protobuf.dart';
 
 class SettingsPage extends GetView<SettingsController> {
   const SettingsPage({super.key});
@@ -40,7 +37,9 @@ class SettingsPage extends GetView<SettingsController> {
                     dense: true,
                     leading: const Icon(Icons.person_outline, color: AppColors.textSecondary),
                     title: Text(
-                      StorageService.to.authMethod.isEmpty ? LanKey.guest.tr : StorageService.to.authMethod.capitalizeFirst!,
+                      StorageService.to.authMethod.isEmpty
+                          ? LanKey.guest.tr
+                          : StorageService.to.authMethod.capitalizeFirst!,
                       style: textStyleRegular(color: AppColors.textPrimary),
                     ),
                     subtitle: Text(
@@ -79,23 +78,23 @@ class SettingsPage extends GetView<SettingsController> {
             _SettingsCard(
               child: Column(
                 children: [
-                  _PreferenceRow(
-                    label: LanKey.sound.tr,
-                    value: prefs.soundEnabled,
-                    onChanged: (v) {
-                      Get.find<AudioService>().setEnabled(v);
-                      StorageService.to.saveUserPrefs(prefs.rebuild((p) => p..soundEnabled = v));
-                    },
-                  ),
+                  // _PreferenceRow(
+                  //   label: LanKey.sound.tr,
+                  //   value: prefs.soundEnabled,
+                  //   onChanged: (v) {
+                  //     Get.find<AudioService>().setEnabled(v);
+                  //     StorageService.to.saveUserPrefs(prefs.rebuild((p) => p..soundEnabled = v));
+                  //   },
+                  // ),
                   const Divider(color: AppColors.elevated, height: 1, thickness: 1),
-                  _PreferenceRow(
-                    label: LanKey.haptic.tr,
-                    value: prefs.hapticEnabled,
-                    onChanged: (v) {
-                      Get.find<HapticService>().setEnabled(v);
-                      StorageService.to.saveUserPrefs(prefs.rebuild((p) => p..hapticEnabled = v));
-                    },
-                  ),
+                  // _PreferenceRow(
+                  //   label: LanKey.haptic.tr,
+                  //   value: prefs.hapticEnabled,
+                  //   onChanged: (v) {
+                  //     Get.find<HapticService>().setEnabled(v);
+                  //     StorageService.to.saveUserPrefs(prefs.rebuild((p) => p..hapticEnabled = v));
+                  //   },
+                  // ),
                 ],
               ),
             ),

@@ -1,6 +1,6 @@
 // This is a generated file - do not edit.
 //
-// Generated from character/v1/character.proto.
+// Generated from api/character/v1/character.proto.
 
 // @dart = 3.3
 

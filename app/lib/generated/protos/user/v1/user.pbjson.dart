@@ -1,6 +1,6 @@
 // This is a generated file - do not edit.
 //
-// Generated from user/v1/user.proto.
+// Generated from api/user/v1/user.proto.
 
 // @dart = 3.3
 
@@ -20,51 +20,41 @@ const UserPrefs$json = {
   '1': 'UserPrefs',
   '2': [
     {
-      '1': 'onboarding_completed',
+      '1': 'charactor_class',
       '3': 1,
       '4': 1,
-      '5': 8,
-      '10': 'onboardingCompleted'
+      '5': 14,
+      '6': '.api.character.v1.CharacterClass',
+      '10': 'charactorClass'
     },
-    {
-      '1': 'last_onboarding_step',
-      '3': 2,
-      '4': 1,
-      '5': 5,
-      '10': 'lastOnboardingStep'
-    },
-    {'1': 'current_gold', '3': 3, '4': 1, '5': 3, '10': 'currentGold'},
-    {'1': 'current_gems', '3': 4, '4': 1, '5': 3, '10': 'currentGems'},
-    {'1': 'sound_enabled', '3': 5, '4': 1, '5': 8, '10': 'soundEnabled'},
-    {'1': 'haptic_enabled', '3': 6, '4': 1, '5': 8, '10': 'hapticEnabled'},
+    {'1': 'current_gold', '3': 2, '4': 1, '5': 3, '10': 'currentGold'},
+    {'1': 'current_gems', '3': 3, '4': 1, '5': 3, '10': 'currentGems'},
     {
       '1': 'notifications_enabled',
-      '3': 7,
+      '3': 4,
       '4': 1,
       '5': 8,
       '10': 'notificationsEnabled'
     },
     {
       '1': 'total_tasks_completed',
-      '3': 8,
+      '3': 5,
       '4': 1,
       '5': 3,
       '10': 'totalTasksCompleted'
     },
-    {'1': 'first_task_date', '3': 9, '4': 1, '5': 3, '10': 'firstTaskDate'},
+    {'1': 'first_task_date', '3': 6, '4': 1, '5': 3, '10': 'firstTaskDate'},
   ],
 };
 
 /// Descriptor for `UserPrefs`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List userPrefsDescriptor = $convert.base64Decode(
-    'CglVc2VyUHJlZnMSMQoUb25ib2FyZGluZ19jb21wbGV0ZWQYASABKAhSE29uYm9hcmRpbmdDb2'
-    '1wbGV0ZWQSMAoUbGFzdF9vbmJvYXJkaW5nX3N0ZXAYAiABKAVSEmxhc3RPbmJvYXJkaW5nU3Rl'
-    'cBIhCgxjdXJyZW50X2dvbGQYAyABKANSC2N1cnJlbnRHb2xkEiEKDGN1cnJlbnRfZ2VtcxgEIA'
-    'EoA1ILY3VycmVudEdlbXMSIwoNc291bmRfZW5hYmxlZBgFIAEoCFIMc291bmRFbmFibGVkEiUK'
-    'DmhhcHRpY19lbmFibGVkGAYgASgIUg1oYXB0aWNFbmFibGVkEjMKFW5vdGlmaWNhdGlvbnNfZW'
-    '5hYmxlZBgHIAEoCFIUbm90aWZpY2F0aW9uc0VuYWJsZWQSMgoVdG90YWxfdGFza3NfY29tcGxl'
-    'dGVkGAggASgDUhN0b3RhbFRhc2tzQ29tcGxldGVkEiYKD2ZpcnN0X3Rhc2tfZGF0ZRgJIAEoA1'
-    'INZmlyc3RUYXNrRGF0ZQ==');
+    'CglVc2VyUHJlZnMSSQoPY2hhcmFjdG9yX2NsYXNzGAEgASgOMiAuYXBpLmNoYXJhY3Rlci52MS'
+    '5DaGFyYWN0ZXJDbGFzc1IOY2hhcmFjdG9yQ2xhc3MSIQoMY3VycmVudF9nb2xkGAIgASgDUgtj'
+    'dXJyZW50R29sZBIhCgxjdXJyZW50X2dlbXMYAyABKANSC2N1cnJlbnRHZW1zEjMKFW5vdGlmaW'
+    'NhdGlvbnNfZW5hYmxlZBgEIAEoCFIUbm90aWZpY2F0aW9uc0VuYWJsZWQSMgoVdG90YWxfdGFz'
+    'a3NfY29tcGxldGVkGAUgASgDUhN0b3RhbFRhc2tzQ29tcGxldGVkEiYKD2ZpcnN0X3Rhc2tfZG'
+    'F0ZRgGIAEoA1INZmlyc3RUYXNrRGF0ZQ==');
 
 @$core.Deprecated('Use getPrefsRequestDescriptor instead')
 const GetPrefsRequest$json = {
@@ -134,38 +124,3 @@ const UpdatePrefsReply$json = {
 final $typed_data.Uint8List updatePrefsReplyDescriptor = $convert.base64Decode(
     'ChBVcGRhdGVQcmVmc1JlcGx5EiwKBXByZWZzGAEgASgLMhYuYXBpLnVzZXIudjEuVXNlclByZW'
     'ZzUgVwcmVmcw==');
-
-const $core.Map<$core.String, $core.dynamic> UserServiceBase$json = {
-  '1': 'UserService',
-  '2': [
-    {
-      '1': 'GetPrefs',
-      '2': '.api.user.v1.GetPrefsRequest',
-      '3': '.api.user.v1.GetPrefsReply',
-      '4': {}
-    },
-    {
-      '1': 'UpdatePrefs',
-      '2': '.api.user.v1.UpdatePrefsRequest',
-      '3': '.api.user.v1.UpdatePrefsReply',
-      '4': {}
-    },
-  ],
-};
-
-@$core.Deprecated('Use userServiceDescriptor instead')
-const $core.Map<$core.String, $core.Map<$core.String, $core.dynamic>>
-    UserServiceBase$messageJson = {
-  '.api.user.v1.GetPrefsRequest': GetPrefsRequest$json,
-  '.api.user.v1.GetPrefsReply': GetPrefsReply$json,
-  '.api.user.v1.UserPrefs': UserPrefs$json,
-  '.api.user.v1.UpdatePrefsRequest': UpdatePrefsRequest$json,
-  '.api.user.v1.UpdatePrefsReply': UpdatePrefsReply$json,
-};
-
-/// Descriptor for `UserService`. Decode as a `google.protobuf.ServiceDescriptorProto`.
-final $typed_data.Uint8List userServiceDescriptor = $convert.base64Decode(
-    'CgtVc2VyU2VydmljZRJgCghHZXRQcmVmcxIcLmFwaS51c2VyLnYxLkdldFByZWZzUmVxdWVzdB'
-    'oaLmFwaS51c2VyLnYxLkdldFByZWZzUmVwbHkiGoLT5JMCFBISL2FwaS92MS91c2VyL3ByZWZz'
-    'EmwKC1VwZGF0ZVByZWZzEh8uYXBpLnVzZXIudjEuVXBkYXRlUHJlZnNSZXF1ZXN0Gh0uYXBpLn'
-    'VzZXIudjEuVXBkYXRlUHJlZnNSZXBseSIdgtPkkwIXGhIvYXBpL3YxL3VzZXIvcHJlZnM6ASo=');

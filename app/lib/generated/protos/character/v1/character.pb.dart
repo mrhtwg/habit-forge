@@ -1,6 +1,6 @@
 // This is a generated file - do not edit.
 //
-// Generated from character/v1/character.proto.
+// Generated from api/character/v1/character.proto.
 
 // @dart = 3.3
 
@@ -10,7 +10,6 @@
 // ignore_for_file: deprecated_member_use_from_same_package, library_prefixes
 // ignore_for_file: non_constant_identifier_names, prefer_relative_imports
 
-import 'dart:async' as $async;
 import 'dart:core' as $core;
 
 import 'package:fixnum/fixnum.dart' as $fixnum;
@@ -760,37 +759,6 @@ class ReviveReply extends $pb.GeneratedMessage {
   void clearCharacter() => $_clearField(1);
   @$pb.TagNumber(1)
   Character ensureCharacter() => $_ensure(0);
-}
-
-/// CharacterService — RPG character state: class, level, EXP, HP, stats, equipment.
-class CharacterServiceApi {
-  final $pb.RpcClient _client;
-
-  CharacterServiceApi(this._client);
-
-  /// GetCharacter returns the current user's character.
-  $async.Future<GetCharacterReply> getCharacter(
-          $pb.ClientContext? ctx, GetCharacterRequest request) =>
-      _client.invoke<GetCharacterReply>(ctx, 'CharacterService', 'GetCharacter',
-          request, GetCharacterReply());
-
-  /// UpdateCharacter replaces the character state (level/exp/hp/stats/equipment).
-  $async.Future<UpdateCharacterReply> updateCharacter(
-          $pb.ClientContext? ctx, UpdateCharacterRequest request) =>
-      _client.invoke<UpdateCharacterReply>(ctx, 'CharacterService',
-          'UpdateCharacter', request, UpdateCharacterReply());
-
-  /// AllocateStatPoint spends one available stat point on an attribute.
-  $async.Future<AllocateStatPointReply> allocateStatPoint(
-          $pb.ClientContext? ctx, AllocateStatPointRequest request) =>
-      _client.invoke<AllocateStatPointReply>(ctx, 'CharacterService',
-          'AllocateStatPoint', request, AllocateStatPointReply());
-
-  /// Revive revives a dead character (e.g. after the recovery timer).
-  $async.Future<ReviveReply> revive(
-          $pb.ClientContext? ctx, ReviveRequest request) =>
-      _client.invoke<ReviveReply>(
-          ctx, 'CharacterService', 'Revive', request, ReviveReply());
 }
 
 const $core.bool _omitFieldNames =

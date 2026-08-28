@@ -1,6 +1,6 @@
 // This is a generated file - do not edit.
 //
-// Generated from shop/v1/shop.proto.
+// Generated from api/shop/v1/shop.proto.
 
 // @dart = 3.3
 
@@ -10,7 +10,6 @@
 // ignore_for_file: deprecated_member_use_from_same_package, library_prefixes
 // ignore_for_file: non_constant_identifier_names, prefer_relative_imports
 
-import 'dart:async' as $async;
 import 'dart:core' as $core;
 
 import 'package:fixnum/fixnum.dart' as $fixnum;
@@ -684,37 +683,6 @@ class ListOwnedItemsReply extends $pb.GeneratedMessage {
   /// Owned item ids.
   @$pb.TagNumber(1)
   $pb.PbList<$core.String> get itemIds => $_getList(0);
-}
-
-/// ShopService — Forge shop: items, daily deals, purchases, owned items.
-class ShopServiceApi {
-  final $pb.RpcClient _client;
-
-  ShopServiceApi(this._client);
-
-  /// ListShopItems lists all purchasable shop items.
-  $async.Future<ListShopItemsReply> listShopItems(
-          $pb.ClientContext? ctx, ListShopItemsRequest request) =>
-      _client.invoke<ListShopItemsReply>(
-          ctx, 'ShopService', 'ListShopItems', request, ListShopItemsReply());
-
-  /// GetDailyDeal returns the current rotating discounted item.
-  $async.Future<GetDailyDealReply> getDailyDeal(
-          $pb.ClientContext? ctx, GetDailyDealRequest request) =>
-      _client.invoke<GetDailyDealReply>(
-          ctx, 'ShopService', 'GetDailyDeal', request, GetDailyDealReply());
-
-  /// BuyItem purchases an item with gold or gems.
-  $async.Future<BuyItemReply> buyItem(
-          $pb.ClientContext? ctx, BuyItemRequest request) =>
-      _client.invoke<BuyItemReply>(
-          ctx, 'ShopService', 'BuyItem', request, BuyItemReply());
-
-  /// ListOwnedItems lists items the current user owns.
-  $async.Future<ListOwnedItemsReply> listOwnedItems(
-          $pb.ClientContext? ctx, ListOwnedItemsRequest request) =>
-      _client.invoke<ListOwnedItemsReply>(
-          ctx, 'ShopService', 'ListOwnedItems', request, ListOwnedItemsReply());
 }
 
 const $core.bool _omitFieldNames =

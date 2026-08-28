@@ -31,7 +31,7 @@ class WalletChip extends StatelessWidget {
           Image.asset(
             switch (sysMaterial) {
               SysMaterial.SYSMATERIAL_GOLD => Assets.imagesSharedIcGold,
-              SysMaterial.SYSMATERIAL_DIAMOND => Assets.imagesSharedIcDiamand,
+              SysMaterial.SYSMATERIAL_DIAMOND => Assets.imagesSharedIcGem,
               _ => Assets.imagesSharedIcGold
             },
             width: 16.w,

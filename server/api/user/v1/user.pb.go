@@ -7,6 +7,7 @@
 package v1
 
 import (
+	v1 "github.com/habitforge/backend/api/character/v1"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -25,24 +26,18 @@ const (
 // UserPrefs — per-user preferences, wallet balances and onboarding state.
 type UserPrefs struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Whether the onboarding flow has been completed.
-	OnboardingCompleted bool `protobuf:"varint,1,opt,name=onboarding_completed,json=onboardingCompleted,proto3" json:"onboarding_completed,omitempty"`
-	// Last onboarding step reached (used to resume the flow).
-	LastOnboardingStep int32 `protobuf:"varint,2,opt,name=last_onboarding_step,json=lastOnboardingStep,proto3" json:"last_onboarding_step,omitempty"`
+	// Chosen character class.
+	CharactorClass v1.CharacterClass `protobuf:"varint,1,opt,name=charactor_class,json=charactorClass,proto3,enum=api.character.v1.CharacterClass" json:"charactor_class,omitempty"`
 	// Current gold balance.
-	CurrentGold int64 `protobuf:"varint,3,opt,name=current_gold,json=currentGold,proto3" json:"current_gold,omitempty"`
+	CurrentGold int64 `protobuf:"varint,2,opt,name=current_gold,json=currentGold,proto3" json:"current_gold,omitempty"`
 	// Current gem balance.
-	CurrentGems int64 `protobuf:"varint,4,opt,name=current_gems,json=currentGems,proto3" json:"current_gems,omitempty"`
-	// Whether sound effects are enabled.
-	SoundEnabled bool `protobuf:"varint,5,opt,name=sound_enabled,json=soundEnabled,proto3" json:"sound_enabled,omitempty"`
-	// Whether haptic feedback is enabled.
-	HapticEnabled bool `protobuf:"varint,6,opt,name=haptic_enabled,json=hapticEnabled,proto3" json:"haptic_enabled,omitempty"`
+	CurrentGems int64 `protobuf:"varint,3,opt,name=current_gems,json=currentGems,proto3" json:"current_gems,omitempty"`
 	// Whether push notifications are enabled.
-	NotificationsEnabled bool `protobuf:"varint,7,opt,name=notifications_enabled,json=notificationsEnabled,proto3" json:"notifications_enabled,omitempty"`
+	NotificationsEnabled bool `protobuf:"varint,4,opt,name=notifications_enabled,json=notificationsEnabled,proto3" json:"notifications_enabled,omitempty"`
 	// Lifetime count of completed tasks.
-	TotalTasksCompleted int64 `protobuf:"varint,8,opt,name=total_tasks_completed,json=totalTasksCompleted,proto3" json:"total_tasks_completed,omitempty"`
+	TotalTasksCompleted int64 `protobuf:"varint,5,opt,name=total_tasks_completed,json=totalTasksCompleted,proto3" json:"total_tasks_completed,omitempty"`
 	// Date of the first completed task, unix millis.
-	FirstTaskDate int64 `protobuf:"varint,9,opt,name=first_task_date,json=firstTaskDate,proto3" json:"first_task_date,omitempty"`
+	FirstTaskDate int64 `protobuf:"varint,6,opt,name=first_task_date,json=firstTaskDate,proto3" json:"first_task_date,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -77,18 +72,11 @@ func (*UserPrefs) Descriptor() ([]byte, []int) {
 	return file_api_user_v1_user_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *UserPrefs) GetOnboardingCompleted() bool {
+func (x *UserPrefs) GetCharactorClass() v1.CharacterClass {
 	if x != nil {
-		return x.OnboardingCompleted
+		return x.CharactorClass
 	}
-	return false
-}
-
-func (x *UserPrefs) GetLastOnboardingStep() int32 {
-	if x != nil {
-		return x.LastOnboardingStep
-	}
-	return 0
+	return v1.CharacterClass(0)
 }
 
 func (x *UserPrefs) GetCurrentGold() int64 {
@@ -103,20 +91,6 @@ func (x *UserPrefs) GetCurrentGems() int64 {
 		return x.CurrentGems
 	}
 	return 0
-}
-
-func (x *UserPrefs) GetSoundEnabled() bool {
-	if x != nil {
-		return x.SoundEnabled
-	}
-	return false
-}
-
-func (x *UserPrefs) GetHapticEnabled() bool {
-	if x != nil {
-		return x.HapticEnabled
-	}
-	return false
 }
 
 func (x *UserPrefs) GetNotificationsEnabled() bool {
@@ -319,17 +293,14 @@ var File_api_user_v1_user_proto protoreflect.FileDescriptor
 
 const file_api_user_v1_user_proto_rawDesc = "" +
 	"\n" +
-	"\x16api/user/v1/user.proto\x12\vapi.user.v1\x1a\x1cgoogle/api/annotations.proto\"\x93\x03\n" +
-	"\tUserPrefs\x121\n" +
-	"\x14onboarding_completed\x18\x01 \x01(\bR\x13onboardingCompleted\x120\n" +
-	"\x14last_onboarding_step\x18\x02 \x01(\x05R\x12lastOnboardingStep\x12!\n" +
-	"\fcurrent_gold\x18\x03 \x01(\x03R\vcurrentGold\x12!\n" +
-	"\fcurrent_gems\x18\x04 \x01(\x03R\vcurrentGems\x12#\n" +
-	"\rsound_enabled\x18\x05 \x01(\bR\fsoundEnabled\x12%\n" +
-	"\x0ehaptic_enabled\x18\x06 \x01(\bR\rhapticEnabled\x123\n" +
-	"\x15notifications_enabled\x18\a \x01(\bR\x14notificationsEnabled\x122\n" +
-	"\x15total_tasks_completed\x18\b \x01(\x03R\x13totalTasksCompleted\x12&\n" +
-	"\x0ffirst_task_date\x18\t \x01(\x03R\rfirstTaskDate\"\x11\n" +
+	"\x16api/user/v1/user.proto\x12\vapi.user.v1\x1a\x1cgoogle/api/annotations.proto\x1a api/character/v1/character.proto\"\xad\x02\n" +
+	"\tUserPrefs\x12I\n" +
+	"\x0fcharactor_class\x18\x01 \x01(\x0e2 .api.character.v1.CharacterClassR\x0echaractorClass\x12!\n" +
+	"\fcurrent_gold\x18\x02 \x01(\x03R\vcurrentGold\x12!\n" +
+	"\fcurrent_gems\x18\x03 \x01(\x03R\vcurrentGems\x123\n" +
+	"\x15notifications_enabled\x18\x04 \x01(\bR\x14notificationsEnabled\x122\n" +
+	"\x15total_tasks_completed\x18\x05 \x01(\x03R\x13totalTasksCompleted\x12&\n" +
+	"\x0ffirst_task_date\x18\x06 \x01(\x03R\rfirstTaskDate\"\x11\n" +
 	"\x0fGetPrefsRequest\"=\n" +
 	"\rGetPrefsReply\x12,\n" +
 	"\x05prefs\x18\x01 \x01(\v2\x16.api.user.v1.UserPrefsR\x05prefs\"B\n" +
@@ -360,20 +331,22 @@ var file_api_user_v1_user_proto_goTypes = []any{
 	(*GetPrefsReply)(nil),      // 2: api.user.v1.GetPrefsReply
 	(*UpdatePrefsRequest)(nil), // 3: api.user.v1.UpdatePrefsRequest
 	(*UpdatePrefsReply)(nil),   // 4: api.user.v1.UpdatePrefsReply
+	(v1.CharacterClass)(0),     // 5: api.character.v1.CharacterClass
 }
 var file_api_user_v1_user_proto_depIdxs = []int32{
-	0, // 0: api.user.v1.GetPrefsReply.prefs:type_name -> api.user.v1.UserPrefs
-	0, // 1: api.user.v1.UpdatePrefsRequest.prefs:type_name -> api.user.v1.UserPrefs
-	0, // 2: api.user.v1.UpdatePrefsReply.prefs:type_name -> api.user.v1.UserPrefs
-	1, // 3: api.user.v1.UserService.GetPrefs:input_type -> api.user.v1.GetPrefsRequest
-	3, // 4: api.user.v1.UserService.UpdatePrefs:input_type -> api.user.v1.UpdatePrefsRequest
-	2, // 5: api.user.v1.UserService.GetPrefs:output_type -> api.user.v1.GetPrefsReply
-	4, // 6: api.user.v1.UserService.UpdatePrefs:output_type -> api.user.v1.UpdatePrefsReply
-	5, // [5:7] is the sub-list for method output_type
-	3, // [3:5] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	5, // 0: api.user.v1.UserPrefs.charactor_class:type_name -> api.character.v1.CharacterClass
+	0, // 1: api.user.v1.GetPrefsReply.prefs:type_name -> api.user.v1.UserPrefs
+	0, // 2: api.user.v1.UpdatePrefsRequest.prefs:type_name -> api.user.v1.UserPrefs
+	0, // 3: api.user.v1.UpdatePrefsReply.prefs:type_name -> api.user.v1.UserPrefs
+	1, // 4: api.user.v1.UserService.GetPrefs:input_type -> api.user.v1.GetPrefsRequest
+	3, // 5: api.user.v1.UserService.UpdatePrefs:input_type -> api.user.v1.UpdatePrefsRequest
+	2, // 6: api.user.v1.UserService.GetPrefs:output_type -> api.user.v1.GetPrefsReply
+	4, // 7: api.user.v1.UserService.UpdatePrefs:output_type -> api.user.v1.UpdatePrefsReply
+	6, // [6:8] is the sub-list for method output_type
+	4, // [4:6] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_api_user_v1_user_proto_init() }

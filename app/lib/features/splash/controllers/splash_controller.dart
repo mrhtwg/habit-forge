@@ -1,5 +1,4 @@
 import 'package:get/get.dart';
-import 'package:habit_forge_app/core/constants/env_constants.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
 import 'package:habit_forge_app/core/storage/storage.dart';
 import 'package:habit_forge_app/core/storage/storage_service.dart';
@@ -13,15 +12,9 @@ class SplashController extends GetxController {
       return storage.init();
     });
 
-    await Future.delayed(const Duration(seconds: 1));
+    await Future.delayed(const Duration(milliseconds: 500));
 
     final storage = StorageService.to;
-
-    // Hive (local) mode: no login required — enter directly as guest.
-    if (EnvConstants.isHive()) {
-      _routeAfterEntry(storage);
-      return;
-    }
 
     // Firebase / server mode: not logged in → login page
     if (!storage.isLoggedIn) {
@@ -41,7 +34,7 @@ class SplashController extends GetxController {
   void _routeAfterEntry(StorageService storage) {
     // Logged in, check onboarding
     final prefs = storage.userPrefs.value;
-    if (prefs == null || !prefs.onboardingCompleted) {
+    if (prefs == null) {
       Get.offAllNamed(Routers.boarding);
     } else {
       Get.offAllNamed(Routers.main);

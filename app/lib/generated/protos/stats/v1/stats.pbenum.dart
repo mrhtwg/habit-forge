@@ -1,6 +1,6 @@
 // This is a generated file - do not edit.
 //
-// Generated from stats/v1/stats.proto.
+// Generated from api/stats/v1/stats.proto.
 
 // @dart = 3.3
 

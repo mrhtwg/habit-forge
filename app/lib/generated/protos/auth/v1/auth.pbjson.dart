@@ -1,6 +1,6 @@
 // This is a generated file - do not edit.
 //
-// Generated from auth/v1/auth.proto.
+// Generated from api/auth/v1/auth.proto.
 
 // @dart = 3.3
 
@@ -150,57 +150,3 @@ const MeReply$json = {
 /// Descriptor for `MeReply`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List meReplyDescriptor = $convert.base64Decode(
     'CgdNZVJlcGx5EikKBHVzZXIYASABKAsyFS5hcGkuYXV0aC52MS5Vc2VySW5mb1IEdXNlcg==');
-
-const $core.Map<$core.String, $core.dynamic> AuthServiceBase$json = {
-  '1': 'AuthService',
-  '2': [
-    {
-      '1': 'Register',
-      '2': '.api.auth.v1.RegisterRequest',
-      '3': '.api.auth.v1.RegisterReply',
-      '4': {}
-    },
-    {
-      '1': 'Login',
-      '2': '.api.auth.v1.LoginRequest',
-      '3': '.api.auth.v1.LoginReply',
-      '4': {}
-    },
-    {
-      '1': 'OAuthLogin',
-      '2': '.api.auth.v1.OAuthLoginRequest',
-      '3': '.api.auth.v1.LoginReply',
-      '4': {}
-    },
-    {
-      '1': 'Me',
-      '2': '.api.auth.v1.MeRequest',
-      '3': '.api.auth.v1.MeReply',
-      '4': {}
-    },
-  ],
-};
-
-@$core.Deprecated('Use authServiceDescriptor instead')
-const $core.Map<$core.String, $core.Map<$core.String, $core.dynamic>>
-    AuthServiceBase$messageJson = {
-  '.api.auth.v1.RegisterRequest': RegisterRequest$json,
-  '.api.auth.v1.RegisterReply': RegisterReply$json,
-  '.api.auth.v1.UserInfo': UserInfo$json,
-  '.api.auth.v1.LoginRequest': LoginRequest$json,
-  '.api.auth.v1.LoginReply': LoginReply$json,
-  '.api.auth.v1.OAuthLoginRequest': OAuthLoginRequest$json,
-  '.api.auth.v1.MeRequest': MeRequest$json,
-  '.api.auth.v1.MeReply': MeReply$json,
-};
-
-/// Descriptor for `AuthService`. Decode as a `google.protobuf.ServiceDescriptorProto`.
-final $typed_data.Uint8List authServiceDescriptor = $convert.base64Decode(
-    'CgtBdXRoU2VydmljZRJmCghSZWdpc3RlchIcLmFwaS5hdXRoLnYxLlJlZ2lzdGVyUmVxdWVzdB'
-    'oaLmFwaS5hdXRoLnYxLlJlZ2lzdGVyUmVwbHkiIILT5JMCGiIVL2FwaS92MS9hdXRoL3JlZ2lz'
-    'dGVyOgEqEloKBUxvZ2luEhkuYXBpLmF1dGgudjEuTG9naW5SZXF1ZXN0GhcuYXBpLmF1dGgudj'
-    'EuTG9naW5SZXBseSIdgtPkkwIXIhIvYXBpL3YxL2F1dGgvbG9naW46ASoSZAoKT0F1dGhMb2dp'
-    'bhIeLmFwaS5hdXRoLnYxLk9BdXRoTG9naW5SZXF1ZXN0GhcuYXBpLmF1dGgudjEuTG9naW5SZX'
-    'BseSIdgtPkkwIXIhIvYXBpL3YxL2F1dGgvb2F1dGg6ASoSSwoCTWUSFi5hcGkuYXV0aC52MS5N'
-    'ZVJlcXVlc3QaFC5hcGkuYXV0aC52MS5NZVJlcGx5IheC0+STAhESDy9hcGkvdjEvYXV0aC9tZQ'
-    '==');

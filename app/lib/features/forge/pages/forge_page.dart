@@ -40,7 +40,11 @@ class ForgePage extends GetView<ForgeController> {
         child: GestureDetector(
           onTap: () => ItemDetailSheet.show(context, item),
           child: Container(
-            padding: EdgeInsets.all(14.w),
+            padding: EdgeInsets.only(
+              left: 14.w,
+              right: 14.w,
+              bottom: 14.w,
+            ),
             decoration: BoxDecoration(
               gradient: const LinearGradient(colors: [Color(0xFFFFE9B8), Color(0xFFFFD180)]),
               border: Border.all(color: AppColors.border, width: 2.5),
@@ -51,8 +55,8 @@ class ForgePage extends GetView<ForgeController> {
               children: [
                 // 40% OFF badge
                 Positioned(
-                  top: -10,
-                  right: 12,
+                  top: 6.h,
+                  right: 12.w,
                   child: Transform.rotate(
                     angle: 0.07,
                     child: Container(
@@ -70,80 +74,85 @@ class ForgePage extends GetView<ForgeController> {
                     ),
                   ),
                 ),
-                Row(
-                  children: [
-                    // Item icon
-                    Container(
-                      width: 68.w,
-                      height: 68.w,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(color: AppColors.border, width: 2.5),
-                        borderRadius: BorderRadius.circular(18),
+                Padding(
+                  padding: EdgeInsets.only(
+                    top: 14.w,
+                  ),
+                  child: Row(
+                    children: [
+                      // Item icon
+                      Container(
+                        width: 68.w,
+                        height: 68.w,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(color: AppColors.border, width: 2.5),
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        child: ShopItemIcon(itemId: item.id, size: 40.w),
                       ),
-                      child: ShopItemIcon(itemId: item.id, size: 40.w),
-                    ),
-                    SizedBox(width: 12.w),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(item.name, style: textStyleBold(fontSize: 16.sp, color: AppColors.textPrimary)),
-                          SizedBox(height: 6.h),
-                          // Countdown segment
-                          Row(
-                            children: [
-                              Icon(Icons.timer_outlined, size: 14.w, color: const Color(0xFFC97700)),
-                              SizedBox(width: 4.w),
-                              ...controller.countdown.value.split(':').map(
-                                    (seg) => Padding(
-                                      padding: EdgeInsets.only(right: 3.w),
-                                      child: Container(
-                                        padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 3.h),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          border: Border.all(color: AppColors.border, width: 2),
-                                          borderRadius: BorderRadius.circular(8),
-                                        ),
-                                        child: Text(
-                                          seg,
-                                          style: textStyleBold(fontSize: 12.sp, color: AppColors.textPrimary),
+                      SizedBox(width: 12.w),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(item.name, style: textStyleBold(fontSize: 16.sp, color: AppColors.textPrimary)),
+                            SizedBox(height: 6.h),
+                            // Countdown segment
+                            Row(
+                              children: [
+                                Icon(Icons.timer_outlined, size: 14.w, color: const Color(0xFFC97700)),
+                                SizedBox(width: 4.w),
+                                ...controller.countdown.value.split(':').map(
+                                      (seg) => Padding(
+                                        padding: EdgeInsets.only(right: 3.w),
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 3.h),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            border: Border.all(color: AppColors.border, width: 2),
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          child: Text(
+                                            seg,
+                                            style: textStyleBold(fontSize: 12.sp, color: AppColors.textPrimary),
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                            ],
-                          ),
-                          SizedBox(height: 6.h),
-                          // Price
-                          Row(
-                            children: [
-                              Text(
-                                '$original',
-                                style: textStyleBold(fontSize: 13.sp, color: AppColors.textMuted)
-                                    .copyWith(decoration: TextDecoration.lineThrough),
-                              ),
-                              SizedBox(width: 8.w),
-                              Container(
-                                width: 14.w,
-                                height: 14.w,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: AppColors.gold,
-                                  border: Border.all(color: AppColors.border, width: 1.5),
+                              ],
+                            ),
+                            SizedBox(height: 6.h),
+                            // Price
+                            Row(
+                              children: [
+                                Text(
+                                  '$original',
+                                  style: textStyleBold(fontSize: 13.sp, color: AppColors.textMuted)
+                                      .copyWith(decoration: TextDecoration.lineThrough),
                                 ),
-                              ),
-                              SizedBox(width: 3.w),
-                              Text(
-                                '$discounted',
-                                style: textStyleBold(fontSize: 18.sp, color: const Color(0xFFC97700)),
-                              ),
-                            ],
-                          ),
-                        ],
+                                SizedBox(width: 8.w),
+                                Container(
+                                  width: 14.w,
+                                  height: 14.w,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: AppColors.gold,
+                                    border: Border.all(color: AppColors.border, width: 1.5),
+                                  ),
+                                ),
+                                SizedBox(width: 3.w),
+                                Text(
+                                  '$discounted',
+                                  style: textStyleBold(fontSize: 18.sp, color: const Color(0xFFC97700)),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),

@@ -1,6 +1,6 @@
 // This is a generated file - do not edit.
 //
-// Generated from achievement/v1/achievement.proto.
+// Generated from api/achievement/v1/achievement.proto.
 
 // @dart = 3.3
 

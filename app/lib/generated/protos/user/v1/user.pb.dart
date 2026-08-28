@@ -1,6 +1,6 @@
 // This is a generated file - do not edit.
 //
-// Generated from user/v1/user.proto.
+// Generated from api/user/v1/user.proto.
 
 // @dart = 3.3
 
@@ -10,36 +10,29 @@
 // ignore_for_file: deprecated_member_use_from_same_package, library_prefixes
 // ignore_for_file: non_constant_identifier_names, prefer_relative_imports
 
-import 'dart:async' as $async;
 import 'dart:core' as $core;
 
 import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:protobuf/protobuf.dart' as $pb;
+
+import '../../character/v1/character.pbenum.dart' as $1;
 
 export 'package:protobuf/protobuf.dart' show GeneratedMessageGenericExtensions;
 
 /// UserPrefs — per-user preferences, wallet balances and onboarding state.
 class UserPrefs extends $pb.GeneratedMessage {
   factory UserPrefs({
-    $core.bool? onboardingCompleted,
-    $core.int? lastOnboardingStep,
+    $1.CharacterClass? charactorClass,
     $fixnum.Int64? currentGold,
     $fixnum.Int64? currentGems,
-    $core.bool? soundEnabled,
-    $core.bool? hapticEnabled,
     $core.bool? notificationsEnabled,
     $fixnum.Int64? totalTasksCompleted,
     $fixnum.Int64? firstTaskDate,
   }) {
     final result = create();
-    if (onboardingCompleted != null)
-      result.onboardingCompleted = onboardingCompleted;
-    if (lastOnboardingStep != null)
-      result.lastOnboardingStep = lastOnboardingStep;
+    if (charactorClass != null) result.charactorClass = charactorClass;
     if (currentGold != null) result.currentGold = currentGold;
     if (currentGems != null) result.currentGems = currentGems;
-    if (soundEnabled != null) result.soundEnabled = soundEnabled;
-    if (hapticEnabled != null) result.hapticEnabled = hapticEnabled;
     if (notificationsEnabled != null)
       result.notificationsEnabled = notificationsEnabled;
     if (totalTasksCompleted != null)
@@ -61,15 +54,13 @@ class UserPrefs extends $pb.GeneratedMessage {
       _omitMessageNames ? '' : 'UserPrefs',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'api.user.v1'),
       createEmptyInstance: create)
-    ..aOB(1, _omitFieldNames ? '' : 'onboardingCompleted')
-    ..aI(2, _omitFieldNames ? '' : 'lastOnboardingStep')
-    ..aInt64(3, _omitFieldNames ? '' : 'currentGold')
-    ..aInt64(4, _omitFieldNames ? '' : 'currentGems')
-    ..aOB(5, _omitFieldNames ? '' : 'soundEnabled')
-    ..aOB(6, _omitFieldNames ? '' : 'hapticEnabled')
-    ..aOB(7, _omitFieldNames ? '' : 'notificationsEnabled')
-    ..aInt64(8, _omitFieldNames ? '' : 'totalTasksCompleted')
-    ..aInt64(9, _omitFieldNames ? '' : 'firstTaskDate')
+    ..aE<$1.CharacterClass>(1, _omitFieldNames ? '' : 'charactorClass',
+        enumValues: $1.CharacterClass.values)
+    ..aInt64(2, _omitFieldNames ? '' : 'currentGold')
+    ..aInt64(3, _omitFieldNames ? '' : 'currentGems')
+    ..aOB(4, _omitFieldNames ? '' : 'notificationsEnabled')
+    ..aInt64(5, _omitFieldNames ? '' : 'totalTasksCompleted')
+    ..aInt64(6, _omitFieldNames ? '' : 'firstTaskDate')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -90,95 +81,65 @@ class UserPrefs extends $pb.GeneratedMessage {
       _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<UserPrefs>(create);
   static UserPrefs? _defaultInstance;
 
-  /// Whether the onboarding flow has been completed.
+  /// Chosen character class.
   @$pb.TagNumber(1)
-  $core.bool get onboardingCompleted => $_getBF(0);
+  $1.CharacterClass get charactorClass => $_getN(0);
   @$pb.TagNumber(1)
-  set onboardingCompleted($core.bool value) => $_setBool(0, value);
+  set charactorClass($1.CharacterClass value) => $_setField(1, value);
   @$pb.TagNumber(1)
-  $core.bool hasOnboardingCompleted() => $_has(0);
+  $core.bool hasCharactorClass() => $_has(0);
   @$pb.TagNumber(1)
-  void clearOnboardingCompleted() => $_clearField(1);
-
-  /// Last onboarding step reached (used to resume the flow).
-  @$pb.TagNumber(2)
-  $core.int get lastOnboardingStep => $_getIZ(1);
-  @$pb.TagNumber(2)
-  set lastOnboardingStep($core.int value) => $_setSignedInt32(1, value);
-  @$pb.TagNumber(2)
-  $core.bool hasLastOnboardingStep() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearLastOnboardingStep() => $_clearField(2);
+  void clearCharactorClass() => $_clearField(1);
 
   /// Current gold balance.
-  @$pb.TagNumber(3)
-  $fixnum.Int64 get currentGold => $_getI64(2);
-  @$pb.TagNumber(3)
-  set currentGold($fixnum.Int64 value) => $_setInt64(2, value);
-  @$pb.TagNumber(3)
-  $core.bool hasCurrentGold() => $_has(2);
-  @$pb.TagNumber(3)
-  void clearCurrentGold() => $_clearField(3);
+  @$pb.TagNumber(2)
+  $fixnum.Int64 get currentGold => $_getI64(1);
+  @$pb.TagNumber(2)
+  set currentGold($fixnum.Int64 value) => $_setInt64(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasCurrentGold() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearCurrentGold() => $_clearField(2);
 
   /// Current gem balance.
-  @$pb.TagNumber(4)
-  $fixnum.Int64 get currentGems => $_getI64(3);
-  @$pb.TagNumber(4)
-  set currentGems($fixnum.Int64 value) => $_setInt64(3, value);
-  @$pb.TagNumber(4)
-  $core.bool hasCurrentGems() => $_has(3);
-  @$pb.TagNumber(4)
-  void clearCurrentGems() => $_clearField(4);
-
-  /// Whether sound effects are enabled.
-  @$pb.TagNumber(5)
-  $core.bool get soundEnabled => $_getBF(4);
-  @$pb.TagNumber(5)
-  set soundEnabled($core.bool value) => $_setBool(4, value);
-  @$pb.TagNumber(5)
-  $core.bool hasSoundEnabled() => $_has(4);
-  @$pb.TagNumber(5)
-  void clearSoundEnabled() => $_clearField(5);
-
-  /// Whether haptic feedback is enabled.
-  @$pb.TagNumber(6)
-  $core.bool get hapticEnabled => $_getBF(5);
-  @$pb.TagNumber(6)
-  set hapticEnabled($core.bool value) => $_setBool(5, value);
-  @$pb.TagNumber(6)
-  $core.bool hasHapticEnabled() => $_has(5);
-  @$pb.TagNumber(6)
-  void clearHapticEnabled() => $_clearField(6);
+  @$pb.TagNumber(3)
+  $fixnum.Int64 get currentGems => $_getI64(2);
+  @$pb.TagNumber(3)
+  set currentGems($fixnum.Int64 value) => $_setInt64(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasCurrentGems() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearCurrentGems() => $_clearField(3);
 
   /// Whether push notifications are enabled.
-  @$pb.TagNumber(7)
-  $core.bool get notificationsEnabled => $_getBF(6);
-  @$pb.TagNumber(7)
-  set notificationsEnabled($core.bool value) => $_setBool(6, value);
-  @$pb.TagNumber(7)
-  $core.bool hasNotificationsEnabled() => $_has(6);
-  @$pb.TagNumber(7)
-  void clearNotificationsEnabled() => $_clearField(7);
+  @$pb.TagNumber(4)
+  $core.bool get notificationsEnabled => $_getBF(3);
+  @$pb.TagNumber(4)
+  set notificationsEnabled($core.bool value) => $_setBool(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasNotificationsEnabled() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearNotificationsEnabled() => $_clearField(4);
 
   /// Lifetime count of completed tasks.
-  @$pb.TagNumber(8)
-  $fixnum.Int64 get totalTasksCompleted => $_getI64(7);
-  @$pb.TagNumber(8)
-  set totalTasksCompleted($fixnum.Int64 value) => $_setInt64(7, value);
-  @$pb.TagNumber(8)
-  $core.bool hasTotalTasksCompleted() => $_has(7);
-  @$pb.TagNumber(8)
-  void clearTotalTasksCompleted() => $_clearField(8);
+  @$pb.TagNumber(5)
+  $fixnum.Int64 get totalTasksCompleted => $_getI64(4);
+  @$pb.TagNumber(5)
+  set totalTasksCompleted($fixnum.Int64 value) => $_setInt64(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasTotalTasksCompleted() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearTotalTasksCompleted() => $_clearField(5);
 
   /// Date of the first completed task, unix millis.
-  @$pb.TagNumber(9)
-  $fixnum.Int64 get firstTaskDate => $_getI64(8);
-  @$pb.TagNumber(9)
-  set firstTaskDate($fixnum.Int64 value) => $_setInt64(8, value);
-  @$pb.TagNumber(9)
-  $core.bool hasFirstTaskDate() => $_has(8);
-  @$pb.TagNumber(9)
-  void clearFirstTaskDate() => $_clearField(9);
+  @$pb.TagNumber(6)
+  $fixnum.Int64 get firstTaskDate => $_getI64(5);
+  @$pb.TagNumber(6)
+  set firstTaskDate($fixnum.Int64 value) => $_setInt64(5, value);
+  @$pb.TagNumber(6)
+  $core.bool hasFirstTaskDate() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearFirstTaskDate() => $_clearField(6);
 }
 
 /// GetPrefsRequest — no parameters.
@@ -395,25 +356,6 @@ class UpdatePrefsReply extends $pb.GeneratedMessage {
   void clearPrefs() => $_clearField(1);
   @$pb.TagNumber(1)
   UserPrefs ensurePrefs() => $_ensure(0);
-}
-
-/// UserService — user preferences, wallet and settings.
-class UserServiceApi {
-  final $pb.RpcClient _client;
-
-  UserServiceApi(this._client);
-
-  /// GetPrefs returns the current user's preferences and wallet.
-  $async.Future<GetPrefsReply> getPrefs(
-          $pb.ClientContext? ctx, GetPrefsRequest request) =>
-      _client.invoke<GetPrefsReply>(
-          ctx, 'UserService', 'GetPrefs', request, GetPrefsReply());
-
-  /// UpdatePrefs saves the current user's preferences and wallet.
-  $async.Future<UpdatePrefsReply> updatePrefs(
-          $pb.ClientContext? ctx, UpdatePrefsRequest request) =>
-      _client.invoke<UpdatePrefsReply>(
-          ctx, 'UserService', 'UpdatePrefs', request, UpdatePrefsReply());
 }
 
 const $core.bool _omitFieldNames =

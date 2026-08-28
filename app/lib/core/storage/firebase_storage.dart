@@ -27,90 +27,37 @@ class FirebaseStorage extends GetxService implements StorageService {
 
   List<StreamSubscription<Object?>> _subscriptions = [];
 
-  // Firebase manages its own session — auth state derives from FirebaseAuth.
-  @override
-  bool get isLoggedIn => FirebaseAuth.instance.currentUser != null;
-
   @override
   String get authMethod => 'firebase';
 
   @override
   String? get authToken => null;
 
+  // Firebase manages its own session — auth state derives from FirebaseAuth.
+  @override
+  bool get isLoggedIn => FirebaseAuth.instance.currentUser != null;
+
   String? get _uid => FirebaseAuth.instance.currentUser?.uid;
 
-  CollectionReference<Map<String, dynamic>> _col(String name) =>
-      FirebaseFirestore.instance.collection('users/${_uid ?? 'anonymous'}/$name');
-
   @override
-  Future<StorageService> init() async {
-    if (_uid == null) return this;
-    await refreshAll();
-    _listen();
-    return this;
+  Future<void> addGems(int amount) async {
+    final prefs = userPrefs.value ?? UserPrefs();
+    await _savePrefs(GameLogic.addGems(prefs, amount));
   }
 
   @override
-  Future<void> refreshAll() async {
-    if (_uid == null) return;
-
-    final prefs = await _col('prefs').doc('self').get();
-    userPrefs.value = prefs.exists ? (UserPrefs()..mergeFromJsonMap(prefs.data() ?? {})) : UserPrefs();
-
-    final char = await _col('character').doc('self').get();
-    character.value = char.exists ? (Character()..mergeFromJsonMap(char.data() ?? {})) : null;
-
-    final tasksSnap = await _col('tasks').get();
-    tasks.value = tasksSnap.docs.map((d) => Task()..mergeFromJsonMap(d.data())).toList();
-
-    final owned = await _col('owned').doc('self').get();
-    ownedItemIds.value = List<String>.from((owned.data()?['ids'] as List?) ?? const []);
-
-    final ach = await _col('achievements').get();
-    achievements.value = ach.docs.map((d) => Achievement()..mergeFromJsonMap(d.data())).toList();
-
-    final deal = await _col('shop').doc('dailyDeal').get();
-    dailyDeal.value = deal.exists ? (DailyDeal()..mergeFromJsonMap(deal.data() ?? {})) : null;
-  }
-
-  // Keep reactive state in sync with Firestore (multi-device safe).
-  void _listen() {
-    _subscriptions = [
-      _col('prefs').doc('self').snapshots().listen((d) {
-        if (d.exists) userPrefs.value = UserPrefs()..mergeFromJsonMap(d.data() ?? {});
-      }),
-      _col('character').doc('self').snapshots().listen((d) {
-        character.value = d.exists ? (Character()..mergeFromJsonMap(d.data() ?? {})) : null;
-      }),
-      _col('tasks').snapshots().listen((s) {
-        tasks.value = s.docs.map((d) => Task()..mergeFromJsonMap(d.data())).toList();
-      }),
-    ];
-  }
-
-  // ── Task operations ──
-  @override
-  String createTask(Task task) {
-    final id = task.id.isEmpty ? const Uuid().v4() : task.id;
-    _col('tasks').doc(id).set((task..id = id).writeToJsonMap()).ignore();
-    return id;
+  Future<void> addGold(int amount) async {
+    final prefs = userPrefs.value ?? UserPrefs();
+    await _savePrefs(GameLogic.addGold(prefs, amount));
   }
 
   @override
-  void updateTask(Task task) {
-    _col('tasks').doc(task.id).set(task.writeToJsonMap()).ignore();
+  Future<bool> allocateStatPoint(StatType stat) async {
+    final char = character.value;
+    if (char == null || char.availableStatPoints <= 0) return false;
+    await _saveCharacter(GameLogic.allocateStat(char, stat));
+    return true;
   }
-
-  @override
-  void deleteTask(String id) {
-    _col('tasks').doc(id).delete().ignore();
-  }
-
-  @override
-  void skipTask(Task task) => updateTask(GameLogic.skip(task));
-
-  @override
-  void postponeTask(Task task) => updateTask(GameLogic.postpone(task));
 
   @override
   Future<TaskCompleteResult> completeTask(Task task) async {
@@ -139,24 +86,17 @@ class FirebaseStorage extends GetxService implements StorageService {
     await _saveCharacter(c);
   }
 
+  // ── Task operations ──
   @override
-  Future<bool> allocateStatPoint(StatType stat) async {
-    final char = character.value;
-    if (char == null || char.availableStatPoints <= 0) return false;
-    await _saveCharacter(GameLogic.allocateStat(char, stat));
-    return true;
+  String createTask(Task task) {
+    final id = task.id.isEmpty ? const Uuid().v4() : task.id;
+    _col('tasks').doc(id).set((task..id = id).writeToJsonMap()).ignore();
+    return id;
   }
 
   @override
-  Future<void> takeDamage(int amount) async {
-    final char = character.value;
-    if (char != null) await _saveCharacter(GameLogic.takeDamage(char, amount));
-  }
-
-  @override
-  Future<void> reviveCharacter() async {
-    final char = character.value;
-    if (char != null && char.isDead) await _saveCharacter(GameLogic.revive(char));
+  void deleteTask(String id) {
+    _col('tasks').doc(id).delete().ignore();
   }
 
   @override
@@ -164,6 +104,17 @@ class FirebaseStorage extends GetxService implements StorageService {
     final char = character.value;
     if (char != null) _saveCharacter(GameLogic.equip(char, slot, itemId));
   }
+
+  @override
+  Future<StorageService> init() async {
+    if (_uid == null) return this;
+    await refreshAll();
+    _listen();
+    return this;
+  }
+
+  @override
+  void postponeTask(Task task) => updateTask(GameLogic.postpone(task));
 
   // ── Economy ──
   @override
@@ -177,54 +128,26 @@ class FirebaseStorage extends GetxService implements StorageService {
   }
 
   @override
-  Future<void> addGold(int amount) async {
-    final prefs = userPrefs.value ?? UserPrefs();
-    await _savePrefs(GameLogic.addGold(prefs, amount));
-  }
+  Future<void> refreshAll() async {
+    if (_uid == null) return;
 
-  @override
-  Future<void> addGems(int amount) async {
-    final prefs = userPrefs.value ?? UserPrefs();
-    await _savePrefs(GameLogic.addGems(prefs, amount));
-  }
+    final prefs = await _col('prefs').doc('self').get();
+    userPrefs.value = prefs.exists ? (UserPrefs()..mergeFromJsonMap(prefs.data() ?? {})) : UserPrefs();
 
-  // ── Achievements ──
-  @override
-  Future<bool> unlockAchievement(Achievement def) async {
-    if (achievements.any((a) => a.id == def.id && a.isUnlocked)) return false;
-    final unlocked = def.rebuild((a) => a
-      ..isUnlocked = true
-      ..unlockedAt = Int64(DateTime.now().millisecondsSinceEpoch),
-    );
-    await _col('achievements').doc(unlocked.id).set(unlocked.writeToJsonMap());
-    if (unlocked.gemReward > 0) {
-      await addGems(unlocked.gemReward.toInt());
-    }
-    return true;
-  }
+    final char = await _col('character').doc('self').get();
+    character.value = char.exists ? (Character()..mergeFromJsonMap(char.data() ?? {})) : null;
 
-  // ── User prefs / deal ──
-  @override
-  void saveUserPrefs(UserPrefs prefs) {
-    userPrefs.value = prefs;
-    _col('prefs').doc('self').set(prefs.writeToJsonMap()).ignore();
-  }
+    final tasksSnap = await _col('tasks').get();
+    tasks.value = tasksSnap.docs.map((d) => Task()..mergeFromJsonMap(d.data())).toList();
 
-  @override
-  void saveDailyDeal(DailyDeal deal) {
-    dailyDeal.value = deal;
-    _col('shop').doc('dailyDeal').set(deal.writeToJsonMap()).ignore();
-  }
+    final owned = await _col('owned').doc('self').get();
+    ownedItemIds.value = List<String>.from((owned.data()?['ids'] as List?) ?? const []);
 
-  // ── Auth (Firebase manages its own session) ──
-  @override
-  void saveAuthToken(String? token) {
-    // No local token to store; FirebaseAuth owns the session.
-  }
+    final ach = await _col('achievements').get();
+    achievements.value = ach.docs.map((d) => Achievement()..mergeFromJsonMap(d.data())).toList();
 
-  @override
-  void setLoggedIn(bool value, {String method = ''}) {
-    // Login state derives from FirebaseAuth; ignore local calls.
+    final deal = await _col('shop').doc('dailyDeal').get();
+    dailyDeal.value = deal.exists ? (DailyDeal()..mergeFromJsonMap(deal.data() ?? {})) : null;
   }
 
   @override
@@ -252,15 +175,64 @@ class FirebaseStorage extends GetxService implements StorageService {
     dailyDeal.value = null;
   }
 
-  // ── Internal helpers ──
-  Future<void> _savePrefs(UserPrefs prefs) async {
-    userPrefs.value = prefs;
-    await _col('prefs').doc('self').set(prefs.writeToJsonMap());
+  @override
+  Future<void> reviveCharacter() async {
+    final char = character.value;
+    if (char != null && char.isDead) await _saveCharacter(GameLogic.revive(char));
   }
 
-  Future<void> _saveCharacter(Character c) async {
-    character.value = c;
-    await _col('character').doc('self').set(c.writeToJsonMap());
+  // ── Auth (Firebase manages its own session) ──
+  @override
+  void saveAuthToken(String? token) {
+    // No local token to store; FirebaseAuth owns the session.
+  }
+
+  @override
+  void saveDailyDeal(DailyDeal deal) {
+    dailyDeal.value = deal;
+    _col('shop').doc('dailyDeal').set(deal.writeToJsonMap()).ignore();
+  }
+
+  // ── User prefs / deal ──
+  @override
+  void saveUserPrefs(UserPrefs prefs) {
+    userPrefs.value = prefs;
+    _col('prefs').doc('self').set(prefs.writeToJsonMap()).ignore();
+  }
+
+  @override
+  void setLoggedIn(bool value, {String method = ''}) {
+    // Login state derives from FirebaseAuth; ignore local calls.
+  }
+
+  @override
+  void skipTask(Task task) => updateTask(GameLogic.skip(task));
+
+  @override
+  Future<void> takeDamage(int amount) async {
+    final char = character.value;
+    if (char != null) await _saveCharacter(GameLogic.takeDamage(char, amount));
+  }
+
+  // ── Achievements ──
+  @override
+  Future<bool> unlockAchievement(Achievement def) async {
+    if (achievements.any((a) => a.id == def.id && a.isUnlocked)) return false;
+    final unlocked = def.rebuild(
+      (a) => a
+        ..isUnlocked = true
+        ..unlockedAt = Int64(DateTime.now().millisecondsSinceEpoch),
+    );
+    await _col('achievements').doc(unlocked.id).set(unlocked.writeToJsonMap());
+    if (unlocked.gemReward > 0) {
+      await addGems(unlocked.gemReward.toInt());
+    }
+    return true;
+  }
+
+  @override
+  void updateTask(Task task) {
+    _col('tasks').doc(task.id).set(task.writeToJsonMap()).ignore();
   }
 
   Future<void> _addOwnedItem(String itemId) async {
@@ -268,5 +240,34 @@ class FirebaseStorage extends GetxService implements StorageService {
       ownedItemIds.add(itemId);
       await _col('owned').doc('self').set({'ids': ownedItemIds.toList()}, SetOptions(merge: true));
     }
+  }
+
+  CollectionReference<Map<String, dynamic>> _col(String name) =>
+      FirebaseFirestore.instance.collection('users/${_uid ?? 'anonymous'}/$name');
+
+  // Keep reactive state in sync with Firestore (multi-device safe).
+  void _listen() {
+    _subscriptions = [
+      _col('prefs').doc('self').snapshots().listen((d) {
+        if (d.exists) userPrefs.value = UserPrefs()..mergeFromJsonMap(d.data() ?? {});
+      }),
+      _col('character').doc('self').snapshots().listen((d) {
+        character.value = d.exists ? (Character()..mergeFromJsonMap(d.data() ?? {})) : null;
+      }),
+      _col('tasks').snapshots().listen((s) {
+        tasks.value = s.docs.map((d) => Task()..mergeFromJsonMap(d.data())).toList();
+      }),
+    ];
+  }
+
+  Future<void> _saveCharacter(Character c) async {
+    character.value = c;
+    await _col('character').doc('self').set(c.writeToJsonMap());
+  }
+
+  // ── Internal helpers ──
+  Future<void> _savePrefs(UserPrefs prefs) async {
+    userPrefs.value = prefs;
+    await _col('prefs').doc('self').set(prefs.writeToJsonMap());
   }
 }

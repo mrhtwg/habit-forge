@@ -1,6 +1,6 @@
 // This is a generated file - do not edit.
 //
-// Generated from achievement/v1/achievement.proto.
+// Generated from api/achievement/v1/achievement.proto.
 
 // @dart = 3.3
 
@@ -101,40 +101,3 @@ const UnlockReply$json = {
 final $typed_data.Uint8List unlockReplyDescriptor = $convert.base64Decode(
     'CgtVbmxvY2tSZXBseRJBCgthY2hpZXZlbWVudBgBIAEoCzIfLmFwaS5hY2hpZXZlbWVudC52MS'
     '5BY2hpZXZlbWVudFILYWNoaWV2ZW1lbnQSHQoKZ2VtX3Jld2FyZBgCIAEoBVIJZ2VtUmV3YXJk');
-
-const $core.Map<$core.String, $core.dynamic> AchievementServiceBase$json = {
-  '1': 'AchievementService',
-  '2': [
-    {
-      '1': 'ListAchievements',
-      '2': '.api.achievement.v1.ListAchievementsRequest',
-      '3': '.api.achievement.v1.ListAchievementsReply',
-      '4': {}
-    },
-    {
-      '1': 'Unlock',
-      '2': '.api.achievement.v1.UnlockRequest',
-      '3': '.api.achievement.v1.UnlockReply',
-      '4': {}
-    },
-  ],
-};
-
-@$core.Deprecated('Use achievementServiceDescriptor instead')
-const $core.Map<$core.String, $core.Map<$core.String, $core.dynamic>>
-    AchievementServiceBase$messageJson = {
-  '.api.achievement.v1.ListAchievementsRequest': ListAchievementsRequest$json,
-  '.api.achievement.v1.ListAchievementsReply': ListAchievementsReply$json,
-  '.api.achievement.v1.Achievement': Achievement$json,
-  '.api.achievement.v1.UnlockRequest': UnlockRequest$json,
-  '.api.achievement.v1.UnlockReply': UnlockReply$json,
-};
-
-/// Descriptor for `AchievementService`. Decode as a `google.protobuf.ServiceDescriptorProto`.
-final $typed_data.Uint8List achievementServiceDescriptor = $convert.base64Decode(
-    'ChJBY2hpZXZlbWVudFNlcnZpY2USiAEKEExpc3RBY2hpZXZlbWVudHMSKy5hcGkuYWNoaWV2ZW'
-    '1lbnQudjEuTGlzdEFjaGlldmVtZW50c1JlcXVlc3QaKS5hcGkuYWNoaWV2ZW1lbnQudjEuTGlz'
-    'dEFjaGlldmVtZW50c1JlcGx5IhyC0+STAhYSFC9hcGkvdjEvYWNoaWV2ZW1lbnRzEnkKBlVubG'
-    '9jaxIhLmFwaS5hY2hpZXZlbWVudC52MS5VbmxvY2tSZXF1ZXN0Gh8uYXBpLmFjaGlldmVtZW50'
-    'LnYxLlVubG9ja1JlcGx5IiuC0+STAiUiIC9hcGkvdjEvYWNoaWV2ZW1lbnRzL3tpZH0vdW5sb2'
-    'NrOgEq');
