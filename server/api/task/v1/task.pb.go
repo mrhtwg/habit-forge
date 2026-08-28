@@ -26,10 +26,14 @@ const (
 type TaskType int32
 
 const (
+	// Unspecified type; used as the zero value.
 	TaskType_TASK_TYPE_UNSPECIFIED TaskType = 0
-	TaskType_TASK_TYPE_HABIT       TaskType = 1
-	TaskType_TASK_TYPE_DAILY       TaskType = 2
-	TaskType_TASK_TYPE_TODO        TaskType = 3
+	// Habit — repeats every day.
+	TaskType_TASK_TYPE_HABIT TaskType = 1
+	// Daily — repeats on the selected weekdays.
+	TaskType_TASK_TYPE_DAILY TaskType = 2
+	// Todo — one-off task with an optional due date.
+	TaskType_TASK_TYPE_TODO TaskType = 3
 )
 
 // Enum value maps for TaskType.
@@ -79,10 +83,14 @@ func (TaskType) EnumDescriptor() ([]byte, []int) {
 type TaskDifficulty int32
 
 const (
+	// Unspecified difficulty; used as the zero value.
 	TaskDifficulty_TASK_DIFFICULTY_UNSPECIFIED TaskDifficulty = 0
-	TaskDifficulty_TASK_DIFFICULTY_EASY        TaskDifficulty = 1
-	TaskDifficulty_TASK_DIFFICULTY_MEDIUM      TaskDifficulty = 2
-	TaskDifficulty_TASK_DIFFICULTY_HARD        TaskDifficulty = 3
+	// Easy — lowest base reward (15 EXP / 5 gold).
+	TaskDifficulty_TASK_DIFFICULTY_EASY TaskDifficulty = 1
+	// Medium — default difficulty (30 EXP / 10 gold).
+	TaskDifficulty_TASK_DIFFICULTY_MEDIUM TaskDifficulty = 2
+	// Hard — highest base reward (50 EXP / 20 gold).
+	TaskDifficulty_TASK_DIFFICULTY_HARD TaskDifficulty = 3
 )
 
 // Enum value maps for TaskDifficulty.
@@ -128,29 +136,49 @@ func (TaskDifficulty) EnumDescriptor() ([]byte, []int) {
 	return file_api_task_v1_task_proto_rawDescGZIP(), []int{1}
 }
 
+// Task — a habit, daily or todo task owned by the current user.
 type Task struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
-	Id               string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Title            string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
-	Description      string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
-	Type             TaskType               `protobuf:"varint,4,opt,name=type,proto3,enum=api.task.v1.TaskType" json:"type,omitempty"`
-	Difficulty       TaskDifficulty         `protobuf:"varint,5,opt,name=difficulty,proto3,enum=api.task.v1.TaskDifficulty" json:"difficulty,omitempty"`
-	Tags             []string               `protobuf:"bytes,6,rep,name=tags,proto3" json:"tags,omitempty"`
-	IsCompleted      bool                   `protobuf:"varint,7,opt,name=is_completed,json=isCompleted,proto3" json:"is_completed,omitempty"`
-	CompletedAt      int64                  `protobuf:"varint,8,opt,name=completed_at,json=completedAt,proto3" json:"completed_at,omitempty"`      // unix millis
-	DueDate          int64                  `protobuf:"varint,9,opt,name=due_date,json=dueDate,proto3" json:"due_date,omitempty"`                  // unix millis
-	RepeatDays       []int32                `protobuf:"varint,10,rep,packed,name=repeat_days,json=repeatDays,proto3" json:"repeat_days,omitempty"` // 0=Mon .. 6=Sun (for dailies)
-	Streak           int32                  `protobuf:"varint,11,opt,name=streak,proto3" json:"streak,omitempty"`
-	LastStreakDate   int64                  `protobuf:"varint,12,opt,name=last_streak_date,json=lastStreakDate,proto3" json:"last_streak_date,omitempty"` // unix millis
-	CustomExpReward  int32                  `protobuf:"varint,13,opt,name=custom_exp_reward,json=customExpReward,proto3" json:"custom_exp_reward,omitempty"`
-	CustomGoldReward int32                  `protobuf:"varint,14,opt,name=custom_gold_reward,json=customGoldReward,proto3" json:"custom_gold_reward,omitempty"`
-	Priority         string                 `protobuf:"bytes,15,opt,name=priority,proto3" json:"priority,omitempty"`
-	HpPenalty        int32                  `protobuf:"varint,16,opt,name=hp_penalty,json=hpPenalty,proto3" json:"hp_penalty,omitempty"`
-	IsSkipped        bool                   `protobuf:"varint,17,opt,name=is_skipped,json=isSkipped,proto3" json:"is_skipped,omitempty"`
-	CreatedAt        int64                  `protobuf:"varint,18,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"` // unix millis
-	UpdatedAt        int64                  `protobuf:"varint,19,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"` // unix millis
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Unique task id.
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// Short display title.
+	Title string `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
+	// Optional longer description.
+	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	// Task kind (habit / daily / todo).
+	Type TaskType `protobuf:"varint,4,opt,name=type,proto3,enum=api.task.v1.TaskType" json:"type,omitempty"`
+	// Difficulty that drives the base EXP/gold reward.
+	Difficulty TaskDifficulty `protobuf:"varint,5,opt,name=difficulty,proto3,enum=api.task.v1.TaskDifficulty" json:"difficulty,omitempty"`
+	// Free-form tags used for filtering.
+	Tags []string `protobuf:"bytes,6,rep,name=tags,proto3" json:"tags,omitempty"`
+	// Whether the task is currently completed.
+	IsCompleted bool `protobuf:"varint,7,opt,name=is_completed,json=isCompleted,proto3" json:"is_completed,omitempty"`
+	// Completion time, unix millis; zero when not completed.
+	CompletedAt int64 `protobuf:"varint,8,opt,name=completed_at,json=completedAt,proto3" json:"completed_at,omitempty"`
+	// Due date, unix millis; zero when there is no due date.
+	DueDate int64 `protobuf:"varint,9,opt,name=due_date,json=dueDate,proto3" json:"due_date,omitempty"`
+	// Weekday repeat mask for dailies: 0=Mon .. 6=Sun.
+	RepeatDays []int32 `protobuf:"varint,10,rep,packed,name=repeat_days,json=repeatDays,proto3" json:"repeat_days,omitempty"`
+	// Consecutive completion streak (one bump per day).
+	Streak int32 `protobuf:"varint,11,opt,name=streak,proto3" json:"streak,omitempty"`
+	// Date of the last day counted into the streak, unix millis.
+	LastStreakDate int64 `protobuf:"varint,12,opt,name=last_streak_date,json=lastStreakDate,proto3" json:"last_streak_date,omitempty"`
+	// Optional custom EXP reward overriding the difficulty-based value.
+	CustomExpReward int32 `protobuf:"varint,13,opt,name=custom_exp_reward,json=customExpReward,proto3" json:"custom_exp_reward,omitempty"`
+	// Optional custom gold reward overriding the difficulty-based value.
+	CustomGoldReward int32 `protobuf:"varint,14,opt,name=custom_gold_reward,json=customGoldReward,proto3" json:"custom_gold_reward,omitempty"`
+	// Optional priority label (e.g. "high" | "medium" | "low").
+	Priority string `protobuf:"bytes,15,opt,name=priority,proto3" json:"priority,omitempty"`
+	// HP penalty applied to the character when the task is missed.
+	HpPenalty int32 `protobuf:"varint,16,opt,name=hp_penalty,json=hpPenalty,proto3" json:"hp_penalty,omitempty"`
+	// Whether the task was skipped for the current period.
+	IsSkipped bool `protobuf:"varint,17,opt,name=is_skipped,json=isSkipped,proto3" json:"is_skipped,omitempty"`
+	// Creation time, unix millis.
+	CreatedAt int64 `protobuf:"varint,18,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	// Last update time, unix millis.
+	UpdatedAt     int64 `protobuf:"varint,19,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Task) Reset() {
@@ -316,13 +344,19 @@ func (x *Task) GetUpdatedAt() int64 {
 	return 0
 }
 
+// ListTasksRequest — filters for listing tasks.
 type ListTasksRequest struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
-	Type             TaskType               `protobuf:"varint,1,opt,name=type,proto3,enum=api.task.v1.TaskType" json:"type,omitempty"`                   // optional filter
-	Difficulty       TaskDifficulty         `protobuf:"varint,2,opt,name=difficulty,proto3,enum=api.task.v1.TaskDifficulty" json:"difficulty,omitempty"` // optional filter
-	Tags             []string               `protobuf:"bytes,3,rep,name=tags,proto3" json:"tags,omitempty"`                                              // optional filter
-	OnlyDueToday     bool                   `protobuf:"varint,4,opt,name=only_due_today,json=onlyDueToday,proto3" json:"only_due_today,omitempty"`
-	IncludeCompleted bool                   `protobuf:"varint,5,opt,name=include_completed,json=includeCompleted,proto3" json:"include_completed,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Optional filter by task type.
+	Type TaskType `protobuf:"varint,1,opt,name=type,proto3,enum=api.task.v1.TaskType" json:"type,omitempty"`
+	// Optional filter by difficulty.
+	Difficulty TaskDifficulty `protobuf:"varint,2,opt,name=difficulty,proto3,enum=api.task.v1.TaskDifficulty" json:"difficulty,omitempty"`
+	// Optional filter by tags (matches any tag).
+	Tags []string `protobuf:"bytes,3,rep,name=tags,proto3" json:"tags,omitempty"`
+	// When true, only tasks due today are returned.
+	OnlyDueToday bool `protobuf:"varint,4,opt,name=only_due_today,json=onlyDueToday,proto3" json:"only_due_today,omitempty"`
+	// When true, completed tasks are included in the results.
+	IncludeCompleted bool `protobuf:"varint,5,opt,name=include_completed,json=includeCompleted,proto3" json:"include_completed,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -392,9 +426,11 @@ func (x *ListTasksRequest) GetIncludeCompleted() bool {
 	return false
 }
 
+// ListTasksReply — the matching tasks.
 type ListTasksReply struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Tasks         []*Task                `protobuf:"bytes,1,rep,name=tasks,proto3" json:"tasks,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The matching tasks.
+	Tasks         []*Task `protobuf:"bytes,1,rep,name=tasks,proto3" json:"tasks,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -436,9 +472,11 @@ func (x *ListTasksReply) GetTasks() []*Task {
 	return nil
 }
 
+// GetTaskRequest — id of the task to fetch.
 type GetTaskRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Task id.
+	Id            string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -480,9 +518,11 @@ func (x *GetTaskRequest) GetId() string {
 	return ""
 }
 
+// GetTaskReply — the requested task.
 type GetTaskReply struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Task          *Task                  `protobuf:"bytes,1,opt,name=task,proto3" json:"task,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The requested task.
+	Task          *Task `protobuf:"bytes,1,opt,name=task,proto3" json:"task,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -524,9 +564,11 @@ func (x *GetTaskReply) GetTask() *Task {
 	return nil
 }
 
+// CreateTaskRequest — task payload to create.
 type CreateTaskRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Task          *Task                  `protobuf:"bytes,1,opt,name=task,proto3" json:"task,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The task to create; the server assigns the id.
+	Task          *Task `protobuf:"bytes,1,opt,name=task,proto3" json:"task,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -568,9 +610,11 @@ func (x *CreateTaskRequest) GetTask() *Task {
 	return nil
 }
 
+// CreateTaskReply — the created task with server-assigned fields.
 type CreateTaskReply struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Task          *Task                  `protobuf:"bytes,1,opt,name=task,proto3" json:"task,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The created task.
+	Task          *Task `protobuf:"bytes,1,opt,name=task,proto3" json:"task,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -612,10 +656,13 @@ func (x *CreateTaskReply) GetTask() *Task {
 	return nil
 }
 
+// UpdateTaskRequest — id plus the full task payload to persist.
 type UpdateTaskRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Task          *Task                  `protobuf:"bytes,2,opt,name=task,proto3" json:"task,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Task id.
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// Updated task payload (full replace).
+	Task          *Task `protobuf:"bytes,2,opt,name=task,proto3" json:"task,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -664,9 +711,11 @@ func (x *UpdateTaskRequest) GetTask() *Task {
 	return nil
 }
 
+// UpdateTaskReply — the updated task.
 type UpdateTaskReply struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Task          *Task                  `protobuf:"bytes,1,opt,name=task,proto3" json:"task,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The updated task.
+	Task          *Task `protobuf:"bytes,1,opt,name=task,proto3" json:"task,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -708,9 +757,11 @@ func (x *UpdateTaskReply) GetTask() *Task {
 	return nil
 }
 
+// DeleteTaskRequest — id of the task to delete.
 type DeleteTaskRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Task id.
+	Id            string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -752,6 +803,7 @@ func (x *DeleteTaskRequest) GetId() string {
 	return ""
 }
 
+// DeleteTaskReply — empty response for a successful delete.
 type DeleteTaskReply struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -788,9 +840,11 @@ func (*DeleteTaskReply) Descriptor() ([]byte, []int) {
 	return file_api_task_v1_task_proto_rawDescGZIP(), []int{10}
 }
 
+// CompleteTaskRequest — id of the task to mark completed.
 type CompleteTaskRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Task id.
+	Id            string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -832,12 +886,17 @@ func (x *CompleteTaskRequest) GetId() string {
 	return ""
 }
 
+// CompleteTaskReply — completion result and granted rewards.
 type CompleteTaskReply struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Task          *Task                  `protobuf:"bytes,1,opt,name=task,proto3" json:"task,omitempty"`
-	ExpReward     int32                  `protobuf:"varint,2,opt,name=exp_reward,json=expReward,proto3" json:"exp_reward,omitempty"`
-	GoldReward    int32                  `protobuf:"varint,3,opt,name=gold_reward,json=goldReward,proto3" json:"gold_reward,omitempty"`
-	HpChange      int32                  `protobuf:"varint,4,opt,name=hp_change,json=hpChange,proto3" json:"hp_change,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The task with updated completion state.
+	Task *Task `protobuf:"bytes,1,opt,name=task,proto3" json:"task,omitempty"`
+	// EXP granted for completing this task (includes streak multiplier).
+	ExpReward int32 `protobuf:"varint,2,opt,name=exp_reward,json=expReward,proto3" json:"exp_reward,omitempty"`
+	// Gold granted for completing this task.
+	GoldReward int32 `protobuf:"varint,3,opt,name=gold_reward,json=goldReward,proto3" json:"gold_reward,omitempty"`
+	// HP change applied on completion (positive heals, negative damages).
+	HpChange      int32 `protobuf:"varint,4,opt,name=hp_change,json=hpChange,proto3" json:"hp_change,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

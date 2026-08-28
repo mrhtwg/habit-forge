@@ -22,19 +22,29 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// UserPrefs — per-user preferences, wallet balances and onboarding state.
 type UserPrefs struct {
-	state                protoimpl.MessageState `protogen:"open.v1"`
-	OnboardingCompleted  bool                   `protobuf:"varint,1,opt,name=onboarding_completed,json=onboardingCompleted,proto3" json:"onboarding_completed,omitempty"`
-	LastOnboardingStep   int32                  `protobuf:"varint,2,opt,name=last_onboarding_step,json=lastOnboardingStep,proto3" json:"last_onboarding_step,omitempty"`
-	CurrentGold          int64                  `protobuf:"varint,3,opt,name=current_gold,json=currentGold,proto3" json:"current_gold,omitempty"`
-	CurrentGems          int64                  `protobuf:"varint,4,opt,name=current_gems,json=currentGems,proto3" json:"current_gems,omitempty"`
-	SoundEnabled         bool                   `protobuf:"varint,5,opt,name=sound_enabled,json=soundEnabled,proto3" json:"sound_enabled,omitempty"`
-	HapticEnabled        bool                   `protobuf:"varint,6,opt,name=haptic_enabled,json=hapticEnabled,proto3" json:"haptic_enabled,omitempty"`
-	NotificationsEnabled bool                   `protobuf:"varint,7,opt,name=notifications_enabled,json=notificationsEnabled,proto3" json:"notifications_enabled,omitempty"`
-	TotalTasksCompleted  int64                  `protobuf:"varint,8,opt,name=total_tasks_completed,json=totalTasksCompleted,proto3" json:"total_tasks_completed,omitempty"`
-	FirstTaskDate        int64                  `protobuf:"varint,9,opt,name=first_task_date,json=firstTaskDate,proto3" json:"first_task_date,omitempty"` // unix millis
-	unknownFields        protoimpl.UnknownFields
-	sizeCache            protoimpl.SizeCache
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Whether the onboarding flow has been completed.
+	OnboardingCompleted bool `protobuf:"varint,1,opt,name=onboarding_completed,json=onboardingCompleted,proto3" json:"onboarding_completed,omitempty"`
+	// Last onboarding step reached (used to resume the flow).
+	LastOnboardingStep int32 `protobuf:"varint,2,opt,name=last_onboarding_step,json=lastOnboardingStep,proto3" json:"last_onboarding_step,omitempty"`
+	// Current gold balance.
+	CurrentGold int64 `protobuf:"varint,3,opt,name=current_gold,json=currentGold,proto3" json:"current_gold,omitempty"`
+	// Current gem balance.
+	CurrentGems int64 `protobuf:"varint,4,opt,name=current_gems,json=currentGems,proto3" json:"current_gems,omitempty"`
+	// Whether sound effects are enabled.
+	SoundEnabled bool `protobuf:"varint,5,opt,name=sound_enabled,json=soundEnabled,proto3" json:"sound_enabled,omitempty"`
+	// Whether haptic feedback is enabled.
+	HapticEnabled bool `protobuf:"varint,6,opt,name=haptic_enabled,json=hapticEnabled,proto3" json:"haptic_enabled,omitempty"`
+	// Whether push notifications are enabled.
+	NotificationsEnabled bool `protobuf:"varint,7,opt,name=notifications_enabled,json=notificationsEnabled,proto3" json:"notifications_enabled,omitempty"`
+	// Lifetime count of completed tasks.
+	TotalTasksCompleted int64 `protobuf:"varint,8,opt,name=total_tasks_completed,json=totalTasksCompleted,proto3" json:"total_tasks_completed,omitempty"`
+	// Date of the first completed task, unix millis.
+	FirstTaskDate int64 `protobuf:"varint,9,opt,name=first_task_date,json=firstTaskDate,proto3" json:"first_task_date,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *UserPrefs) Reset() {
@@ -130,6 +140,7 @@ func (x *UserPrefs) GetFirstTaskDate() int64 {
 	return 0
 }
 
+// GetPrefsRequest — no parameters.
 type GetPrefsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -166,9 +177,11 @@ func (*GetPrefsRequest) Descriptor() ([]byte, []int) {
 	return file_api_user_v1_user_proto_rawDescGZIP(), []int{1}
 }
 
+// GetPrefsReply — the current user's preferences.
 type GetPrefsReply struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Prefs         *UserPrefs             `protobuf:"bytes,1,opt,name=prefs,proto3" json:"prefs,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The user's preferences and wallet.
+	Prefs         *UserPrefs `protobuf:"bytes,1,opt,name=prefs,proto3" json:"prefs,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -210,9 +223,11 @@ func (x *GetPrefsReply) GetPrefs() *UserPrefs {
 	return nil
 }
 
+// UpdatePrefsRequest — preferences to persist.
 type UpdatePrefsRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Prefs         *UserPrefs             `protobuf:"bytes,1,opt,name=prefs,proto3" json:"prefs,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Full preferences payload to save.
+	Prefs         *UserPrefs `protobuf:"bytes,1,opt,name=prefs,proto3" json:"prefs,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -254,9 +269,11 @@ func (x *UpdatePrefsRequest) GetPrefs() *UserPrefs {
 	return nil
 }
 
+// UpdatePrefsReply — the saved preferences.
 type UpdatePrefsReply struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Prefs         *UserPrefs             `protobuf:"bytes,1,opt,name=prefs,proto3" json:"prefs,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The persisted preferences.
+	Prefs         *UserPrefs `protobuf:"bytes,1,opt,name=prefs,proto3" json:"prefs,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

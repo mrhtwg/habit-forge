@@ -2,11 +2,12 @@ syntax = "proto3";
 
 package api.user.v1;
 
-
 option go_package = "github.com/habitforge/backend/api/user/v1;v1";
 
-// SysMaterial — gold, diamond, exp.
+// SysMaterial — in-game currency types shown in the wallet.
 enum SysMaterial {
+  // Gold — earned by completing tasks.
   SYSMATERIAL_GOLD = 0;
+  // Diamond — premium currency.
   SYSMATERIAL_DIAMOND = 1;
 }

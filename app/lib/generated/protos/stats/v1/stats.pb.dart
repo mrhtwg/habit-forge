@@ -8,8 +8,9 @@
 // ignore_for_file: constant_identifier_names
 // ignore_for_file: curly_braces_in_flow_control_structures
 // ignore_for_file: deprecated_member_use_from_same_package, library_prefixes
-// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: non_constant_identifier_names, prefer_relative_imports
 
+import 'dart:async' as $async;
 import 'dart:core' as $core;
 
 import 'package:fixnum/fixnum.dart' as $fixnum;
@@ -21,6 +22,7 @@ export 'package:protobuf/protobuf.dart' show GeneratedMessageGenericExtensions;
 
 export 'stats.pbenum.dart';
 
+/// TimeSegment — one bucket of a completion chart.
 class TimeSegment extends $pb.GeneratedMessage {
   factory TimeSegment({
     $core.String? label,
@@ -68,6 +70,7 @@ class TimeSegment extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<TimeSegment>(create);
   static TimeSegment? _defaultInstance;
 
+  /// Segment label, e.g. "Mon", "2026-08".
   @$pb.TagNumber(1)
   $core.String get label => $_getSZ(0);
   @$pb.TagNumber(1)
@@ -77,6 +80,7 @@ class TimeSegment extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   void clearLabel() => $_clearField(1);
 
+  /// Tasks completed within this segment.
   @$pb.TagNumber(2)
   $fixnum.Int64 get completedCount => $_getI64(1);
   @$pb.TagNumber(2)
@@ -87,6 +91,7 @@ class TimeSegment extends $pb.GeneratedMessage {
   void clearCompletedCount() => $_clearField(2);
 }
 
+/// StreakEntry — one row of the streak leaderboard.
 class StreakEntry extends $pb.GeneratedMessage {
   factory StreakEntry({
     $core.String? taskId,
@@ -137,6 +142,7 @@ class StreakEntry extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<StreakEntry>(create);
   static StreakEntry? _defaultInstance;
 
+  /// Id of the task.
   @$pb.TagNumber(1)
   $core.String get taskId => $_getSZ(0);
   @$pb.TagNumber(1)
@@ -146,6 +152,7 @@ class StreakEntry extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   void clearTaskId() => $_clearField(1);
 
+  /// Task title.
   @$pb.TagNumber(2)
   $core.String get title => $_getSZ(1);
   @$pb.TagNumber(2)
@@ -155,6 +162,7 @@ class StreakEntry extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   void clearTitle() => $_clearField(2);
 
+  /// Current consecutive-day streak length.
   @$pb.TagNumber(3)
   $core.int get streak => $_getIZ(2);
   @$pb.TagNumber(3)
@@ -165,6 +173,7 @@ class StreakEntry extends $pb.GeneratedMessage {
   void clearStreak() => $_clearField(3);
 }
 
+/// StatsReply — aggregated statistics over the requested range.
 class StatsReply extends $pb.GeneratedMessage {
   factory StatsReply({
     StatsRange? range,
@@ -228,6 +237,7 @@ class StatsReply extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<StatsReply>(create);
   static StatsReply? _defaultInstance;
 
+  /// The range these stats were aggregated over.
   @$pb.TagNumber(1)
   StatsRange get range => $_getN(0);
   @$pb.TagNumber(1)
@@ -237,12 +247,15 @@ class StatsReply extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   void clearRange() => $_clearField(1);
 
+  /// Completion bar chart data.
   @$pb.TagNumber(2)
   $pb.PbList<TimeSegment> get segments => $_getList(1);
 
+  /// Top streaks, descending.
   @$pb.TagNumber(3)
   $pb.PbList<StreakEntry> get streakLeaderboard => $_getList(2);
 
+  /// Total tasks completed in the range.
   @$pb.TagNumber(4)
   $fixnum.Int64 get totalTasksCompleted => $_getI64(3);
   @$pb.TagNumber(4)
@@ -252,6 +265,7 @@ class StatsReply extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   void clearTotalTasksCompleted() => $_clearField(4);
 
+  /// Total gold earned in the range.
   @$pb.TagNumber(5)
   $fixnum.Int64 get totalGoldEarned => $_getI64(4);
   @$pb.TagNumber(5)
@@ -261,6 +275,7 @@ class StatsReply extends $pb.GeneratedMessage {
   @$pb.TagNumber(5)
   void clearTotalGoldEarned() => $_clearField(5);
 
+  /// Total EXP earned in the range.
   @$pb.TagNumber(6)
   $fixnum.Int64 get totalExpEarned => $_getI64(5);
   @$pb.TagNumber(6)
@@ -271,6 +286,7 @@ class StatsReply extends $pb.GeneratedMessage {
   void clearTotalExpEarned() => $_clearField(6);
 }
 
+/// GetStatsRequest — the aggregation window to fetch.
 class GetStatsRequest extends $pb.GeneratedMessage {
   factory GetStatsRequest({
     StatsRange? range,
@@ -316,6 +332,7 @@ class GetStatsRequest extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<GetStatsRequest>(create);
   static GetStatsRequest? _defaultInstance;
 
+  /// Desired aggregation range.
   @$pb.TagNumber(1)
   StatsRange get range => $_getN(0);
   @$pb.TagNumber(1)
@@ -326,6 +343,7 @@ class GetStatsRequest extends $pb.GeneratedMessage {
   void clearRange() => $_clearField(1);
 }
 
+/// GetStatsReply — the requested statistics.
 class GetStatsReply extends $pb.GeneratedMessage {
   factory GetStatsReply({
     StatsReply? stats,
@@ -371,6 +389,7 @@ class GetStatsReply extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<GetStatsReply>(create);
   static GetStatsReply? _defaultInstance;
 
+  /// Aggregated statistics.
   @$pb.TagNumber(1)
   StatsReply get stats => $_getN(0);
   @$pb.TagNumber(1)
@@ -381,6 +400,19 @@ class GetStatsReply extends $pb.GeneratedMessage {
   void clearStats() => $_clearField(1);
   @$pb.TagNumber(1)
   StatsReply ensureStats() => $_ensure(0);
+}
+
+/// StatsService — completion statistics and streak leaderboard.
+class StatsServiceApi {
+  final $pb.RpcClient _client;
+
+  StatsServiceApi(this._client);
+
+  /// GetStats returns task statistics over a time range.
+  $async.Future<GetStatsReply> getStats(
+          $pb.ClientContext? ctx, GetStatsRequest request) =>
+      _client.invoke<GetStatsReply>(
+          ctx, 'StatsService', 'GetStats', request, GetStatsReply());
 }
 
 const $core.bool _omitFieldNames =

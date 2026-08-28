@@ -37,45 +37,73 @@ service AuthService {
   }
 }
 
+// RegisterRequest — credentials and profile for a new account.
 message RegisterRequest {
+  // Email address, used as the login identifier.
   string email    = 1;
-  string password = 2; // min 8 characters
+  // Password, min 8 characters.
+  string password = 2;
+  // Display nickname.
   string nickname = 3;
 }
 
+// LoginRequest — email/password credentials.
 message LoginRequest {
+  // Email address.
   string email    = 1;
+  // Password.
   string password = 2;
 }
 
+// OAuthLoginRequest — identity provided by a third-party OAuth provider.
 message OAuthLoginRequest {
-  string provider    = 1; // "google" | "apple"
+  // Provider name: "google" | "apple".
+  string provider    = 1;
+  // Provider-specific user id.
   string provider_id = 2;
+  // Email reported by the provider.
   string email       = 3;
+  // Nickname reported by the provider.
   string nickname    = 4;
 }
 
+// MeRequest — no parameters; the identity comes from the JWT.
 message MeRequest {}
 
+// UserInfo — public profile of a user.
 message UserInfo {
+  // Unique user id.
   string id         = 1;
+  // Email address.
   string email      = 2;
+  // Display nickname.
   string nickname   = 3;
+  // Avatar image URL.
   string avatar_url = 4;
-  int64  created_at = 5; // unix millis
-  int64  updated_at = 6; // unix millis
+  // Account creation time, unix millis.
+  int64  created_at = 5;
+  // Last profile update time, unix millis.
+  int64  updated_at = 6;
 }
 
+// RegisterReply — session token and profile after registration.
 message RegisterReply {
+  // JWT session token.
   string   token = 1;
+  // The registered user.
   UserInfo user  = 2;
 }
 
+// LoginReply — session token and profile after login.
 message LoginReply {
+  // JWT session token.
   string   token = 1;
+  // The authenticated user.
   UserInfo user  = 2;
 }
 
+// MeReply — the current user's profile.
 message MeReply {
+  // The authenticated user.
   UserInfo user = 1;
 }

@@ -8,8 +8,9 @@
 // ignore_for_file: constant_identifier_names
 // ignore_for_file: curly_braces_in_flow_control_structures
 // ignore_for_file: deprecated_member_use_from_same_package, library_prefixes
-// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: non_constant_identifier_names, prefer_relative_imports
 
+import 'dart:async' as $async;
 import 'dart:core' as $core;
 
 import 'package:fixnum/fixnum.dart' as $fixnum;
@@ -17,6 +18,7 @@ import 'package:protobuf/protobuf.dart' as $pb;
 
 export 'package:protobuf/protobuf.dart' show GeneratedMessageGenericExtensions;
 
+/// UserPrefs — per-user preferences, wallet balances and onboarding state.
 class UserPrefs extends $pb.GeneratedMessage {
   factory UserPrefs({
     $core.bool? onboardingCompleted,
@@ -88,6 +90,7 @@ class UserPrefs extends $pb.GeneratedMessage {
       _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<UserPrefs>(create);
   static UserPrefs? _defaultInstance;
 
+  /// Whether the onboarding flow has been completed.
   @$pb.TagNumber(1)
   $core.bool get onboardingCompleted => $_getBF(0);
   @$pb.TagNumber(1)
@@ -97,6 +100,7 @@ class UserPrefs extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   void clearOnboardingCompleted() => $_clearField(1);
 
+  /// Last onboarding step reached (used to resume the flow).
   @$pb.TagNumber(2)
   $core.int get lastOnboardingStep => $_getIZ(1);
   @$pb.TagNumber(2)
@@ -106,6 +110,7 @@ class UserPrefs extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   void clearLastOnboardingStep() => $_clearField(2);
 
+  /// Current gold balance.
   @$pb.TagNumber(3)
   $fixnum.Int64 get currentGold => $_getI64(2);
   @$pb.TagNumber(3)
@@ -115,6 +120,7 @@ class UserPrefs extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   void clearCurrentGold() => $_clearField(3);
 
+  /// Current gem balance.
   @$pb.TagNumber(4)
   $fixnum.Int64 get currentGems => $_getI64(3);
   @$pb.TagNumber(4)
@@ -124,6 +130,7 @@ class UserPrefs extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   void clearCurrentGems() => $_clearField(4);
 
+  /// Whether sound effects are enabled.
   @$pb.TagNumber(5)
   $core.bool get soundEnabled => $_getBF(4);
   @$pb.TagNumber(5)
@@ -133,6 +140,7 @@ class UserPrefs extends $pb.GeneratedMessage {
   @$pb.TagNumber(5)
   void clearSoundEnabled() => $_clearField(5);
 
+  /// Whether haptic feedback is enabled.
   @$pb.TagNumber(6)
   $core.bool get hapticEnabled => $_getBF(5);
   @$pb.TagNumber(6)
@@ -142,6 +150,7 @@ class UserPrefs extends $pb.GeneratedMessage {
   @$pb.TagNumber(6)
   void clearHapticEnabled() => $_clearField(6);
 
+  /// Whether push notifications are enabled.
   @$pb.TagNumber(7)
   $core.bool get notificationsEnabled => $_getBF(6);
   @$pb.TagNumber(7)
@@ -151,6 +160,7 @@ class UserPrefs extends $pb.GeneratedMessage {
   @$pb.TagNumber(7)
   void clearNotificationsEnabled() => $_clearField(7);
 
+  /// Lifetime count of completed tasks.
   @$pb.TagNumber(8)
   $fixnum.Int64 get totalTasksCompleted => $_getI64(7);
   @$pb.TagNumber(8)
@@ -160,6 +170,7 @@ class UserPrefs extends $pb.GeneratedMessage {
   @$pb.TagNumber(8)
   void clearTotalTasksCompleted() => $_clearField(8);
 
+  /// Date of the first completed task, unix millis.
   @$pb.TagNumber(9)
   $fixnum.Int64 get firstTaskDate => $_getI64(8);
   @$pb.TagNumber(9)
@@ -170,6 +181,7 @@ class UserPrefs extends $pb.GeneratedMessage {
   void clearFirstTaskDate() => $_clearField(9);
 }
 
+/// GetPrefsRequest — no parameters.
 class GetPrefsRequest extends $pb.GeneratedMessage {
   factory GetPrefsRequest() => create();
 
@@ -208,6 +220,7 @@ class GetPrefsRequest extends $pb.GeneratedMessage {
   static GetPrefsRequest? _defaultInstance;
 }
 
+/// GetPrefsReply — the current user's preferences.
 class GetPrefsReply extends $pb.GeneratedMessage {
   factory GetPrefsReply({
     UserPrefs? prefs,
@@ -253,6 +266,7 @@ class GetPrefsReply extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<GetPrefsReply>(create);
   static GetPrefsReply? _defaultInstance;
 
+  /// The user's preferences and wallet.
   @$pb.TagNumber(1)
   UserPrefs get prefs => $_getN(0);
   @$pb.TagNumber(1)
@@ -265,6 +279,7 @@ class GetPrefsReply extends $pb.GeneratedMessage {
   UserPrefs ensurePrefs() => $_ensure(0);
 }
 
+/// UpdatePrefsRequest — preferences to persist.
 class UpdatePrefsRequest extends $pb.GeneratedMessage {
   factory UpdatePrefsRequest({
     UserPrefs? prefs,
@@ -310,6 +325,7 @@ class UpdatePrefsRequest extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<UpdatePrefsRequest>(create);
   static UpdatePrefsRequest? _defaultInstance;
 
+  /// Full preferences payload to save.
   @$pb.TagNumber(1)
   UserPrefs get prefs => $_getN(0);
   @$pb.TagNumber(1)
@@ -322,6 +338,7 @@ class UpdatePrefsRequest extends $pb.GeneratedMessage {
   UserPrefs ensurePrefs() => $_ensure(0);
 }
 
+/// UpdatePrefsReply — the saved preferences.
 class UpdatePrefsReply extends $pb.GeneratedMessage {
   factory UpdatePrefsReply({
     UserPrefs? prefs,
@@ -367,6 +384,7 @@ class UpdatePrefsReply extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<UpdatePrefsReply>(create);
   static UpdatePrefsReply? _defaultInstance;
 
+  /// The persisted preferences.
   @$pb.TagNumber(1)
   UserPrefs get prefs => $_getN(0);
   @$pb.TagNumber(1)
@@ -377,6 +395,25 @@ class UpdatePrefsReply extends $pb.GeneratedMessage {
   void clearPrefs() => $_clearField(1);
   @$pb.TagNumber(1)
   UserPrefs ensurePrefs() => $_ensure(0);
+}
+
+/// UserService — user preferences, wallet and settings.
+class UserServiceApi {
+  final $pb.RpcClient _client;
+
+  UserServiceApi(this._client);
+
+  /// GetPrefs returns the current user's preferences and wallet.
+  $async.Future<GetPrefsReply> getPrefs(
+          $pb.ClientContext? ctx, GetPrefsRequest request) =>
+      _client.invoke<GetPrefsReply>(
+          ctx, 'UserService', 'GetPrefs', request, GetPrefsReply());
+
+  /// UpdatePrefs saves the current user's preferences and wallet.
+  $async.Future<UpdatePrefsReply> updatePrefs(
+          $pb.ClientContext? ctx, UpdatePrefsRequest request) =>
+      _client.invoke<UpdatePrefsReply>(
+          ctx, 'UserService', 'UpdatePrefs', request, UpdatePrefsReply());
 }
 
 const $core.bool _omitFieldNames =

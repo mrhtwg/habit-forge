@@ -22,11 +22,15 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// RegisterRequest — credentials and profile for a new account.
 type RegisterRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
-	Password      string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"` // min 8 characters
-	Nickname      string                 `protobuf:"bytes,3,opt,name=nickname,proto3" json:"nickname,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Email address, used as the login identifier.
+	Email string `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
+	// Password, min 8 characters.
+	Password string `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
+	// Display nickname.
+	Nickname      string `protobuf:"bytes,3,opt,name=nickname,proto3" json:"nickname,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -82,10 +86,13 @@ func (x *RegisterRequest) GetNickname() string {
 	return ""
 }
 
+// LoginRequest — email/password credentials.
 type LoginRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
-	Password      string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Email address.
+	Email string `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
+	// Password.
+	Password      string `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -134,12 +141,17 @@ func (x *LoginRequest) GetPassword() string {
 	return ""
 }
 
+// OAuthLoginRequest — identity provided by a third-party OAuth provider.
 type OAuthLoginRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Provider      string                 `protobuf:"bytes,1,opt,name=provider,proto3" json:"provider,omitempty"` // "google" | "apple"
-	ProviderId    string                 `protobuf:"bytes,2,opt,name=provider_id,json=providerId,proto3" json:"provider_id,omitempty"`
-	Email         string                 `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
-	Nickname      string                 `protobuf:"bytes,4,opt,name=nickname,proto3" json:"nickname,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Provider name: "google" | "apple".
+	Provider string `protobuf:"bytes,1,opt,name=provider,proto3" json:"provider,omitempty"`
+	// Provider-specific user id.
+	ProviderId string `protobuf:"bytes,2,opt,name=provider_id,json=providerId,proto3" json:"provider_id,omitempty"`
+	// Email reported by the provider.
+	Email string `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
+	// Nickname reported by the provider.
+	Nickname      string `protobuf:"bytes,4,opt,name=nickname,proto3" json:"nickname,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -202,6 +214,7 @@ func (x *OAuthLoginRequest) GetNickname() string {
 	return ""
 }
 
+// MeRequest — no parameters; the identity comes from the JWT.
 type MeRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -238,14 +251,21 @@ func (*MeRequest) Descriptor() ([]byte, []int) {
 	return file_api_auth_v1_auth_proto_rawDescGZIP(), []int{3}
 }
 
+// UserInfo — public profile of a user.
 type UserInfo struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Email         string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
-	Nickname      string                 `protobuf:"bytes,3,opt,name=nickname,proto3" json:"nickname,omitempty"`
-	AvatarUrl     string                 `protobuf:"bytes,4,opt,name=avatar_url,json=avatarUrl,proto3" json:"avatar_url,omitempty"`
-	CreatedAt     int64                  `protobuf:"varint,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"` // unix millis
-	UpdatedAt     int64                  `protobuf:"varint,6,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"` // unix millis
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Unique user id.
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// Email address.
+	Email string `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
+	// Display nickname.
+	Nickname string `protobuf:"bytes,3,opt,name=nickname,proto3" json:"nickname,omitempty"`
+	// Avatar image URL.
+	AvatarUrl string `protobuf:"bytes,4,opt,name=avatar_url,json=avatarUrl,proto3" json:"avatar_url,omitempty"`
+	// Account creation time, unix millis.
+	CreatedAt int64 `protobuf:"varint,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	// Last profile update time, unix millis.
+	UpdatedAt     int64 `protobuf:"varint,6,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -322,10 +342,13 @@ func (x *UserInfo) GetUpdatedAt() int64 {
 	return 0
 }
 
+// RegisterReply — session token and profile after registration.
 type RegisterReply struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
-	User          *UserInfo              `protobuf:"bytes,2,opt,name=user,proto3" json:"user,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// JWT session token.
+	Token string `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
+	// The registered user.
+	User          *UserInfo `protobuf:"bytes,2,opt,name=user,proto3" json:"user,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -374,10 +397,13 @@ func (x *RegisterReply) GetUser() *UserInfo {
 	return nil
 }
 
+// LoginReply — session token and profile after login.
 type LoginReply struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
-	User          *UserInfo              `protobuf:"bytes,2,opt,name=user,proto3" json:"user,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// JWT session token.
+	Token string `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
+	// The authenticated user.
+	User          *UserInfo `protobuf:"bytes,2,opt,name=user,proto3" json:"user,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -426,9 +452,11 @@ func (x *LoginReply) GetUser() *UserInfo {
 	return nil
 }
 
+// MeReply — the current user's profile.
 type MeReply struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	User          *UserInfo              `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The authenticated user.
+	User          *UserInfo `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

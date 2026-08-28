@@ -18,37 +18,60 @@ service StatsService {
 
 // StatsRange — aggregation window.
 enum StatsRange {
+  // Unspecified range; used as the zero value.
   STATS_RANGE_UNSPECIFIED = 0;
+  // Aggregate per day.
   STATS_RANGE_DAY = 1;
+  // Aggregate per week.
   STATS_RANGE_WEEK = 2;
+  // Aggregate per month.
   STATS_RANGE_MONTH = 3;
+  // No aggregation — all-time totals.
   STATS_RANGE_ALL = 4;
 }
 
+// TimeSegment — one bucket of a completion chart.
 message TimeSegment {
-  string label = 1; // e.g. "Mon", "2026-08"
+  // Segment label, e.g. "Mon", "2026-08".
+  string label = 1;
+  // Tasks completed within this segment.
   int64 completed_count = 2;
 }
 
+// StreakEntry — one row of the streak leaderboard.
 message StreakEntry {
+  // Id of the task.
   string task_id = 1;
+  // Task title.
   string title = 2;
+  // Current consecutive-day streak length.
   int32 streak = 3;
 }
 
+// StatsReply — aggregated statistics over the requested range.
 message StatsReply {
+  // The range these stats were aggregated over.
   StatsRange range = 1;
-  repeated TimeSegment segments = 2; // completion bar chart data
-  repeated StreakEntry streak_leaderboard = 3; // top streaks, desc
+  // Completion bar chart data.
+  repeated TimeSegment segments = 2;
+  // Top streaks, descending.
+  repeated StreakEntry streak_leaderboard = 3;
+  // Total tasks completed in the range.
   int64 total_tasks_completed = 4;
+  // Total gold earned in the range.
   int64 total_gold_earned = 5;
+  // Total EXP earned in the range.
   int64 total_exp_earned = 6;
 }
 
+// GetStatsRequest — the aggregation window to fetch.
 message GetStatsRequest {
+  // Desired aggregation range.
   StatsRange range = 1;
 }
 
+// GetStatsReply — the requested statistics.
 message GetStatsReply {
+  // Aggregated statistics.
   StatsReply stats = 1;
 }

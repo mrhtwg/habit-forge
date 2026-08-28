@@ -22,14 +22,18 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// CharacterType - character class.
+// CharacterClass — playable character classes.
 type CharacterClass int32
 
 const (
+	// Unspecified class; used as the zero value.
 	CharacterClass_CHARACTER_CLASS_UNSPECIFIED CharacterClass = 0
-	CharacterClass_CHARACTER_CLASS_WARRIOR     CharacterClass = 1
-	CharacterClass_CHARACTER_CLASS_MAGE        CharacterClass = 2
-	CharacterClass_CHARACTER_CLASS_RANGER      CharacterClass = 3
+	// Warrior — melee combat class.
+	CharacterClass_CHARACTER_CLASS_WARRIOR CharacterClass = 1
+	// Mage — spellcasting class.
+	CharacterClass_CHARACTER_CLASS_MAGE CharacterClass = 2
+	// Ranger — ranged combat class.
+	CharacterClass_CHARACTER_CLASS_RANGER CharacterClass = 3
 )
 
 // Enum value maps for CharacterClass.
@@ -79,13 +83,20 @@ func (CharacterClass) EnumDescriptor() ([]byte, []int) {
 type StatType int32
 
 const (
-	StatType_STAT_TYPE_UNSPECIFIED  StatType = 0
-	StatType_STAT_TYPE_STRENGTH     StatType = 1
+	// Unspecified stat; used as the zero value.
+	StatType_STAT_TYPE_UNSPECIFIED StatType = 0
+	// Strength — physical power.
+	StatType_STAT_TYPE_STRENGTH StatType = 1
+	// Intelligence — magical power.
 	StatType_STAT_TYPE_INTELLIGENCE StatType = 2
-	StatType_STAT_TYPE_AGILITY      StatType = 3
-	StatType_STAT_TYPE_DEFENSE      StatType = 4
-	StatType_STAT_TYPE_VITALITY     StatType = 5
-	StatType_STAT_TYPE_LUCK         StatType = 6
+	// Agility — speed and precision.
+	StatType_STAT_TYPE_AGILITY StatType = 3
+	// Defense — reduces damage taken.
+	StatType_STAT_TYPE_DEFENSE StatType = 4
+	// Vitality — maximum HP.
+	StatType_STAT_TYPE_VITALITY StatType = 5
+	// Luck — random outcomes such as criticals and drops.
+	StatType_STAT_TYPE_LUCK StatType = 6
 )
 
 // Enum value maps for StatType.
@@ -137,14 +148,21 @@ func (StatType) EnumDescriptor() ([]byte, []int) {
 	return file_api_character_v1_character_proto_rawDescGZIP(), []int{1}
 }
 
+// CharacterStats — base attribute values.
 type CharacterStats struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Strength      int32                  `protobuf:"varint,1,opt,name=strength,proto3" json:"strength,omitempty"`
-	Intelligence  int32                  `protobuf:"varint,2,opt,name=intelligence,proto3" json:"intelligence,omitempty"`
-	Agility       int32                  `protobuf:"varint,3,opt,name=agility,proto3" json:"agility,omitempty"`
-	Defense       int32                  `protobuf:"varint,4,opt,name=defense,proto3" json:"defense,omitempty"`
-	Vitality      int32                  `protobuf:"varint,5,opt,name=vitality,proto3" json:"vitality,omitempty"`
-	Luck          int32                  `protobuf:"varint,6,opt,name=luck,proto3" json:"luck,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Strength attribute.
+	Strength int32 `protobuf:"varint,1,opt,name=strength,proto3" json:"strength,omitempty"`
+	// Intelligence attribute.
+	Intelligence int32 `protobuf:"varint,2,opt,name=intelligence,proto3" json:"intelligence,omitempty"`
+	// Agility attribute.
+	Agility int32 `protobuf:"varint,3,opt,name=agility,proto3" json:"agility,omitempty"`
+	// Defense attribute.
+	Defense int32 `protobuf:"varint,4,opt,name=defense,proto3" json:"defense,omitempty"`
+	// Vitality attribute.
+	Vitality int32 `protobuf:"varint,5,opt,name=vitality,proto3" json:"vitality,omitempty"`
+	// Luck attribute.
+	Luck          int32 `protobuf:"varint,6,opt,name=luck,proto3" json:"luck,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -221,20 +239,31 @@ func (x *CharacterStats) GetLuck() int32 {
 	return 0
 }
 
+// Character — the current user's RPG character state.
 type Character struct {
-	state               protoimpl.MessageState `protogen:"open.v1"`
-	Id                  string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Character_Class     CharacterClass         `protobuf:"varint,2,opt,name=character_Class,json=characterClass,proto3,enum=api.character.v1.CharacterClass" json:"character_Class,omitempty"`
-	Level               int32                  `protobuf:"varint,3,opt,name=level,proto3" json:"level,omitempty"`
-	CurrentExp          int64                  `protobuf:"varint,4,opt,name=current_exp,json=currentExp,proto3" json:"current_exp,omitempty"`
-	CurrentHp           int32                  `protobuf:"varint,5,opt,name=current_hp,json=currentHp,proto3" json:"current_hp,omitempty"`
-	BaseStats           *CharacterStats        `protobuf:"bytes,6,opt,name=base_stats,json=baseStats,proto3" json:"base_stats,omitempty"`
-	AvailableStatPoints int32                  `protobuf:"varint,7,opt,name=available_stat_points,json=availableStatPoints,proto3" json:"available_stat_points,omitempty"`
-	Equipment           map[string]string      `protobuf:"bytes,8,rep,name=equipment,proto3" json:"equipment,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"` // weapon/helmet/armor/accessory -> shop item id
-	IsDead              bool                   `protobuf:"varint,9,opt,name=is_dead,json=isDead,proto3" json:"is_dead,omitempty"`
-	DeathRecoveryUntil  int64                  `protobuf:"varint,10,opt,name=death_recovery_until,json=deathRecoveryUntil,proto3" json:"death_recovery_until,omitempty"` // unix millis
-	unknownFields       protoimpl.UnknownFields
-	sizeCache           protoimpl.SizeCache
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Unique character id.
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// Chosen character class.
+	Character_Class CharacterClass `protobuf:"varint,2,opt,name=character_Class,json=characterClass,proto3,enum=api.character.v1.CharacterClass" json:"character_Class,omitempty"`
+	// Current level (max 50).
+	Level int32 `protobuf:"varint,3,opt,name=level,proto3" json:"level,omitempty"`
+	// EXP accumulated toward the next level.
+	CurrentExp int64 `protobuf:"varint,4,opt,name=current_exp,json=currentExp,proto3" json:"current_exp,omitempty"`
+	// Current HP (max 100); reaches 0 when dead.
+	CurrentHp int32 `protobuf:"varint,5,opt,name=current_hp,json=currentHp,proto3" json:"current_hp,omitempty"`
+	// Base attribute values.
+	BaseStats *CharacterStats `protobuf:"bytes,6,opt,name=base_stats,json=baseStats,proto3" json:"base_stats,omitempty"`
+	// Unspent stat points available for allocation (1 per level).
+	AvailableStatPoints int32 `protobuf:"varint,7,opt,name=available_stat_points,json=availableStatPoints,proto3" json:"available_stat_points,omitempty"`
+	// Equipped items: equipment slot -> shop item id (weapon/helmet/armor/accessory).
+	Equipment map[string]string `protobuf:"bytes,8,rep,name=equipment,proto3" json:"equipment,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	// Whether the character is dead (unusable until revived).
+	IsDead bool `protobuf:"varint,9,opt,name=is_dead,json=isDead,proto3" json:"is_dead,omitempty"`
+	// Time when the death recovery finishes, unix millis.
+	DeathRecoveryUntil int64 `protobuf:"varint,10,opt,name=death_recovery_until,json=deathRecoveryUntil,proto3" json:"death_recovery_until,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *Character) Reset() {
@@ -337,6 +366,7 @@ func (x *Character) GetDeathRecoveryUntil() int64 {
 	return 0
 }
 
+// GetCharacterRequest — no parameters; the character belongs to the current user.
 type GetCharacterRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -373,9 +403,11 @@ func (*GetCharacterRequest) Descriptor() ([]byte, []int) {
 	return file_api_character_v1_character_proto_rawDescGZIP(), []int{2}
 }
 
+// GetCharacterReply — the user's character.
 type GetCharacterReply struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Character     *Character             `protobuf:"bytes,1,opt,name=character,proto3" json:"character,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The current character state.
+	Character     *Character `protobuf:"bytes,1,opt,name=character,proto3" json:"character,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -417,9 +449,11 @@ func (x *GetCharacterReply) GetCharacter() *Character {
 	return nil
 }
 
+// UpdateCharacterRequest — full character state to persist.
 type UpdateCharacterRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Character     *Character             `protobuf:"bytes,1,opt,name=character,proto3" json:"character,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Character payload to save (full replace).
+	Character     *Character `protobuf:"bytes,1,opt,name=character,proto3" json:"character,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -461,9 +495,11 @@ func (x *UpdateCharacterRequest) GetCharacter() *Character {
 	return nil
 }
 
+// UpdateCharacterReply — the saved character state.
 type UpdateCharacterReply struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Character     *Character             `protobuf:"bytes,1,opt,name=character,proto3" json:"character,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The persisted character.
+	Character     *Character `protobuf:"bytes,1,opt,name=character,proto3" json:"character,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -505,9 +541,11 @@ func (x *UpdateCharacterReply) GetCharacter() *Character {
 	return nil
 }
 
+// AllocateStatPointRequest — the attribute to invest one stat point into.
 type AllocateStatPointRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Stat          StatType               `protobuf:"varint,1,opt,name=stat,proto3,enum=api.character.v1.StatType" json:"stat,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The attribute to increase.
+	Stat          StatType `protobuf:"varint,1,opt,name=stat,proto3,enum=api.character.v1.StatType" json:"stat,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -549,9 +587,11 @@ func (x *AllocateStatPointRequest) GetStat() StatType {
 	return StatType_STAT_TYPE_UNSPECIFIED
 }
 
+// AllocateStatPointReply — the updated character after allocation.
 type AllocateStatPointReply struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Character     *Character             `protobuf:"bytes,1,opt,name=character,proto3" json:"character,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Character with the allocated point applied.
+	Character     *Character `protobuf:"bytes,1,opt,name=character,proto3" json:"character,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -593,6 +633,7 @@ func (x *AllocateStatPointReply) GetCharacter() *Character {
 	return nil
 }
 
+// ReviveRequest — no parameters; revives the current user's character.
 type ReviveRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -629,9 +670,11 @@ func (*ReviveRequest) Descriptor() ([]byte, []int) {
 	return file_api_character_v1_character_proto_rawDescGZIP(), []int{8}
 }
 
+// ReviveReply — the revived character state.
 type ReviveReply struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Character     *Character             `protobuf:"bytes,1,opt,name=character,proto3" json:"character,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Character with death cleared and recovery HP restored.
+	Character     *Character `protobuf:"bytes,1,opt,name=character,proto3" json:"character,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

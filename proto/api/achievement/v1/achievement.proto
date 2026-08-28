@@ -23,29 +23,47 @@ service AchievementService {
   }
 }
 
+// Achievement — a defined achievement with the user's progress and unlock state.
 message Achievement {
+  // Unique achievement id.
   string id = 1;
+  // Display title.
   string title = 2;
+  // Display description.
   string description = 3;
-  string condition_type = 4; // e.g. "tasks_completed" | "streak" | "level"
+  // Condition kind: "tasks_completed" | "streak" | "level".
+  string condition_type = 4;
+  // Value the progress must reach to unlock.
   int32 threshold = 5;
+  // Current progress toward the threshold.
   int32 progress = 6;
+  // Whether the achievement has been unlocked.
   bool is_unlocked = 7;
-  int64 unlocked_at = 8; // unix millis
+  // Unlock time, unix millis.
+  int64 unlocked_at = 8;
+  // Gem reward granted when unlocking.
   int32 gem_reward = 9;
 }
 
+// ListAchievementsRequest — no parameters.
 message ListAchievementsRequest {}
 
+// ListAchievementsReply — all achievements with the user's state.
 message ListAchievementsReply {
+  // All achievements.
   repeated Achievement achievements = 1;
 }
 
+// UnlockRequest — the achievement to claim.
 message UnlockRequest {
+  // Achievement id.
   string id = 1;
 }
 
+// UnlockReply — the unlock result.
 message UnlockReply {
+  // The unlocked achievement.
   Achievement achievement = 1;
+  // Gem reward granted by the unlock.
   int32 gem_reward = 2;
 }

@@ -8,7 +8,7 @@
 // ignore_for_file: constant_identifier_names
 // ignore_for_file: curly_braces_in_flow_control_structures
 // ignore_for_file: deprecated_member_use_from_same_package, library_prefixes
-// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: non_constant_identifier_names, prefer_relative_imports
 
 import 'dart:core' as $core;
 
@@ -16,10 +16,15 @@ import 'package:protobuf/protobuf.dart' as $pb;
 
 /// ShopCurrency — purchase currency.
 class ShopCurrency extends $pb.ProtobufEnum {
+  /// Unspecified currency; used as the zero value.
   static const ShopCurrency SHOP_CURRENCY_UNSPECIFIED =
       ShopCurrency._(0, _omitEnumNames ? '' : 'SHOP_CURRENCY_UNSPECIFIED');
+
+  /// Gold — earned by completing tasks.
   static const ShopCurrency SHOP_CURRENCY_GOLD =
       ShopCurrency._(1, _omitEnumNames ? '' : 'SHOP_CURRENCY_GOLD');
+
+  /// Gems — premium currency from achievements and purchases.
   static const ShopCurrency SHOP_CURRENCY_GEMS =
       ShopCurrency._(2, _omitEnumNames ? '' : 'SHOP_CURRENCY_GEMS');
 

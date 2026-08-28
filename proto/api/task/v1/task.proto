@@ -51,92 +51,151 @@ service TaskService {
 
 // TaskType — habit (daily repeat), daily (weekday repeat), todo (due date).
 enum TaskType {
+  // Unspecified type; used as the zero value.
   TASK_TYPE_UNSPECIFIED = 0;
+  // Habit — repeats every day.
   TASK_TYPE_HABIT = 1;
+  // Daily — repeats on the selected weekdays.
   TASK_TYPE_DAILY = 2;
+  // Todo — one-off task with an optional due date.
   TASK_TYPE_TODO = 3;
 }
 
 // TaskDifficulty — drives base EXP/gold rewards.
 enum TaskDifficulty {
+  // Unspecified difficulty; used as the zero value.
   TASK_DIFFICULTY_UNSPECIFIED = 0;
+  // Easy — lowest base reward (15 EXP / 5 gold).
   TASK_DIFFICULTY_EASY = 1;
+  // Medium — default difficulty (30 EXP / 10 gold).
   TASK_DIFFICULTY_MEDIUM = 2;
+  // Hard — highest base reward (50 EXP / 20 gold).
   TASK_DIFFICULTY_HARD = 3;
 }
 
+// Task — a habit, daily or todo task owned by the current user.
 message Task {
+  // Unique task id.
   string id = 1;
+  // Short display title.
   string title = 2;
+  // Optional longer description.
   string description = 3;
+  // Task kind (habit / daily / todo).
   TaskType type = 4;
+  // Difficulty that drives the base EXP/gold reward.
   TaskDifficulty difficulty = 5;
+  // Free-form tags used for filtering.
   repeated string tags = 6;
+  // Whether the task is currently completed.
   bool is_completed = 7;
-  int64 completed_at = 8; // unix millis
-  int64 due_date = 9; // unix millis
-  repeated int32 repeat_days = 10; // 0=Mon .. 6=Sun (for dailies)
+  // Completion time, unix millis; zero when not completed.
+  int64 completed_at = 8;
+  // Due date, unix millis; zero when there is no due date.
+  int64 due_date = 9;
+  // Weekday repeat mask for dailies: 0=Mon .. 6=Sun.
+  repeated int32 repeat_days = 10;
+  // Consecutive completion streak (one bump per day).
   int32 streak = 11;
-  int64 last_streak_date = 12; // unix millis
+  // Date of the last day counted into the streak, unix millis.
+  int64 last_streak_date = 12;
+  // Optional custom EXP reward overriding the difficulty-based value.
   int32 custom_exp_reward = 13;
+  // Optional custom gold reward overriding the difficulty-based value.
   int32 custom_gold_reward = 14;
+  // Optional priority label (e.g. "high" | "medium" | "low").
   string priority = 15;
+  // HP penalty applied to the character when the task is missed.
   int32 hp_penalty = 16;
+  // Whether the task was skipped for the current period.
   bool is_skipped = 17;
-  int64 created_at = 18; // unix millis
-  int64 updated_at = 19; // unix millis
+  // Creation time, unix millis.
+  int64 created_at = 18;
+  // Last update time, unix millis.
+  int64 updated_at = 19;
 }
 
+// ListTasksRequest — filters for listing tasks.
 message ListTasksRequest {
-  TaskType type = 1; // optional filter
-  TaskDifficulty difficulty = 2; // optional filter
-  repeated string tags = 3; // optional filter
+  // Optional filter by task type.
+  TaskType type = 1;
+  // Optional filter by difficulty.
+  TaskDifficulty difficulty = 2;
+  // Optional filter by tags (matches any tag).
+  repeated string tags = 3;
+  // When true, only tasks due today are returned.
   bool only_due_today = 4;
+  // When true, completed tasks are included in the results.
   bool include_completed = 5;
 }
 
+// ListTasksReply — the matching tasks.
 message ListTasksReply {
+  // The matching tasks.
   repeated Task tasks = 1;
 }
 
+// GetTaskRequest — id of the task to fetch.
 message GetTaskRequest {
+  // Task id.
   string id = 1;
 }
 
+// GetTaskReply — the requested task.
 message GetTaskReply {
+  // The requested task.
   Task task = 1;
 }
 
+// CreateTaskRequest — task payload to create.
 message CreateTaskRequest {
+  // The task to create; the server assigns the id.
   Task task = 1;
 }
 
+// CreateTaskReply — the created task with server-assigned fields.
 message CreateTaskReply {
+  // The created task.
   Task task = 1;
 }
 
+// UpdateTaskRequest — id plus the full task payload to persist.
 message UpdateTaskRequest {
+  // Task id.
   string id = 1;
+  // Updated task payload (full replace).
   Task task = 2;
 }
 
+// UpdateTaskReply — the updated task.
 message UpdateTaskReply {
+  // The updated task.
   Task task = 1;
 }
 
+// DeleteTaskRequest — id of the task to delete.
 message DeleteTaskRequest {
+  // Task id.
   string id = 1;
 }
 
+// DeleteTaskReply — empty response for a successful delete.
 message DeleteTaskReply {}
 
+// CompleteTaskRequest — id of the task to mark completed.
 message CompleteTaskRequest {
+  // Task id.
   string id = 1;
 }
 
+// CompleteTaskReply — completion result and granted rewards.
 message CompleteTaskReply {
+  // The task with updated completion state.
   Task task = 1;
+  // EXP granted for completing this task (includes streak multiplier).
   int32 exp_reward = 2;
+  // Gold granted for completing this task.
   int32 gold_reward = 3;
+  // HP change applied on completion (positive heals, negative damages).
   int32 hp_change = 4;
 }

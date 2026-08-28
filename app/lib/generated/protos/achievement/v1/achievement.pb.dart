@@ -8,8 +8,9 @@
 // ignore_for_file: constant_identifier_names
 // ignore_for_file: curly_braces_in_flow_control_structures
 // ignore_for_file: deprecated_member_use_from_same_package, library_prefixes
-// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: non_constant_identifier_names, prefer_relative_imports
 
+import 'dart:async' as $async;
 import 'dart:core' as $core;
 
 import 'package:fixnum/fixnum.dart' as $fixnum;
@@ -17,6 +18,7 @@ import 'package:protobuf/protobuf.dart' as $pb;
 
 export 'package:protobuf/protobuf.dart' show GeneratedMessageGenericExtensions;
 
+/// Achievement — a defined achievement with the user's progress and unlock state.
 class Achievement extends $pb.GeneratedMessage {
   factory Achievement({
     $core.String? id,
@@ -86,6 +88,7 @@ class Achievement extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<Achievement>(create);
   static Achievement? _defaultInstance;
 
+  /// Unique achievement id.
   @$pb.TagNumber(1)
   $core.String get id => $_getSZ(0);
   @$pb.TagNumber(1)
@@ -95,6 +98,7 @@ class Achievement extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   void clearId() => $_clearField(1);
 
+  /// Display title.
   @$pb.TagNumber(2)
   $core.String get title => $_getSZ(1);
   @$pb.TagNumber(2)
@@ -104,6 +108,7 @@ class Achievement extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   void clearTitle() => $_clearField(2);
 
+  /// Display description.
   @$pb.TagNumber(3)
   $core.String get description => $_getSZ(2);
   @$pb.TagNumber(3)
@@ -113,6 +118,7 @@ class Achievement extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   void clearDescription() => $_clearField(3);
 
+  /// Condition kind: "tasks_completed" | "streak" | "level".
   @$pb.TagNumber(4)
   $core.String get conditionType => $_getSZ(3);
   @$pb.TagNumber(4)
@@ -122,6 +128,7 @@ class Achievement extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   void clearConditionType() => $_clearField(4);
 
+  /// Value the progress must reach to unlock.
   @$pb.TagNumber(5)
   $core.int get threshold => $_getIZ(4);
   @$pb.TagNumber(5)
@@ -131,6 +138,7 @@ class Achievement extends $pb.GeneratedMessage {
   @$pb.TagNumber(5)
   void clearThreshold() => $_clearField(5);
 
+  /// Current progress toward the threshold.
   @$pb.TagNumber(6)
   $core.int get progress => $_getIZ(5);
   @$pb.TagNumber(6)
@@ -140,6 +148,7 @@ class Achievement extends $pb.GeneratedMessage {
   @$pb.TagNumber(6)
   void clearProgress() => $_clearField(6);
 
+  /// Whether the achievement has been unlocked.
   @$pb.TagNumber(7)
   $core.bool get isUnlocked => $_getBF(6);
   @$pb.TagNumber(7)
@@ -149,6 +158,7 @@ class Achievement extends $pb.GeneratedMessage {
   @$pb.TagNumber(7)
   void clearIsUnlocked() => $_clearField(7);
 
+  /// Unlock time, unix millis.
   @$pb.TagNumber(8)
   $fixnum.Int64 get unlockedAt => $_getI64(7);
   @$pb.TagNumber(8)
@@ -158,6 +168,7 @@ class Achievement extends $pb.GeneratedMessage {
   @$pb.TagNumber(8)
   void clearUnlockedAt() => $_clearField(8);
 
+  /// Gem reward granted when unlocking.
   @$pb.TagNumber(9)
   $core.int get gemReward => $_getIZ(8);
   @$pb.TagNumber(9)
@@ -168,6 +179,7 @@ class Achievement extends $pb.GeneratedMessage {
   void clearGemReward() => $_clearField(9);
 }
 
+/// ListAchievementsRequest — no parameters.
 class ListAchievementsRequest extends $pb.GeneratedMessage {
   factory ListAchievementsRequest() => create();
 
@@ -208,6 +220,7 @@ class ListAchievementsRequest extends $pb.GeneratedMessage {
   static ListAchievementsRequest? _defaultInstance;
 }
 
+/// ListAchievementsReply — all achievements with the user's state.
 class ListAchievementsReply extends $pb.GeneratedMessage {
   factory ListAchievementsReply({
     $core.Iterable<Achievement>? achievements,
@@ -255,10 +268,12 @@ class ListAchievementsReply extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<ListAchievementsReply>(create);
   static ListAchievementsReply? _defaultInstance;
 
+  /// All achievements.
   @$pb.TagNumber(1)
   $pb.PbList<Achievement> get achievements => $_getList(0);
 }
 
+/// UnlockRequest — the achievement to claim.
 class UnlockRequest extends $pb.GeneratedMessage {
   factory UnlockRequest({
     $core.String? id,
@@ -304,6 +319,7 @@ class UnlockRequest extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<UnlockRequest>(create);
   static UnlockRequest? _defaultInstance;
 
+  /// Achievement id.
   @$pb.TagNumber(1)
   $core.String get id => $_getSZ(0);
   @$pb.TagNumber(1)
@@ -314,6 +330,7 @@ class UnlockRequest extends $pb.GeneratedMessage {
   void clearId() => $_clearField(1);
 }
 
+/// UnlockReply — the unlock result.
 class UnlockReply extends $pb.GeneratedMessage {
   factory UnlockReply({
     Achievement? achievement,
@@ -363,6 +380,7 @@ class UnlockReply extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<UnlockReply>(create);
   static UnlockReply? _defaultInstance;
 
+  /// The unlocked achievement.
   @$pb.TagNumber(1)
   Achievement get achievement => $_getN(0);
   @$pb.TagNumber(1)
@@ -374,6 +392,7 @@ class UnlockReply extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   Achievement ensureAchievement() => $_ensure(0);
 
+  /// Gem reward granted by the unlock.
   @$pb.TagNumber(2)
   $core.int get gemReward => $_getIZ(1);
   @$pb.TagNumber(2)
@@ -382,6 +401,25 @@ class UnlockReply extends $pb.GeneratedMessage {
   $core.bool hasGemReward() => $_has(1);
   @$pb.TagNumber(2)
   void clearGemReward() => $_clearField(2);
+}
+
+/// AchievementService — achievement definitions, progress and unlock claiming.
+class AchievementServiceApi {
+  final $pb.RpcClient _client;
+
+  AchievementServiceApi(this._client);
+
+  /// ListAchievements lists all achievements with unlock state.
+  $async.Future<ListAchievementsReply> listAchievements(
+          $pb.ClientContext? ctx, ListAchievementsRequest request) =>
+      _client.invoke<ListAchievementsReply>(ctx, 'AchievementService',
+          'ListAchievements', request, ListAchievementsReply());
+
+  /// Unlock claims an achievement and grants its gem reward.
+  $async.Future<UnlockReply> unlock(
+          $pb.ClientContext? ctx, UnlockRequest request) =>
+      _client.invoke<UnlockReply>(
+          ctx, 'AchievementService', 'Unlock', request, UnlockReply());
 }
 
 const $core.bool _omitFieldNames =

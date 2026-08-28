@@ -8,8 +8,9 @@
 // ignore_for_file: constant_identifier_names
 // ignore_for_file: curly_braces_in_flow_control_structures
 // ignore_for_file: deprecated_member_use_from_same_package, library_prefixes
-// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: non_constant_identifier_names, prefer_relative_imports
 
+import 'dart:async' as $async;
 import 'dart:core' as $core;
 
 import 'package:fixnum/fixnum.dart' as $fixnum;
@@ -21,6 +22,7 @@ export 'package:protobuf/protobuf.dart' show GeneratedMessageGenericExtensions;
 
 export 'shop.pbenum.dart';
 
+/// ShopItem — a purchasable cosmetic or equipment item.
 class ShopItem extends $pb.GeneratedMessage {
   factory ShopItem({
     $core.String? id,
@@ -85,6 +87,7 @@ class ShopItem extends $pb.GeneratedMessage {
       _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<ShopItem>(create);
   static ShopItem? _defaultInstance;
 
+  /// Unique item id.
   @$pb.TagNumber(1)
   $core.String get id => $_getSZ(0);
   @$pb.TagNumber(1)
@@ -94,6 +97,7 @@ class ShopItem extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   void clearId() => $_clearField(1);
 
+  /// Display name.
   @$pb.TagNumber(2)
   $core.String get name => $_getSZ(1);
   @$pb.TagNumber(2)
@@ -103,6 +107,7 @@ class ShopItem extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   void clearName() => $_clearField(2);
 
+  /// Display description.
   @$pb.TagNumber(3)
   $core.String get description => $_getSZ(2);
   @$pb.TagNumber(3)
@@ -112,6 +117,7 @@ class ShopItem extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   void clearDescription() => $_clearField(3);
 
+  /// Price in the currency chosen at purchase time.
   @$pb.TagNumber(4)
   $fixnum.Int64 get price => $_getI64(3);
   @$pb.TagNumber(4)
@@ -121,6 +127,7 @@ class ShopItem extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   void clearPrice() => $_clearField(4);
 
+  /// Equipment category: "weapon" | "helmet" | "armor" | "accessory".
   @$pb.TagNumber(5)
   $core.String get category => $_getSZ(4);
   @$pb.TagNumber(5)
@@ -130,6 +137,7 @@ class ShopItem extends $pb.GeneratedMessage {
   @$pb.TagNumber(5)
   void clearCategory() => $_clearField(5);
 
+  /// Rarity tier: "common" | "rare" | "epic" | "legendary".
   @$pb.TagNumber(6)
   $core.String get rarity => $_getSZ(5);
   @$pb.TagNumber(6)
@@ -139,6 +147,7 @@ class ShopItem extends $pb.GeneratedMessage {
   @$pb.TagNumber(6)
   void clearRarity() => $_clearField(6);
 
+  /// Path of the 3D model asset (glb) rendered in the app.
   @$pb.TagNumber(7)
   $core.String get glbAssetPath => $_getSZ(6);
   @$pb.TagNumber(7)
@@ -148,6 +157,7 @@ class ShopItem extends $pb.GeneratedMessage {
   @$pb.TagNumber(7)
   void clearGlbAssetPath() => $_clearField(7);
 
+  /// Whether the current user already owns this item.
   @$pb.TagNumber(8)
   $core.bool get isOwned => $_getBF(7);
   @$pb.TagNumber(8)
@@ -158,6 +168,7 @@ class ShopItem extends $pb.GeneratedMessage {
   void clearIsOwned() => $_clearField(8);
 }
 
+/// DailyDeal — a rotating discounted item.
 class DailyDeal extends $pb.GeneratedMessage {
   factory DailyDeal({
     $core.String? itemId,
@@ -207,6 +218,7 @@ class DailyDeal extends $pb.GeneratedMessage {
       _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DailyDeal>(create);
   static DailyDeal? _defaultInstance;
 
+  /// Id of the discounted item.
   @$pb.TagNumber(1)
   $core.String get itemId => $_getSZ(0);
   @$pb.TagNumber(1)
@@ -216,6 +228,7 @@ class DailyDeal extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   void clearItemId() => $_clearField(1);
 
+  /// Discount percentage (0-100).
   @$pb.TagNumber(2)
   $core.int get discountPercent => $_getIZ(1);
   @$pb.TagNumber(2)
@@ -225,6 +238,7 @@ class DailyDeal extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   void clearDiscountPercent() => $_clearField(2);
 
+  /// Time the deal expires, unix millis.
   @$pb.TagNumber(3)
   $fixnum.Int64 get expiresAt => $_getI64(2);
   @$pb.TagNumber(3)
@@ -235,6 +249,7 @@ class DailyDeal extends $pb.GeneratedMessage {
   void clearExpiresAt() => $_clearField(3);
 }
 
+/// ListShopItemsRequest — optional filtering for the shop catalog.
 class ListShopItemsRequest extends $pb.GeneratedMessage {
   factory ListShopItemsRequest({
     $core.String? category,
@@ -279,6 +294,7 @@ class ListShopItemsRequest extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<ListShopItemsRequest>(create);
   static ListShopItemsRequest? _defaultInstance;
 
+  /// Optional filter by equipment category.
   @$pb.TagNumber(1)
   $core.String get category => $_getSZ(0);
   @$pb.TagNumber(1)
@@ -289,6 +305,7 @@ class ListShopItemsRequest extends $pb.GeneratedMessage {
   void clearCategory() => $_clearField(1);
 }
 
+/// ListShopItemsReply — the shop catalog.
 class ListShopItemsReply extends $pb.GeneratedMessage {
   factory ListShopItemsReply({
     $core.Iterable<ShopItem>? items,
@@ -334,10 +351,12 @@ class ListShopItemsReply extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<ListShopItemsReply>(create);
   static ListShopItemsReply? _defaultInstance;
 
+  /// The matching shop items.
   @$pb.TagNumber(1)
   $pb.PbList<ShopItem> get items => $_getList(0);
 }
 
+/// GetDailyDealRequest — no parameters.
 class GetDailyDealRequest extends $pb.GeneratedMessage {
   factory GetDailyDealRequest() => create();
 
@@ -376,6 +395,7 @@ class GetDailyDealRequest extends $pb.GeneratedMessage {
   static GetDailyDealRequest? _defaultInstance;
 }
 
+/// GetDailyDealReply — the current daily deal.
 class GetDailyDealReply extends $pb.GeneratedMessage {
   factory GetDailyDealReply({
     DailyDeal? deal,
@@ -421,6 +441,7 @@ class GetDailyDealReply extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<GetDailyDealReply>(create);
   static GetDailyDealReply? _defaultInstance;
 
+  /// The active deal; absent when no deal is running.
   @$pb.TagNumber(1)
   DailyDeal get deal => $_getN(0);
   @$pb.TagNumber(1)
@@ -433,6 +454,7 @@ class GetDailyDealReply extends $pb.GeneratedMessage {
   DailyDeal ensureDeal() => $_ensure(0);
 }
 
+/// BuyItemRequest — the item and currency to spend.
 class BuyItemRequest extends $pb.GeneratedMessage {
   factory BuyItemRequest({
     $core.String? itemId,
@@ -481,6 +503,7 @@ class BuyItemRequest extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<BuyItemRequest>(create);
   static BuyItemRequest? _defaultInstance;
 
+  /// Id of the item to purchase.
   @$pb.TagNumber(1)
   $core.String get itemId => $_getSZ(0);
   @$pb.TagNumber(1)
@@ -490,6 +513,7 @@ class BuyItemRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   void clearItemId() => $_clearField(1);
 
+  /// Currency used for the payment.
   @$pb.TagNumber(2)
   ShopCurrency get currency => $_getN(1);
   @$pb.TagNumber(2)
@@ -500,6 +524,7 @@ class BuyItemRequest extends $pb.GeneratedMessage {
   void clearCurrency() => $_clearField(2);
 }
 
+/// BuyItemReply — the purchase result.
 class BuyItemReply extends $pb.GeneratedMessage {
   factory BuyItemReply({
     ShopItem? item,
@@ -548,6 +573,7 @@ class BuyItemReply extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<BuyItemReply>(create);
   static BuyItemReply? _defaultInstance;
 
+  /// The purchased item (now owned).
   @$pb.TagNumber(1)
   ShopItem get item => $_getN(0);
   @$pb.TagNumber(1)
@@ -559,6 +585,7 @@ class BuyItemReply extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   ShopItem ensureItem() => $_ensure(0);
 
+  /// Remaining balance of the spent currency.
   @$pb.TagNumber(2)
   $fixnum.Int64 get balance => $_getI64(1);
   @$pb.TagNumber(2)
@@ -569,6 +596,7 @@ class BuyItemReply extends $pb.GeneratedMessage {
   void clearBalance() => $_clearField(2);
 }
 
+/// ListOwnedItemsRequest — no parameters.
 class ListOwnedItemsRequest extends $pb.GeneratedMessage {
   factory ListOwnedItemsRequest() => create();
 
@@ -608,6 +636,7 @@ class ListOwnedItemsRequest extends $pb.GeneratedMessage {
   static ListOwnedItemsRequest? _defaultInstance;
 }
 
+/// ListOwnedItemsReply — ids of all items the user owns.
 class ListOwnedItemsReply extends $pb.GeneratedMessage {
   factory ListOwnedItemsReply({
     $core.Iterable<$core.String>? itemIds,
@@ -652,8 +681,40 @@ class ListOwnedItemsReply extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<ListOwnedItemsReply>(create);
   static ListOwnedItemsReply? _defaultInstance;
 
+  /// Owned item ids.
   @$pb.TagNumber(1)
   $pb.PbList<$core.String> get itemIds => $_getList(0);
+}
+
+/// ShopService — Forge shop: items, daily deals, purchases, owned items.
+class ShopServiceApi {
+  final $pb.RpcClient _client;
+
+  ShopServiceApi(this._client);
+
+  /// ListShopItems lists all purchasable shop items.
+  $async.Future<ListShopItemsReply> listShopItems(
+          $pb.ClientContext? ctx, ListShopItemsRequest request) =>
+      _client.invoke<ListShopItemsReply>(
+          ctx, 'ShopService', 'ListShopItems', request, ListShopItemsReply());
+
+  /// GetDailyDeal returns the current rotating discounted item.
+  $async.Future<GetDailyDealReply> getDailyDeal(
+          $pb.ClientContext? ctx, GetDailyDealRequest request) =>
+      _client.invoke<GetDailyDealReply>(
+          ctx, 'ShopService', 'GetDailyDeal', request, GetDailyDealReply());
+
+  /// BuyItem purchases an item with gold or gems.
+  $async.Future<BuyItemReply> buyItem(
+          $pb.ClientContext? ctx, BuyItemRequest request) =>
+      _client.invoke<BuyItemReply>(
+          ctx, 'ShopService', 'BuyItem', request, BuyItemReply());
+
+  /// ListOwnedItems lists items the current user owns.
+  $async.Future<ListOwnedItemsReply> listOwnedItems(
+          $pb.ClientContext? ctx, ListOwnedItemsRequest request) =>
+      _client.invoke<ListOwnedItemsReply>(
+          ctx, 'ShopService', 'ListOwnedItems', request, ListOwnedItemsReply());
 }
 
 const $core.bool _omitFieldNames =

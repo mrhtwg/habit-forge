@@ -8,8 +8,9 @@
 // ignore_for_file: constant_identifier_names
 // ignore_for_file: curly_braces_in_flow_control_structures
 // ignore_for_file: deprecated_member_use_from_same_package, library_prefixes
-// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: non_constant_identifier_names, prefer_relative_imports
 
+import 'dart:async' as $async;
 import 'dart:core' as $core;
 
 import 'package:fixnum/fixnum.dart' as $fixnum;
@@ -21,6 +22,7 @@ export 'package:protobuf/protobuf.dart' show GeneratedMessageGenericExtensions;
 
 export 'task.pbenum.dart';
 
+/// Task — a habit, daily or todo task owned by the current user.
 class Task extends $pb.GeneratedMessage {
   factory Task({
     $core.String? id,
@@ -120,6 +122,7 @@ class Task extends $pb.GeneratedMessage {
       _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Task>(create);
   static Task? _defaultInstance;
 
+  /// Unique task id.
   @$pb.TagNumber(1)
   $core.String get id => $_getSZ(0);
   @$pb.TagNumber(1)
@@ -129,6 +132,7 @@ class Task extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   void clearId() => $_clearField(1);
 
+  /// Short display title.
   @$pb.TagNumber(2)
   $core.String get title => $_getSZ(1);
   @$pb.TagNumber(2)
@@ -138,6 +142,7 @@ class Task extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   void clearTitle() => $_clearField(2);
 
+  /// Optional longer description.
   @$pb.TagNumber(3)
   $core.String get description => $_getSZ(2);
   @$pb.TagNumber(3)
@@ -147,6 +152,7 @@ class Task extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   void clearDescription() => $_clearField(3);
 
+  /// Task kind (habit / daily / todo).
   @$pb.TagNumber(4)
   TaskType get type => $_getN(3);
   @$pb.TagNumber(4)
@@ -156,6 +162,7 @@ class Task extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   void clearType() => $_clearField(4);
 
+  /// Difficulty that drives the base EXP/gold reward.
   @$pb.TagNumber(5)
   TaskDifficulty get difficulty => $_getN(4);
   @$pb.TagNumber(5)
@@ -165,9 +172,11 @@ class Task extends $pb.GeneratedMessage {
   @$pb.TagNumber(5)
   void clearDifficulty() => $_clearField(5);
 
+  /// Free-form tags used for filtering.
   @$pb.TagNumber(6)
   $pb.PbList<$core.String> get tags => $_getList(5);
 
+  /// Whether the task is currently completed.
   @$pb.TagNumber(7)
   $core.bool get isCompleted => $_getBF(6);
   @$pb.TagNumber(7)
@@ -177,6 +186,7 @@ class Task extends $pb.GeneratedMessage {
   @$pb.TagNumber(7)
   void clearIsCompleted() => $_clearField(7);
 
+  /// Completion time, unix millis; zero when not completed.
   @$pb.TagNumber(8)
   $fixnum.Int64 get completedAt => $_getI64(7);
   @$pb.TagNumber(8)
@@ -186,6 +196,7 @@ class Task extends $pb.GeneratedMessage {
   @$pb.TagNumber(8)
   void clearCompletedAt() => $_clearField(8);
 
+  /// Due date, unix millis; zero when there is no due date.
   @$pb.TagNumber(9)
   $fixnum.Int64 get dueDate => $_getI64(8);
   @$pb.TagNumber(9)
@@ -195,9 +206,11 @@ class Task extends $pb.GeneratedMessage {
   @$pb.TagNumber(9)
   void clearDueDate() => $_clearField(9);
 
+  /// Weekday repeat mask for dailies: 0=Mon .. 6=Sun.
   @$pb.TagNumber(10)
   $pb.PbList<$core.int> get repeatDays => $_getList(9);
 
+  /// Consecutive completion streak (one bump per day).
   @$pb.TagNumber(11)
   $core.int get streak => $_getIZ(10);
   @$pb.TagNumber(11)
@@ -207,6 +220,7 @@ class Task extends $pb.GeneratedMessage {
   @$pb.TagNumber(11)
   void clearStreak() => $_clearField(11);
 
+  /// Date of the last day counted into the streak, unix millis.
   @$pb.TagNumber(12)
   $fixnum.Int64 get lastStreakDate => $_getI64(11);
   @$pb.TagNumber(12)
@@ -216,6 +230,7 @@ class Task extends $pb.GeneratedMessage {
   @$pb.TagNumber(12)
   void clearLastStreakDate() => $_clearField(12);
 
+  /// Optional custom EXP reward overriding the difficulty-based value.
   @$pb.TagNumber(13)
   $core.int get customExpReward => $_getIZ(12);
   @$pb.TagNumber(13)
@@ -225,6 +240,7 @@ class Task extends $pb.GeneratedMessage {
   @$pb.TagNumber(13)
   void clearCustomExpReward() => $_clearField(13);
 
+  /// Optional custom gold reward overriding the difficulty-based value.
   @$pb.TagNumber(14)
   $core.int get customGoldReward => $_getIZ(13);
   @$pb.TagNumber(14)
@@ -234,6 +250,7 @@ class Task extends $pb.GeneratedMessage {
   @$pb.TagNumber(14)
   void clearCustomGoldReward() => $_clearField(14);
 
+  /// Optional priority label (e.g. "high" | "medium" | "low").
   @$pb.TagNumber(15)
   $core.String get priority => $_getSZ(14);
   @$pb.TagNumber(15)
@@ -243,6 +260,7 @@ class Task extends $pb.GeneratedMessage {
   @$pb.TagNumber(15)
   void clearPriority() => $_clearField(15);
 
+  /// HP penalty applied to the character when the task is missed.
   @$pb.TagNumber(16)
   $core.int get hpPenalty => $_getIZ(15);
   @$pb.TagNumber(16)
@@ -252,6 +270,7 @@ class Task extends $pb.GeneratedMessage {
   @$pb.TagNumber(16)
   void clearHpPenalty() => $_clearField(16);
 
+  /// Whether the task was skipped for the current period.
   @$pb.TagNumber(17)
   $core.bool get isSkipped => $_getBF(16);
   @$pb.TagNumber(17)
@@ -261,6 +280,7 @@ class Task extends $pb.GeneratedMessage {
   @$pb.TagNumber(17)
   void clearIsSkipped() => $_clearField(17);
 
+  /// Creation time, unix millis.
   @$pb.TagNumber(18)
   $fixnum.Int64 get createdAt => $_getI64(17);
   @$pb.TagNumber(18)
@@ -270,6 +290,7 @@ class Task extends $pb.GeneratedMessage {
   @$pb.TagNumber(18)
   void clearCreatedAt() => $_clearField(18);
 
+  /// Last update time, unix millis.
   @$pb.TagNumber(19)
   $fixnum.Int64 get updatedAt => $_getI64(18);
   @$pb.TagNumber(19)
@@ -280,6 +301,7 @@ class Task extends $pb.GeneratedMessage {
   void clearUpdatedAt() => $_clearField(19);
 }
 
+/// ListTasksRequest — filters for listing tasks.
 class ListTasksRequest extends $pb.GeneratedMessage {
   factory ListTasksRequest({
     TaskType? type,
@@ -338,6 +360,7 @@ class ListTasksRequest extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<ListTasksRequest>(create);
   static ListTasksRequest? _defaultInstance;
 
+  /// Optional filter by task type.
   @$pb.TagNumber(1)
   TaskType get type => $_getN(0);
   @$pb.TagNumber(1)
@@ -347,6 +370,7 @@ class ListTasksRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   void clearType() => $_clearField(1);
 
+  /// Optional filter by difficulty.
   @$pb.TagNumber(2)
   TaskDifficulty get difficulty => $_getN(1);
   @$pb.TagNumber(2)
@@ -356,9 +380,11 @@ class ListTasksRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   void clearDifficulty() => $_clearField(2);
 
+  /// Optional filter by tags (matches any tag).
   @$pb.TagNumber(3)
   $pb.PbList<$core.String> get tags => $_getList(2);
 
+  /// When true, only tasks due today are returned.
   @$pb.TagNumber(4)
   $core.bool get onlyDueToday => $_getBF(3);
   @$pb.TagNumber(4)
@@ -368,6 +394,7 @@ class ListTasksRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   void clearOnlyDueToday() => $_clearField(4);
 
+  /// When true, completed tasks are included in the results.
   @$pb.TagNumber(5)
   $core.bool get includeCompleted => $_getBF(4);
   @$pb.TagNumber(5)
@@ -378,6 +405,7 @@ class ListTasksRequest extends $pb.GeneratedMessage {
   void clearIncludeCompleted() => $_clearField(5);
 }
 
+/// ListTasksReply — the matching tasks.
 class ListTasksReply extends $pb.GeneratedMessage {
   factory ListTasksReply({
     $core.Iterable<Task>? tasks,
@@ -422,10 +450,12 @@ class ListTasksReply extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<ListTasksReply>(create);
   static ListTasksReply? _defaultInstance;
 
+  /// The matching tasks.
   @$pb.TagNumber(1)
   $pb.PbList<Task> get tasks => $_getList(0);
 }
 
+/// GetTaskRequest — id of the task to fetch.
 class GetTaskRequest extends $pb.GeneratedMessage {
   factory GetTaskRequest({
     $core.String? id,
@@ -470,6 +500,7 @@ class GetTaskRequest extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<GetTaskRequest>(create);
   static GetTaskRequest? _defaultInstance;
 
+  /// Task id.
   @$pb.TagNumber(1)
   $core.String get id => $_getSZ(0);
   @$pb.TagNumber(1)
@@ -480,6 +511,7 @@ class GetTaskRequest extends $pb.GeneratedMessage {
   void clearId() => $_clearField(1);
 }
 
+/// GetTaskReply — the requested task.
 class GetTaskReply extends $pb.GeneratedMessage {
   factory GetTaskReply({
     Task? task,
@@ -524,6 +556,7 @@ class GetTaskReply extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<GetTaskReply>(create);
   static GetTaskReply? _defaultInstance;
 
+  /// The requested task.
   @$pb.TagNumber(1)
   Task get task => $_getN(0);
   @$pb.TagNumber(1)
@@ -536,6 +569,7 @@ class GetTaskReply extends $pb.GeneratedMessage {
   Task ensureTask() => $_ensure(0);
 }
 
+/// CreateTaskRequest — task payload to create.
 class CreateTaskRequest extends $pb.GeneratedMessage {
   factory CreateTaskRequest({
     Task? task,
@@ -580,6 +614,7 @@ class CreateTaskRequest extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<CreateTaskRequest>(create);
   static CreateTaskRequest? _defaultInstance;
 
+  /// The task to create; the server assigns the id.
   @$pb.TagNumber(1)
   Task get task => $_getN(0);
   @$pb.TagNumber(1)
@@ -592,6 +627,7 @@ class CreateTaskRequest extends $pb.GeneratedMessage {
   Task ensureTask() => $_ensure(0);
 }
 
+/// CreateTaskReply — the created task with server-assigned fields.
 class CreateTaskReply extends $pb.GeneratedMessage {
   factory CreateTaskReply({
     Task? task,
@@ -636,6 +672,7 @@ class CreateTaskReply extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<CreateTaskReply>(create);
   static CreateTaskReply? _defaultInstance;
 
+  /// The created task.
   @$pb.TagNumber(1)
   Task get task => $_getN(0);
   @$pb.TagNumber(1)
@@ -648,6 +685,7 @@ class CreateTaskReply extends $pb.GeneratedMessage {
   Task ensureTask() => $_ensure(0);
 }
 
+/// UpdateTaskRequest — id plus the full task payload to persist.
 class UpdateTaskRequest extends $pb.GeneratedMessage {
   factory UpdateTaskRequest({
     $core.String? id,
@@ -695,6 +733,7 @@ class UpdateTaskRequest extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<UpdateTaskRequest>(create);
   static UpdateTaskRequest? _defaultInstance;
 
+  /// Task id.
   @$pb.TagNumber(1)
   $core.String get id => $_getSZ(0);
   @$pb.TagNumber(1)
@@ -704,6 +743,7 @@ class UpdateTaskRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   void clearId() => $_clearField(1);
 
+  /// Updated task payload (full replace).
   @$pb.TagNumber(2)
   Task get task => $_getN(1);
   @$pb.TagNumber(2)
@@ -716,6 +756,7 @@ class UpdateTaskRequest extends $pb.GeneratedMessage {
   Task ensureTask() => $_ensure(1);
 }
 
+/// UpdateTaskReply — the updated task.
 class UpdateTaskReply extends $pb.GeneratedMessage {
   factory UpdateTaskReply({
     Task? task,
@@ -760,6 +801,7 @@ class UpdateTaskReply extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<UpdateTaskReply>(create);
   static UpdateTaskReply? _defaultInstance;
 
+  /// The updated task.
   @$pb.TagNumber(1)
   Task get task => $_getN(0);
   @$pb.TagNumber(1)
@@ -772,6 +814,7 @@ class UpdateTaskReply extends $pb.GeneratedMessage {
   Task ensureTask() => $_ensure(0);
 }
 
+/// DeleteTaskRequest — id of the task to delete.
 class DeleteTaskRequest extends $pb.GeneratedMessage {
   factory DeleteTaskRequest({
     $core.String? id,
@@ -816,6 +859,7 @@ class DeleteTaskRequest extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<DeleteTaskRequest>(create);
   static DeleteTaskRequest? _defaultInstance;
 
+  /// Task id.
   @$pb.TagNumber(1)
   $core.String get id => $_getSZ(0);
   @$pb.TagNumber(1)
@@ -826,6 +870,7 @@ class DeleteTaskRequest extends $pb.GeneratedMessage {
   void clearId() => $_clearField(1);
 }
 
+/// DeleteTaskReply — empty response for a successful delete.
 class DeleteTaskReply extends $pb.GeneratedMessage {
   factory DeleteTaskReply() => create();
 
@@ -864,6 +909,7 @@ class DeleteTaskReply extends $pb.GeneratedMessage {
   static DeleteTaskReply? _defaultInstance;
 }
 
+/// CompleteTaskRequest — id of the task to mark completed.
 class CompleteTaskRequest extends $pb.GeneratedMessage {
   factory CompleteTaskRequest({
     $core.String? id,
@@ -908,6 +954,7 @@ class CompleteTaskRequest extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<CompleteTaskRequest>(create);
   static CompleteTaskRequest? _defaultInstance;
 
+  /// Task id.
   @$pb.TagNumber(1)
   $core.String get id => $_getSZ(0);
   @$pb.TagNumber(1)
@@ -918,6 +965,7 @@ class CompleteTaskRequest extends $pb.GeneratedMessage {
   void clearId() => $_clearField(1);
 }
 
+/// CompleteTaskReply — completion result and granted rewards.
 class CompleteTaskReply extends $pb.GeneratedMessage {
   factory CompleteTaskReply({
     Task? task,
@@ -971,6 +1019,7 @@ class CompleteTaskReply extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<CompleteTaskReply>(create);
   static CompleteTaskReply? _defaultInstance;
 
+  /// The task with updated completion state.
   @$pb.TagNumber(1)
   Task get task => $_getN(0);
   @$pb.TagNumber(1)
@@ -982,6 +1031,7 @@ class CompleteTaskReply extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   Task ensureTask() => $_ensure(0);
 
+  /// EXP granted for completing this task (includes streak multiplier).
   @$pb.TagNumber(2)
   $core.int get expReward => $_getIZ(1);
   @$pb.TagNumber(2)
@@ -991,6 +1041,7 @@ class CompleteTaskReply extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   void clearExpReward() => $_clearField(2);
 
+  /// Gold granted for completing this task.
   @$pb.TagNumber(3)
   $core.int get goldReward => $_getIZ(2);
   @$pb.TagNumber(3)
@@ -1000,6 +1051,7 @@ class CompleteTaskReply extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   void clearGoldReward() => $_clearField(3);
 
+  /// HP change applied on completion (positive heals, negative damages).
   @$pb.TagNumber(4)
   $core.int get hpChange => $_getIZ(3);
   @$pb.TagNumber(4)
@@ -1008,6 +1060,49 @@ class CompleteTaskReply extends $pb.GeneratedMessage {
   $core.bool hasHpChange() => $_has(3);
   @$pb.TagNumber(4)
   void clearHpChange() => $_clearField(4);
+}
+
+/// TaskService — Habit / Daily / ToDo task management with RPG rewards.
+class TaskServiceApi {
+  final $pb.RpcClient _client;
+
+  TaskServiceApi(this._client);
+
+  /// ListTasks lists tasks for the current user with optional filters.
+  $async.Future<ListTasksReply> listTasks(
+          $pb.ClientContext? ctx, ListTasksRequest request) =>
+      _client.invoke<ListTasksReply>(
+          ctx, 'TaskService', 'ListTasks', request, ListTasksReply());
+
+  /// GetTask returns one task by id.
+  $async.Future<GetTaskReply> getTask(
+          $pb.ClientContext? ctx, GetTaskRequest request) =>
+      _client.invoke<GetTaskReply>(
+          ctx, 'TaskService', 'GetTask', request, GetTaskReply());
+
+  /// CreateTask creates a new task.
+  $async.Future<CreateTaskReply> createTask(
+          $pb.ClientContext? ctx, CreateTaskRequest request) =>
+      _client.invoke<CreateTaskReply>(
+          ctx, 'TaskService', 'CreateTask', request, CreateTaskReply());
+
+  /// UpdateTask updates an existing task (title, difficulty, tags, skip, etc.).
+  $async.Future<UpdateTaskReply> updateTask(
+          $pb.ClientContext? ctx, UpdateTaskRequest request) =>
+      _client.invoke<UpdateTaskReply>(
+          ctx, 'TaskService', 'UpdateTask', request, UpdateTaskReply());
+
+  /// DeleteTask removes a task.
+  $async.Future<DeleteTaskReply> deleteTask(
+          $pb.ClientContext? ctx, DeleteTaskRequest request) =>
+      _client.invoke<DeleteTaskReply>(
+          ctx, 'TaskService', 'DeleteTask', request, DeleteTaskReply());
+
+  /// CompleteTask marks a task completed and grants EXP/gold rewards.
+  $async.Future<CompleteTaskReply> completeTask(
+          $pb.ClientContext? ctx, CompleteTaskRequest request) =>
+      _client.invoke<CompleteTaskReply>(
+          ctx, 'TaskService', 'CompleteTask', request, CompleteTaskReply());
 }
 
 const $core.bool _omitFieldNames =

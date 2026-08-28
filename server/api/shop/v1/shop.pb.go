@@ -26,9 +26,12 @@ const (
 type ShopCurrency int32
 
 const (
+	// Unspecified currency; used as the zero value.
 	ShopCurrency_SHOP_CURRENCY_UNSPECIFIED ShopCurrency = 0
-	ShopCurrency_SHOP_CURRENCY_GOLD        ShopCurrency = 1
-	ShopCurrency_SHOP_CURRENCY_GEMS        ShopCurrency = 2
+	// Gold — earned by completing tasks.
+	ShopCurrency_SHOP_CURRENCY_GOLD ShopCurrency = 1
+	// Gems — premium currency from achievements and purchases.
+	ShopCurrency_SHOP_CURRENCY_GEMS ShopCurrency = 2
 )
 
 // Enum value maps for ShopCurrency.
@@ -72,16 +75,25 @@ func (ShopCurrency) EnumDescriptor() ([]byte, []int) {
 	return file_api_shop_v1_shop_proto_rawDescGZIP(), []int{0}
 }
 
+// ShopItem — a purchasable cosmetic or equipment item.
 type ShopItem struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
-	Price         int64                  `protobuf:"varint,4,opt,name=price,proto3" json:"price,omitempty"`
-	Category      string                 `protobuf:"bytes,5,opt,name=category,proto3" json:"category,omitempty"` // e.g. "weapon" | "helmet" | "armor" | "accessory"
-	Rarity        string                 `protobuf:"bytes,6,opt,name=rarity,proto3" json:"rarity,omitempty"`     // e.g. "common" | "rare" | "epic" | "legendary"
-	GlbAssetPath  string                 `protobuf:"bytes,7,opt,name=glb_asset_path,json=glbAssetPath,proto3" json:"glb_asset_path,omitempty"`
-	IsOwned       bool                   `protobuf:"varint,8,opt,name=is_owned,json=isOwned,proto3" json:"is_owned,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Unique item id.
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// Display name.
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	// Display description.
+	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	// Price in the currency chosen at purchase time.
+	Price int64 `protobuf:"varint,4,opt,name=price,proto3" json:"price,omitempty"`
+	// Equipment category: "weapon" | "helmet" | "armor" | "accessory".
+	Category string `protobuf:"bytes,5,opt,name=category,proto3" json:"category,omitempty"`
+	// Rarity tier: "common" | "rare" | "epic" | "legendary".
+	Rarity string `protobuf:"bytes,6,opt,name=rarity,proto3" json:"rarity,omitempty"`
+	// Path of the 3D model asset (glb) rendered in the app.
+	GlbAssetPath string `protobuf:"bytes,7,opt,name=glb_asset_path,json=glbAssetPath,proto3" json:"glb_asset_path,omitempty"`
+	// Whether the current user already owns this item.
+	IsOwned       bool `protobuf:"varint,8,opt,name=is_owned,json=isOwned,proto3" json:"is_owned,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -172,13 +184,17 @@ func (x *ShopItem) GetIsOwned() bool {
 	return false
 }
 
+// DailyDeal — a rotating discounted item.
 type DailyDeal struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
-	ItemId          string                 `protobuf:"bytes,1,opt,name=item_id,json=itemId,proto3" json:"item_id,omitempty"`
-	DiscountPercent int32                  `protobuf:"varint,2,opt,name=discount_percent,json=discountPercent,proto3" json:"discount_percent,omitempty"`
-	ExpiresAt       int64                  `protobuf:"varint,3,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"` // unix millis
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Id of the discounted item.
+	ItemId string `protobuf:"bytes,1,opt,name=item_id,json=itemId,proto3" json:"item_id,omitempty"`
+	// Discount percentage (0-100).
+	DiscountPercent int32 `protobuf:"varint,2,opt,name=discount_percent,json=discountPercent,proto3" json:"discount_percent,omitempty"`
+	// Time the deal expires, unix millis.
+	ExpiresAt     int64 `protobuf:"varint,3,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *DailyDeal) Reset() {
@@ -232,9 +248,11 @@ func (x *DailyDeal) GetExpiresAt() int64 {
 	return 0
 }
 
+// ListShopItemsRequest — optional filtering for the shop catalog.
 type ListShopItemsRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Category      string                 `protobuf:"bytes,1,opt,name=category,proto3" json:"category,omitempty"` // optional filter
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Optional filter by equipment category.
+	Category      string `protobuf:"bytes,1,opt,name=category,proto3" json:"category,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -276,9 +294,11 @@ func (x *ListShopItemsRequest) GetCategory() string {
 	return ""
 }
 
+// ListShopItemsReply — the shop catalog.
 type ListShopItemsReply struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Items         []*ShopItem            `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The matching shop items.
+	Items         []*ShopItem `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -320,6 +340,7 @@ func (x *ListShopItemsReply) GetItems() []*ShopItem {
 	return nil
 }
 
+// GetDailyDealRequest — no parameters.
 type GetDailyDealRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -356,9 +377,11 @@ func (*GetDailyDealRequest) Descriptor() ([]byte, []int) {
 	return file_api_shop_v1_shop_proto_rawDescGZIP(), []int{4}
 }
 
+// GetDailyDealReply — the current daily deal.
 type GetDailyDealReply struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Deal          *DailyDeal             `protobuf:"bytes,1,opt,name=deal,proto3" json:"deal,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The active deal; absent when no deal is running.
+	Deal          *DailyDeal `protobuf:"bytes,1,opt,name=deal,proto3" json:"deal,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -400,10 +423,13 @@ func (x *GetDailyDealReply) GetDeal() *DailyDeal {
 	return nil
 }
 
+// BuyItemRequest — the item and currency to spend.
 type BuyItemRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	ItemId        string                 `protobuf:"bytes,1,opt,name=item_id,json=itemId,proto3" json:"item_id,omitempty"`
-	Currency      ShopCurrency           `protobuf:"varint,2,opt,name=currency,proto3,enum=api.shop.v1.ShopCurrency" json:"currency,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Id of the item to purchase.
+	ItemId string `protobuf:"bytes,1,opt,name=item_id,json=itemId,proto3" json:"item_id,omitempty"`
+	// Currency used for the payment.
+	Currency      ShopCurrency `protobuf:"varint,2,opt,name=currency,proto3,enum=api.shop.v1.ShopCurrency" json:"currency,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -452,10 +478,13 @@ func (x *BuyItemRequest) GetCurrency() ShopCurrency {
 	return ShopCurrency_SHOP_CURRENCY_UNSPECIFIED
 }
 
+// BuyItemReply — the purchase result.
 type BuyItemReply struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Item          *ShopItem              `protobuf:"bytes,1,opt,name=item,proto3" json:"item,omitempty"`
-	Balance       int64                  `protobuf:"varint,2,opt,name=balance,proto3" json:"balance,omitempty"` // remaining balance of the spent currency
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The purchased item (now owned).
+	Item *ShopItem `protobuf:"bytes,1,opt,name=item,proto3" json:"item,omitempty"`
+	// Remaining balance of the spent currency.
+	Balance       int64 `protobuf:"varint,2,opt,name=balance,proto3" json:"balance,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -504,6 +533,7 @@ func (x *BuyItemReply) GetBalance() int64 {
 	return 0
 }
 
+// ListOwnedItemsRequest — no parameters.
 type ListOwnedItemsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -540,9 +570,11 @@ func (*ListOwnedItemsRequest) Descriptor() ([]byte, []int) {
 	return file_api_shop_v1_shop_proto_rawDescGZIP(), []int{8}
 }
 
+// ListOwnedItemsReply — ids of all items the user owns.
 type ListOwnedItemsReply struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	ItemIds       []string               `protobuf:"bytes,1,rep,name=item_ids,json=itemIds,proto3" json:"item_ids,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Owned item ids.
+	ItemIds       []string `protobuf:"bytes,1,rep,name=item_ids,json=itemIds,proto3" json:"item_ids,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

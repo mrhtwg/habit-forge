@@ -26,11 +26,16 @@ const (
 type StatsRange int32
 
 const (
+	// Unspecified range; used as the zero value.
 	StatsRange_STATS_RANGE_UNSPECIFIED StatsRange = 0
-	StatsRange_STATS_RANGE_DAY         StatsRange = 1
-	StatsRange_STATS_RANGE_WEEK        StatsRange = 2
-	StatsRange_STATS_RANGE_MONTH       StatsRange = 3
-	StatsRange_STATS_RANGE_ALL         StatsRange = 4
+	// Aggregate per day.
+	StatsRange_STATS_RANGE_DAY StatsRange = 1
+	// Aggregate per week.
+	StatsRange_STATS_RANGE_WEEK StatsRange = 2
+	// Aggregate per month.
+	StatsRange_STATS_RANGE_MONTH StatsRange = 3
+	// No aggregation — all-time totals.
+	StatsRange_STATS_RANGE_ALL StatsRange = 4
 )
 
 // Enum value maps for StatsRange.
@@ -78,10 +83,13 @@ func (StatsRange) EnumDescriptor() ([]byte, []int) {
 	return file_api_stats_v1_stats_proto_rawDescGZIP(), []int{0}
 }
 
+// TimeSegment — one bucket of a completion chart.
 type TimeSegment struct {
-	state          protoimpl.MessageState `protogen:"open.v1"`
-	Label          string                 `protobuf:"bytes,1,opt,name=label,proto3" json:"label,omitempty"` // e.g. "Mon", "2026-08"
-	CompletedCount int64                  `protobuf:"varint,2,opt,name=completed_count,json=completedCount,proto3" json:"completed_count,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Segment label, e.g. "Mon", "2026-08".
+	Label string `protobuf:"bytes,1,opt,name=label,proto3" json:"label,omitempty"`
+	// Tasks completed within this segment.
+	CompletedCount int64 `protobuf:"varint,2,opt,name=completed_count,json=completedCount,proto3" json:"completed_count,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -130,11 +138,15 @@ func (x *TimeSegment) GetCompletedCount() int64 {
 	return 0
 }
 
+// StreakEntry — one row of the streak leaderboard.
 type StreakEntry struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	TaskId        string                 `protobuf:"bytes,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
-	Title         string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
-	Streak        int32                  `protobuf:"varint,3,opt,name=streak,proto3" json:"streak,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Id of the task.
+	TaskId string `protobuf:"bytes,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
+	// Task title.
+	Title string `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
+	// Current consecutive-day streak length.
+	Streak        int32 `protobuf:"varint,3,opt,name=streak,proto3" json:"streak,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -190,16 +202,23 @@ func (x *StreakEntry) GetStreak() int32 {
 	return 0
 }
 
+// StatsReply — aggregated statistics over the requested range.
 type StatsReply struct {
-	state               protoimpl.MessageState `protogen:"open.v1"`
-	Range               StatsRange             `protobuf:"varint,1,opt,name=range,proto3,enum=api.stats.v1.StatsRange" json:"range,omitempty"`
-	Segments            []*TimeSegment         `protobuf:"bytes,2,rep,name=segments,proto3" json:"segments,omitempty"`                                            // completion bar chart data
-	StreakLeaderboard   []*StreakEntry         `protobuf:"bytes,3,rep,name=streak_leaderboard,json=streakLeaderboard,proto3" json:"streak_leaderboard,omitempty"` // top streaks, desc
-	TotalTasksCompleted int64                  `protobuf:"varint,4,opt,name=total_tasks_completed,json=totalTasksCompleted,proto3" json:"total_tasks_completed,omitempty"`
-	TotalGoldEarned     int64                  `protobuf:"varint,5,opt,name=total_gold_earned,json=totalGoldEarned,proto3" json:"total_gold_earned,omitempty"`
-	TotalExpEarned      int64                  `protobuf:"varint,6,opt,name=total_exp_earned,json=totalExpEarned,proto3" json:"total_exp_earned,omitempty"`
-	unknownFields       protoimpl.UnknownFields
-	sizeCache           protoimpl.SizeCache
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The range these stats were aggregated over.
+	Range StatsRange `protobuf:"varint,1,opt,name=range,proto3,enum=api.stats.v1.StatsRange" json:"range,omitempty"`
+	// Completion bar chart data.
+	Segments []*TimeSegment `protobuf:"bytes,2,rep,name=segments,proto3" json:"segments,omitempty"`
+	// Top streaks, descending.
+	StreakLeaderboard []*StreakEntry `protobuf:"bytes,3,rep,name=streak_leaderboard,json=streakLeaderboard,proto3" json:"streak_leaderboard,omitempty"`
+	// Total tasks completed in the range.
+	TotalTasksCompleted int64 `protobuf:"varint,4,opt,name=total_tasks_completed,json=totalTasksCompleted,proto3" json:"total_tasks_completed,omitempty"`
+	// Total gold earned in the range.
+	TotalGoldEarned int64 `protobuf:"varint,5,opt,name=total_gold_earned,json=totalGoldEarned,proto3" json:"total_gold_earned,omitempty"`
+	// Total EXP earned in the range.
+	TotalExpEarned int64 `protobuf:"varint,6,opt,name=total_exp_earned,json=totalExpEarned,proto3" json:"total_exp_earned,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *StatsReply) Reset() {
@@ -274,9 +293,11 @@ func (x *StatsReply) GetTotalExpEarned() int64 {
 	return 0
 }
 
+// GetStatsRequest — the aggregation window to fetch.
 type GetStatsRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Range         StatsRange             `protobuf:"varint,1,opt,name=range,proto3,enum=api.stats.v1.StatsRange" json:"range,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Desired aggregation range.
+	Range         StatsRange `protobuf:"varint,1,opt,name=range,proto3,enum=api.stats.v1.StatsRange" json:"range,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -318,9 +339,11 @@ func (x *GetStatsRequest) GetRange() StatsRange {
 	return StatsRange_STATS_RANGE_UNSPECIFIED
 }
 
+// GetStatsReply — the requested statistics.
 type GetStatsReply struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Stats         *StatsReply            `protobuf:"bytes,1,opt,name=stats,proto3" json:"stats,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Aggregated statistics.
+	Stats         *StatsReply `protobuf:"bytes,1,opt,name=stats,proto3" json:"stats,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

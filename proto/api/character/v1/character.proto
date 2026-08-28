@@ -37,71 +37,114 @@ service CharacterService {
   }
 }
 
-// CharacterType - character class.
+// CharacterClass — playable character classes.
 enum CharacterClass {
+  // Unspecified class; used as the zero value.
   CHARACTER_CLASS_UNSPECIFIED = 0;
+  // Warrior — melee combat class.
   CHARACTER_CLASS_WARRIOR = 1;
+  // Mage — spellcasting class.
   CHARACTER_CLASS_MAGE = 2;
+  // Ranger — ranged combat class.
   CHARACTER_CLASS_RANGER = 3;
 }
 
 // StatType — character attributes.
 enum StatType {
+  // Unspecified stat; used as the zero value.
   STAT_TYPE_UNSPECIFIED = 0;
+  // Strength — physical power.
   STAT_TYPE_STRENGTH = 1;
+  // Intelligence — magical power.
   STAT_TYPE_INTELLIGENCE = 2;
+  // Agility — speed and precision.
   STAT_TYPE_AGILITY = 3;
+  // Defense — reduces damage taken.
   STAT_TYPE_DEFENSE = 4;
+  // Vitality — maximum HP.
   STAT_TYPE_VITALITY = 5;
+  // Luck — random outcomes such as criticals and drops.
   STAT_TYPE_LUCK = 6;
 }
 
+// CharacterStats — base attribute values.
 message CharacterStats {
+  // Strength attribute.
   int32 strength = 1;
+  // Intelligence attribute.
   int32 intelligence = 2;
+  // Agility attribute.
   int32 agility = 3;
+  // Defense attribute.
   int32 defense = 4;
+  // Vitality attribute.
   int32 vitality = 5;
+  // Luck attribute.
   int32 luck = 6;
 }
 
+// Character — the current user's RPG character state.
 message Character {
+  // Unique character id.
   string id = 1;
+  // Chosen character class.
   CharacterClass character_Class = 2;
+  // Current level (max 50).
   int32 level = 3;
+  // EXP accumulated toward the next level.
   int64 current_exp = 4;
+  // Current HP (max 100); reaches 0 when dead.
   int32 current_hp = 5;
+  // Base attribute values.
   CharacterStats base_stats = 6;
+  // Unspent stat points available for allocation (1 per level).
   int32 available_stat_points = 7;
-  map<string, string> equipment = 8; // weapon/helmet/armor/accessory -> shop item id
+  // Equipped items: equipment slot -> shop item id (weapon/helmet/armor/accessory).
+  map<string, string> equipment = 8;
+  // Whether the character is dead (unusable until revived).
   bool is_dead = 9;
-  int64 death_recovery_until = 10; // unix millis
+  // Time when the death recovery finishes, unix millis.
+  int64 death_recovery_until = 10;
 }
 
+// GetCharacterRequest — no parameters; the character belongs to the current user.
 message GetCharacterRequest {}
 
+// GetCharacterReply — the user's character.
 message GetCharacterReply {
+  // The current character state.
   Character character = 1;
 }
 
+// UpdateCharacterRequest — full character state to persist.
 message UpdateCharacterRequest {
+  // Character payload to save (full replace).
   Character character = 1;
 }
 
+// UpdateCharacterReply — the saved character state.
 message UpdateCharacterReply {
+  // The persisted character.
   Character character = 1;
 }
 
+// AllocateStatPointRequest — the attribute to invest one stat point into.
 message AllocateStatPointRequest {
+  // The attribute to increase.
   StatType stat = 1;
 }
 
+// AllocateStatPointReply — the updated character after allocation.
 message AllocateStatPointReply {
+  // Character with the allocated point applied.
   Character character = 1;
 }
 
+// ReviveRequest — no parameters; revives the current user's character.
 message ReviveRequest {}
 
+// ReviveReply — the revived character state.
 message ReviveReply {
+  // Character with death cleared and recovery HP restored.
   Character character = 1;
 }

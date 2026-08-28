@@ -22,17 +22,27 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// Achievement — a defined achievement with the user's progress and unlock state.
 type Achievement struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Title         string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
-	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
-	ConditionType string                 `protobuf:"bytes,4,opt,name=condition_type,json=conditionType,proto3" json:"condition_type,omitempty"` // e.g. "tasks_completed" | "streak" | "level"
-	Threshold     int32                  `protobuf:"varint,5,opt,name=threshold,proto3" json:"threshold,omitempty"`
-	Progress      int32                  `protobuf:"varint,6,opt,name=progress,proto3" json:"progress,omitempty"`
-	IsUnlocked    bool                   `protobuf:"varint,7,opt,name=is_unlocked,json=isUnlocked,proto3" json:"is_unlocked,omitempty"`
-	UnlockedAt    int64                  `protobuf:"varint,8,opt,name=unlocked_at,json=unlockedAt,proto3" json:"unlocked_at,omitempty"` // unix millis
-	GemReward     int32                  `protobuf:"varint,9,opt,name=gem_reward,json=gemReward,proto3" json:"gem_reward,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Unique achievement id.
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// Display title.
+	Title string `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
+	// Display description.
+	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	// Condition kind: "tasks_completed" | "streak" | "level".
+	ConditionType string `protobuf:"bytes,4,opt,name=condition_type,json=conditionType,proto3" json:"condition_type,omitempty"`
+	// Value the progress must reach to unlock.
+	Threshold int32 `protobuf:"varint,5,opt,name=threshold,proto3" json:"threshold,omitempty"`
+	// Current progress toward the threshold.
+	Progress int32 `protobuf:"varint,6,opt,name=progress,proto3" json:"progress,omitempty"`
+	// Whether the achievement has been unlocked.
+	IsUnlocked bool `protobuf:"varint,7,opt,name=is_unlocked,json=isUnlocked,proto3" json:"is_unlocked,omitempty"`
+	// Unlock time, unix millis.
+	UnlockedAt int64 `protobuf:"varint,8,opt,name=unlocked_at,json=unlockedAt,proto3" json:"unlocked_at,omitempty"`
+	// Gem reward granted when unlocking.
+	GemReward     int32 `protobuf:"varint,9,opt,name=gem_reward,json=gemReward,proto3" json:"gem_reward,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -130,6 +140,7 @@ func (x *Achievement) GetGemReward() int32 {
 	return 0
 }
 
+// ListAchievementsRequest — no parameters.
 type ListAchievementsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -166,9 +177,11 @@ func (*ListAchievementsRequest) Descriptor() ([]byte, []int) {
 	return file_api_achievement_v1_achievement_proto_rawDescGZIP(), []int{1}
 }
 
+// ListAchievementsReply — all achievements with the user's state.
 type ListAchievementsReply struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Achievements  []*Achievement         `protobuf:"bytes,1,rep,name=achievements,proto3" json:"achievements,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// All achievements.
+	Achievements  []*Achievement `protobuf:"bytes,1,rep,name=achievements,proto3" json:"achievements,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -210,9 +223,11 @@ func (x *ListAchievementsReply) GetAchievements() []*Achievement {
 	return nil
 }
 
+// UnlockRequest — the achievement to claim.
 type UnlockRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Achievement id.
+	Id            string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -254,10 +269,13 @@ func (x *UnlockRequest) GetId() string {
 	return ""
 }
 
+// UnlockReply — the unlock result.
 type UnlockReply struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Achievement   *Achievement           `protobuf:"bytes,1,opt,name=achievement,proto3" json:"achievement,omitempty"`
-	GemReward     int32                  `protobuf:"varint,2,opt,name=gem_reward,json=gemReward,proto3" json:"gem_reward,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The unlocked achievement.
+	Achievement *Achievement `protobuf:"bytes,1,opt,name=achievement,proto3" json:"achievement,omitempty"`
+	// Gem reward granted by the unlock.
+	GemReward     int32 `protobuf:"varint,2,opt,name=gem_reward,json=gemReward,proto3" json:"gem_reward,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

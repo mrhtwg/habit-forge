@@ -8,8 +8,9 @@
 // ignore_for_file: constant_identifier_names
 // ignore_for_file: curly_braces_in_flow_control_structures
 // ignore_for_file: deprecated_member_use_from_same_package, library_prefixes
-// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: non_constant_identifier_names, prefer_relative_imports
 
+import 'dart:async' as $async;
 import 'dart:core' as $core;
 
 import 'package:fixnum/fixnum.dart' as $fixnum;
@@ -17,6 +18,7 @@ import 'package:protobuf/protobuf.dart' as $pb;
 
 export 'package:protobuf/protobuf.dart' show GeneratedMessageGenericExtensions;
 
+/// RegisterRequest — credentials and profile for a new account.
 class RegisterRequest extends $pb.GeneratedMessage {
   factory RegisterRequest({
     $core.String? email,
@@ -67,6 +69,7 @@ class RegisterRequest extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<RegisterRequest>(create);
   static RegisterRequest? _defaultInstance;
 
+  /// Email address, used as the login identifier.
   @$pb.TagNumber(1)
   $core.String get email => $_getSZ(0);
   @$pb.TagNumber(1)
@@ -76,6 +79,7 @@ class RegisterRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   void clearEmail() => $_clearField(1);
 
+  /// Password, min 8 characters.
   @$pb.TagNumber(2)
   $core.String get password => $_getSZ(1);
   @$pb.TagNumber(2)
@@ -85,6 +89,7 @@ class RegisterRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   void clearPassword() => $_clearField(2);
 
+  /// Display nickname.
   @$pb.TagNumber(3)
   $core.String get nickname => $_getSZ(2);
   @$pb.TagNumber(3)
@@ -95,6 +100,7 @@ class RegisterRequest extends $pb.GeneratedMessage {
   void clearNickname() => $_clearField(3);
 }
 
+/// LoginRequest — email/password credentials.
 class LoginRequest extends $pb.GeneratedMessage {
   factory LoginRequest({
     $core.String? email,
@@ -142,6 +148,7 @@ class LoginRequest extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<LoginRequest>(create);
   static LoginRequest? _defaultInstance;
 
+  /// Email address.
   @$pb.TagNumber(1)
   $core.String get email => $_getSZ(0);
   @$pb.TagNumber(1)
@@ -151,6 +158,7 @@ class LoginRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   void clearEmail() => $_clearField(1);
 
+  /// Password.
   @$pb.TagNumber(2)
   $core.String get password => $_getSZ(1);
   @$pb.TagNumber(2)
@@ -161,6 +169,7 @@ class LoginRequest extends $pb.GeneratedMessage {
   void clearPassword() => $_clearField(2);
 }
 
+/// OAuthLoginRequest — identity provided by a third-party OAuth provider.
 class OAuthLoginRequest extends $pb.GeneratedMessage {
   factory OAuthLoginRequest({
     $core.String? provider,
@@ -214,6 +223,7 @@ class OAuthLoginRequest extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<OAuthLoginRequest>(create);
   static OAuthLoginRequest? _defaultInstance;
 
+  /// Provider name: "google" | "apple".
   @$pb.TagNumber(1)
   $core.String get provider => $_getSZ(0);
   @$pb.TagNumber(1)
@@ -223,6 +233,7 @@ class OAuthLoginRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   void clearProvider() => $_clearField(1);
 
+  /// Provider-specific user id.
   @$pb.TagNumber(2)
   $core.String get providerId => $_getSZ(1);
   @$pb.TagNumber(2)
@@ -232,6 +243,7 @@ class OAuthLoginRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   void clearProviderId() => $_clearField(2);
 
+  /// Email reported by the provider.
   @$pb.TagNumber(3)
   $core.String get email => $_getSZ(2);
   @$pb.TagNumber(3)
@@ -241,6 +253,7 @@ class OAuthLoginRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   void clearEmail() => $_clearField(3);
 
+  /// Nickname reported by the provider.
   @$pb.TagNumber(4)
   $core.String get nickname => $_getSZ(3);
   @$pb.TagNumber(4)
@@ -251,6 +264,7 @@ class OAuthLoginRequest extends $pb.GeneratedMessage {
   void clearNickname() => $_clearField(4);
 }
 
+/// MeRequest — no parameters; the identity comes from the JWT.
 class MeRequest extends $pb.GeneratedMessage {
   factory MeRequest() => create();
 
@@ -288,6 +302,7 @@ class MeRequest extends $pb.GeneratedMessage {
   static MeRequest? _defaultInstance;
 }
 
+/// UserInfo — public profile of a user.
 class UserInfo extends $pb.GeneratedMessage {
   factory UserInfo({
     $core.String? id,
@@ -346,6 +361,7 @@ class UserInfo extends $pb.GeneratedMessage {
       _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<UserInfo>(create);
   static UserInfo? _defaultInstance;
 
+  /// Unique user id.
   @$pb.TagNumber(1)
   $core.String get id => $_getSZ(0);
   @$pb.TagNumber(1)
@@ -355,6 +371,7 @@ class UserInfo extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   void clearId() => $_clearField(1);
 
+  /// Email address.
   @$pb.TagNumber(2)
   $core.String get email => $_getSZ(1);
   @$pb.TagNumber(2)
@@ -364,6 +381,7 @@ class UserInfo extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   void clearEmail() => $_clearField(2);
 
+  /// Display nickname.
   @$pb.TagNumber(3)
   $core.String get nickname => $_getSZ(2);
   @$pb.TagNumber(3)
@@ -373,6 +391,7 @@ class UserInfo extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   void clearNickname() => $_clearField(3);
 
+  /// Avatar image URL.
   @$pb.TagNumber(4)
   $core.String get avatarUrl => $_getSZ(3);
   @$pb.TagNumber(4)
@@ -382,6 +401,7 @@ class UserInfo extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   void clearAvatarUrl() => $_clearField(4);
 
+  /// Account creation time, unix millis.
   @$pb.TagNumber(5)
   $fixnum.Int64 get createdAt => $_getI64(4);
   @$pb.TagNumber(5)
@@ -391,6 +411,7 @@ class UserInfo extends $pb.GeneratedMessage {
   @$pb.TagNumber(5)
   void clearCreatedAt() => $_clearField(5);
 
+  /// Last profile update time, unix millis.
   @$pb.TagNumber(6)
   $fixnum.Int64 get updatedAt => $_getI64(5);
   @$pb.TagNumber(6)
@@ -401,6 +422,7 @@ class UserInfo extends $pb.GeneratedMessage {
   void clearUpdatedAt() => $_clearField(6);
 }
 
+/// RegisterReply — session token and profile after registration.
 class RegisterReply extends $pb.GeneratedMessage {
   factory RegisterReply({
     $core.String? token,
@@ -449,6 +471,7 @@ class RegisterReply extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<RegisterReply>(create);
   static RegisterReply? _defaultInstance;
 
+  /// JWT session token.
   @$pb.TagNumber(1)
   $core.String get token => $_getSZ(0);
   @$pb.TagNumber(1)
@@ -458,6 +481,7 @@ class RegisterReply extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   void clearToken() => $_clearField(1);
 
+  /// The registered user.
   @$pb.TagNumber(2)
   UserInfo get user => $_getN(1);
   @$pb.TagNumber(2)
@@ -470,6 +494,7 @@ class RegisterReply extends $pb.GeneratedMessage {
   UserInfo ensureUser() => $_ensure(1);
 }
 
+/// LoginReply — session token and profile after login.
 class LoginReply extends $pb.GeneratedMessage {
   factory LoginReply({
     $core.String? token,
@@ -517,6 +542,7 @@ class LoginReply extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<LoginReply>(create);
   static LoginReply? _defaultInstance;
 
+  /// JWT session token.
   @$pb.TagNumber(1)
   $core.String get token => $_getSZ(0);
   @$pb.TagNumber(1)
@@ -526,6 +552,7 @@ class LoginReply extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   void clearToken() => $_clearField(1);
 
+  /// The authenticated user.
   @$pb.TagNumber(2)
   UserInfo get user => $_getN(1);
   @$pb.TagNumber(2)
@@ -538,6 +565,7 @@ class LoginReply extends $pb.GeneratedMessage {
   UserInfo ensureUser() => $_ensure(1);
 }
 
+/// MeReply — the current user's profile.
 class MeReply extends $pb.GeneratedMessage {
   factory MeReply({
     UserInfo? user,
@@ -582,6 +610,7 @@ class MeReply extends $pb.GeneratedMessage {
       _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<MeReply>(create);
   static MeReply? _defaultInstance;
 
+  /// The authenticated user.
   @$pb.TagNumber(1)
   UserInfo get user => $_getN(0);
   @$pb.TagNumber(1)
@@ -592,6 +621,35 @@ class MeReply extends $pb.GeneratedMessage {
   void clearUser() => $_clearField(1);
   @$pb.TagNumber(1)
   UserInfo ensureUser() => $_ensure(0);
+}
+
+/// AuthService — email/password register & login, OAuth login, current user.
+class AuthServiceApi {
+  final $pb.RpcClient _client;
+
+  AuthServiceApi(this._client);
+
+  /// Register a new email account. No email verification required.
+  $async.Future<RegisterReply> register(
+          $pb.ClientContext? ctx, RegisterRequest request) =>
+      _client.invoke<RegisterReply>(
+          ctx, 'AuthService', 'Register', request, RegisterReply());
+
+  /// Login with email and password.
+  $async.Future<LoginReply> login(
+          $pb.ClientContext? ctx, LoginRequest request) =>
+      _client.invoke<LoginReply>(
+          ctx, 'AuthService', 'Login', request, LoginReply());
+
+  /// OAuth login (google / apple), auto-creates the user when missing.
+  $async.Future<LoginReply> oAuthLogin(
+          $pb.ClientContext? ctx, OAuthLoginRequest request) =>
+      _client.invoke<LoginReply>(
+          ctx, 'AuthService', 'OAuthLogin', request, LoginReply());
+
+  /// Me returns the current authenticated user (JWT required).
+  $async.Future<MeReply> me($pb.ClientContext? ctx, MeRequest request) =>
+      _client.invoke<MeReply>(ctx, 'AuthService', 'Me', request, MeReply());
 }
 
 const $core.bool _omitFieldNames =

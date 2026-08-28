@@ -8,8 +8,9 @@
 // ignore_for_file: constant_identifier_names
 // ignore_for_file: curly_braces_in_flow_control_structures
 // ignore_for_file: deprecated_member_use_from_same_package, library_prefixes
-// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: non_constant_identifier_names, prefer_relative_imports
 
+import 'dart:async' as $async;
 import 'dart:core' as $core;
 
 import 'package:fixnum/fixnum.dart' as $fixnum;
@@ -21,6 +22,7 @@ export 'package:protobuf/protobuf.dart' show GeneratedMessageGenericExtensions;
 
 export 'character.pbenum.dart';
 
+/// CharacterStats — base attribute values.
 class CharacterStats extends $pb.GeneratedMessage {
   factory CharacterStats({
     $core.int? strength,
@@ -81,6 +83,7 @@ class CharacterStats extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<CharacterStats>(create);
   static CharacterStats? _defaultInstance;
 
+  /// Strength attribute.
   @$pb.TagNumber(1)
   $core.int get strength => $_getIZ(0);
   @$pb.TagNumber(1)
@@ -90,6 +93,7 @@ class CharacterStats extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   void clearStrength() => $_clearField(1);
 
+  /// Intelligence attribute.
   @$pb.TagNumber(2)
   $core.int get intelligence => $_getIZ(1);
   @$pb.TagNumber(2)
@@ -99,6 +103,7 @@ class CharacterStats extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   void clearIntelligence() => $_clearField(2);
 
+  /// Agility attribute.
   @$pb.TagNumber(3)
   $core.int get agility => $_getIZ(2);
   @$pb.TagNumber(3)
@@ -108,6 +113,7 @@ class CharacterStats extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   void clearAgility() => $_clearField(3);
 
+  /// Defense attribute.
   @$pb.TagNumber(4)
   $core.int get defense => $_getIZ(3);
   @$pb.TagNumber(4)
@@ -117,6 +123,7 @@ class CharacterStats extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   void clearDefense() => $_clearField(4);
 
+  /// Vitality attribute.
   @$pb.TagNumber(5)
   $core.int get vitality => $_getIZ(4);
   @$pb.TagNumber(5)
@@ -126,6 +133,7 @@ class CharacterStats extends $pb.GeneratedMessage {
   @$pb.TagNumber(5)
   void clearVitality() => $_clearField(5);
 
+  /// Luck attribute.
   @$pb.TagNumber(6)
   $core.int get luck => $_getIZ(5);
   @$pb.TagNumber(6)
@@ -136,6 +144,7 @@ class CharacterStats extends $pb.GeneratedMessage {
   void clearLuck() => $_clearField(6);
 }
 
+/// Character — the current user's RPG character state.
 class Character extends $pb.GeneratedMessage {
   factory Character({
     $core.String? id,
@@ -215,6 +224,7 @@ class Character extends $pb.GeneratedMessage {
       _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Character>(create);
   static Character? _defaultInstance;
 
+  /// Unique character id.
   @$pb.TagNumber(1)
   $core.String get id => $_getSZ(0);
   @$pb.TagNumber(1)
@@ -224,6 +234,7 @@ class Character extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   void clearId() => $_clearField(1);
 
+  /// Chosen character class.
   @$pb.TagNumber(2)
   CharacterClass get characterClass => $_getN(1);
   @$pb.TagNumber(2)
@@ -233,6 +244,7 @@ class Character extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   void clearCharacterClass() => $_clearField(2);
 
+  /// Current level (max 50).
   @$pb.TagNumber(3)
   $core.int get level => $_getIZ(2);
   @$pb.TagNumber(3)
@@ -242,6 +254,7 @@ class Character extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   void clearLevel() => $_clearField(3);
 
+  /// EXP accumulated toward the next level.
   @$pb.TagNumber(4)
   $fixnum.Int64 get currentExp => $_getI64(3);
   @$pb.TagNumber(4)
@@ -251,6 +264,7 @@ class Character extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   void clearCurrentExp() => $_clearField(4);
 
+  /// Current HP (max 100); reaches 0 when dead.
   @$pb.TagNumber(5)
   $core.int get currentHp => $_getIZ(4);
   @$pb.TagNumber(5)
@@ -260,6 +274,7 @@ class Character extends $pb.GeneratedMessage {
   @$pb.TagNumber(5)
   void clearCurrentHp() => $_clearField(5);
 
+  /// Base attribute values.
   @$pb.TagNumber(6)
   CharacterStats get baseStats => $_getN(5);
   @$pb.TagNumber(6)
@@ -271,6 +286,7 @@ class Character extends $pb.GeneratedMessage {
   @$pb.TagNumber(6)
   CharacterStats ensureBaseStats() => $_ensure(5);
 
+  /// Unspent stat points available for allocation (1 per level).
   @$pb.TagNumber(7)
   $core.int get availableStatPoints => $_getIZ(6);
   @$pb.TagNumber(7)
@@ -280,9 +296,11 @@ class Character extends $pb.GeneratedMessage {
   @$pb.TagNumber(7)
   void clearAvailableStatPoints() => $_clearField(7);
 
+  /// Equipped items: equipment slot -> shop item id (weapon/helmet/armor/accessory).
   @$pb.TagNumber(8)
   $pb.PbMap<$core.String, $core.String> get equipment => $_getMap(7);
 
+  /// Whether the character is dead (unusable until revived).
   @$pb.TagNumber(9)
   $core.bool get isDead => $_getBF(8);
   @$pb.TagNumber(9)
@@ -292,6 +310,7 @@ class Character extends $pb.GeneratedMessage {
   @$pb.TagNumber(9)
   void clearIsDead() => $_clearField(9);
 
+  /// Time when the death recovery finishes, unix millis.
   @$pb.TagNumber(10)
   $fixnum.Int64 get deathRecoveryUntil => $_getI64(9);
   @$pb.TagNumber(10)
@@ -302,6 +321,7 @@ class Character extends $pb.GeneratedMessage {
   void clearDeathRecoveryUntil() => $_clearField(10);
 }
 
+/// GetCharacterRequest — no parameters; the character belongs to the current user.
 class GetCharacterRequest extends $pb.GeneratedMessage {
   factory GetCharacterRequest() => create();
 
@@ -341,6 +361,7 @@ class GetCharacterRequest extends $pb.GeneratedMessage {
   static GetCharacterRequest? _defaultInstance;
 }
 
+/// GetCharacterReply — the user's character.
 class GetCharacterReply extends $pb.GeneratedMessage {
   factory GetCharacterReply({
     Character? character,
@@ -387,6 +408,7 @@ class GetCharacterReply extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<GetCharacterReply>(create);
   static GetCharacterReply? _defaultInstance;
 
+  /// The current character state.
   @$pb.TagNumber(1)
   Character get character => $_getN(0);
   @$pb.TagNumber(1)
@@ -399,6 +421,7 @@ class GetCharacterReply extends $pb.GeneratedMessage {
   Character ensureCharacter() => $_ensure(0);
 }
 
+/// UpdateCharacterRequest — full character state to persist.
 class UpdateCharacterRequest extends $pb.GeneratedMessage {
   factory UpdateCharacterRequest({
     Character? character,
@@ -446,6 +469,7 @@ class UpdateCharacterRequest extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<UpdateCharacterRequest>(create);
   static UpdateCharacterRequest? _defaultInstance;
 
+  /// Character payload to save (full replace).
   @$pb.TagNumber(1)
   Character get character => $_getN(0);
   @$pb.TagNumber(1)
@@ -458,6 +482,7 @@ class UpdateCharacterRequest extends $pb.GeneratedMessage {
   Character ensureCharacter() => $_ensure(0);
 }
 
+/// UpdateCharacterReply — the saved character state.
 class UpdateCharacterReply extends $pb.GeneratedMessage {
   factory UpdateCharacterReply({
     Character? character,
@@ -504,6 +529,7 @@ class UpdateCharacterReply extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<UpdateCharacterReply>(create);
   static UpdateCharacterReply? _defaultInstance;
 
+  /// The persisted character.
   @$pb.TagNumber(1)
   Character get character => $_getN(0);
   @$pb.TagNumber(1)
@@ -516,6 +542,7 @@ class UpdateCharacterReply extends $pb.GeneratedMessage {
   Character ensureCharacter() => $_ensure(0);
 }
 
+/// AllocateStatPointRequest — the attribute to invest one stat point into.
 class AllocateStatPointRequest extends $pb.GeneratedMessage {
   factory AllocateStatPointRequest({
     StatType? stat,
@@ -563,6 +590,7 @@ class AllocateStatPointRequest extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<AllocateStatPointRequest>(create);
   static AllocateStatPointRequest? _defaultInstance;
 
+  /// The attribute to increase.
   @$pb.TagNumber(1)
   StatType get stat => $_getN(0);
   @$pb.TagNumber(1)
@@ -573,6 +601,7 @@ class AllocateStatPointRequest extends $pb.GeneratedMessage {
   void clearStat() => $_clearField(1);
 }
 
+/// AllocateStatPointReply — the updated character after allocation.
 class AllocateStatPointReply extends $pb.GeneratedMessage {
   factory AllocateStatPointReply({
     Character? character,
@@ -620,6 +649,7 @@ class AllocateStatPointReply extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<AllocateStatPointReply>(create);
   static AllocateStatPointReply? _defaultInstance;
 
+  /// Character with the allocated point applied.
   @$pb.TagNumber(1)
   Character get character => $_getN(0);
   @$pb.TagNumber(1)
@@ -632,6 +662,7 @@ class AllocateStatPointReply extends $pb.GeneratedMessage {
   Character ensureCharacter() => $_ensure(0);
 }
 
+/// ReviveRequest — no parameters; revives the current user's character.
 class ReviveRequest extends $pb.GeneratedMessage {
   factory ReviveRequest() => create();
 
@@ -671,6 +702,7 @@ class ReviveRequest extends $pb.GeneratedMessage {
   static ReviveRequest? _defaultInstance;
 }
 
+/// ReviveReply — the revived character state.
 class ReviveReply extends $pb.GeneratedMessage {
   factory ReviveReply({
     Character? character,
@@ -717,6 +749,7 @@ class ReviveReply extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<ReviveReply>(create);
   static ReviveReply? _defaultInstance;
 
+  /// Character with death cleared and recovery HP restored.
   @$pb.TagNumber(1)
   Character get character => $_getN(0);
   @$pb.TagNumber(1)
@@ -727,6 +760,37 @@ class ReviveReply extends $pb.GeneratedMessage {
   void clearCharacter() => $_clearField(1);
   @$pb.TagNumber(1)
   Character ensureCharacter() => $_ensure(0);
+}
+
+/// CharacterService — RPG character state: class, level, EXP, HP, stats, equipment.
+class CharacterServiceApi {
+  final $pb.RpcClient _client;
+
+  CharacterServiceApi(this._client);
+
+  /// GetCharacter returns the current user's character.
+  $async.Future<GetCharacterReply> getCharacter(
+          $pb.ClientContext? ctx, GetCharacterRequest request) =>
+      _client.invoke<GetCharacterReply>(ctx, 'CharacterService', 'GetCharacter',
+          request, GetCharacterReply());
+
+  /// UpdateCharacter replaces the character state (level/exp/hp/stats/equipment).
+  $async.Future<UpdateCharacterReply> updateCharacter(
+          $pb.ClientContext? ctx, UpdateCharacterRequest request) =>
+      _client.invoke<UpdateCharacterReply>(ctx, 'CharacterService',
+          'UpdateCharacter', request, UpdateCharacterReply());
+
+  /// AllocateStatPoint spends one available stat point on an attribute.
+  $async.Future<AllocateStatPointReply> allocateStatPoint(
+          $pb.ClientContext? ctx, AllocateStatPointRequest request) =>
+      _client.invoke<AllocateStatPointReply>(ctx, 'CharacterService',
+          'AllocateStatPoint', request, AllocateStatPointReply());
+
+  /// Revive revives a dead character (e.g. after the recovery timer).
+  $async.Future<ReviveReply> revive(
+          $pb.ClientContext? ctx, ReviveRequest request) =>
+      _client.invoke<ReviveReply>(
+          ctx, 'CharacterService', 'Revive', request, ReviveReply());
 }
 
 const $core.bool _omitFieldNames =

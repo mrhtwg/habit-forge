@@ -37,54 +37,86 @@ service ShopService {
 
 // ShopCurrency — purchase currency.
 enum ShopCurrency {
+  // Unspecified currency; used as the zero value.
   SHOP_CURRENCY_UNSPECIFIED = 0;
+  // Gold — earned by completing tasks.
   SHOP_CURRENCY_GOLD = 1;
+  // Gems — premium currency from achievements and purchases.
   SHOP_CURRENCY_GEMS = 2;
 }
 
+// ShopItem — a purchasable cosmetic or equipment item.
 message ShopItem {
+  // Unique item id.
   string id = 1;
+  // Display name.
   string name = 2;
+  // Display description.
   string description = 3;
+  // Price in the currency chosen at purchase time.
   int64 price = 4;
-  string category = 5; // e.g. "weapon" | "helmet" | "armor" | "accessory"
-  string rarity = 6; // e.g. "common" | "rare" | "epic" | "legendary"
+  // Equipment category: "weapon" | "helmet" | "armor" | "accessory".
+  string category = 5;
+  // Rarity tier: "common" | "rare" | "epic" | "legendary".
+  string rarity = 6;
+  // Path of the 3D model asset (glb) rendered in the app.
   string glb_asset_path = 7;
+  // Whether the current user already owns this item.
   bool is_owned = 8;
 }
 
+// DailyDeal — a rotating discounted item.
 message DailyDeal {
+  // Id of the discounted item.
   string item_id = 1;
+  // Discount percentage (0-100).
   int32 discount_percent = 2;
-  int64 expires_at = 3; // unix millis
+  // Time the deal expires, unix millis.
+  int64 expires_at = 3;
 }
 
+// ListShopItemsRequest — optional filtering for the shop catalog.
 message ListShopItemsRequest {
-  string category = 1; // optional filter
+  // Optional filter by equipment category.
+  string category = 1;
 }
 
+// ListShopItemsReply — the shop catalog.
 message ListShopItemsReply {
+  // The matching shop items.
   repeated ShopItem items = 1;
 }
 
+// GetDailyDealRequest — no parameters.
 message GetDailyDealRequest {}
 
+// GetDailyDealReply — the current daily deal.
 message GetDailyDealReply {
+  // The active deal; absent when no deal is running.
   DailyDeal deal = 1;
 }
 
+// BuyItemRequest — the item and currency to spend.
 message BuyItemRequest {
+  // Id of the item to purchase.
   string item_id = 1;
+  // Currency used for the payment.
   ShopCurrency currency = 2;
 }
 
+// BuyItemReply — the purchase result.
 message BuyItemReply {
+  // The purchased item (now owned).
   ShopItem item = 1;
-  int64 balance = 2; // remaining balance of the spent currency
+  // Remaining balance of the spent currency.
+  int64 balance = 2;
 }
 
+// ListOwnedItemsRequest — no parameters.
 message ListOwnedItemsRequest {}
 
+// ListOwnedItemsReply — ids of all items the user owns.
 message ListOwnedItemsReply {
+  // Owned item ids.
   repeated string item_ids = 1;
 }

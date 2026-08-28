@@ -8,16 +8,19 @@
 // ignore_for_file: constant_identifier_names
 // ignore_for_file: curly_braces_in_flow_control_structures
 // ignore_for_file: deprecated_member_use_from_same_package, library_prefixes
-// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: non_constant_identifier_names, prefer_relative_imports
 
 import 'dart:core' as $core;
 
 import 'package:protobuf/protobuf.dart' as $pb;
 
-/// SysMaterial — gold, diamond, exp.
+/// SysMaterial — in-game currency types shown in the wallet.
 class SysMaterial extends $pb.ProtobufEnum {
+  /// Gold — earned by completing tasks.
   static const SysMaterial SYSMATERIAL_GOLD =
       SysMaterial._(0, _omitEnumNames ? '' : 'SYSMATERIAL_GOLD');
+
+  /// Diamond — premium currency.
   static const SysMaterial SYSMATERIAL_DIAMOND =
       SysMaterial._(1, _omitEnumNames ? '' : 'SYSMATERIAL_DIAMOND');
 

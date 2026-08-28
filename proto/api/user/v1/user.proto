@@ -23,28 +23,45 @@ service UserService {
   }
 }
 
+// UserPrefs — per-user preferences, wallet balances and onboarding state.
 message UserPrefs {
+  // Whether the onboarding flow has been completed.
   bool onboarding_completed = 1;
+  // Last onboarding step reached (used to resume the flow).
   int32 last_onboarding_step = 2;
+  // Current gold balance.
   int64 current_gold = 3;
+  // Current gem balance.
   int64 current_gems = 4;
+  // Whether sound effects are enabled.
   bool sound_enabled = 5;
+  // Whether haptic feedback is enabled.
   bool haptic_enabled = 6;
+  // Whether push notifications are enabled.
   bool notifications_enabled = 7;
+  // Lifetime count of completed tasks.
   int64 total_tasks_completed = 8;
-  int64 first_task_date = 9; // unix millis
+  // Date of the first completed task, unix millis.
+  int64 first_task_date = 9;
 }
 
+// GetPrefsRequest — no parameters.
 message GetPrefsRequest {}
 
+// GetPrefsReply — the current user's preferences.
 message GetPrefsReply {
+  // The user's preferences and wallet.
   UserPrefs prefs = 1;
 }
 
+// UpdatePrefsRequest — preferences to persist.
 message UpdatePrefsRequest {
+  // Full preferences payload to save.
   UserPrefs prefs = 1;
 }
 
+// UpdatePrefsReply — the saved preferences.
 message UpdatePrefsReply {
+  // The persisted preferences.
   UserPrefs prefs = 1;
 }
