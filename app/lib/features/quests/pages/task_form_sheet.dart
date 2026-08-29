@@ -361,16 +361,19 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
             _buildSectionLabel(LanKey.tags.tr),
             SizedBox(height: 8.h),
             _buildTagField(),
-            // Animated expand/collapse: fades the options in/out while the
+            // Animated expand/collapse: the options fade in/out while the
             // height eases, matching the rotating chevron in the field.
-            AnimatedCrossFade(
-              duration: const Duration(milliseconds: 200),
-              sizeCurve: Curves.easeInOutCubic,
-              crossFadeState: _tagsExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
-              firstChild: const SizedBox(width: double.infinity),
-              secondChild: Padding(
-                padding: EdgeInsets.only(top: 8.h),
-                child: _buildTagOptions(),
+            ClipRect(
+              child: AnimatedSize(
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeInOutCubic,
+                alignment: Alignment.topCenter,
+                child: _tagsExpanded
+                    ? Padding(
+                        padding: EdgeInsets.only(top: 8.h),
+                        child: _buildTagOptions(),
+                      )
+                    : const SizedBox(width: double.infinity),
               ),
             ),
             SizedBox(height: 16.h),
@@ -610,6 +613,8 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
   }
 
   // Inline tag multi-select, revealed below the field when expanded.
+  // Compact capsules flow in a Wrap: tags are short (<= 10 letters), so the
+  // pills shrink-wrap their text and wrap naturally into a staggered layout.
   Widget _buildTagOptions() {
     return Container(
       width: double.infinity,
@@ -620,13 +625,14 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
         border: Border.all(color: AppColors.border, width: 1.5),
       ),
       child: Wrap(
-        spacing: 8.w,
-        runSpacing: 8.h,
+        spacing: 6.w,
+        runSpacing: 6.h,
         children: AppConstants.taskTags.map((tag) {
           final selected = _tags.contains(tag);
           return _pill(
             active: selected,
             activeBg: AppColors.green,
+            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
             onTap: () => setState(() {
               if (selected) {
                 _tags.remove(tag);
@@ -702,6 +708,7 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
                       onTap: () => setState(() => _priority = selected ? '' : p),
                       child: Text(
                         p,
+                        textAlign: TextAlign.center,
                         style: textStyleBold(
                           fontSize: 11.sp,
                           color: selected ? Colors.white : AppColors.textSecondary,
@@ -784,18 +791,21 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
     required Color activeBg,
     required VoidCallback onTap,
     required Widget child,
+    EdgeInsetsGeometry padding = const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
   }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
+        padding: padding,
         decoration: BoxDecoration(
           color: active ? activeBg : Colors.white,
           borderRadius: BorderRadius.circular(999),
           border: Border.all(color: active ? activeBg : AppColors.border, width: 2),
           boxShadow: active ? [BoxShadow(color: activeBg.withValues(alpha: 0.5), offset: const Offset(0, 3))] : null,
         ),
-        child: Center(child: child),
+        // No Center wrapper: in a Wrap the pill must shrink-wrap its child
+        // (Center would expand to fill the remaining width -> one tag per row).
+        child: child,
       ),
     );
   }
