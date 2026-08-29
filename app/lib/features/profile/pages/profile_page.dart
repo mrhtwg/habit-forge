@@ -9,6 +9,8 @@ import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/profile/controllers/profile_controller.dart';
+import 'package:habit_forge_app/generated/protos/shared/v1/shared.pbenum.dart';
+import 'package:habit_forge_app/widgets/mini_chip.dart';
 
 class ProfilePage extends GetView<ProfileController> {
   const ProfilePage({super.key});
@@ -162,9 +164,9 @@ class ProfilePage extends GetView<ProfileController> {
                   SizedBox(height: 8.h),
                   Row(
                     children: [
-                      _miniWallet(color: AppColors.gold, value: prefs?.currentGold.toInt() ?? 0),
+                      MiniChip(sysMaterial: SysMaterial.SYSMATERIAL_GOLD),
                       SizedBox(width: 8.w),
-                      _miniWallet(color: const Color(0xFF7ED0FF), value: prefs?.currentGems.toInt() ?? 0),
+                      MiniChip(sysMaterial: SysMaterial.SYSMATERIAL_GEM),
                     ],
                   ),
                 ],
@@ -186,33 +188,6 @@ class ProfilePage extends GetView<ProfileController> {
         SizedBox(width: 10.w),
         _statCard('${controller.totalTasksCompleted}', LanKey.tasks.tr),
       ],
-    );
-  }
-
-  Widget _miniWallet({required Color color, required int value}) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: AppColors.border, width: 2),
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 13.w,
-            height: 13.w,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: color,
-              border: Border.all(color: AppColors.border, width: 1.2),
-            ),
-          ),
-          SizedBox(width: 4.w),
-          Text('$value', style: textStyleBold(fontSize: 12.sp, color: AppColors.textPrimary)),
-        ],
-      ),
     );
   }
 

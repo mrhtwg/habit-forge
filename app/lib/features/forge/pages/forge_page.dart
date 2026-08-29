@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
-import 'package:habit_forge_app/core/interface/network_registry.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/forge/controllers/forge_controller.dart';
 import 'package:habit_forge_app/features/forge/pages/item_detail_sheet.dart';
+import 'package:habit_forge_app/generated/protos/shared/v1/shared.pbenum.dart';
 import 'package:habit_forge_app/widgets/shop_item_icon.dart';
+import 'package:habit_forge_app/widgets/wallet_chip.dart';
 
 class ForgePage extends GetView<ForgeController> {
   const ForgePage({super.key});
@@ -312,34 +313,7 @@ class ForgePage extends GetView<ForgeController> {
         children: [
           Text(LanKey.forge.tr, style: textStyleBlack(fontSize: 26.sp, color: AppColors.textPrimary)),
           const Spacer(),
-          Obx(() {
-            final gold = NetworkRegistry.ins.userPrefs.value?.currentGold ?? 0;
-            return Container(
-              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 5.h),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(color: AppColors.border, width: 2),
-                borderRadius: BorderRadius.circular(999),
-                boxShadow: const [BoxShadow(color: Color(0xFFE9D9BE), offset: Offset(0, 3))],
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 16.w,
-                    height: 16.w,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: AppColors.gold,
-                      border: Border.all(color: AppColors.border, width: 1.5),
-                    ),
-                  ),
-                  SizedBox(width: 5.w),
-                  Text('$gold', style: textStyleBold(fontSize: 14.sp, color: AppColors.textPrimary)),
-                ],
-              ),
-            );
-          }),
+          WalletChip(sysMaterial: SysMaterial.SYSMATERIAL_GOLD),
         ],
       ),
     );
