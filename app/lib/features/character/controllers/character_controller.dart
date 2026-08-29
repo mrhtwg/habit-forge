@@ -1,11 +1,11 @@
 import 'dart:async';
 
 import 'package:get/get.dart';
-import 'package:habit_forge_app/core/storage/storage_service.dart';
+import 'package:habit_forge_app/core/interface/network_registry.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart';
 
 class CharacterController extends GetxController {
-  final _hive = StorageService.to;
+  final _hive = NetworkRegistry.ins;
   String currentAnimation = 'idle';
   Timer? _deathTimer;
 

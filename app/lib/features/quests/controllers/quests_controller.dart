@@ -1,12 +1,12 @@
 import 'package:get/get.dart';
+import 'package:habit_forge_app/core/interface/network_registry.dart';
 import 'package:habit_forge_app/core/services/audio_service.dart';
 import 'package:habit_forge_app/core/services/haptic_service.dart';
-import 'package:habit_forge_app/core/storage/storage_service.dart';
 import 'package:habit_forge_app/features/rewards/reward_popup.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';
 
 class QuestsController extends GetxController {
-  final _hive = StorageService.to;
+  final _hive = NetworkRegistry.ins;
   final activeType = TaskType.TASK_TYPE_HABIT.obs;
   final activeTag = 'all'.obs;
   final showAll = false.obs;

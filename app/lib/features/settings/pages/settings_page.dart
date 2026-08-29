@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/i18n/app_locale.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
+import 'package:habit_forge_app/core/interface/network_registry.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
-import 'package:habit_forge_app/core/storage/storage_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/auth/controllers/auth_controller.dart';
@@ -23,7 +23,7 @@ class SettingsPage extends GetView<SettingsController> {
         elevation: 0,
       ),
       body: Obx(() {
-        final prefs = StorageService.to.userPrefs.value;
+        final prefs = NetworkRegistry.ins.userPrefs.value;
         if (prefs == null) return const SizedBox();
         return ListView(
           padding: const EdgeInsets.all(16),
@@ -37,9 +37,9 @@ class SettingsPage extends GetView<SettingsController> {
                     dense: true,
                     leading: const Icon(Icons.person_outline, color: AppColors.textSecondary),
                     title: Text(
-                      StorageService.to.authMethod.isEmpty
+                      NetworkRegistry.ins.authMethod.isEmpty
                           ? LanKey.guest.tr
-                          : StorageService.to.authMethod.capitalizeFirst!,
+                          : NetworkRegistry.ins.authMethod.capitalizeFirst!,
                       style: textStyleRegular(color: AppColors.textPrimary),
                     ),
                     subtitle: Text(
@@ -83,7 +83,7 @@ class SettingsPage extends GetView<SettingsController> {
                   //   value: prefs.soundEnabled,
                   //   onChanged: (v) {
                   //     Get.find<AudioService>().setEnabled(v);
-                  //     StorageService.to.saveUserPrefs(prefs.rebuild((p) => p..soundEnabled = v));
+                  //     NetworkRegistry.ins.saveUserPrefs(prefs.rebuild((p) => p..soundEnabled = v));
                   //   },
                   // ),
                   const Divider(color: AppColors.elevated, height: 1, thickness: 1),
@@ -92,7 +92,7 @@ class SettingsPage extends GetView<SettingsController> {
                   //   value: prefs.hapticEnabled,
                   //   onChanged: (v) {
                   //     Get.find<HapticService>().setEnabled(v);
-                  //     StorageService.to.saveUserPrefs(prefs.rebuild((p) => p..hapticEnabled = v));
+                  //     NetworkRegistry.ins.saveUserPrefs(prefs.rebuild((p) => p..hapticEnabled = v));
                   //   },
                   // ),
                 ],
@@ -131,7 +131,7 @@ class SettingsPage extends GetView<SettingsController> {
                     isDestructive: true,
                   );
                   if (confirmed == true) {
-                    await StorageService.to.resetAllData();
+                    await NetworkRegistry.ins.resetAllData();
                     Get.offAllNamed(Routers.splash);
                   }
                 },

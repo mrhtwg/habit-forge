@@ -1,5 +1,5 @@
 {
   "env": "firebase",
-  "storage": "firebase",
+  "network": "firebase",
   "auth": "firebase"
 }

@@ -4,7 +4,8 @@ import 'package:get/get.dart';
 import 'package:habit_forge_app/core/common/animation/frame_sequence_player.dart';
 import 'package:habit_forge_app/core/constants/game_constants.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
-import 'package:habit_forge_app/core/storage/storage_service.dart';
+import 'package:habit_forge_app/core/interface/network_registry.dart';
+import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/home/controllers/home_controller.dart';
@@ -116,7 +117,7 @@ class HomePage extends GetView<HomeController> {
           ),
           // Hero circular frame + level badge + idle animation
           Obx(() {
-            final char = StorageService.to.character.value;
+            final char = NetworkRegistry.ins.character.value;
             return GestureDetector(
               onTap: controller.onCharacterTap,
               child: SizedBox(
@@ -142,7 +143,7 @@ class HomePage extends GetView<HomeController> {
                       ),
                       child: ClipOval(
                         child: FrameSequencePlayer(
-                          frames: FrameSequencePlayer.knightIdleFrames(),
+                          frames: UserService.to.getCharacterFrame(),
                           preferredSize: Size(112.w, 142.h),
                         ),
                       ),
@@ -230,7 +231,7 @@ class HomePage extends GetView<HomeController> {
   }
 
   String _hpText() {
-    final char = StorageService.to.character.value;
+    final char = NetworkRegistry.ins.character.value;
     return '${char?.currentHp ?? 100}/${GameConstants.maxHp}';
   }
 
@@ -271,7 +272,7 @@ class HomePage extends GetView<HomeController> {
   }
 
   double _ratioFor(String label) {
-    final char = StorageService.to.character.value;
+    final char = NetworkRegistry.ins.character.value;
     if (label == 'HP') {
       return ((char?.currentHp ?? 100) / GameConstants.maxHp).clamp(0.0, 1.0).toDouble();
     }
@@ -282,7 +283,7 @@ class HomePage extends GetView<HomeController> {
 
   Widget _walletChip({required bool gold}) {
     return Obx(() {
-      final prefs = StorageService.to.userPrefs.value;
+      final prefs = NetworkRegistry.ins.userPrefs.value;
       final value = gold ? prefs?.currentGold ?? 0 : prefs?.currentGems ?? 0;
       return Container(
         padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 7.h),
@@ -309,7 +310,7 @@ class HomePage extends GetView<HomeController> {
   }
 
   String _xpText() {
-    final char = StorageService.to.character.value;
+    final char = NetworkRegistry.ins.character.value;
     final level = char?.level ?? 1;
     final needed = GameConstants.expForLevel(level);
     return '${char?.currentExp ?? 0}/$needed';

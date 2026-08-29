@@ -4,8 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fixnum/fixnum.dart';
 import 'package:get/get.dart';
+import 'package:habit_forge_app/core/interface/network_interface.dart';
 import 'package:habit_forge_app/core/storage/game_logic.dart';
-import 'package:habit_forge_app/core/storage/storage_service.dart';
 import 'package:habit_forge_app/generated/protos/achievement/v1/achievement.pb.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart';
 import 'package:habit_forge_app/generated/protos/shop/v1/shop.pb.dart';
@@ -17,7 +17,7 @@ import 'package:uuid/uuid.dart';
 ///
 /// Game logic runs locally through [GameLogic]; results are persisted per
 /// authenticated user in Firestore and mirrored into reactive state.
-class FirebaseStorage extends GetxService implements StorageService {
+class NetworkFirebaseImpl implements NetworkInterface {
   final userPrefs = Rxn<UserPrefs>();
   final character = Rxn<Character>();
   final tasks = <Task>[].obs;
@@ -34,8 +34,6 @@ class FirebaseStorage extends GetxService implements StorageService {
   String? get authToken => null;
 
   // Firebase manages its own session — auth state derives from FirebaseAuth.
-  @override
-  bool get isLoggedIn => FirebaseAuth.instance.currentUser != null;
 
   String? get _uid => FirebaseAuth.instance.currentUser?.uid;
 
@@ -82,8 +80,9 @@ class FirebaseStorage extends GetxService implements StorageService {
 
   // ── Character operations ──
   @override
-  Future<void> createCharacter(Character c) async {
-    await _saveCharacter(c);
+  Future<(Character, bool)> createCharacter(CharacterClass characterClass) async {
+    await _saveCharacter(Character(characterClass: characterClass));
+    return (character.value!, true);
   }
 
   // ── Task operations ──
@@ -106,11 +105,17 @@ class FirebaseStorage extends GetxService implements StorageService {
   }
 
   @override
-  Future<StorageService> init() async {
+  Future<NetworkInterface> init() async {
     if (_uid == null) return this;
     await refreshAll();
     _listen();
     return this;
+  }
+
+  Future<Character?> loadCharacter() async {
+    final char = await _col('character').doc('self').get();
+    character.value = char.exists ? (Character()..mergeFromJsonMap(char.data() ?? {})) : null;
+    return character.value;
   }
 
   @override
@@ -134,8 +139,8 @@ class FirebaseStorage extends GetxService implements StorageService {
     final prefs = await _col('prefs').doc('self').get();
     userPrefs.value = prefs.exists ? (UserPrefs()..mergeFromJsonMap(prefs.data() ?? {})) : UserPrefs();
 
-    final char = await _col('character').doc('self').get();
-    character.value = char.exists ? (Character()..mergeFromJsonMap(char.data() ?? {})) : null;
+    // final char = await _col('character').doc('self').get();
+    // character.value = char.exists ? (Character()..mergeFromJsonMap(char.data() ?? {})) : null;
 
     final tasksSnap = await _col('tasks').get();
     tasks.value = tasksSnap.docs.map((d) => Task()..mergeFromJsonMap(d.data())).toList();

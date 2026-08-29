@@ -1,5 +1,5 @@
 {
   "env": "hive",
-  "storage": "hive",
+  "network": "hive",
   "auth": "local"
 }

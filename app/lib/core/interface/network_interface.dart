@@ -17,11 +17,11 @@ import 'package:habit_forge_app/generated/protos/user/v1/user.pb.dart';
 ///
 /// Business code depends on this interface only (never a concrete class):
 ///
-///     await StorageService.to.completeTask(task);
-///     await StorageService.to.allocateStatPoint(StatType.STAT_TYPE_STRENGTH);
-abstract class StorageService {
+///     await NetworkRegistry.ins.completeTask(task);
+///     await NetworkRegistry.ins.allocateStatPoint(StatType.STAT_TYPE_STRENGTH);
+abstract class NetworkInterface {
   /// Resolves the active implementation registered in Get.
-  static StorageService get to => Get.find<StorageService>();
+  static NetworkInterface get to => Get.find<NetworkInterface>();
 
   RxList<Achievement> get achievements;
   String get authMethod;
@@ -30,7 +30,7 @@ abstract class StorageService {
   Rxn<DailyDeal> get dailyDeal;
 
   // ── Auth state ──
-  bool get isLoggedIn;
+
   RxList<String> get ownedItemIds;
   RxList<Task> get tasks;
   // ── Reactive state ──
@@ -47,16 +47,17 @@ abstract class StorageService {
   Future<TaskCompleteResult> completeTask(Task task);
 
   /// Creates/replaces the initial character (onboarding).
-  Future<void> createCharacter(Character c);
-
+  Future<(Character, bool)> createCharacter(CharacterClass characterClass);
   // ── Task operations ──
   String createTask(Task task);
   void deleteTask(String id);
 
   /// Equips [itemId] into [slot] (empty itemId unequips).
   void equipItem(String itemId, {String slot = 'weapon'});
+
   // ── Lifecycle ──
-  Future<StorageService> init();
+  Future<NetworkInterface> init();
+  Future<Character?> loadCharacter();
   void postponeTask(Task task);
 
   /// Purchases an item with the given currency; returns whether it succeeded.
@@ -85,7 +86,7 @@ abstract class StorageService {
   void updateTask(Task task);
 }
 
-/// Reward summary returned by [StorageService.completeTask].
+/// Reward summary returned by [NetworkInterface.completeTask].
 class TaskCompleteResult {
   final int expGained;
 

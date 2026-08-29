@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/constants/env_constants.dart';
-import 'package:habit_forge_app/core/storage/storage_service.dart';
+import 'package:habit_forge_app/core/interface/network_registry.dart';
 
 /// Self-hosted backend auth client (server mode).
 ///
@@ -24,7 +24,7 @@ class ServerAuthService extends GetxService {
   Future<String?> loginWithEmail(String email, String password) async {
     final result = await _post('/api/v1/auth/login', {'email': email, 'password': password});
     if (result.error != null) return result.error;
-    StorageService.to.saveAuthToken(result.token);
+    NetworkRegistry.ins.saveAuthToken(result.token);
     return null;
   }
 
@@ -37,13 +37,13 @@ class ServerAuthService extends GetxService {
       'nickname': email.split('@').first,
     });
     if (result.error != null) return result.error;
-    StorageService.to.saveAuthToken(result.token);
+    NetworkRegistry.ins.saveAuthToken(result.token);
     return null;
   }
 
   /// Clears the locally stored token (server sessions are stateless JWT).
   Future<void> signOut() async {
-    StorageService.to.saveAuthToken(null);
+    NetworkRegistry.ins.saveAuthToken(null);
   }
 
   String _mapStatus(int status, String message) {

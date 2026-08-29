@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:habit_forge_app/core/common/utils/sp_utils.dart';
 import 'package:hive/hive.dart';
 
 /// Language/locale helper for the app.
@@ -18,8 +19,7 @@ class AppLocale {
 
   /// Reads the persisted language code (defaults to English).
   static String current() {
-    final box = Hive.box('userBox');
-    return box.get('locale', defaultValue: en) as String;
+    return SpUtils.ins.getString('locale') ?? en;
   }
 
   /// Locale to pass to GetMaterialApp on startup (always non-null).

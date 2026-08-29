@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:habit_forge_app/core/constants/app_constants.dart';
 import 'package:habit_forge_app/core/extensions/task_extensions.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
-import 'package:habit_forge_app/core/storage/storage_service.dart';
+import 'package:habit_forge_app/core/interface/network_registry.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/quests/controllers/quests_controller.dart';
@@ -149,7 +149,7 @@ class QuestsPage extends GetView<QuestsController> {
           Text(LanKey.quests.tr, style: textStyleBlack(fontSize: 26.sp, color: AppColors.textPrimary)),
           const Spacer(),
           Obx(() {
-            final n = StorageService.to.tasks.where((t) => !t.isSkipped && t.isDueToday).length;
+            final n = NetworkRegistry.ins.tasks.where((t) => !t.isSkipped && t.isDueToday).length;
             return Container(
               padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 5.h),
               decoration: BoxDecoration(

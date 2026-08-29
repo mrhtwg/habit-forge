@@ -2,12 +2,12 @@ import 'dart:async';
 
 import 'package:fixnum/fixnum.dart';
 import 'package:get/get.dart';
-import 'package:habit_forge_app/core/storage/storage_service.dart';
+import 'package:habit_forge_app/core/interface/network_registry.dart';
 import 'package:habit_forge_app/generated/protos/shop/v1/shop.pb.dart';
 import 'package:habit_forge_app/generated/protos/user/v1/user.pb.dart';
 
 class ForgeController extends GetxController {
-  final _hive = StorageService.to;
+  final _hive = NetworkRegistry.ins;
 
   final activeCategory = 'appearance'.obs;
   // Daily deal

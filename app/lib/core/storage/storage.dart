@@ -1,8 +1,8 @@
 import 'package:habit_forge_app/core/constants/env_constants.dart';
-import 'package:habit_forge_app/core/services/hive_service.dart';
-import 'package:habit_forge_app/core/storage/firebase_storage.dart';
-import 'package:habit_forge_app/core/storage/server_storage.dart';
-import 'package:habit_forge_app/core/storage/storage_service.dart';
+import 'package:habit_forge_app/core/interface/network_firebase_impl.dart';
+import 'package:habit_forge_app/core/interface/network_hive_impl.dart';
+import 'package:habit_forge_app/core/interface/network_interface.dart';
+import 'package:habit_forge_app/core/interface/network_server_impl.dart';
 
 /// Creates the storage implementation for the active mode
 /// (see `EnvConstants.storageMode`):
@@ -12,14 +12,14 @@ import 'package:habit_forge_app/core/storage/storage_service.dart';
 abstract class Storage {
   Storage._();
 
-  static Future<StorageService> create() async {
-    switch (EnvConstants.storageMode) {
+  static Future<NetworkInterface> create() async {
+    switch (EnvConstants.networkMode) {
       case EnvConstants.firebase:
-        return FirebaseStorage();
+        return NetworkFirebaseImpl();
       case EnvConstants.server:
-        return ServerStorage();
+        return NetworkServerImpl();
       default:
-        return HiveService();
+        return NetworkHiveImpl();
     }
   }
 }

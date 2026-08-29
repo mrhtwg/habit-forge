@@ -4,7 +4,8 @@ import 'package:get/get.dart';
 import 'package:habit_forge_app/core/common/animation/frame_sequence_player.dart';
 import 'package:habit_forge_app/core/constants/game_constants.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
-import 'package:habit_forge_app/core/storage/storage_service.dart';
+import 'package:habit_forge_app/core/interface/network_registry.dart';
+import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_spacing.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
@@ -21,7 +22,7 @@ class CharacterPage extends GetView<CharacterController> {
       backgroundColor: AppColors.scaffold,
       body: SafeArea(
         child: Obx(() {
-          final char = StorageService.to.character.value;
+          final char = NetworkRegistry.ins.character.value;
           if (char == null) return const SizedBox();
           return Column(
             children: [
@@ -150,7 +151,7 @@ class CharacterPage extends GetView<CharacterController> {
                   ),
                   child: ClipOval(
                     child: FrameSequencePlayer(
-                      frames: FrameSequencePlayer.knightIdleFrames(),
+                      frames: UserService.to.getCharacterFrame(),
                       preferredSize: Size(114.w, 144.h),
                     ),
                   ),
@@ -293,7 +294,7 @@ class CharacterPage extends GetView<CharacterController> {
   }
 
   void _showEquipSheet(BuildContext context, String slot) {
-    final hive = StorageService.to;
+    final hive = NetworkRegistry.ins;
     final char = hive.character.value;
     if (char == null) return;
 

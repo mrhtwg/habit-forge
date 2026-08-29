@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
-import 'package:habit_forge_app/core/storage/storage_service.dart';
+import 'package:habit_forge_app/core/interface/network_registry.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/achievements/controllers/achievements_controller.dart';
@@ -101,7 +101,7 @@ class AchievementsPage extends GetView<AchievementsController> {
           Text(LanKey.achievements.tr, style: textStyleBlack(fontSize: 22.sp, color: AppColors.textPrimary)),
           const Spacer(),
           Obx(() {
-            final n = StorageService.to.achievements.where((a) => a.isUnlocked).length;
+            final n = NetworkRegistry.ins.achievements.where((a) => a.isUnlocked).length;
             return Container(
               padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 5.h),
               decoration: BoxDecoration(
@@ -129,7 +129,7 @@ class AchievementsPage extends GetView<AchievementsController> {
       itemBuilder: (context, index) {
         final def = controller.achievementDefs[index];
         Achievement? saved;
-        for (final a in StorageService.to.achievements) {
+        for (final a in NetworkRegistry.ins.achievements) {
           if (a.id == def.id) {
             saved = a;
             break;

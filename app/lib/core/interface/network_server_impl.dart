@@ -1,8 +1,8 @@
 import 'package:get/get.dart';
 import 'package:grpc/grpc.dart';
 import 'package:habit_forge_app/core/constants/env_constants.dart';
+import 'package:habit_forge_app/core/interface/network_interface.dart';
 import 'package:habit_forge_app/core/storage/game_logic.dart';
-import 'package:habit_forge_app/core/storage/storage_service.dart';
 import 'package:habit_forge_app/generated/protos/achievement/v1/achievement.pbgrpc.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pbgrpc.dart';
 import 'package:habit_forge_app/generated/protos/shop/v1/shop.pbgrpc.dart';
@@ -20,7 +20,7 @@ import 'package:uuid/uuid.dart';
 /// Note: the backend business logic is not implemented yet (its methods return
 /// 501), so gRPC calls currently fail at runtime until `server/internal/biz`
 /// is filled in.
-class ServerStorage extends GetxService implements StorageService {
+class NetworkServerImpl implements NetworkInterface {
   final userPrefs = Rxn<UserPrefs>();
   final character = Rxn<Character>();
   final tasks = <Task>[].obs;
@@ -43,9 +43,6 @@ class ServerStorage extends GetxService implements StorageService {
 
   @override
   String? get authToken => _token;
-
-  @override
-  bool get isLoggedIn => _loggedIn;
 
   @override
   Future<void> addGems(int amount) async {
@@ -81,9 +78,10 @@ class ServerStorage extends GetxService implements StorageService {
 
   // ── Character operations ──
   @override
-  Future<void> createCharacter(Character c) async {
-    character.value = c;
-    _character.updateCharacter(UpdateCharacterRequest(character: c)).ignore();
+  Future<(Character, bool)> createCharacter(CharacterClass characterClass) async {
+    character.value = Character(characterClass: characterClass);
+    _character.updateCharacter(UpdateCharacterRequest(character: character.value)).ignore();
+    return (character.value!, true);
   }
 
   // ── Task operations ──
@@ -110,7 +108,7 @@ class ServerStorage extends GetxService implements StorageService {
   }
 
   @override
-  Future<StorageService> init() async {
+  Future<NetworkInterface> init() async {
     final (host, port) = _parseEndpoint(EnvConstants.grpcUrl);
     _channel = ClientChannel(
       host,
@@ -132,6 +130,12 @@ class ServerStorage extends GetxService implements StorageService {
       await refreshAll();
     }
     return this;
+  }
+
+  Future<Character?> loadCharacter() async {
+    final char = await _character.getCharacter(GetCharacterRequest());
+    character.value = char.character;
+    return character.value;
   }
 
   @override
@@ -156,8 +160,8 @@ class ServerStorage extends GetxService implements StorageService {
     // these calls start working once server/internal/biz is filled in.
     final prefs = await _user.getPrefs(GetPrefsRequest());
     userPrefs.value = prefs.prefs;
-    final char = await _character.getCharacter(GetCharacterRequest());
-    character.value = char.character;
+    // final char = await _character.getCharacter(GetCharacterRequest());
+    // character.value = char.character;
     final list = await _task.listTasks(ListTasksRequest());
     tasks.value = list.tasks;
     final owned = await _shop.listOwnedItems(ListOwnedItemsRequest());

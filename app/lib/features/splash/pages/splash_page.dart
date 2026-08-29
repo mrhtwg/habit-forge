@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/common/animation/frame_sequence_player.dart';
+import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/splash/controllers/splash_controller.dart';
@@ -26,7 +27,7 @@ class SplashPage extends GetView<SplashController> {
             mainAxisSize: MainAxisSize.min,
             children: [
               FrameSequencePlayer(
-                frames: FrameSequencePlayer.knightIdleFrames(),
+                frames: UserService.to.getCharacterFrame(),
                 preferredSize: Size(200.h, 220.h),
               ),
               Row(

@@ -3,8 +3,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/common/animation/frame_sequence_player.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
+import 'package:habit_forge_app/core/interface/network_registry.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
-import 'package:habit_forge_app/core/storage/storage_service.dart';
+import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/profile/controllers/profile_controller.dart';
@@ -112,8 +113,8 @@ class ProfilePage extends GetView<ProfileController> {
       ),
       padding: EdgeInsets.fromLTRB(20.w, 14.h + MediaQuery.of(Get.context!).padding.top, 20.w, 20.h),
       child: Obx(() {
-        final char = StorageService.to.character.value;
-        final prefs = StorageService.to.userPrefs.value;
+        final char = NetworkRegistry.ins.character.value;
+        final prefs = NetworkRegistry.ins.userPrefs.value;
         return Row(
           children: [
             // Knight circular frame (idle animation)
@@ -131,7 +132,7 @@ class ProfilePage extends GetView<ProfileController> {
               ),
               child: ClipOval(
                 child: FrameSequencePlayer(
-                  frames: FrameSequencePlayer.knightIdleFrames(),
+                  frames: UserService.to.getCharacterFrame(),
                   preferredSize: Size(62.w, 78.h),
                 ),
               ),

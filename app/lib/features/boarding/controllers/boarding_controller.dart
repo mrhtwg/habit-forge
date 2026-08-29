@@ -1,9 +1,11 @@
 import 'package:carousel_slider/carousel_controller.dart';
 import 'package:get/get.dart';
+import 'package:habit_forge_app/core/interface/network_registry.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
-import 'package:habit_forge_app/core/storage/storage_service.dart';
+import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';
+import 'package:habit_forge_app/widgets/toast_widget.dart';
 
 class BoardingController extends GetxController {
   final totalStepsCount = 4;
@@ -16,25 +18,21 @@ class BoardingController extends GetxController {
 
   int get currentStep => _step.value;
 
-  void complete() {
-    // final prefs = UserPrefs(onboardingCompleted: true);
-    // StorageService.to.saveUserPrefs(prefs);
-
-    final character = Character(
-      id: 'default',
-      characterClass: selectedClass.value,
-    );
-    StorageService.to.createCharacter(character);
+  void complete() async {
+    final character = await NetworkRegistry.ins.createCharacter(selectedClass.value);
+    if (!character.$2) {
+      Toast.show('character_creation_failed'.tr); //TODO: Localize
+      return;
+    }
+    UserService.to.saveCharacter(character.$1);
 
     if (firstHabitTitle.value.isNotEmpty) {
       final task = Task(
-        id: '',
         title: firstHabitTitle.value,
         type: TaskType.TASK_TYPE_HABIT,
         difficulty: TaskDifficulty.TASK_DIFFICULTY_EASY,
-        // createdAt: DateTime.now(),
       );
-      StorageService.to.createTask(task);
+      await NetworkRegistry.ins.createTask(task);
     }
 
     Get.offNamed(Routers.main);
@@ -57,15 +55,7 @@ class BoardingController extends GetxController {
   void selectHabit(String title) => firstHabitTitle.value = title;
 
   void skip() {
-    // final prefs = UserPrefs(onboardingCompleted: true);
-    // StorageService.to.saveUserPrefs(prefs);
-
-    final character = Character(
-      id: 'default',
-      characterClass: selectedClass.value,
-    );
-    StorageService.to.createCharacter(character);
-
+    NetworkRegistry.ins.createCharacter(CharacterClass.CHARACTER_CLASS_WARRIOR);
     Get.offNamed(Routers.main);
   }
 }
