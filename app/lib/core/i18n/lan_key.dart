@@ -82,6 +82,7 @@ enum LanKey {
   descriptionOptional, // 'Description (optional)'
   difficulty, // 'Difficulty'
   tags, // 'Tags'
+  addTags, // 'Add tags'
   saveChanges, // 'Save Changes'
   repeatOn, // 'Repeat on'
   selectAtLeastOneDay, // 'Select at least one day'
@@ -207,10 +208,11 @@ enum LanKey {
   // Double-quoted keys (missed by the generator) added manually:
   todaysQuests, // "Today's Quests"
   whatsYourQuest, // "What's your quest?"
+  titleRequired, // 'Please enter a quest title'
   youreAllSetAdventurer, // "You're all set,\nadventurer!"
   lifeIsGrandAdventure, // 'Your life is\na grand adventure'
   termsAndPrivacy, // 'By continuing, you agree to our Terms of Service\nand Privacy Policy.'
-  noAccountYet, // "Don't have an account?"
+  noAccountYet,
   ;
 
   /// Resolves this key for the active locale (GetX translations).

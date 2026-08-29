@@ -20,11 +20,12 @@ const SysMaterial$json = {
   '1': 'SysMaterial',
   '2': [
     {'1': 'SYSMATERIAL_GOLD', '2': 0},
-    {'1': 'SYSMATERIAL_DIAMOND', '2': 1},
+    {'1': 'SYSMATERIAL_GEM', '2': 1},
+    {'1': 'SYSMATERIAL_EXP', '2': 2},
   ],
 };
 
 /// Descriptor for `SysMaterial`. Decode as a `google.protobuf.EnumDescriptorProto`.
 final $typed_data.Uint8List sysMaterialDescriptor = $convert.base64Decode(
-    'CgtTeXNNYXRlcmlhbBIUChBTWVNNQVRFUklBTF9HT0xEEAASFwoTU1lTTUFURVJJQUxfRElBTU'
-    '9ORBAB');
+    'CgtTeXNNYXRlcmlhbBIUChBTWVNNQVRFUklBTF9HT0xEEAASEwoPU1lTTUFURVJJQUxfR0VNEA'
+    'ESEwoPU1lTTUFURVJJQUxfRVhQEAI=');

@@ -8,6 +8,8 @@ option go_package = "github.com/habitforge/backend/api/user/v1;v1";
 enum SysMaterial {
   // Gold — earned by completing tasks.
   SYSMATERIAL_GOLD = 0;
-  // Diamond — premium currency.
-  SYSMATERIAL_DIAMOND = 1;
+  // Gem — earned by completing achievements.
+  SYSMATERIAL_GEM = 1;
+  // Exp — earned by completing tasks, can be spent on character upgrades.
+  SYSMATERIAL_EXP = 2;
 }

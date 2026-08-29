@@ -8,7 +8,7 @@ class SplashController extends GetxController {
     // Initialize network
     await NetworkRegistry.ins.init();
 
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 1000));
 
     if (!(await UserService.to.isLoggedIn())) {
       Get.offAllNamed(Routers.login);

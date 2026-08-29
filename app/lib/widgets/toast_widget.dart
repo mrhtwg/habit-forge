@@ -1,7 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
+
+/// Hosts the app-wide Toast overlay.
+///
+/// Mounted once at the root of the widget tree (see HabitForgeApp), above the
+/// Navigator, so [Toast] can show from anywhere — bottom sheets, dialogs,
+/// early startup — without requiring a BuildContext.
+class ToastOverlay {
+  static final GlobalKey<OverlayState> _key = GlobalKey<OverlayState>();
+
+  ToastOverlay._();
+
+  /// The root-level [Overlay] widget; place it above the app's Navigator.
+  static Widget mount() {
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: Overlay(key: _key),
+    );
+  }
+
+  /// Insert an entry into the Toast overlay. No-op when the overlay is not
+  /// mounted yet (e.g. Toast called before runApp).
+  static void insert(OverlayEntry entry) {
+    _key.currentState?.insert(entry);
+  }
+}
 
 /// Convenience methods for Toast
 class Toast {
@@ -12,12 +38,22 @@ class Toast {
 
   /// Show an error Toast
   static void error(String message, {int? duration}) {
-    ToastManager.instance.show(message, duration: duration);
+    ToastManager.instance.show(
+      message,
+      duration: duration,
+      icon: Icons.error_rounded,
+      iconColor: AppColors.coral,
+    );
   }
 
   /// Show an info Toast
   static void info(String message, {int? duration}) {
-    ToastManager.instance.show(message, duration: duration);
+    ToastManager.instance.show(
+      message,
+      duration: duration,
+      icon: Icons.info_rounded,
+      iconColor: AppColors.info,
+    );
   }
 
   /// Configure the bottom margin
@@ -42,17 +78,32 @@ class Toast {
 
   /// Show a normal Toast
   static void show(String message, {int? duration}) {
-    ToastManager.instance.show(message, duration: duration);
+    ToastManager.instance.show(
+      message,
+      duration: duration,
+      icon: Icons.bolt_rounded,
+      iconColor: AppColors.primary,
+    );
   }
 
   /// Show a success Toast
   static void success(String message, {int? duration}) {
-    ToastManager.instance.show(message, duration: duration);
+    ToastManager.instance.show(
+      message,
+      duration: duration,
+      icon: Icons.check_circle_rounded,
+      iconColor: AppColors.green,
+    );
   }
 
   /// Show a warning Toast
   static void warning(String message, {int? duration}) {
-    ToastManager.instance.show(message, duration: duration);
+    ToastManager.instance.show(
+      message,
+      duration: duration,
+      icon: Icons.warning_amber_rounded,
+      iconColor: AppColors.warning,
+    );
   }
 }
 
@@ -67,8 +118,20 @@ class ToastConfig {
   /// Spacing between Toasts
   static double spacing = 8.0.h;
 
-  /// Toast bottom margin
-  static double bottomMargin = MediaQuery.of(Get.context!).size.height * 2 / 3;
+  /// Toast bottom margin (2/3 of the screen height by default, or a custom
+  /// value set via [Toast.setBottomMargin]).
+  static double? _customBottomMargin;
+
+  static double get bottomMargin {
+    if (_customBottomMargin != null) return _customBottomMargin!;
+    final ctx = Get.context;
+    if (ctx == null) return 400;
+    return MediaQuery.of(ctx).size.height * 2 / 3;
+  }
+
+  static set bottomMargin(double value) {
+    _customBottomMargin = value;
+  }
 }
 
 /// Toast manager
@@ -90,7 +153,12 @@ class ToastManager {
   }
 
   /// Show a Toast
-  void show(String message, {int? duration}) {
+  void show(
+    String message, {
+    int? duration,
+    IconData? icon,
+    Color? iconColor,
+  }) {
     // If the maximum count is exceeded, remove the oldest one (at the end of the list)
     if (_toasts.length >= ToastConfig.maxToasts) {
       final oldest = _toasts.last;
@@ -104,7 +172,13 @@ class ToastManager {
     }
 
     // Create a new Toast with position 0 (at the very bottom)
-    final toastItem = _ToastItem(message: message, duration: duration ?? ToastConfig.duration, position: 0);
+    final toastItem = _ToastItem(
+      message: message,
+      duration: duration ?? ToastConfig.duration,
+      position: 0,
+      icon: icon ?? Icons.info_rounded,
+      iconColor: iconColor ?? AppColors.info,
+    );
 
     // Insert the new toast at the beginning of the list
     _toasts.insert(0, toastItem);
@@ -128,12 +202,20 @@ class ToastManager {
 class _ToastItem {
   final String message;
   final int duration;
+  final IconData icon;
+  final Color iconColor;
   int position;
   OverlayEntry? _overlayEntry;
   final _animationController = Rx<AnimationController?>(null);
   VoidCallback? _onDismiss;
 
-  _ToastItem({required this.message, required this.duration, required this.position});
+  _ToastItem({
+    required this.message,
+    required this.duration,
+    required this.icon,
+    required this.iconColor,
+    required this.position,
+  });
 
   /// Remove the Toast
   void remove() {
@@ -159,13 +241,14 @@ class _ToastItem {
 
   /// Show a Toast
   void show(VoidCallback onRemove) {
-    final overlay = Get.overlayContext;
-    if (overlay == null) return;
-
+    // Insert into the app-wide Toast overlay mounted at the root, so no
+    // caller BuildContext is needed (works in sheets, dialogs, startup).
     _overlayEntry = OverlayEntry(
       builder: (context) => _ToastWidget(
         message: message,
         position: position,
+        icon: icon,
+        iconColor: iconColor,
         onAnimationController: (controller) {
           _animationController.value = controller;
         },
@@ -175,7 +258,7 @@ class _ToastItem {
       ),
     );
 
-    Overlay.of(overlay).insert(_overlayEntry!);
+    ToastOverlay.insert(_overlayEntry!);
 
     // Automatically remove after the delay
     Future.delayed(Duration(milliseconds: duration), () {
@@ -195,12 +278,16 @@ class _ToastItem {
 class _ToastWidget extends StatefulWidget {
   final String message;
   final int position;
+  final IconData icon;
+  final Color iconColor;
   final ValueChanged<AnimationController> onAnimationController;
   final ValueChanged<VoidCallback> onDismiss;
 
   const _ToastWidget({
     required this.message,
     required this.position,
+    required this.icon,
+    required this.iconColor,
     required this.onAnimationController,
     required this.onDismiss,
   });
@@ -246,16 +333,34 @@ class _ToastWidgetState extends State<_ToastWidget> with TickerProviderStateMixi
           child: Center(
             child: Container(
               constraints: BoxConstraints(maxWidth: 300.w),
-              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
               decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.85),
-                borderRadius: BorderRadius.circular(8.r),
+                // Game-style card: cream surface, ink stroke, hard shadow.
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(14.r),
+                border: Border.all(color: AppColors.border, width: 2),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.border.withValues(alpha: 0.35),
+                    offset: const Offset(0, 3),
+                  ),
+                ],
               ),
-              child: Text(
-                widget.message,
-                style: textStyleMedium(color: Colors.white, fontSize: 13.sp).copyWith(decoration: TextDecoration.none),
-                textAlign: TextAlign.center,
-                softWrap: true,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(widget.icon, size: 18.w, color: widget.iconColor),
+                  SizedBox(width: 8.w),
+                  Flexible(
+                    child: Text(
+                      widget.message,
+                      style: textStyleBold(fontSize: 13.sp, color: AppColors.textPrimary)
+                          .copyWith(decoration: TextDecoration.none),
+                      textAlign: TextAlign.center,
+                      softWrap: true,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

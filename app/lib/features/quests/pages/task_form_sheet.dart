@@ -4,11 +4,16 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/constants/app_constants.dart';
 import 'package:habit_forge_app/core/constants/game_constants.dart';
+import 'package:habit_forge_app/core/extensions/task_extensions.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/quests/controllers/quests_controller.dart';
+import 'package:habit_forge_app/generated/protos/shared/v1/shared.pbenum.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';
+import 'package:habit_forge_app/widgets/pressable_button.dart';
+import 'package:habit_forge_app/widgets/reward_chip.dart';
+import 'package:habit_forge_app/widgets/toast_widget.dart';
 import 'package:intl/intl.dart';
 
 class TaskFormSheet extends StatefulWidget {
@@ -30,6 +35,212 @@ class TaskFormSheet extends StatefulWidget {
   }
 }
 
+/// Theme-matched date picker: a month grid styled like the rest of the app
+/// (cream field, ink borders, rounded chips) instead of the default Material
+/// calendar. Pops with the picked [DateTime], or null if dismissed.
+class _DatePickerSheet extends StatefulWidget {
+  final DateTime? initial;
+
+  const _DatePickerSheet({this.initial});
+
+  @override
+  State<_DatePickerSheet> createState() => _DatePickerSheetState();
+}
+
+class _DatePickerSheetState extends State<_DatePickerSheet> {
+  static final _weekdayLabels = [
+    LanKey.mon.tr,
+    LanKey.tue.tr,
+    LanKey.wed.tr,
+    LanKey.thu.tr,
+    LanKey.fri.tr,
+    LanKey.sat.tr,
+    LanKey.sun.tr,
+  ];
+
+  late final DateTime _today;
+  late final DateTime _maxDate;
+  late DateTime _month; // first day of the month currently shown
+  DateTime? _selected;
+
+  @override
+  Widget build(BuildContext context) {
+    final daysInMonth = DateTime(_month.year, _month.month + 1, 0).day;
+    final leadingBlanks = DateTime(_month.year, _month.month, 1).weekday - 1; // Monday = 0
+
+    final cells = <Widget>[
+      for (var i = 0; i < leadingBlanks; i++) const SizedBox.shrink(),
+      for (var day = 1; day <= daysInMonth; day++) _dayCell(DateTime(_month.year, _month.month, day)),
+    ];
+
+    return SingleChildScrollView(
+      padding: EdgeInsets.all(20.w),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Drag handle
+          Center(
+            child: Container(
+              width: 44.w,
+              height: 5.h,
+              decoration: BoxDecoration(
+                color: AppColors.textMuted,
+                borderRadius: BorderRadius.circular(3),
+              ),
+            ),
+          ),
+          SizedBox(height: 14.h),
+          Text(
+            LanKey.pickDate.tr,
+            style: textStyleBlack(fontSize: 20.sp, color: AppColors.textPrimary),
+          ),
+          SizedBox(height: 12.h),
+          // Month navigation
+          Row(
+            children: [
+              _navButton(icon: Icons.chevron_left_rounded, onTap: () => _changeMonth(-1)),
+              Expanded(
+                child: Text(
+                  DateFormat('MMMM yyyy').format(_month),
+                  textAlign: TextAlign.center,
+                  style: textStyleBold(fontSize: 15.sp, color: AppColors.textPrimary),
+                ),
+              ),
+              _navButton(icon: Icons.chevron_right_rounded, onTap: () => _changeMonth(1)),
+            ],
+          ),
+          SizedBox(height: 10.h),
+          // Weekday header
+          Row(
+            children: List.generate(7, (i) {
+              return Expanded(
+                child: Center(
+                  child: Text(
+                    _weekdayLabels[i],
+                    style: textStyleBold(fontSize: 11.sp, color: AppColors.textMuted),
+                  ),
+                ),
+              );
+            }),
+          ),
+          SizedBox(height: 6.h),
+          GridView.count(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisCount: 7,
+            mainAxisSpacing: 6.h,
+            crossAxisSpacing: 4.w,
+            children: cells,
+          ),
+          SizedBox(height: 16.h),
+          // Confirm
+          SizedBox(
+            width: double.infinity,
+            child: GestureDetector(
+              onTap: () => Navigator.pop(context, _selected),
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: 14.h),
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  border: Border.all(color: AppColors.border, width: 2.5),
+                  borderRadius: BorderRadius.circular(999),
+                  boxShadow: const [BoxShadow(color: AppColors.primaryDark, offset: Offset(0, 4))],
+                ),
+                child: Center(
+                  child: Text(
+                    LanKey.done.tr,
+                    style: textStyleBold(fontSize: 16.sp, color: Colors.white),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: 8.h),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _today = DateUtils.dateOnly(DateTime.now());
+    _maxDate = _today.add(const Duration(days: 365));
+    final initial = widget.initial == null ? null : DateUtils.dateOnly(widget.initial!);
+    _selected = initial;
+    _month = DateTime(initial?.year ?? _today.year, initial?.month ?? _today.month);
+  }
+
+  void _changeMonth(int delta) {
+    setState(() => _month = DateTime(_month.year, _month.month + delta));
+  }
+
+  Widget _dayCell(DateTime date) {
+    final selectable = _isSelectable(date);
+    final isSelected = _selected != null && date == _selected;
+    final isToday = date == _today;
+
+    return GestureDetector(
+      onTap: selectable ? () => Navigator.pop(context, date) : null,
+      child: Center(
+        child: Container(
+          width: 38.w,
+          height: 38.w,
+          decoration: BoxDecoration(
+            color: isSelected
+                ? AppColors.primary
+                : isToday
+                    ? AppColors.primaryLight.withValues(alpha: 0.15)
+                    : Colors.transparent,
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: isSelected
+                  ? AppColors.primaryDark
+                  : isToday
+                      ? AppColors.primary
+                      : Colors.transparent,
+              width: 2,
+            ),
+            boxShadow: isSelected
+                ? [BoxShadow(color: AppColors.primaryDark.withValues(alpha: 0.4), offset: const Offset(0, 3))]
+                : null,
+          ),
+          child: Center(
+            child: Text(
+              '${date.day}',
+              style: textStyleBold(
+                fontSize: 13.sp,
+                color: !selectable && !isSelected
+                    ? AppColors.textMuted
+                    : isSelected
+                        ? Colors.white
+                        : AppColors.textPrimary,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  bool _isSelectable(DateTime date) => !date.isBefore(_today) && !date.isAfter(_maxDate);
+
+  Widget _navButton({required IconData icon, required VoidCallback onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.all(8.w),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF3E7CE),
+          border: Border.all(color: AppColors.border, width: 2),
+          borderRadius: BorderRadius.circular(999),
+        ),
+        child: Icon(icon, size: 18.w, color: AppColors.textPrimary),
+      ),
+    );
+  }
+}
+
 class _TaskFormSheetState extends State<TaskFormSheet> {
   static final _weekdayLabels = [
     LanKey.mon.tr,
@@ -45,8 +256,8 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
   TaskType _type = TaskType.TASK_TYPE_HABIT;
   TaskDifficulty _difficulty = TaskDifficulty.TASK_DIFFICULTY_MEDIUM;
   List<String> _tags = [];
+  bool _tagsExpanded = false;
   Int64? _dueDate;
-  final _tagCtrl = TextEditingController();
   List<int> _repeatDays = [];
   String _priority = '';
   int _hpPenalty = 10;
@@ -58,7 +269,7 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
     final isEdit = widget.task != null;
 
     return Padding(
-      padding: EdgeInsets.only(bottom: padding.bottom),
+      padding: EdgeInsets.only(bottom: padding.top),
       child: SingleChildScrollView(
         padding: EdgeInsets.all(20.w),
         child: Column(
@@ -149,30 +360,18 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
             // Tags
             _buildSectionLabel(LanKey.tags.tr),
             SizedBox(height: 8.h),
-            Wrap(
-              spacing: 8.w,
-              runSpacing: 8.h,
-              children: AppConstants.taskTags.map((tag) {
-                final selected = _tags.contains(tag);
-                return _pill(
-                  active: selected,
-                  activeBg: AppColors.primary,
-                  onTap: () => setState(() {
-                    if (selected) {
-                      _tags.remove(tag);
-                    } else {
-                      _tags.add(tag);
-                    }
-                  }),
-                  child: Text(
-                    '# $tag',
-                    style: textStyleBold(
-                      fontSize: 12.sp,
-                      color: selected ? Colors.white : AppColors.textSecondary,
-                    ),
-                  ),
-                );
-              }).toList(),
+            _buildTagField(),
+            // Animated expand/collapse: fades the options in/out while the
+            // height eases, matching the rotating chevron in the field.
+            AnimatedCrossFade(
+              duration: const Duration(milliseconds: 200),
+              sizeCurve: Curves.easeInOutCubic,
+              crossFadeState: _tagsExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+              firstChild: const SizedBox(width: double.infinity),
+              secondChild: Padding(
+                padding: EdgeInsets.only(top: 8.h),
+                child: _buildTagOptions(),
+              ),
             ),
             SizedBox(height: 16.h),
             // Reward preview
@@ -181,9 +380,15 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
             // Submit
             SizedBox(
               width: double.infinity,
-              child: GestureDetector(
+              child: PressableButton(
+                borderWidth: 2.5,
+                padding: EdgeInsets.symmetric(vertical: 15.h),
                 onTap: () {
-                  if (_titleCtrl.text.trim().isEmpty) return;
+                  if (_titleCtrl.text.trim().isEmpty) {
+                    Toast.warning(LanKey.titleRequired.tr);
+                    return;
+                  }
+
                   // final now = DateTime.now();
                   final task = Task(
                     id: widget.task?.id ?? '',
@@ -206,19 +411,10 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
                   }
                   Get.back();
                 },
-                child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 15.h),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    border: Border.all(color: AppColors.border, width: 2.5),
-                    borderRadius: BorderRadius.circular(999),
-                    boxShadow: const [BoxShadow(color: AppColors.primaryDark, offset: Offset(0, 4))],
-                  ),
-                  child: Center(
-                    child: Text(
-                      isEdit ? LanKey.saveChanges.tr : LanKey.createQuest.tr,
-                      style: textStyleBold(fontSize: 16.sp, color: Colors.white),
-                    ),
+                child: Center(
+                  child: Text(
+                    isEdit ? LanKey.saveChanges.tr : LanKey.createQuest.tr,
+                    style: textStyleBold(fontSize: 16.sp, color: Colors.white),
                   ),
                 ),
               ),
@@ -234,7 +430,6 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
   void dispose() {
     _titleCtrl.dispose();
     _descCtrl.dispose();
-    _tagCtrl.dispose();
     super.dispose();
   }
 
@@ -258,31 +453,7 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
       SizedBox(height: 14.h),
       _buildSectionLabel(LanKey.repeatOn.tr),
       SizedBox(height: 8.h),
-      Wrap(
-        spacing: 6.w,
-        runSpacing: 6.h,
-        children: List.generate(7, (i) {
-          final selected = _repeatDays.contains(i);
-          return _pill(
-            active: selected,
-            activeBg: AppColors.primary,
-            onTap: () => setState(() {
-              if (selected) {
-                _repeatDays.remove(i);
-              } else {
-                _repeatDays.add(i);
-              }
-            }),
-            child: Text(
-              _weekdayLabels[i],
-              style: textStyleBold(
-                fontSize: 12.sp,
-                color: selected ? Colors.white : AppColors.textSecondary,
-              ),
-            ),
-          );
-        }),
-      ),
+      _buildRepeatDayRow(),
       if (_repeatDays.isEmpty)
         Padding(
           padding: EdgeInsets.only(top: 4.h),
@@ -307,6 +478,53 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
     );
   }
 
+  // Compact single-row day picker: 7 equal segments, no wrapping.
+  Widget _buildRepeatDayRow() {
+    return Container(
+      padding: EdgeInsets.all(4.w),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF3E7CE),
+        border: Border.all(color: AppColors.border, width: 2),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Row(
+        children: List.generate(7, (i) {
+          final selected = _repeatDays.contains(i);
+          return Expanded(
+            child: GestureDetector(
+              onTap: () => setState(() {
+                if (selected) {
+                  _repeatDays.remove(i);
+                } else {
+                  _repeatDays.add(i);
+                }
+              }),
+              child: Container(
+                margin: EdgeInsets.symmetric(horizontal: 2.w),
+                padding: EdgeInsets.symmetric(vertical: 9.h),
+                decoration: BoxDecoration(
+                  color: selected ? AppColors.green : Colors.transparent,
+                  borderRadius: BorderRadius.circular(999),
+                  boxShadow: selected
+                      ? [BoxShadow(color: AppColors.greenDark.withValues(alpha: 0.4), offset: const Offset(0, 3))]
+                      : null,
+                ),
+                child: Text(
+                  _weekdayLabels[i],
+                  textAlign: TextAlign.center,
+                  style: textStyleBold(
+                    fontSize: 11.sp,
+                    color: selected ? Colors.white : AppColors.textSecondary,
+                  ),
+                ),
+              ),
+            ),
+          );
+        }),
+      ),
+    );
+  }
+
   // ── Reward preview ──
   Widget _buildRewardRow() {
     final exp = GameConstants.baseExpReward(_difficulty);
@@ -315,15 +533,118 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
       children: [
         Text(LanKey.reward.tr, style: textStyleBold(fontSize: 13.sp, color: AppColors.textSecondary)),
         const Spacer(),
-        _rewardChip(icon: Icons.bolt_rounded, text: '+$exp XP', bg: AppColors.goldLight),
+        RewardChip(
+          sysMaterial: SysMaterial.SYSMATERIAL_EXP,
+          value: exp,
+        ),
         SizedBox(width: 8.w),
-        _rewardChip(icon: Icons.star_rounded, text: '+$gold', bg: AppColors.goldLight),
+        RewardChip(
+          sysMaterial: SysMaterial.SYSMATERIAL_GOLD,
+          value: gold,
+        ),
       ],
     );
   }
 
   Widget _buildSectionLabel(String text) {
     return Text(text, style: textStyleBold(fontSize: 13.sp, color: AppColors.textSecondary));
+  }
+
+  // ── Tags ──
+  // Single field row: selected tags render as removable chips inside; tapping
+  // expands an inline multi-select below so the sheet itself stays compact.
+  Widget _buildTagField() {
+    return GestureDetector(
+      onTap: () => setState(() => _tagsExpanded = !_tagsExpanded),
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFBF5EA),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: _tags.isNotEmpty ? AppColors.green : AppColors.border,
+            width: 2,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.sell_rounded, size: 16.w, color: AppColors.textSecondary),
+            SizedBox(width: 8.w),
+            Expanded(
+              child: _tags.isEmpty
+                  ? Text(
+                      LanKey.addTags.tr,
+                      style: textStyleRegular(fontSize: 13.sp, color: AppColors.textMuted),
+                    )
+                  : Wrap(
+                      spacing: 6.w,
+                      runSpacing: 6.h,
+                      children: _tags.map(_selectedTagChip).toList(),
+                    ),
+            ),
+            if (_tags.isNotEmpty)
+              Padding(
+                padding: EdgeInsets.only(right: 6.w),
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
+                  decoration: BoxDecoration(
+                    color: AppColors.green,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text(
+                    '${_tags.length}',
+                    style: textStyleBold(fontSize: 11.sp, color: Colors.white),
+                  ),
+                ),
+              ),
+            AnimatedRotation(
+              turns: _tagsExpanded ? 0.5 : 0,
+              duration: const Duration(milliseconds: 200),
+              child: Icon(Icons.expand_more_rounded, size: 22.w, color: AppColors.textMuted),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Inline tag multi-select, revealed below the field when expanded.
+  Widget _buildTagOptions() {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(12.w),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFBF5EA),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.border, width: 1.5),
+      ),
+      child: Wrap(
+        spacing: 8.w,
+        runSpacing: 8.h,
+        children: AppConstants.taskTags.map((tag) {
+          final selected = _tags.contains(tag);
+          return _pill(
+            active: selected,
+            activeBg: AppColors.green,
+            onTap: () => setState(() {
+              if (selected) {
+                _tags.remove(tag);
+              } else {
+                _tags.add(tag);
+              }
+            }),
+            child: Text(
+              '# $tag',
+              style: textStyleBold(
+                fontSize: 12.sp,
+                color: selected ? Colors.white : AppColors.textSecondary,
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
   }
 
   // ── Todo-specific ──
@@ -335,7 +656,7 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
       Row(
         children: [
           Expanded(
-            flex: 3,
+            flex: 2,
             child: GestureDetector(
               onTap: _pickDate,
               child: Container(
@@ -354,7 +675,7 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
                     SizedBox(width: 8.w),
                     Text(
                       _dueDate != null
-                          ? DateFormat('MMM d, yyyy').format((DateTime(_dueDate!.toInt())))
+                          ? DateFormat('MMM d, yyyy').format((DateTime.fromMillisecondsSinceEpoch(_dueDate!.toInt())))
                           : LanKey.pickDate.tr,
                       style: textStyleRegular(
                         fontSize: 12.sp,
@@ -415,11 +736,8 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
   // ── Difficulty pills ──
   Widget _difficultySelector() {
     return Row(
-      children: [
-        TaskDifficulty.TASK_DIFFICULTY_EASY,
-        TaskDifficulty.TASK_DIFFICULTY_MEDIUM,
-        TaskDifficulty.TASK_DIFFICULTY_HARD,
-      ].map((d) {
+      children:
+          TaskDifficulty.values.where((td) => td.value != TaskDifficulty.TASK_DIFFICULTY_UNSPECIFIED.value).map((d) {
         final active = _difficulty == d;
         return Expanded(
           child: Padding(
@@ -429,7 +747,7 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
               activeBg: _diffColor(d),
               onTap: () => setState(() => _difficulty = d),
               child: Text(
-                LanKey.difficultyFor(d).tr,
+                d.difficultyName,
                 textAlign: TextAlign.center,
                 style: textStyleBold(
                   fontSize: 13.sp,
@@ -444,11 +762,16 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
   }
 
   Future<void> _pickDate() async {
-    final dt = await showDatePicker(
+    final dt = await showModalBottomSheet<DateTime>(
       context: context,
-      initialDate: _dueDate == null ? DateTime(_dueDate!.toInt()) : DateTime.now().add(const Duration(days: 1)),
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      isScrollControlled: true,
+      builder: (_) => _DatePickerSheet(
+        initial: _dueDate != null ? DateTime(_dueDate!.toInt()) : null,
+      ),
     );
     if (dt != null) {
       setState(() => _dueDate = Int64(dt.millisecondsSinceEpoch));
@@ -490,20 +813,24 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
     }
   }
 
-  Widget _rewardChip({required IconData icon, required String text, required Color bg}) {
+  Widget _selectedTagChip(String tag) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+      padding: EdgeInsets.only(left: 10.w, right: 4.w),
       decoration: BoxDecoration(
-        color: bg,
-        border: Border.all(color: AppColors.border, width: 1.5),
-        borderRadius: BorderRadius.circular(10),
+        color: AppColors.green,
+        borderRadius: BorderRadius.circular(999),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14.w, color: AppColors.goldDark),
-          SizedBox(width: 3.w),
-          Text(text, style: textStyleBold(fontSize: 12.sp, color: AppColors.textPrimary)),
+          Text('# $tag', style: textStyleBold(fontSize: 11.sp, color: Colors.white)),
+          GestureDetector(
+            onTap: () => setState(() => _tags.remove(tag)),
+            child: Padding(
+              padding: EdgeInsets.all(4.w),
+              child: Icon(Icons.close_rounded, size: 13.w, color: Colors.white70),
+            ),
+          ),
         ],
       ),
     );
@@ -519,7 +846,7 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
         borderRadius: BorderRadius.circular(999),
       ),
       child: Row(
-        children: TaskType.values.map((t) {
+        children: TaskType.values.where((task) => task.value != TaskType.TASK_TYPE_UNSPECIFIED.value).map((t) {
           final active = _type == t;
           return Expanded(
             child: GestureDetector(
@@ -531,7 +858,7 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
-                  LanKey.taskType(t.name).tr,
+                  t.taskName,
                   textAlign: TextAlign.center,
                   style: textStyleBold(
                     fontSize: 13.sp,

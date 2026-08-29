@@ -10,9 +10,10 @@ import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/home/controllers/home_controller.dart';
 import 'package:habit_forge_app/features/quests/pages/task_form_sheet.dart';
-import 'package:habit_forge_app/generated/assets.dart';
+import 'package:habit_forge_app/generated/protos/shared/v1/shared.pbenum.dart';
 import 'package:habit_forge_app/widgets/pressable_button.dart';
 import 'package:habit_forge_app/widgets/task_ticket.dart';
+import 'package:habit_forge_app/widgets/wallet_chip.dart';
 
 class HomePage extends GetView<HomeController> {
   const HomePage({super.key});
@@ -109,9 +110,9 @@ class HomePage extends GetView<HomeController> {
                     ],
                   ),
                 ),
-                _walletChip(gold: true),
+                WalletChip(sysMaterial: SysMaterial.SYSMATERIAL_GOLD),
                 SizedBox(width: 8.w),
-                _walletChip(gold: false),
+                WalletChip(sysMaterial: SysMaterial.SYSMATERIAL_GEM),
               ],
             ),
           ),
@@ -172,7 +173,7 @@ class HomePage extends GetView<HomeController> {
           }),
           // XP / HP
           Padding(
-            padding: EdgeInsets.fromLTRB(24.w, 8.h, 24.w, 18.h),
+            padding: EdgeInsets.fromLTRB(24.w, 18.h, 24.w, 18.h),
             child: Column(
               children: [
                 _hudBar(label: LanKey.xp.tr, color: AppColors.gold, text: _xpText()),
@@ -239,11 +240,10 @@ class HomePage extends GetView<HomeController> {
     return Obx(() {
       final ratio = _ratioFor(label);
       return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SizedBox(
-            width: 34.w,
-            child: Text(label, style: textStyleBold(fontSize: 11.sp, color: AppColors.textSecondary)),
-          ),
+          Text(label, style: textStyleBold(fontSize: 11.sp, color: AppColors.textSecondary)),
+          SizedBox(width: 8.w),
           Expanded(
             child: Container(
               height: 14.h,
@@ -265,7 +265,10 @@ class HomePage extends GetView<HomeController> {
             ),
           ),
           SizedBox(width: 8.w),
-          Text(text, style: textStyleBold(fontSize: 12.sp, color: AppColors.textPrimary)),
+          SizedBox(
+            width: 36.w,
+            child: Text(text, style: textStyleBold(fontSize: 12.sp, color: AppColors.textPrimary)),
+          ),
         ],
       );
     });
@@ -279,34 +282,6 @@ class HomePage extends GetView<HomeController> {
     final level = char?.level ?? 1;
     final needed = GameConstants.expForLevel(level).toDouble();
     return ((char?.currentExp.toInt() ?? 0) / needed).clamp(0.0, 1.0).toDouble();
-  }
-
-  Widget _walletChip({required bool gold}) {
-    return Obx(() {
-      final prefs = NetworkRegistry.ins.userPrefs.value;
-      final value = gold ? prefs?.currentGold ?? 0 : prefs?.currentGems ?? 0;
-      return Container(
-        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 7.h),
-        decoration: BoxDecoration(
-          color: gold ? AppColors.goldLight : const Color(0xFFEAF4FF),
-          border: Border.all(color: AppColors.border, width: 2),
-          borderRadius: BorderRadius.circular(999),
-          boxShadow: const [BoxShadow(color: Color(0xFFE9D9BE), offset: Offset(0, 3))],
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Image.asset(
-              gold ? Assets.imagesSharedIcGold : Assets.imagesSharedIcExp,
-              width: 16.w,
-              height: 16.w,
-            ),
-            SizedBox(width: 5.w),
-            Text('$value', style: textStyleBold(fontSize: 14.sp, color: AppColors.textPrimary)),
-          ],
-        ),
-      );
-    });
   }
 
   String _xpText() {

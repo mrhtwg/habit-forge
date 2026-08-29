@@ -20,17 +20,22 @@ class SysMaterial extends $pb.ProtobufEnum {
   static const SysMaterial SYSMATERIAL_GOLD =
       SysMaterial._(0, _omitEnumNames ? '' : 'SYSMATERIAL_GOLD');
 
-  /// Diamond — premium currency.
-  static const SysMaterial SYSMATERIAL_DIAMOND =
-      SysMaterial._(1, _omitEnumNames ? '' : 'SYSMATERIAL_DIAMOND');
+  /// Gem — earned by completing achievements.
+  static const SysMaterial SYSMATERIAL_GEM =
+      SysMaterial._(1, _omitEnumNames ? '' : 'SYSMATERIAL_GEM');
+
+  /// Exp — earned by completing tasks, can be spent on character upgrades.
+  static const SysMaterial SYSMATERIAL_EXP =
+      SysMaterial._(2, _omitEnumNames ? '' : 'SYSMATERIAL_EXP');
 
   static const $core.List<SysMaterial> values = <SysMaterial>[
     SYSMATERIAL_GOLD,
-    SYSMATERIAL_DIAMOND,
+    SYSMATERIAL_GEM,
+    SYSMATERIAL_EXP,
   ];
 
   static final $core.List<SysMaterial?> _byValue =
-      $pb.ProtobufEnum.$_initByValueList(values, 1);
+      $pb.ProtobufEnum.$_initByValueList(values, 2);
   static SysMaterial? valueOf($core.int value) =>
       value < 0 || value >= _byValue.length ? null : _byValue[value];
 

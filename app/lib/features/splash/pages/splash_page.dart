@@ -27,7 +27,7 @@ class SplashPage extends GetView<SplashController> {
             mainAxisSize: MainAxisSize.min,
             children: [
               FrameSequencePlayer(
-                frames: UserService.to.getCharacterFrame(),
+                frames: UserService.to.getCharacterFrame(UserService.to.initialClass.value),
                 preferredSize: Size(200.h, 220.h),
               ),
               Row(

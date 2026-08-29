@@ -27,6 +27,7 @@ void main() async {
   // Get.put(HapticService());
   // Get.put(ServerAuthService());
   Get.put(UserService(), permanent: true);
+  await UserService.to.init();
 
   // Always register FirebaseAuthService so AuthController can find it.
   // Firebase initialization only happens in firebase storage/auth mode.

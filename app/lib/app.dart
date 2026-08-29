@@ -7,6 +7,7 @@ import 'package:habit_forge_app/core/i18n/app_locale.dart';
 import 'package:habit_forge_app/core/i18n/app_translations.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
+import 'package:habit_forge_app/widgets/toast_widget.dart';
 
 class HabitForgeApp extends StatelessWidget {
   const HabitForgeApp({super.key});
@@ -36,9 +37,17 @@ class HabitForgeApp extends StatelessWidget {
         initialRoute: Routers.splash,
         getPages: AppPages.pages,
         builder: (context, child) {
-          return MediaQuery(
-            data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.0)),
-            child: child ?? const SizedBox(),
+          // App-wide Toast overlay sits above the Navigator (and above any
+          // bottom sheet / dialog), so Toast.show works without a context.
+          return Stack(
+            textDirection: TextDirection.ltr,
+            children: [
+              MediaQuery(
+                data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.0)),
+                child: child ?? const SizedBox(),
+              ),
+              ToastOverlay.mount(),
+            ],
           );
         },
       ),
