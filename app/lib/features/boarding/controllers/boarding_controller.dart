@@ -1,5 +1,6 @@
 import 'package:carousel_slider/carousel_controller.dart';
 import 'package:get/get.dart';
+import 'package:habit_forge_app/core/network/network_interface.dart';
 import 'package:habit_forge_app/core/network/network_registry.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
@@ -26,12 +27,13 @@ class BoardingController extends GetxController {
     );
 
     if (firstHabitTitle.value.isNotEmpty) {
-      final task = Task(
-        title: firstHabitTitle.value,
-        type: TaskType.TASK_TYPE_HABIT,
-        difficulty: TaskDifficulty.TASK_DIFFICULTY_EASY,
+      await NetworkRegistry.ins.createTask(
+        CreateTaskParams(
+          title: firstHabitTitle.value,
+          type: TaskType.TASK_TYPE_HABIT,
+          difficulty: TaskDifficulty.TASK_DIFFICULTY_EASY,
+        ),
       );
-      await NetworkRegistry.ins.createTask(task);
     }
 
     Get.offNamed(Routers.main);

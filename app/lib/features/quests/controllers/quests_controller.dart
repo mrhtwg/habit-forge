@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:habit_forge_app/core/network/network_interface.dart';
 import 'package:habit_forge_app/core/network/network_registry.dart';
 import 'package:habit_forge_app/core/services/audio_service.dart';
 import 'package:habit_forge_app/core/services/haptic_service.dart';
@@ -28,21 +29,21 @@ class QuestsController extends GetxController {
     return list.toList();
   }
 
-  void createTask(Task task) {
-    NetworkRegistry.ins.createTask(task);
+  Future<void> createTask(CreateTaskParams params) async {
+    await NetworkRegistry.ins.createTask(params);
   }
 
-  void deleteTask(String id) {
-    _hive.deleteTask(id);
+  Future<void> deleteTask(String id) async {
+    await _hive.deleteTask(id);
   }
 
-  void onTaskPostpone(Task task) {
-    _hive.postponeTask(task);
+  Future<void> onTaskPostpone(Task task) async {
+    await _hive.postponeTask(task.id);
   }
 
   Future<void> toggleComplete(Task task) async {
     if (task.isCompleted) return;
-    final result = await _hive.completeTask(task);
+    final result = await _hive.completeTask(task.id);
 
     // Trigger audio/haptic feedback
     final audio = Get.find<AudioService>();
@@ -61,11 +62,11 @@ class QuestsController extends GetxController {
     }
   }
 
-  void toggleSkip(Task task) {
-    _hive.skipTask(task);
+  Future<void> toggleSkip(Task task) async {
+    await _hive.skipTask(task.id);
   }
 
-  void updateTask(Task task) {
-    _hive.updateTask(task);
+  Future<void> updateTask(String id, CreateTaskParams params) async {
+    await _hive.updateTask(id, params);
   }
 }

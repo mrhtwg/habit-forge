@@ -1,8 +1,11 @@
+import 'package:fixnum/fixnum.dart';
 import 'package:get/get.dart';
 import 'package:grpc/grpc.dart';
 import 'package:habit_forge_app/core/constants/env_constants.dart';
 import 'package:habit_forge_app/core/network/api_response.dart';
+import 'package:habit_forge_app/core/network/grpc/character_api.dart';
 import 'package:habit_forge_app/core/network/network_interface.dart';
+import 'package:habit_forge_app/core/storage/catalog.dart';
 import 'package:habit_forge_app/core/storage/game_logic.dart';
 import 'package:habit_forge_app/generated/protos/achievement/v1/achievement.pbgrpc.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pbgrpc.dart';
@@ -10,7 +13,6 @@ import 'package:habit_forge_app/generated/protos/shop/v1/shop.pbgrpc.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.pbgrpc.dart';
 import 'package:habit_forge_app/generated/protos/user/v1/user.pbgrpc.dart';
 import 'package:hive/hive.dart';
-import 'package:uuid/uuid.dart';
 
 /// gRPC-backed storage (server mode). Talks to the self-hosted Go backend,
 /// which owns the game logic (rewards, level-ups, purchases...).
@@ -20,7 +22,8 @@ import 'package:uuid/uuid.dart';
 ///
 /// Note: the backend business logic is not implemented yet (its methods return
 /// 501), so gRPC calls currently fail at runtime until `server/internal/biz`
-/// is filled in.
+/// is filled in. Every call degrades to an [ApiResponse.failure] instead of
+/// crashing the UI.
 class NetworkServerImpl implements NetworkInterface {
   final userPrefs = Rxn<UserPrefs>();
   final character = Rxn<Character>();
@@ -40,22 +43,16 @@ class NetworkServerImpl implements NetworkInterface {
   bool _loggedIn = false;
 
   @override
+  List<Achievement> get achievementDefs => GameCatalog.achievementDefs;
+
+  @override
   String get authMethod => 'server';
 
   @override
   String? get authToken => _token;
 
   @override
-  Future<void> addGems(int amount) async {
-    final prefs = userPrefs.value ?? UserPrefs();
-    saveUserPrefs(GameLogic.addGems(prefs, amount));
-  }
-
-  @override
-  Future<void> addGold(int amount) async {
-    final prefs = userPrefs.value ?? UserPrefs();
-    saveUserPrefs(GameLogic.addGold(prefs, amount));
-  }
+  List<ShopItem> get shopItems => GameCatalog.shopItems;
 
   @override
   Future<bool> allocateStatPoint(StatType stat) async {
@@ -65,8 +62,8 @@ class NetworkServerImpl implements NetworkInterface {
   }
 
   @override
-  Future<TaskCompleteResult> completeTask(Task task) async {
-    final reply = await _task.completeTask(CompleteTaskRequest(id: task.id));
+  Future<TaskCompleteResult> completeTask(String id) async {
+    final reply = await _task.completeTask(CompleteTaskRequest(id: id));
     tasks.value = [for (final t in tasks) t.id == reply.task.id ? reply.task : t];
     // Sync wallet / character from the backend (the reply carries the rewards).
     await refreshAll();
@@ -78,23 +75,46 @@ class NetworkServerImpl implements NetworkInterface {
   }
 
   // ── Character operations ──
+
   @override
   Future<ApiResponse<GetCharacterReply>> createCharacter(CharacterClass characterClass) async {
-    character.value = Character(characterClass: characterClass);
-    _character.updateCharacter(UpdateCharacterRequest(character: character.value)).ignore();
-    return ApiResponse.success(GetCharacterReply(character: Character()), 'Character created');
+    try {
+      await _character.createCharacter(CreateCharacterRequest(characterClass: characterClass));
+      final reply = await _character.getCharacter(GetCharacterRequest());
+      return ApiResponse.success(reply, 'Character created');
+    } on Exception catch (e) {
+      return ApiResponse.fromException(e);
+    }
   }
 
   // ── Task operations ──
+
   @override
-  String createTask(Task task) {
-    final id = task.id.isEmpty ? const Uuid().v4() : task.id;
-    _task.createTask(CreateTaskRequest(task: task..id = id)).ignore();
-    return id;
+  Future<ApiResponse<Task>> createTask(CreateTaskParams params) async {
+    if (params.title.trim().isEmpty) {
+      return ApiResponse.failure(code: 400, message: 'Title is required');
+    }
+    final task = Task(
+      title: params.title.trim(),
+      description: params.description?.trim().isNotEmpty == true ? params.description!.trim() : null,
+      type: params.type,
+      difficulty: params.difficulty,
+      tags: params.tags,
+      dueDate: params.dueDate ?? Int64.ZERO,
+      repeatDays: params.repeatDays,
+      priority: params.priority,
+      hpPenalty: params.hpPenalty,
+    );
+    try {
+      final reply = await _task.createTask(CreateTaskRequest(task: task));
+      return ApiResponse.success(reply.task, 'Task created');
+    } on Exception catch (e) {
+      return ApiResponse.fromException(e);
+    }
   }
 
   @override
-  void deleteTask(String id) {
+  Future<void> deleteTask(String id) async {
     _task.deleteTask(DeleteTaskRequest(id: id)).ignore();
   }
 
@@ -106,6 +126,10 @@ class NetworkServerImpl implements NetworkInterface {
     final updated = GameLogic.equip(char, slot, itemId);
     character.value = updated;
     _character.updateCharacter(UpdateCharacterRequest(character: updated)).ignore();
+  }
+
+  Future<ApiResponse<GetCharacterReply>> getCharacter() async {
+    return await CharacterApi().getCharacter();
   }
 
   @override
@@ -123,9 +147,6 @@ class NetworkServerImpl implements NetworkInterface {
     _shop = ShopServiceClient(_channel, interceptors: [auth]);
     _achievement = AchievementServiceClient(_channel, interceptors: [auth]);
 
-    // Restore the persisted session token (if any).
-    final box = await Hive.openBox('userBox');
-    _token = box.get('serverToken') as String?;
     _loggedIn = _token != null && _token!.isNotEmpty;
     if (_loggedIn) {
       await refreshAll();
@@ -133,24 +154,39 @@ class NetworkServerImpl implements NetworkInterface {
     return this;
   }
 
-  Future<Character?> loadCharacter() async {
-    final char = await _character.getCharacter(GetCharacterRequest());
-    character.value = char.character;
-    return character.value;
+  @override
+  Future<void> postponeTask(String id) async {
+    final task = _findTask(id);
+    if (task == null) return;
+    await updateTask(
+      id,
+      CreateTaskParams(
+        title: task.title,
+        description: task.description,
+        type: task.type,
+        difficulty: task.difficulty,
+        tags: task.tags,
+        dueDate: task.dueDate == Int64.ZERO ? null : task.dueDate,
+        repeatDays: task.repeatDays,
+        priority: task.priority,
+        hpPenalty: task.hpPenalty,
+      ),
+    );
   }
 
-  @override
-  void postponeTask(Task task) => updateTask(GameLogic.postpone(task));
-
   // ── Economy ──
+
   @override
-  Future<bool> purchaseItem(String itemId, int price, {ShopCurrency currency = ShopCurrency.SHOP_CURRENCY_GOLD}) async {
+  Future<ApiResponse<BuyItemReply>> purchaseItem(
+    String itemId, {
+    ShopCurrency currency = ShopCurrency.SHOP_CURRENCY_GOLD,
+  }) async {
     try {
       final reply = await _shop.buyItem(BuyItemRequest(itemId: itemId, currency: currency));
       await refreshAll();
-      return reply.item.id.isNotEmpty;
-    } catch (_) {
-      return false;
+      return ApiResponse.success(reply, 'Purchase successful');
+    } on Exception catch (e) {
+      return ApiResponse.fromException(e);
     }
   }
 
@@ -161,8 +197,6 @@ class NetworkServerImpl implements NetworkInterface {
     // these calls start working once server/internal/biz is filled in.
     final prefs = await _user.getPrefs(GetPrefsRequest());
     userPrefs.value = prefs.prefs;
-    // final char = await _character.getCharacter(GetCharacterRequest());
-    // character.value = char.character;
     final list = await _task.listTasks(ListTasksRequest());
     tasks.value = list.tasks;
     final owned = await _shop.listOwnedItems(ListOwnedItemsRequest());
@@ -171,6 +205,35 @@ class NetworkServerImpl implements NetworkInterface {
     achievements.value = ach.achievements;
     final deal = await _shop.getDailyDeal(GetDailyDealRequest());
     dailyDeal.value = deal.deal;
+  }
+
+  @override
+  Future<DailyDeal> refreshDailyDeal() async {
+    try {
+      final reply = await _shop.getDailyDeal(GetDailyDealRequest());
+      if (reply.hasDeal()) {
+        dailyDeal.value = reply.deal;
+        return reply.deal;
+      }
+    } on Exception {
+      // Backend not available yet — fall back to a local deal.
+    }
+    final saved = dailyDeal.value;
+    if (saved != null && DateTime(saved.expiresAt.toInt()).isAfter(DateTime.now())) {
+      return saved;
+    }
+    final now = DateTime.now();
+    final endOfDay = DateTime(now.year, now.month, now.day, 23, 59, 59);
+    final expiresAt = now.isAfter(endOfDay)
+        ? DateTime(now.year, now.month, now.day, 23, 59, 59).add(const Duration(days: 1))
+        : endOfDay;
+    final deal = DailyDeal(
+      itemId: 'staff_arcane',
+      discountPercent: 40,
+      expiresAt: Int64(expiresAt.millisecondsSinceEpoch),
+    );
+    dailyDeal.value = deal;
+    return deal;
   }
 
   @override
@@ -195,23 +258,11 @@ class NetworkServerImpl implements NetworkInterface {
   }
 
   // ── Auth ──
+
   @override
   void saveAuthToken(String? token) {
     _token = token;
     Hive.box('userBox').put('serverToken', token);
-  }
-
-  @override
-  void saveDailyDeal(DailyDeal deal) {
-    dailyDeal.value = deal;
-    // TODO(server): daily deals are server-owned; a local override is not supported.
-  }
-
-  // ── User prefs / deal ──
-  @override
-  void saveUserPrefs(UserPrefs prefs) {
-    userPrefs.value = prefs;
-    _user.updatePrefs(UpdatePrefsRequest(prefs: prefs)).ignore();
   }
 
   @override
@@ -223,7 +274,12 @@ class NetworkServerImpl implements NetworkInterface {
   }
 
   @override
-  void skipTask(Task task) => updateTask(GameLogic.skip(task));
+  Future<void> skipTask(String id) async {
+    final task = _findTask(id);
+    if (task == null) return;
+    final updated = GameLogic.skip(task);
+    _task.updateTask(UpdateTaskRequest(id: id, task: updated)).ignore();
+  }
 
   @override
   Future<void> takeDamage(int amount) async {
@@ -236,17 +292,26 @@ class NetworkServerImpl implements NetworkInterface {
     _character.updateCharacter(UpdateCharacterRequest(character: updated)).ignore();
   }
 
-  // ── Achievements ──
   @override
-  Future<bool> unlockAchievement(Achievement def) async {
-    final reply = await _achievement.unlock(UnlockRequest(id: def.id));
-    await refreshAll();
-    return reply.achievement.isUnlocked;
+  Future<ApiResponse<Task>> updateTask(String id, CreateTaskParams params) async {
+    final current = _findTask(id);
+    if (current == null) {
+      return ApiResponse.failure(code: 404, message: 'Task not found');
+    }
+    final updated = params.applyTo(current);
+    try {
+      final reply = await _task.updateTask(UpdateTaskRequest(id: id, task: updated));
+      return ApiResponse.success(reply.task, 'Task updated');
+    } on Exception catch (e) {
+      return ApiResponse.fromException(e);
+    }
   }
 
-  @override
-  void updateTask(Task task) {
-    _task.updateTask(UpdateTaskRequest(id: task.id, task: task)).ignore();
+  Task? _findTask(String id) {
+    for (final t in tasks) {
+      if (t.id == id) return t;
+    }
+    return null;
   }
 
   /// Parses "host:port" (or "http://host:port") into a (host, port) record.

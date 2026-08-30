@@ -127,8 +127,8 @@ class ItemDetailSheet extends StatelessWidget {
       showPrice = false;
     } else {
       onTap = () async {
-        final success = await controller.purchase(item);
-        if (success) Get.back();
+        final result = await controller.purchase(item);
+        if (result.isSuccess) Get.back();
       };
       bg = AppColors.gold;
       fg = AppColors.textPrimary;

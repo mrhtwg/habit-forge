@@ -1,14 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_forge_app/app.dart';
+import 'package:habit_forge_app/core/common/utils/log.dart';
 import 'package:habit_forge_app/core/common/utils/sp_utils.dart';
 import 'package:habit_forge_app/core/constants/env_constants.dart';
+import 'package:habit_forge_app/core/di/injection_container.dart';
 import 'package:habit_forge_app/core/network/network_bootstrap.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 void main() async {
+  // Must come first: SpUtils.init() and any plugin channel call require an
+  // initialized binding.
   WidgetsFlutterBinding.ensureInitialized();
+
+  // App-wide logging (only in debug builds by default).
+  Log.init();
+
+  // Register the GetIt service locator (SpUtils and friends).
+  configureDependencies();
 
   registerNetworkMode(EnvConstants.networkMode);
 

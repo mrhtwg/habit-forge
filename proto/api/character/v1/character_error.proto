@@ -11,4 +11,5 @@ enum CharacterErrorReason {
   option (errors.default_code) = 500;
 
   CHARACTER_ALREADY_EXISTS = 0 [(errors.code) = 409];
+  CHARACTER_NOT_FOUND = 1 [(errors.code) = 404];
 }

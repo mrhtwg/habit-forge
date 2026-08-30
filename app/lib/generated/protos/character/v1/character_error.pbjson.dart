@@ -20,6 +20,7 @@ const CharacterErrorReason$json = {
   '1': 'CharacterErrorReason',
   '2': [
     {'1': 'CHARACTER_ALREADY_EXISTS', '2': 0, '3': {}},
+    {'1': 'CHARACTER_NOT_FOUND', '2': 1, '3': {}},
   ],
   '3': {},
 };
@@ -27,4 +28,4 @@ const CharacterErrorReason$json = {
 /// Descriptor for `CharacterErrorReason`. Decode as a `google.protobuf.EnumDescriptorProto`.
 final $typed_data.Uint8List characterErrorReasonDescriptor = $convert.base64Decode(
     'ChRDaGFyYWN0ZXJFcnJvclJlYXNvbhIiChhDSEFSQUNURVJfQUxSRUFEWV9FWElTVFMQABoEqE'
-    'WZAxoEoEX0Aw==');
+    'WZAxIdChNDSEFSQUNURVJfTk9UX0ZPVU5EEAEaBKhFlAMaBKBF9AM=');

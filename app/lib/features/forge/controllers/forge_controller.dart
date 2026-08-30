@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:fixnum/fixnum.dart';
 import 'package:get/get.dart';
+import 'package:habit_forge_app/core/network/api_response.dart';
 import 'package:habit_forge_app/core/network/network_registry.dart';
 import 'package:habit_forge_app/generated/protos/shop/v1/shop.pb.dart';
 import 'package:habit_forge_app/generated/protos/user/v1/user.pb.dart';
@@ -16,63 +16,8 @@ class ForgeController extends GetxController {
 
   Timer? _countdownTimer;
 
-  // All available shop items (hardcoded MVP items)
-  final allItems = <ShopItem>[
-    ShopItem(
-      id: 'sword_flame',
-      name: 'Flame Sword',
-      description: 'A sword wreathed in eternal flame',
-      price: Int64(500),
-      category: 'equipment',
-      rarity: 'epic',
-      glbAssetPath: null,
-    ),
-    ShopItem(
-      id: 'armor_golden',
-      name: 'Golden Armor',
-      description: 'Shining golden plate armor',
-      price: Int64(300),
-      category: 'equipment',
-      rarity: 'rare',
-      glbAssetPath: null,
-    ),
-    ShopItem(
-      id: 'helm_dragon',
-      name: 'Dragon Helm',
-      description: 'Helm forged from dragon scales',
-      price: Int64(250),
-      category: 'equipment',
-      rarity: 'rare',
-      glbAssetPath: null,
-    ),
-    ShopItem(
-      id: 'cloak_shadow',
-      name: 'Shadow Cloak',
-      description: 'Cloak woven from shadow',
-      price: Int64(150),
-      category: 'appearance',
-      rarity: 'common',
-      glbAssetPath: null,
-    ),
-    ShopItem(
-      id: 'amulet_star',
-      name: 'Star Amulet',
-      description: 'Amulet that glows like starlight',
-      price: Int64(200),
-      category: 'appearance',
-      rarity: 'common',
-      glbAssetPath: null,
-    ),
-    ShopItem(
-      id: 'staff_arcane',
-      name: 'Arcane Staff',
-      description: 'A staff crackling with arcane energy',
-      price: Int64(350),
-      category: 'equipment',
-      rarity: 'epic',
-      glbAssetPath: null,
-    ),
-  ];
+  // Shop catalog is served by the storage layer (simulating a backend).
+  List<ShopItem> get allItems => _hive.shopItems;
 
   int get currentGold => _hive.userPrefs.value?.currentGold.toInt() ?? 0;
 
@@ -118,29 +63,14 @@ class ForgeController extends GetxController {
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (_) => _updateCountdown());
   }
 
-  /// Returns true if the purchase was successful (delegated to the storage layer).
-  Future<bool> purchase(ShopItem item) {
-    return _hive.purchaseItem(item.id, item.price.toInt(), currency: ShopCurrency.SHOP_CURRENCY_GOLD);
+  /// Delegates the purchase to the storage layer, which validates the balance,
+  /// charges the wallet and marks the item as owned.
+  Future<ApiResponse<BuyItemReply>> purchase(ShopItem item) {
+    return _hive.purchaseItem(item.id);
   }
 
-  void _initDailyDeal() {
-    final saved = _hive.dailyDeal.value;
-    if (saved != null && DateTime(saved.expiresAt.toInt()).isAfter(DateTime.now())) {
-      dailyDeal.value = saved;
-      return;
-    }
-    final now = DateTime.now();
-    final endOfDay = DateTime(now.year, now.month, now.day, 23, 59, 59);
-    final expiresAt = now.isAfter(endOfDay)
-        ? DateTime(now.year, now.month, now.day, 23, 59, 59).add(const Duration(days: 1))
-        : endOfDay;
-    final deal = DailyDeal(
-      itemId: 'staff_arcane',
-      discountPercent: 40,
-      expiresAt: Int64(expiresAt.millisecondsSinceEpoch),
-    );
-    dailyDeal.value = deal;
-    _hive.saveDailyDeal(deal);
+  Future<void> _initDailyDeal() async {
+    dailyDeal.value = await _hive.refreshDailyDeal();
   }
 
   void _updateCountdown() {

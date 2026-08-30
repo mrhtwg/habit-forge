@@ -6,6 +6,7 @@ import 'package:habit_forge_app/core/constants/app_constants.dart';
 import 'package:habit_forge_app/core/constants/game_constants.dart';
 import 'package:habit_forge_app/core/extensions/task_extensions.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
+import 'package:habit_forge_app/core/network/network_interface.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/quests/controllers/quests_controller.dart';
@@ -392,9 +393,9 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
                     return;
                   }
 
-                  // final now = DateTime.now();
-                  final task = Task(
-                    id: widget.task?.id ?? '',
+                  // Only the caller-known fields travel to the storage layer;
+                  // ids, timestamps and rewards are owned by the implementation.
+                  final params = CreateTaskParams(
                     title: _titleCtrl.text.trim(),
                     description: _descCtrl.text.trim().isNotEmpty ? _descCtrl.text.trim() : null,
                     type: _type,
@@ -404,13 +405,11 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
                     repeatDays: _type == TaskType.TASK_TYPE_DAILY ? _repeatDays : [],
                     priority: _type == TaskType.TASK_TYPE_TODO ? _priority : '',
                     hpPenalty: _type == TaskType.TASK_TYPE_DAILY ? _hpPenalty : 10,
-                    // createdAt: widget.task?.createdAt ?? now,
-                    // updatedAt: isEdit ? now : null,
                   );
                   if (isEdit) {
-                    ctrl.updateTask(task);
+                    ctrl.updateTask(widget.task!.id, params);
                   } else {
-                    ctrl.createTask(task);
+                    ctrl.createTask(params);
                   }
                   Get.back();
                 },

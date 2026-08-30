@@ -51,7 +51,7 @@ class UserService extends GetxService {
   bool isLoggedIn() => token.value.isNotEmpty;
 
   Future<bool> loadCharacter() async {
-    character.value = await NetworkRegistry.ins.loadCharacter();
+    final result = await NetworkRegistry.ins.getCharacter();
     if (character.value == null) {
       return false;
     }

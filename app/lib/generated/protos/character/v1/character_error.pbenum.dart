@@ -19,13 +19,16 @@ class CharacterErrorReason extends $pb.ProtobufEnum {
   static const CharacterErrorReason CHARACTER_ALREADY_EXISTS =
       CharacterErrorReason._(
           0, _omitEnumNames ? '' : 'CHARACTER_ALREADY_EXISTS');
+  static const CharacterErrorReason CHARACTER_NOT_FOUND =
+      CharacterErrorReason._(1, _omitEnumNames ? '' : 'CHARACTER_NOT_FOUND');
 
   static const $core.List<CharacterErrorReason> values = <CharacterErrorReason>[
     CHARACTER_ALREADY_EXISTS,
+    CHARACTER_NOT_FOUND,
   ];
 
   static final $core.List<CharacterErrorReason?> _byValue =
-      $pb.ProtobufEnum.$_initByValueList(values, 0);
+      $pb.ProtobufEnum.$_initByValueList(values, 1);
   static CharacterErrorReason? valueOf($core.int value) =>
       value < 0 || value >= _byValue.length ? null : _byValue[value];
 

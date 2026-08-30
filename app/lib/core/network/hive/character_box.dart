@@ -44,4 +44,9 @@ class CharacterBox {
   Future init() async {
     _characterBox = await Hive.openBox(_boxKey);
   }
+
+  /// Persists the current character state (level, stats, HP, equipment...).
+  Future<void> save(Character c) async {
+    _characterBox.put(_characterKey, c.writeToBuffer());
+  }
 }

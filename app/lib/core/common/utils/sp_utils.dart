@@ -1,19 +1,21 @@
 import 'package:fixnum/fixnum.dart';
+import 'package:habit_forge_app/core/di/injection_container.dart';
+import 'package:injectable/injectable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// SharedPreferences-backed key/value store.
+///
+/// Registered as a singleton in the GetIt container (see
+/// `core/di/injection_container.dart`); access it via [SpUtils.ins] or
+/// `getIt<SpUtils>()`. Call [SpUtils.init] once at startup so the backing
+/// [SharedPreferences] instance is ready before first use.
+@singleton
 class SpUtils {
-  static SpUtils? _instance;
+  static SpUtils get ins => getIt<SpUtils>();
 
-  static SharedPreferences? _prefs;
+  SharedPreferences? _prefs;
 
-  static SpUtils get ins {
-    if (_instance == null) {
-      _instance = SpUtils._();
-    }
-    return _instance!;
-  }
-
-  SpUtils._();
+  SpUtils();
 
   Future<void> clear() async {
     await _prefs?.clear();
@@ -64,6 +66,6 @@ class SpUtils {
   }
 
   static Future<void> init() async {
-    _prefs = await SharedPreferences.getInstance();
+    getIt<SpUtils>()._prefs ??= await SharedPreferences.getInstance();
   }
 }

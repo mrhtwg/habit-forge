@@ -33,7 +33,7 @@ class HomeController extends GetxController {
   }
 
   void onTaskComplete(Task task) {
-    _hive.completeTask(task);
+    _hive.completeTask(task.id);
   }
 
   void onTaskDelete(String id) {
@@ -41,10 +41,10 @@ class HomeController extends GetxController {
   }
 
   void onTaskPostpone(Task task) {
-    _hive.postponeTask(task);
+    _hive.postponeTask(task.id);
   }
 
   void onTaskSkip(Task task) {
-    _hive.skipTask(task);
+    _hive.skipTask(task.id);
   }
 }

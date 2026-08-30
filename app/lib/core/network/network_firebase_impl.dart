@@ -6,9 +6,11 @@ import 'package:fixnum/fixnum.dart';
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/network/api_response.dart';
 import 'package:habit_forge_app/core/network/network_interface.dart';
+import 'package:habit_forge_app/core/storage/catalog.dart';
 import 'package:habit_forge_app/core/storage/game_logic.dart';
 import 'package:habit_forge_app/generated/protos/achievement/v1/achievement.pb.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart';
+import 'package:habit_forge_app/generated/protos/character/v1/character_error.pbenum.dart';
 import 'package:habit_forge_app/generated/protos/shop/v1/shop.pb.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';
 import 'package:habit_forge_app/generated/protos/user/v1/user.pb.dart';
@@ -17,7 +19,8 @@ import 'package:uuid/uuid.dart';
 /// Firestore-backed storage (firebase mode).
 ///
 /// Game logic runs locally through [GameLogic]; results are persisted per
-/// authenticated user in Firestore and mirrored into reactive state.
+/// authenticated user in Firestore and mirrored into reactive state. All
+/// mutations happen inside this class — the UI only calls intent methods.
 class NetworkFirebaseImpl implements NetworkInterface {
   final userPrefs = Rxn<UserPrefs>();
   final character = Rxn<Character>();
@@ -29,26 +32,20 @@ class NetworkFirebaseImpl implements NetworkInterface {
   List<StreamSubscription<Object?>> _subscriptions = [];
 
   @override
+  List<Achievement> get achievementDefs => GameCatalog.achievementDefs;
+
+  @override
   String get authMethod => 'firebase';
 
   @override
   String? get authToken => null;
 
+  @override
+  List<ShopItem> get shopItems => GameCatalog.shopItems;
+
   // Firebase manages its own session — auth state derives from FirebaseAuth.
 
   String? get _uid => FirebaseAuth.instance.currentUser?.uid;
-
-  @override
-  Future<void> addGems(int amount) async {
-    final prefs = userPrefs.value ?? UserPrefs();
-    await _savePrefs(GameLogic.addGems(prefs, amount));
-  }
-
-  @override
-  Future<void> addGold(int amount) async {
-    final prefs = userPrefs.value ?? UserPrefs();
-    await _savePrefs(GameLogic.addGold(prefs, amount));
-  }
 
   @override
   Future<bool> allocateStatPoint(StatType stat) async {
@@ -59,15 +56,20 @@ class NetworkFirebaseImpl implements NetworkInterface {
   }
 
   @override
-  Future<TaskCompleteResult> completeTask(Task task) async {
+  Future<TaskCompleteResult> completeTask(String id) async {
+    final task = _findTask(id);
+    if (task == null) {
+      return const TaskCompleteResult(expGained: 0, goldGained: 0);
+    }
     final completed = GameLogic.completeTask(task);
-    await _col('tasks').doc(task.id).set(completed.writeToJsonMap());
+    await _col('tasks').doc(id).set(completed.writeToJsonMap());
 
-    final exp = GameLogic.expReward(task);
-    final gold = GameLogic.goldReward(task);
+    final exp = GameLogic.expReward(completed);
+    final gold = GameLogic.goldReward(completed);
 
-    final prefs = userPrefs.value ?? UserPrefs();
-    await _savePrefs(GameLogic.addGold(GameLogic.addCompletedTask(prefs), gold));
+    var prefs = userPrefs.value ?? UserPrefs();
+    prefs = GameLogic.addGold(GameLogic.addCompletedTask(prefs), gold);
+    await _savePrefs(prefs);
 
     var newLevel = -1;
     final char = character.value;
@@ -76,33 +78,69 @@ class NetworkFirebaseImpl implements NetworkInterface {
       await _saveCharacter(updated);
       newLevel = level;
     }
+
+    await _checkAchievements(
+      tasksCompleted: prefs.totalTasksCompleted.toInt(),
+      streak: completed.streak,
+      level: character.value?.level ?? 0,
+    );
+
     return TaskCompleteResult(expGained: exp, goldGained: gold, newLevel: newLevel > 0 ? newLevel : null);
   }
 
   // ── Character operations ──
+
   @override
   Future<ApiResponse<GetCharacterReply>> createCharacter(CharacterClass characterClass) async {
-    await _saveCharacter(Character(characterClass: characterClass));
-    return ApiResponse.success(GetCharacterReply(character: Character()), 'Character created');
+    final c = Character()..characterClass = characterClass;
+    await _saveCharacter(c);
+    return ApiResponse.success(GetCharacterReply(character: c), 'Character created');
   }
 
   // ── Task operations ──
+
   @override
-  String createTask(Task task) {
-    final id = task.id.isEmpty ? const Uuid().v4() : task.id;
-    _col('tasks').doc(id).set((task..id = id).writeToJsonMap()).ignore();
-    return id;
+  Future<ApiResponse<Task>> createTask(CreateTaskParams params) async {
+    if (params.title.trim().isEmpty) {
+      return ApiResponse.failure(code: 400, message: 'Title is required');
+    }
+    final now = Int64(DateTime.now().millisecondsSinceEpoch);
+    final task = Task(
+      id: const Uuid().v4(),
+      title: params.title.trim(),
+      description: params.description?.trim().isNotEmpty == true ? params.description!.trim() : null,
+      type: params.type,
+      difficulty: params.difficulty,
+      tags: params.tags,
+      dueDate: params.dueDate ?? Int64.ZERO,
+      repeatDays: params.repeatDays,
+      priority: params.priority,
+      hpPenalty: params.hpPenalty,
+      createdAt: now,
+      updatedAt: now,
+    );
+    await _col('tasks').doc(task.id).set(task.writeToJsonMap());
+    return ApiResponse.success(task, 'Task created');
   }
 
   @override
-  void deleteTask(String id) {
-    _col('tasks').doc(id).delete().ignore();
+  Future<void> deleteTask(String id) async {
+    await _col('tasks').doc(id).delete();
   }
 
   @override
   void equipItem(String itemId, {String slot = 'weapon'}) {
     final char = character.value;
     if (char != null) _saveCharacter(GameLogic.equip(char, slot, itemId));
+  }
+
+  Future<ApiResponse<GetCharacterReply>> getCharacter() async {
+    return ApiResponse.fromGrpcError(
+      CharacterErrorReason.CHARACTER_NOT_FOUND.value,
+      'Character not found',
+      errorReasonValue: null,
+      reason: null,
+    );
   }
 
   @override
@@ -113,24 +151,40 @@ class NetworkFirebaseImpl implements NetworkInterface {
     return this;
   }
 
-  Future<Character?> loadCharacter() async {
-    final char = await _col('character').doc('self').get();
-    character.value = char.exists ? (Character()..mergeFromJsonMap(char.data() ?? {})) : null;
-    return character.value;
+  @override
+  Future<void> postponeTask(String id) async {
+    final task = _findTask(id);
+    if (task == null) return;
+    await _col('tasks').doc(id).set(GameLogic.postpone(task).writeToJsonMap());
   }
 
-  @override
-  void postponeTask(Task task) => updateTask(GameLogic.postpone(task));
-
   // ── Economy ──
+
   @override
-  Future<bool> purchaseItem(String itemId, int price, {ShopCurrency currency = ShopCurrency.SHOP_CURRENCY_GOLD}) async {
+  Future<ApiResponse<BuyItemReply>> purchaseItem(
+    String itemId, {
+    ShopCurrency currency = ShopCurrency.SHOP_CURRENCY_GOLD,
+  }) async {
+    final item = GameCatalog.shopItems.where((i) => i.id == itemId).firstOrNull;
+    if (item == null) {
+      return ApiResponse.failure(code: 404, message: 'Item not found');
+    }
+    if (ownedItemIds.contains(itemId)) {
+      return ApiResponse.failure(code: 409, message: 'Item already owned');
+    }
     final prefs = userPrefs.value ?? UserPrefs();
-    if (prefs.currentGold < price) return false;
-    if (ownedItemIds.contains(itemId)) return false;
-    await _savePrefs(GameLogic.addGold(prefs, -price));
+    if (prefs.currentGold < item.price) {
+      return ApiResponse.failure(code: 400, message: 'Not enough gold');
+    }
+
+    await _savePrefs(GameLogic.addGold(prefs, -item.price.toInt()));
     await _addOwnedItem(itemId);
-    return true;
+    await _checkAchievements(purchases: 1);
+
+    return ApiResponse.success(
+      BuyItemReply(item: item, balance: (userPrefs.value ?? UserPrefs()).currentGold),
+      'Purchase successful',
+    );
   }
 
   @override
@@ -139,9 +193,6 @@ class NetworkFirebaseImpl implements NetworkInterface {
 
     final prefs = await _col('prefs').doc('self').get();
     userPrefs.value = prefs.exists ? (UserPrefs()..mergeFromJsonMap(prefs.data() ?? {})) : UserPrefs();
-
-    // final char = await _col('character').doc('self').get();
-    // character.value = char.exists ? (Character()..mergeFromJsonMap(char.data() ?? {})) : null;
 
     final tasksSnap = await _col('tasks').get();
     tasks.value = tasksSnap.docs.map((d) => Task()..mergeFromJsonMap(d.data())).toList();
@@ -154,6 +205,27 @@ class NetworkFirebaseImpl implements NetworkInterface {
 
     final deal = await _col('shop').doc('dailyDeal').get();
     dailyDeal.value = deal.exists ? (DailyDeal()..mergeFromJsonMap(deal.data() ?? {})) : null;
+  }
+
+  @override
+  Future<DailyDeal> refreshDailyDeal() async {
+    final saved = dailyDeal.value;
+    if (saved != null && DateTime(saved.expiresAt.toInt()).isAfter(DateTime.now())) {
+      return saved;
+    }
+    final now = DateTime.now();
+    final endOfDay = DateTime(now.year, now.month, now.day, 23, 59, 59);
+    final expiresAt = now.isAfter(endOfDay)
+        ? DateTime(now.year, now.month, now.day, 23, 59, 59).add(const Duration(days: 1))
+        : endOfDay;
+    final deal = DailyDeal(
+      itemId: 'staff_arcane',
+      discountPercent: 40,
+      expiresAt: Int64(expiresAt.millisecondsSinceEpoch),
+    );
+    dailyDeal.value = deal;
+    await _col('shop').doc('dailyDeal').set(deal.writeToJsonMap());
+    return deal;
   }
 
   @override
@@ -184,26 +256,16 @@ class NetworkFirebaseImpl implements NetworkInterface {
   @override
   Future<void> reviveCharacter() async {
     final char = character.value;
-    if (char != null && char.isDead) await _saveCharacter(GameLogic.revive(char));
+    if (char == null || !char.isDead) return;
+    await _saveCharacter(GameLogic.revive(char));
+    await _checkAchievements(deaths: 1);
   }
 
   // ── Auth (Firebase manages its own session) ──
+
   @override
   void saveAuthToken(String? token) {
     // No local token to store; FirebaseAuth owns the session.
-  }
-
-  @override
-  void saveDailyDeal(DailyDeal deal) {
-    dailyDeal.value = deal;
-    _col('shop').doc('dailyDeal').set(deal.writeToJsonMap()).ignore();
-  }
-
-  // ── User prefs / deal ──
-  @override
-  void saveUserPrefs(UserPrefs prefs) {
-    userPrefs.value = prefs;
-    _col('prefs').doc('self').set(prefs.writeToJsonMap()).ignore();
   }
 
   @override
@@ -212,7 +274,11 @@ class NetworkFirebaseImpl implements NetworkInterface {
   }
 
   @override
-  void skipTask(Task task) => updateTask(GameLogic.skip(task));
+  Future<void> skipTask(String id) async {
+    final task = _findTask(id);
+    if (task == null) return;
+    await _col('tasks').doc(id).set(GameLogic.skip(task).writeToJsonMap());
+  }
 
   @override
   Future<void> takeDamage(int amount) async {
@@ -220,25 +286,15 @@ class NetworkFirebaseImpl implements NetworkInterface {
     if (char != null) await _saveCharacter(GameLogic.takeDamage(char, amount));
   }
 
-  // ── Achievements ──
   @override
-  Future<bool> unlockAchievement(Achievement def) async {
-    if (achievements.any((a) => a.id == def.id && a.isUnlocked)) return false;
-    final unlocked = def.rebuild(
-      (a) => a
-        ..isUnlocked = true
-        ..unlockedAt = Int64(DateTime.now().millisecondsSinceEpoch),
-    );
-    await _col('achievements').doc(unlocked.id).set(unlocked.writeToJsonMap());
-    if (unlocked.gemReward > 0) {
-      await addGems(unlocked.gemReward.toInt());
+  Future<ApiResponse<Task>> updateTask(String id, CreateTaskParams params) async {
+    final current = _findTask(id);
+    if (current == null) {
+      return ApiResponse.failure(code: 404, message: 'Task not found');
     }
-    return true;
-  }
-
-  @override
-  void updateTask(Task task) {
-    _col('tasks').doc(task.id).set(task.writeToJsonMap()).ignore();
+    final updated = params.applyTo(current);
+    await _col('tasks').doc(id).set(updated.writeToJsonMap());
+    return ApiResponse.success(updated, 'Task updated');
   }
 
   Future<void> _addOwnedItem(String itemId) async {
@@ -248,8 +304,36 @@ class NetworkFirebaseImpl implements NetworkInterface {
     }
   }
 
+  // ── Achievements (unlocked internally, driven by behaviors) ──
+
+  Future<void> _checkAchievements({int? tasksCompleted, int? streak, int? level, int? purchases, int? deaths}) async {
+    for (final def in GameCatalog.achievementDefs) {
+      if (_isUnlocked(def.id)) continue;
+      final progress = switch (def.conditionType) {
+        'total_tasks' => tasksCompleted ?? 0,
+        'streak' => streak ?? 0,
+        'level' => level ?? 0,
+        'purchases' => purchases ?? 0,
+        'deaths' => deaths ?? 0,
+        _ => 0,
+      };
+      if (progress >= def.threshold) {
+        await _unlockAchievement(def);
+      }
+    }
+  }
+
   CollectionReference<Map<String, dynamic>> _col(String name) =>
       FirebaseFirestore.instance.collection('users/${_uid ?? 'anonymous'}/$name');
+
+  Task? _findTask(String id) {
+    for (final t in tasks) {
+      if (t.id == id) return t;
+    }
+    return null;
+  }
+
+  bool _isUnlocked(String id) => achievements.any((a) => a.id == id && a.isUnlocked);
 
   // Keep reactive state in sync with Firestore (multi-device safe).
   void _listen() {
@@ -271,9 +355,23 @@ class NetworkFirebaseImpl implements NetworkInterface {
     await _col('character').doc('self').set(c.writeToJsonMap());
   }
 
-  // ── Internal helpers ──
   Future<void> _savePrefs(UserPrefs prefs) async {
     userPrefs.value = prefs;
     await _col('prefs').doc('self').set(prefs.writeToJsonMap());
+  }
+
+  Future<void> _unlockAchievement(Achievement def) async {
+    final unlocked = def.rebuild(
+      (a) => a
+        ..isUnlocked = true
+        ..progress = def.threshold
+        ..unlockedAt = Int64(DateTime.now().millisecondsSinceEpoch),
+    );
+    await _col('achievements').doc(unlocked.id).set(unlocked.writeToJsonMap());
+    if (unlocked.gemReward > 0) {
+      final prefs = userPrefs.value ?? UserPrefs();
+      await _savePrefs(GameLogic.addGems(prefs, unlocked.gemReward.toInt()));
+    }
+    achievements.value = [unlocked, ...achievements.where((a) => a.id != unlocked.id)];
   }
 }
