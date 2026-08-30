@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:habit_forge_app/core/interface/network_registry.dart';
+import 'package:habit_forge_app/core/network/network_registry.dart';
 
 class ProfileController extends GetxController {
   final _hive = NetworkRegistry.ins;

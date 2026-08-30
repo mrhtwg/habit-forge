@@ -4,7 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fixnum/fixnum.dart';
 import 'package:get/get.dart';
-import 'package:habit_forge_app/core/interface/network_interface.dart';
+import 'package:habit_forge_app/core/network/api_response.dart';
+import 'package:habit_forge_app/core/network/network_interface.dart';
 import 'package:habit_forge_app/core/storage/game_logic.dart';
 import 'package:habit_forge_app/generated/protos/achievement/v1/achievement.pb.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart';
@@ -80,9 +81,9 @@ class NetworkFirebaseImpl implements NetworkInterface {
 
   // ── Character operations ──
   @override
-  Future<(Character, bool)> createCharacter(CharacterClass characterClass) async {
+  Future<ApiResponse<GetCharacterReply>> createCharacter(CharacterClass characterClass) async {
     await _saveCharacter(Character(characterClass: characterClass));
-    return (character.value!, true);
+    return ApiResponse.success(GetCharacterReply(character: Character()), 'Character created');
   }
 
   // ── Task operations ──

@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/common/animation/frame_sequence_player.dart';
 import 'package:habit_forge_app/core/common/utils/sp_utils.dart';
-import 'package:habit_forge_app/core/interface/network_registry.dart';
+import 'package:habit_forge_app/core/network/network_registry.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';
 
@@ -59,7 +59,8 @@ class UserService extends GetxService {
     return true;
   }
 
-  Future<void> saveCharacter(Character character) async {
-    await SpUtils.ins.putString('character', character.writeToJson());
+  Future<void> saveCharacter(Character c) async {
+    character.value = c;
+    await SpUtils.ins.putString('character', c.writeToJson());
   }
 }

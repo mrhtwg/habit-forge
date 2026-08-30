@@ -1,4 +1,4 @@
-import 'package:habit_forge_app/core/interface/network_bootstrap.dart';
+import 'package:habit_forge_app/core/network/network_bootstrap.dart';
 
 class EnvConstants {
   // Data/backend mode selected by --dart-define-from-file=env/<mode>.json.

@@ -1,8 +1,8 @@
 import 'package:habit_forge_app/core/constants/env_constants.dart';
-import 'package:habit_forge_app/core/interface/network_firebase_impl.dart';
-import 'package:habit_forge_app/core/interface/network_hive_impl.dart';
-import 'package:habit_forge_app/core/interface/network_interface.dart';
-import 'package:habit_forge_app/core/interface/network_server_impl.dart';
+import 'package:habit_forge_app/core/network/network_firebase_impl.dart';
+import 'package:habit_forge_app/core/network/network_hive_impl.dart';
+import 'package:habit_forge_app/core/network/network_interface.dart';
+import 'package:habit_forge_app/core/network/network_server_impl.dart';
 
 /// Creates the storage implementation for the active mode
 /// (see `EnvConstants.storageMode`):

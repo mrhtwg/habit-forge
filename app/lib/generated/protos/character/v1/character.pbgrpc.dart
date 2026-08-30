@@ -33,6 +33,14 @@ class CharacterServiceClient extends $grpc.Client {
 
   CharacterServiceClient(super.channel, {super.options, super.interceptors});
 
+  /// CreateCharacter returns the current user's character.
+  $grpc.ResponseFuture<$0.CreateCharacterReply> createCharacter(
+    $0.CreateCharacterRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$createCharacter, request, options: options);
+  }
+
   /// GetCharacter returns the current user's character.
   $grpc.ResponseFuture<$0.GetCharacterReply> getCharacter(
     $0.GetCharacterRequest request, {
@@ -67,6 +75,11 @@ class CharacterServiceClient extends $grpc.Client {
 
   // method descriptors
 
+  static final _$createCharacter =
+      $grpc.ClientMethod<$0.CreateCharacterRequest, $0.CreateCharacterReply>(
+          '/api.character.v1.CharacterService/CreateCharacter',
+          ($0.CreateCharacterRequest value) => value.writeToBuffer(),
+          $0.CreateCharacterReply.fromBuffer);
   static final _$getCharacter =
       $grpc.ClientMethod<$0.GetCharacterRequest, $0.GetCharacterReply>(
           '/api.character.v1.CharacterService/GetCharacter',
@@ -93,6 +106,15 @@ abstract class CharacterServiceBase extends $grpc.Service {
   $core.String get $name => 'api.character.v1.CharacterService';
 
   CharacterServiceBase() {
+    $addMethod(
+        $grpc.ServiceMethod<$0.CreateCharacterRequest, $0.CreateCharacterReply>(
+            'CreateCharacter',
+            createCharacter_Pre,
+            false,
+            false,
+            ($core.List<$core.int> value) =>
+                $0.CreateCharacterRequest.fromBuffer(value),
+            ($0.CreateCharacterReply value) => value.writeToBuffer()));
     $addMethod(
         $grpc.ServiceMethod<$0.GetCharacterRequest, $0.GetCharacterReply>(
             'GetCharacter',
@@ -128,6 +150,15 @@ abstract class CharacterServiceBase extends $grpc.Service {
         ($core.List<$core.int> value) => $0.ReviveRequest.fromBuffer(value),
         ($0.ReviveReply value) => value.writeToBuffer()));
   }
+
+  $async.Future<$0.CreateCharacterReply> createCharacter_Pre(
+      $grpc.ServiceCall $call,
+      $async.Future<$0.CreateCharacterRequest> $request) async {
+    return createCharacter($call, await $request);
+  }
+
+  $async.Future<$0.CreateCharacterReply> createCharacter(
+      $grpc.ServiceCall call, $0.CreateCharacterRequest request);
 
   $async.Future<$0.GetCharacterReply> getCharacter_Pre($grpc.ServiceCall $call,
       $async.Future<$0.GetCharacterRequest> $request) async {

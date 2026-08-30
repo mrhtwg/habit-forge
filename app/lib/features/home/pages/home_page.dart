@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:habit_forge_app/core/common/animation/frame_sequence_player.dart';
 import 'package:habit_forge_app/core/constants/game_constants.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
-import 'package:habit_forge_app/core/interface/network_registry.dart';
+import 'package:habit_forge_app/core/network/network_registry.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';

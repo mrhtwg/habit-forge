@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:fixnum/fixnum.dart';
 import 'package:get/get.dart';
-import 'package:habit_forge_app/core/interface/network_registry.dart';
+import 'package:habit_forge_app/core/network/network_registry.dart';
 import 'package:habit_forge_app/generated/protos/shop/v1/shop.pb.dart';
 import 'package:habit_forge_app/generated/protos/user/v1/user.pb.dart';
 

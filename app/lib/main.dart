@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:habit_forge_app/app.dart';
 import 'package:habit_forge_app/core/common/utils/sp_utils.dart';
 import 'package:habit_forge_app/core/constants/env_constants.dart';
-import 'package:habit_forge_app/core/interface/network_bootstrap.dart';
+import 'package:habit_forge_app/core/network/network_bootstrap.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:intl/date_symbol_data_local.dart';
 

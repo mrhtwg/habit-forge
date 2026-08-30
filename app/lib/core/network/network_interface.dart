@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:habit_forge_app/core/network/api_response.dart';
 import 'package:habit_forge_app/generated/protos/achievement/v1/achievement.pb.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart';
 import 'package:habit_forge_app/generated/protos/shop/v1/shop.pb.dart';
@@ -21,7 +22,7 @@ import 'package:habit_forge_app/generated/protos/user/v1/user.pb.dart';
 ///     await NetworkRegistry.ins.allocateStatPoint(StatType.STAT_TYPE_STRENGTH);
 abstract class NetworkInterface {
   /// Resolves the active implementation registered in Get.
-  static NetworkInterface get to => Get.find<NetworkInterface>();
+  // static NetworkInterface get to => Get.find<NetworkInterface>();
 
   RxList<Achievement> get achievements;
   String get authMethod;
@@ -47,7 +48,7 @@ abstract class NetworkInterface {
   Future<TaskCompleteResult> completeTask(Task task);
 
   /// Creates/replaces the initial character (onboarding).
-  Future<(Character, bool)> createCharacter(CharacterClass characterClass);
+  Future<ApiResponse<GetCharacterReply>> createCharacter(CharacterClass characterClass);
   // ── Task operations ──
   String createTask(Task task);
   void deleteTask(String id);

@@ -3,11 +3,14 @@ import 'dart:convert';
 import 'package:fixnum/fixnum.dart';
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/common/utils/sp_utils.dart';
-import 'package:habit_forge_app/core/interface/network_interface.dart';
+import 'package:habit_forge_app/core/hive/character_box.dart';
+import 'package:habit_forge_app/core/network/api_response.dart';
+import 'package:habit_forge_app/core/network/network_interface.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/core/storage/game_logic.dart';
 import 'package:habit_forge_app/generated/protos/achievement/v1/achievement.pb.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart';
+import 'package:habit_forge_app/generated/protos/character/v1/character_error.pbenum.dart';
 import 'package:habit_forge_app/generated/protos/shop/v1/shop.pb.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';
 import 'package:habit_forge_app/generated/protos/user/v1/user.pb.dart';
@@ -22,7 +25,7 @@ class NetworkHiveImpl implements NetworkInterface {
   static NetworkHiveImpl get to => Get.find();
 
   late Box _userBox;
-  late Box _characterBox;
+  // late Box _characterBox;
   late Box _tasksBox;
   late Box _shopBox;
   late Box _achievementBox;
@@ -83,10 +86,17 @@ class NetworkHiveImpl implements NetworkInterface {
   }
 
   // ── Character operations ──
-  Future<(Character, bool)> createCharacter(CharacterClass characterClass) async {
-    Character character = Character(id: _uuid.v4(), characterClass: characterClass);
-    saveCharacter(character);
-    return (character, true);
+  Future<ApiResponse<GetCharacterReply>> createCharacter(CharacterClass characterClass) async {
+    if (await loadCharacter() != null) {
+      return ApiResponse.fromGrpcError(
+        CharacterErrorReason.CHARACTER_ALREADY_EXISTS.value,
+        'Character already exists',
+        errorReasonValue: null,
+        reason: null,
+      );
+    }
+    final character = await CharacterBox.ins.createCharacter(characterClass);
+    return ApiResponse.success(GetCharacterReply(character: character), 'Character created');
   }
 
   // ── Task operations ──
@@ -98,7 +108,7 @@ class NetworkHiveImpl implements NetworkInterface {
       ..updatedAt = Int64(DateTime.now().millisecondsSinceEpoch);
 
     _tasksBox.put('task_$id', _json.encode(t.writeToJsonMap()));
-    _loadTasks();
+    // _loadTasks();
     return id;
   }
 
@@ -115,23 +125,23 @@ class NetworkHiveImpl implements NetworkInterface {
   // ── Lifecycle ──
   Future<NetworkHiveImpl> init() async {
     await Hive.initFlutter();
+    await CharacterBox.ins.init();
     _userBox = await Hive.openBox('userBox');
-    _characterBox = await Hive.openBox('characterBox');
+    // _characterBox = await Hive.openBox('characterBox');
     _tasksBox = await Hive.openBox('tasksBox');
     _shopBox = await Hive.openBox('shopBox');
     _achievementBox = await Hive.openBox('achievementBox');
 
     if (!UserService.to.isLoggedIn()) {
-      await SpUtils.ins.putString('token', Uuid().v4());
+      final token = Uuid().v4();
+      await SpUtils.ins.putString('token', token);
+      UserService.to.token.value = token;
     }
-    // await refreshAll();
     return this;
   }
 
-  Future<Character?> loadCharacter() async {
-    character.value = _readJson(_characterBox, 'character', (m) => Character()..mergeFromJsonMap(m));
-    return character.value;
-  }
+  @override
+  Future<Character?> loadCharacter() async => await CharacterBox.ins.getCharacter();
 
   void postponeTask(Task task) {
     final tomorrow = DateTime.now().add(const Duration(days: 1));
@@ -156,7 +166,7 @@ class NetworkHiveImpl implements NetworkInterface {
 
   @override
   Future<void> refreshAll() async {
-    userPrefs.value = _readJson(_userBox, 'userPrefs', (m) => UserPrefs()..mergeFromJsonMap(m));
+    // userPrefs.value = _readJson(_userBox, 'userPrefs', (m) => UserPrefs()..mergeFromJsonMap(m));
     // character.value = _readJson(_characterBox, 'character', (m) => Character()..mergeFromJsonMap(m));
     _loadTasks();
     ownedItemIds.value = _shopBox.get('ownedItems', defaultValue: <String>[]).cast<String>();
@@ -166,7 +176,7 @@ class NetworkHiveImpl implements NetworkInterface {
 
   Future<void> resetAllData() async {
     await _userBox.clear();
-    await _characterBox.clear();
+    // await _characterBox.clear();
     await _tasksBox.clear();
     await _shopBox.clear();
     await _achievementBox.clear();
@@ -193,8 +203,8 @@ class NetworkHiveImpl implements NetworkInterface {
 
   // ── Character persistence (used by the operations above) ──
   void saveCharacter(Character c) {
-    character.value = c;
-    _writeJson(_characterBox, 'character', c.writeToJsonMap());
+    // character.value = c;
+    // _writeJson(_characterBox, 'character', c.writeToJsonMap());
   }
 
   void saveDailyDeal(DailyDeal deal) {

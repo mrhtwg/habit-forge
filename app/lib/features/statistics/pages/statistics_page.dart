@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
-import 'package:habit_forge_app/core/interface/network_registry.dart';
+import 'package:habit_forge_app/core/network/network_registry.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/profile/controllers/profile_controller.dart';

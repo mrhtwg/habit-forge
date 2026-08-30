@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:habit_forge_app/core/interface/network_registry.dart';
+import 'package:habit_forge_app/core/network/network_registry.dart';
 import 'package:habit_forge_app/core/services/audio_service.dart';
 import 'package:habit_forge_app/core/services/haptic_service.dart';
 import 'package:habit_forge_app/features/rewards/reward_popup.dart';
@@ -29,7 +29,7 @@ class QuestsController extends GetxController {
   }
 
   void createTask(Task task) {
-    _hive.createTask(task);
+    NetworkRegistry.ins.createTask(task);
   }
 
   void deleteTask(String id) {

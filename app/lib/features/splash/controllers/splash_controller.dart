@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:habit_forge_app/core/interface/network_registry.dart';
+import 'package:habit_forge_app/core/network/network_registry.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
 

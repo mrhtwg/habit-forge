@@ -320,6 +320,104 @@ class Character extends $pb.GeneratedMessage {
   void clearDeathRecoveryUntil() => $_clearField(10);
 }
 
+/// CreateCharacterRequest
+class CreateCharacterRequest extends $pb.GeneratedMessage {
+  factory CreateCharacterRequest({
+    CharacterClass? characterClass,
+  }) {
+    final result = create();
+    if (characterClass != null) result.characterClass = characterClass;
+    return result;
+  }
+
+  CreateCharacterRequest._();
+
+  factory CreateCharacterRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory CreateCharacterRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'CreateCharacterRequest',
+      package:
+          const $pb.PackageName(_omitMessageNames ? '' : 'api.character.v1'),
+      createEmptyInstance: create)
+    ..aE<CharacterClass>(1, _omitFieldNames ? '' : 'characterClass',
+        protoName: 'characterClass', enumValues: CharacterClass.values)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CreateCharacterRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CreateCharacterRequest copyWith(
+          void Function(CreateCharacterRequest) updates) =>
+      super.copyWith((message) => updates(message as CreateCharacterRequest))
+          as CreateCharacterRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static CreateCharacterRequest create() => CreateCharacterRequest._();
+  @$core.override
+  CreateCharacterRequest createEmptyInstance() => create();
+  @$core.pragma('dart2js:noInline')
+  static CreateCharacterRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<CreateCharacterRequest>(create);
+  static CreateCharacterRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  CharacterClass get characterClass => $_getN(0);
+  @$pb.TagNumber(1)
+  set characterClass(CharacterClass value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasCharacterClass() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearCharacterClass() => $_clearField(1);
+}
+
+/// CreateCharacterReply
+class CreateCharacterReply extends $pb.GeneratedMessage {
+  factory CreateCharacterReply() => create();
+
+  CreateCharacterReply._();
+
+  factory CreateCharacterReply.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory CreateCharacterReply.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'CreateCharacterReply',
+      package:
+          const $pb.PackageName(_omitMessageNames ? '' : 'api.character.v1'),
+      createEmptyInstance: create)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CreateCharacterReply clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CreateCharacterReply copyWith(void Function(CreateCharacterReply) updates) =>
+      super.copyWith((message) => updates(message as CreateCharacterReply))
+          as CreateCharacterReply;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static CreateCharacterReply create() => CreateCharacterReply._();
+  @$core.override
+  CreateCharacterReply createEmptyInstance() => create();
+  @$core.pragma('dart2js:noInline')
+  static CreateCharacterReply getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<CreateCharacterReply>(create);
+  static CreateCharacterReply? _defaultInstance;
+}
+
 /// GetCharacterRequest — no parameters; the character belongs to the current user.
 class GetCharacterRequest extends $pb.GeneratedMessage {
   factory GetCharacterRequest() => create();

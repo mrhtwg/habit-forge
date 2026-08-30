@@ -20,6 +20,7 @@ var _ = binding.EncodeURL
 const _ = http.SupportPackageIsVersion1
 
 const OperationCharacterServiceAllocateStatPoint = "/api.character.v1.CharacterService/AllocateStatPoint"
+const OperationCharacterServiceCreateCharacter = "/api.character.v1.CharacterService/CreateCharacter"
 const OperationCharacterServiceGetCharacter = "/api.character.v1.CharacterService/GetCharacter"
 const OperationCharacterServiceRevive = "/api.character.v1.CharacterService/Revive"
 const OperationCharacterServiceUpdateCharacter = "/api.character.v1.CharacterService/UpdateCharacter"
@@ -27,6 +28,8 @@ const OperationCharacterServiceUpdateCharacter = "/api.character.v1.CharacterSer
 type CharacterServiceHTTPServer interface {
 	// AllocateStatPoint AllocateStatPoint spends one available stat point on an attribute.
 	AllocateStatPoint(context.Context, *AllocateStatPointRequest) (*AllocateStatPointReply, error)
+	// CreateCharacter CreateCharacter returns the current user's character.
+	CreateCharacter(context.Context, *CreateCharacterRequest) (*CreateCharacterReply, error)
 	// GetCharacter GetCharacter returns the current user's character.
 	GetCharacter(context.Context, *GetCharacterRequest) (*GetCharacterReply, error)
 	// Revive Revive revives a dead character (e.g. after the recovery timer).
@@ -37,10 +40,33 @@ type CharacterServiceHTTPServer interface {
 
 func RegisterCharacterServiceHTTPServer(s *http.Server, srv CharacterServiceHTTPServer) {
 	r := s.Route("/")
+	r.POST("/api/v1/character", _CharacterService_CreateCharacter0_HTTP_Handler(srv))
 	r.GET("/api/v1/character", _CharacterService_GetCharacter0_HTTP_Handler(srv))
 	r.PUT("/api/v1/character", _CharacterService_UpdateCharacter0_HTTP_Handler(srv))
 	r.POST("/api/v1/character/stats/allocate", _CharacterService_AllocateStatPoint0_HTTP_Handler(srv))
 	r.POST("/api/v1/character/revive", _CharacterService_Revive0_HTTP_Handler(srv))
+}
+
+func _CharacterService_CreateCharacter0_HTTP_Handler(srv CharacterServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in CreateCharacterRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationCharacterServiceCreateCharacter)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.CreateCharacter(ctx, req.(*CreateCharacterRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*CreateCharacterReply)
+		return ctx.Result(200, reply)
+	}
 }
 
 func _CharacterService_GetCharacter0_HTTP_Handler(srv CharacterServiceHTTPServer) func(ctx http.Context) error {
@@ -131,6 +157,8 @@ func _CharacterService_Revive0_HTTP_Handler(srv CharacterServiceHTTPServer) func
 type CharacterServiceHTTPClient interface {
 	// AllocateStatPoint AllocateStatPoint spends one available stat point on an attribute.
 	AllocateStatPoint(ctx context.Context, req *AllocateStatPointRequest, opts ...http.CallOption) (rsp *AllocateStatPointReply, err error)
+	// CreateCharacter CreateCharacter returns the current user's character.
+	CreateCharacter(ctx context.Context, req *CreateCharacterRequest, opts ...http.CallOption) (rsp *CreateCharacterReply, err error)
 	// GetCharacter GetCharacter returns the current user's character.
 	GetCharacter(ctx context.Context, req *GetCharacterRequest, opts ...http.CallOption) (rsp *GetCharacterReply, err error)
 	// Revive Revive revives a dead character (e.g. after the recovery timer).
@@ -153,6 +181,20 @@ func (c *CharacterServiceHTTPClientImpl) AllocateStatPoint(ctx context.Context, 
 	pattern := "/api/v1/character/stats/allocate"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationCharacterServiceAllocateStatPoint))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// CreateCharacter CreateCharacter returns the current user's character.
+func (c *CharacterServiceHTTPClientImpl) CreateCharacter(ctx context.Context, in *CreateCharacterRequest, opts ...http.CallOption) (*CreateCharacterReply, error) {
+	var out CreateCharacterReply
+	pattern := "/api/v1/character"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationCharacterServiceCreateCharacter))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {

@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package api.character.v1;
+
+import "errors/errors.proto";
+
+option go_package = "github.com/habitforge/backend/api/character/v1;v1";
+
+// CharacterErrorReason — business error codes for the character domain.
+enum CharacterErrorReason {
+  option (errors.default_code) = 500;
+
+  CHARACTER_ALREADY_EXISTS = 0 [(errors.code) = 409];
+}

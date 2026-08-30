@@ -19,6 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
+	CharacterService_CreateCharacter_FullMethodName   = "/api.character.v1.CharacterService/CreateCharacter"
 	CharacterService_GetCharacter_FullMethodName      = "/api.character.v1.CharacterService/GetCharacter"
 	CharacterService_UpdateCharacter_FullMethodName   = "/api.character.v1.CharacterService/UpdateCharacter"
 	CharacterService_AllocateStatPoint_FullMethodName = "/api.character.v1.CharacterService/AllocateStatPoint"
@@ -31,6 +32,8 @@ const (
 //
 // CharacterService — RPG character state: class, level, EXP, HP, stats, equipment.
 type CharacterServiceClient interface {
+	// CreateCharacter returns the current user's character.
+	CreateCharacter(ctx context.Context, in *CreateCharacterRequest, opts ...grpc.CallOption) (*CreateCharacterReply, error)
 	// GetCharacter returns the current user's character.
 	GetCharacter(ctx context.Context, in *GetCharacterRequest, opts ...grpc.CallOption) (*GetCharacterReply, error)
 	// UpdateCharacter replaces the character state (level/exp/hp/stats/equipment).
@@ -47,6 +50,16 @@ type characterServiceClient struct {
 
 func NewCharacterServiceClient(cc grpc.ClientConnInterface) CharacterServiceClient {
 	return &characterServiceClient{cc}
+}
+
+func (c *characterServiceClient) CreateCharacter(ctx context.Context, in *CreateCharacterRequest, opts ...grpc.CallOption) (*CreateCharacterReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateCharacterReply)
+	err := c.cc.Invoke(ctx, CharacterService_CreateCharacter_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *characterServiceClient) GetCharacter(ctx context.Context, in *GetCharacterRequest, opts ...grpc.CallOption) (*GetCharacterReply, error) {
@@ -95,6 +108,8 @@ func (c *characterServiceClient) Revive(ctx context.Context, in *ReviveRequest, 
 //
 // CharacterService — RPG character state: class, level, EXP, HP, stats, equipment.
 type CharacterServiceServer interface {
+	// CreateCharacter returns the current user's character.
+	CreateCharacter(context.Context, *CreateCharacterRequest) (*CreateCharacterReply, error)
 	// GetCharacter returns the current user's character.
 	GetCharacter(context.Context, *GetCharacterRequest) (*GetCharacterReply, error)
 	// UpdateCharacter replaces the character state (level/exp/hp/stats/equipment).
@@ -113,6 +128,9 @@ type CharacterServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedCharacterServiceServer struct{}
 
+func (UnimplementedCharacterServiceServer) CreateCharacter(context.Context, *CreateCharacterRequest) (*CreateCharacterReply, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateCharacter not implemented")
+}
 func (UnimplementedCharacterServiceServer) GetCharacter(context.Context, *GetCharacterRequest) (*GetCharacterReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetCharacter not implemented")
 }
@@ -144,6 +162,24 @@ func RegisterCharacterServiceServer(s grpc.ServiceRegistrar, srv CharacterServic
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&CharacterService_ServiceDesc, srv)
+}
+
+func _CharacterService_CreateCharacter_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateCharacterRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CharacterServiceServer).CreateCharacter(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CharacterService_CreateCharacter_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CharacterServiceServer).CreateCharacter(ctx, req.(*CreateCharacterRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _CharacterService_GetCharacter_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -225,6 +261,10 @@ var CharacterService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "api.character.v1.CharacterService",
 	HandlerType: (*CharacterServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "CreateCharacter",
+			Handler:    _CharacterService_CreateCharacter_Handler,
+		},
 		{
 			MethodName: "GetCharacter",
 			Handler:    _CharacterService_GetCharacter_Handler,

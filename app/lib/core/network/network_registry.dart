@@ -1,4 +1,4 @@
-import 'package:habit_forge_app/core/interface/network_interface.dart';
+import 'package:habit_forge_app/core/network/network_interface.dart';
 
 class NetworkRegistry {
   static NetworkInterface? _instance;

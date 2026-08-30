@@ -8,6 +8,13 @@ option go_package = "github.com/habitforge/backend/api/character/v1;v1";
 
 // CharacterService — RPG character state: class, level, EXP, HP, stats, equipment.
 service CharacterService {
+  // CreateCharacter returns the current user's character.
+  rpc CreateCharacter(CreateCharacterRequest) returns (CreateCharacterReply) {
+    option (google.api.http) = {
+      post: "/api/v1/character"
+      body: "*"
+    };
+  }
   // GetCharacter returns the current user's character.
   rpc GetCharacter(GetCharacterRequest) returns (GetCharacterReply) {
     option (google.api.http) = {
@@ -107,6 +114,15 @@ message Character {
   int64 death_recovery_until = 10;
 }
 
+// CreateCharacterRequest
+message CreateCharacterRequest {  
+  CharacterClass characterClass = 1;
+}
+
+// CreateCharacterReply
+message CreateCharacterReply {
+ 
+}
 // GetCharacterRequest — no parameters; the character belongs to the current user.
 message GetCharacterRequest {}
 

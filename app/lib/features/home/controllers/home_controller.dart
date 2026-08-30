@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/extensions/task_extensions.dart';
-import 'package:habit_forge_app/core/interface/network_registry.dart';
+import 'package:habit_forge_app/core/network/network_registry.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
 import 'package:habit_forge_app/features/main/controllers/main_controller.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';

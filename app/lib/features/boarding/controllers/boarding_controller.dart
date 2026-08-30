@@ -1,6 +1,6 @@
 import 'package:carousel_slider/carousel_controller.dart';
 import 'package:get/get.dart';
-import 'package:habit_forge_app/core/interface/network_registry.dart';
+import 'package:habit_forge_app/core/network/network_registry.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart';
@@ -19,12 +19,11 @@ class BoardingController extends GetxController {
   int get currentStep => _step.value;
 
   void complete() async {
-    final character = await NetworkRegistry.ins.createCharacter(selectedClass.value);
-    if (!character.$2) {
-      Toast.show('character_creation_failed'.tr); //TODO: Localize
-      return;
-    }
-    UserService.to.saveCharacter(character.$1);
+    final result = await NetworkRegistry.ins.createCharacter(selectedClass.value);
+    result.when(
+      onSuccess: (reply) => UserService.to.saveCharacter(reply.character),
+      onFailure: (code, msg) => Toast.warning(msg),
+    );
 
     if (firstHabitTitle.value.isNotEmpty) {
       final task = Task(

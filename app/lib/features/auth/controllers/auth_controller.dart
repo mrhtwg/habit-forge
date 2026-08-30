@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/constants/env_constants.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
-import 'package:habit_forge_app/core/interface/network_registry.dart';
+import 'package:habit_forge_app/core/network/network_registry.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
 import 'package:habit_forge_app/core/services/firebase_auth_service.dart';
 import 'package:habit_forge_app/core/services/server_auth_service.dart';

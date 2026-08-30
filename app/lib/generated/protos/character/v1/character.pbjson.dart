@@ -147,6 +147,36 @@ final $typed_data.Uint8List characterDescriptor = $convert.base64Decode(
     'b3ZlcnlVbnRpbBo8Cg5FcXVpcG1lbnRFbnRyeRIQCgNrZXkYASABKAlSA2tleRIUCgV2YWx1ZR'
     'gCIAEoCVIFdmFsdWU6AjgB');
 
+@$core.Deprecated('Use createCharacterRequestDescriptor instead')
+const CreateCharacterRequest$json = {
+  '1': 'CreateCharacterRequest',
+  '2': [
+    {
+      '1': 'characterClass',
+      '3': 1,
+      '4': 1,
+      '5': 14,
+      '6': '.api.character.v1.CharacterClass',
+      '10': 'characterClass'
+    },
+  ],
+};
+
+/// Descriptor for `CreateCharacterRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List createCharacterRequestDescriptor =
+    $convert.base64Decode(
+        'ChZDcmVhdGVDaGFyYWN0ZXJSZXF1ZXN0EkgKDmNoYXJhY3RlckNsYXNzGAEgASgOMiAuYXBpLm'
+        'NoYXJhY3Rlci52MS5DaGFyYWN0ZXJDbGFzc1IOY2hhcmFjdGVyQ2xhc3M=');
+
+@$core.Deprecated('Use createCharacterReplyDescriptor instead')
+const CreateCharacterReply$json = {
+  '1': 'CreateCharacterReply',
+};
+
+/// Descriptor for `CreateCharacterReply`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List createCharacterReplyDescriptor =
+    $convert.base64Decode('ChRDcmVhdGVDaGFyYWN0ZXJSZXBseQ==');
+
 @$core.Deprecated('Use getCharacterRequestDescriptor instead')
 const GetCharacterRequest$json = {
   '1': 'GetCharacterRequest',

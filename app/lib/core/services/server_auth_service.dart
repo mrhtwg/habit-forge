@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/constants/env_constants.dart';
-import 'package:habit_forge_app/core/interface/network_registry.dart';
+import 'package:habit_forge_app/core/network/network_registry.dart';
 
 /// Self-hosted backend auth client (server mode).
 ///

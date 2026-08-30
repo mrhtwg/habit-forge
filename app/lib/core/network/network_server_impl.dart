@@ -1,7 +1,8 @@
 import 'package:get/get.dart';
 import 'package:grpc/grpc.dart';
 import 'package:habit_forge_app/core/constants/env_constants.dart';
-import 'package:habit_forge_app/core/interface/network_interface.dart';
+import 'package:habit_forge_app/core/network/api_response.dart';
+import 'package:habit_forge_app/core/network/network_interface.dart';
 import 'package:habit_forge_app/core/storage/game_logic.dart';
 import 'package:habit_forge_app/generated/protos/achievement/v1/achievement.pbgrpc.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pbgrpc.dart';
@@ -78,10 +79,10 @@ class NetworkServerImpl implements NetworkInterface {
 
   // ── Character operations ──
   @override
-  Future<(Character, bool)> createCharacter(CharacterClass characterClass) async {
+  Future<ApiResponse<GetCharacterReply>> createCharacter(CharacterClass characterClass) async {
     character.value = Character(characterClass: characterClass);
     _character.updateCharacter(UpdateCharacterRequest(character: character.value)).ignore();
-    return (character.value!, true);
+    return ApiResponse.success(GetCharacterReply(character: Character()), 'Character created');
   }
 
   // ── Task operations ──

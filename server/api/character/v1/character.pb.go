@@ -366,6 +366,88 @@ func (x *Character) GetDeathRecoveryUntil() int64 {
 	return 0
 }
 
+// CreateCharacterRequest
+type CreateCharacterRequest struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	CharacterClass CharacterClass         `protobuf:"varint,1,opt,name=characterClass,proto3,enum=api.character.v1.CharacterClass" json:"characterClass,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *CreateCharacterRequest) Reset() {
+	*x = CreateCharacterRequest{}
+	mi := &file_api_character_v1_character_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateCharacterRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateCharacterRequest) ProtoMessage() {}
+
+func (x *CreateCharacterRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_character_v1_character_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateCharacterRequest.ProtoReflect.Descriptor instead.
+func (*CreateCharacterRequest) Descriptor() ([]byte, []int) {
+	return file_api_character_v1_character_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *CreateCharacterRequest) GetCharacterClass() CharacterClass {
+	if x != nil {
+		return x.CharacterClass
+	}
+	return CharacterClass_CHARACTER_CLASS_UNSPECIFIED
+}
+
+// CreateCharacterReply
+type CreateCharacterReply struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateCharacterReply) Reset() {
+	*x = CreateCharacterReply{}
+	mi := &file_api_character_v1_character_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateCharacterReply) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateCharacterReply) ProtoMessage() {}
+
+func (x *CreateCharacterReply) ProtoReflect() protoreflect.Message {
+	mi := &file_api_character_v1_character_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateCharacterReply.ProtoReflect.Descriptor instead.
+func (*CreateCharacterReply) Descriptor() ([]byte, []int) {
+	return file_api_character_v1_character_proto_rawDescGZIP(), []int{3}
+}
+
 // GetCharacterRequest — no parameters; the character belongs to the current user.
 type GetCharacterRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -375,7 +457,7 @@ type GetCharacterRequest struct {
 
 func (x *GetCharacterRequest) Reset() {
 	*x = GetCharacterRequest{}
-	mi := &file_api_character_v1_character_proto_msgTypes[2]
+	mi := &file_api_character_v1_character_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -387,7 +469,7 @@ func (x *GetCharacterRequest) String() string {
 func (*GetCharacterRequest) ProtoMessage() {}
 
 func (x *GetCharacterRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_character_v1_character_proto_msgTypes[2]
+	mi := &file_api_character_v1_character_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -400,7 +482,7 @@ func (x *GetCharacterRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCharacterRequest.ProtoReflect.Descriptor instead.
 func (*GetCharacterRequest) Descriptor() ([]byte, []int) {
-	return file_api_character_v1_character_proto_rawDescGZIP(), []int{2}
+	return file_api_character_v1_character_proto_rawDescGZIP(), []int{4}
 }
 
 // GetCharacterReply — the user's character.
@@ -414,7 +496,7 @@ type GetCharacterReply struct {
 
 func (x *GetCharacterReply) Reset() {
 	*x = GetCharacterReply{}
-	mi := &file_api_character_v1_character_proto_msgTypes[3]
+	mi := &file_api_character_v1_character_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -426,7 +508,7 @@ func (x *GetCharacterReply) String() string {
 func (*GetCharacterReply) ProtoMessage() {}
 
 func (x *GetCharacterReply) ProtoReflect() protoreflect.Message {
-	mi := &file_api_character_v1_character_proto_msgTypes[3]
+	mi := &file_api_character_v1_character_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -439,7 +521,7 @@ func (x *GetCharacterReply) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCharacterReply.ProtoReflect.Descriptor instead.
 func (*GetCharacterReply) Descriptor() ([]byte, []int) {
-	return file_api_character_v1_character_proto_rawDescGZIP(), []int{3}
+	return file_api_character_v1_character_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *GetCharacterReply) GetCharacter() *Character {
@@ -460,7 +542,7 @@ type UpdateCharacterRequest struct {
 
 func (x *UpdateCharacterRequest) Reset() {
 	*x = UpdateCharacterRequest{}
-	mi := &file_api_character_v1_character_proto_msgTypes[4]
+	mi := &file_api_character_v1_character_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -472,7 +554,7 @@ func (x *UpdateCharacterRequest) String() string {
 func (*UpdateCharacterRequest) ProtoMessage() {}
 
 func (x *UpdateCharacterRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_character_v1_character_proto_msgTypes[4]
+	mi := &file_api_character_v1_character_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -485,7 +567,7 @@ func (x *UpdateCharacterRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateCharacterRequest.ProtoReflect.Descriptor instead.
 func (*UpdateCharacterRequest) Descriptor() ([]byte, []int) {
-	return file_api_character_v1_character_proto_rawDescGZIP(), []int{4}
+	return file_api_character_v1_character_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *UpdateCharacterRequest) GetCharacter() *Character {
@@ -506,7 +588,7 @@ type UpdateCharacterReply struct {
 
 func (x *UpdateCharacterReply) Reset() {
 	*x = UpdateCharacterReply{}
-	mi := &file_api_character_v1_character_proto_msgTypes[5]
+	mi := &file_api_character_v1_character_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -518,7 +600,7 @@ func (x *UpdateCharacterReply) String() string {
 func (*UpdateCharacterReply) ProtoMessage() {}
 
 func (x *UpdateCharacterReply) ProtoReflect() protoreflect.Message {
-	mi := &file_api_character_v1_character_proto_msgTypes[5]
+	mi := &file_api_character_v1_character_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -531,7 +613,7 @@ func (x *UpdateCharacterReply) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateCharacterReply.ProtoReflect.Descriptor instead.
 func (*UpdateCharacterReply) Descriptor() ([]byte, []int) {
-	return file_api_character_v1_character_proto_rawDescGZIP(), []int{5}
+	return file_api_character_v1_character_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *UpdateCharacterReply) GetCharacter() *Character {
@@ -552,7 +634,7 @@ type AllocateStatPointRequest struct {
 
 func (x *AllocateStatPointRequest) Reset() {
 	*x = AllocateStatPointRequest{}
-	mi := &file_api_character_v1_character_proto_msgTypes[6]
+	mi := &file_api_character_v1_character_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -564,7 +646,7 @@ func (x *AllocateStatPointRequest) String() string {
 func (*AllocateStatPointRequest) ProtoMessage() {}
 
 func (x *AllocateStatPointRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_character_v1_character_proto_msgTypes[6]
+	mi := &file_api_character_v1_character_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -577,7 +659,7 @@ func (x *AllocateStatPointRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AllocateStatPointRequest.ProtoReflect.Descriptor instead.
 func (*AllocateStatPointRequest) Descriptor() ([]byte, []int) {
-	return file_api_character_v1_character_proto_rawDescGZIP(), []int{6}
+	return file_api_character_v1_character_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *AllocateStatPointRequest) GetStat() StatType {
@@ -598,7 +680,7 @@ type AllocateStatPointReply struct {
 
 func (x *AllocateStatPointReply) Reset() {
 	*x = AllocateStatPointReply{}
-	mi := &file_api_character_v1_character_proto_msgTypes[7]
+	mi := &file_api_character_v1_character_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -610,7 +692,7 @@ func (x *AllocateStatPointReply) String() string {
 func (*AllocateStatPointReply) ProtoMessage() {}
 
 func (x *AllocateStatPointReply) ProtoReflect() protoreflect.Message {
-	mi := &file_api_character_v1_character_proto_msgTypes[7]
+	mi := &file_api_character_v1_character_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -623,7 +705,7 @@ func (x *AllocateStatPointReply) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AllocateStatPointReply.ProtoReflect.Descriptor instead.
 func (*AllocateStatPointReply) Descriptor() ([]byte, []int) {
-	return file_api_character_v1_character_proto_rawDescGZIP(), []int{7}
+	return file_api_character_v1_character_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *AllocateStatPointReply) GetCharacter() *Character {
@@ -642,7 +724,7 @@ type ReviveRequest struct {
 
 func (x *ReviveRequest) Reset() {
 	*x = ReviveRequest{}
-	mi := &file_api_character_v1_character_proto_msgTypes[8]
+	mi := &file_api_character_v1_character_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -654,7 +736,7 @@ func (x *ReviveRequest) String() string {
 func (*ReviveRequest) ProtoMessage() {}
 
 func (x *ReviveRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_character_v1_character_proto_msgTypes[8]
+	mi := &file_api_character_v1_character_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -667,7 +749,7 @@ func (x *ReviveRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReviveRequest.ProtoReflect.Descriptor instead.
 func (*ReviveRequest) Descriptor() ([]byte, []int) {
-	return file_api_character_v1_character_proto_rawDescGZIP(), []int{8}
+	return file_api_character_v1_character_proto_rawDescGZIP(), []int{10}
 }
 
 // ReviveReply — the revived character state.
@@ -681,7 +763,7 @@ type ReviveReply struct {
 
 func (x *ReviveReply) Reset() {
 	*x = ReviveReply{}
-	mi := &file_api_character_v1_character_proto_msgTypes[9]
+	mi := &file_api_character_v1_character_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -693,7 +775,7 @@ func (x *ReviveReply) String() string {
 func (*ReviveReply) ProtoMessage() {}
 
 func (x *ReviveReply) ProtoReflect() protoreflect.Message {
-	mi := &file_api_character_v1_character_proto_msgTypes[9]
+	mi := &file_api_character_v1_character_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -706,7 +788,7 @@ func (x *ReviveReply) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReviveReply.ProtoReflect.Descriptor instead.
 func (*ReviveReply) Descriptor() ([]byte, []int) {
-	return file_api_character_v1_character_proto_rawDescGZIP(), []int{9}
+	return file_api_character_v1_character_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *ReviveReply) GetCharacter() *Character {
@@ -745,7 +827,10 @@ const file_api_character_v1_character_proto_rawDesc = "" +
 	" \x01(\x03R\x12deathRecoveryUntil\x1a<\n" +
 	"\x0eEquipmentEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x15\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"b\n" +
+	"\x16CreateCharacterRequest\x12H\n" +
+	"\x0echaracterClass\x18\x01 \x01(\x0e2 .api.character.v1.CharacterClassR\x0echaracterClass\"\x16\n" +
+	"\x14CreateCharacterReply\"\x15\n" +
 	"\x13GetCharacterRequest\"N\n" +
 	"\x11GetCharacterReply\x129\n" +
 	"\tcharacter\x18\x01 \x01(\v2\x1b.api.character.v1.CharacterR\tcharacter\"S\n" +
@@ -772,8 +857,9 @@ const file_api_character_v1_character_proto_rawDesc = "" +
 	"\x11STAT_TYPE_AGILITY\x10\x03\x12\x15\n" +
 	"\x11STAT_TYPE_DEFENSE\x10\x04\x12\x16\n" +
 	"\x12STAT_TYPE_VITALITY\x10\x05\x12\x12\n" +
-	"\x0eSTAT_TYPE_LUCK\x10\x062\x95\x04\n" +
-	"\x10CharacterService\x12u\n" +
+	"\x0eSTAT_TYPE_LUCK\x10\x062\x99\x05\n" +
+	"\x10CharacterService\x12\x81\x01\n" +
+	"\x0fCreateCharacter\x12(.api.character.v1.CreateCharacterRequest\x1a&.api.character.v1.CreateCharacterReply\"\x1c\x82\xd3\xe4\x93\x02\x16:\x01*\"\x11/api/v1/character\x12u\n" +
 	"\fGetCharacter\x12%.api.character.v1.GetCharacterRequest\x1a#.api.character.v1.GetCharacterReply\"\x19\x82\xd3\xe4\x93\x02\x13\x12\x11/api/v1/character\x12\x81\x01\n" +
 	"\x0fUpdateCharacter\x12(.api.character.v1.UpdateCharacterRequest\x1a&.api.character.v1.UpdateCharacterReply\"\x1c\x82\xd3\xe4\x93\x02\x16:\x01*\x1a\x11/api/v1/character\x12\x96\x01\n" +
 	"\x11AllocateStatPoint\x12*.api.character.v1.AllocateStatPointRequest\x1a(.api.character.v1.AllocateStatPointReply\"+\x82\xd3\xe4\x93\x02%:\x01*\" /api/v1/character/stats/allocate\x12m\n" +
@@ -792,45 +878,50 @@ func file_api_character_v1_character_proto_rawDescGZIP() []byte {
 }
 
 var file_api_character_v1_character_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_api_character_v1_character_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_api_character_v1_character_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_api_character_v1_character_proto_goTypes = []any{
 	(CharacterClass)(0),              // 0: api.character.v1.CharacterClass
 	(StatType)(0),                    // 1: api.character.v1.StatType
 	(*CharacterStats)(nil),           // 2: api.character.v1.CharacterStats
 	(*Character)(nil),                // 3: api.character.v1.Character
-	(*GetCharacterRequest)(nil),      // 4: api.character.v1.GetCharacterRequest
-	(*GetCharacterReply)(nil),        // 5: api.character.v1.GetCharacterReply
-	(*UpdateCharacterRequest)(nil),   // 6: api.character.v1.UpdateCharacterRequest
-	(*UpdateCharacterReply)(nil),     // 7: api.character.v1.UpdateCharacterReply
-	(*AllocateStatPointRequest)(nil), // 8: api.character.v1.AllocateStatPointRequest
-	(*AllocateStatPointReply)(nil),   // 9: api.character.v1.AllocateStatPointReply
-	(*ReviveRequest)(nil),            // 10: api.character.v1.ReviveRequest
-	(*ReviveReply)(nil),              // 11: api.character.v1.ReviveReply
-	nil,                              // 12: api.character.v1.Character.EquipmentEntry
+	(*CreateCharacterRequest)(nil),   // 4: api.character.v1.CreateCharacterRequest
+	(*CreateCharacterReply)(nil),     // 5: api.character.v1.CreateCharacterReply
+	(*GetCharacterRequest)(nil),      // 6: api.character.v1.GetCharacterRequest
+	(*GetCharacterReply)(nil),        // 7: api.character.v1.GetCharacterReply
+	(*UpdateCharacterRequest)(nil),   // 8: api.character.v1.UpdateCharacterRequest
+	(*UpdateCharacterReply)(nil),     // 9: api.character.v1.UpdateCharacterReply
+	(*AllocateStatPointRequest)(nil), // 10: api.character.v1.AllocateStatPointRequest
+	(*AllocateStatPointReply)(nil),   // 11: api.character.v1.AllocateStatPointReply
+	(*ReviveRequest)(nil),            // 12: api.character.v1.ReviveRequest
+	(*ReviveReply)(nil),              // 13: api.character.v1.ReviveReply
+	nil,                              // 14: api.character.v1.Character.EquipmentEntry
 }
 var file_api_character_v1_character_proto_depIdxs = []int32{
 	0,  // 0: api.character.v1.Character.character_Class:type_name -> api.character.v1.CharacterClass
 	2,  // 1: api.character.v1.Character.base_stats:type_name -> api.character.v1.CharacterStats
-	12, // 2: api.character.v1.Character.equipment:type_name -> api.character.v1.Character.EquipmentEntry
-	3,  // 3: api.character.v1.GetCharacterReply.character:type_name -> api.character.v1.Character
-	3,  // 4: api.character.v1.UpdateCharacterRequest.character:type_name -> api.character.v1.Character
-	3,  // 5: api.character.v1.UpdateCharacterReply.character:type_name -> api.character.v1.Character
-	1,  // 6: api.character.v1.AllocateStatPointRequest.stat:type_name -> api.character.v1.StatType
-	3,  // 7: api.character.v1.AllocateStatPointReply.character:type_name -> api.character.v1.Character
-	3,  // 8: api.character.v1.ReviveReply.character:type_name -> api.character.v1.Character
-	4,  // 9: api.character.v1.CharacterService.GetCharacter:input_type -> api.character.v1.GetCharacterRequest
-	6,  // 10: api.character.v1.CharacterService.UpdateCharacter:input_type -> api.character.v1.UpdateCharacterRequest
-	8,  // 11: api.character.v1.CharacterService.AllocateStatPoint:input_type -> api.character.v1.AllocateStatPointRequest
-	10, // 12: api.character.v1.CharacterService.Revive:input_type -> api.character.v1.ReviveRequest
-	5,  // 13: api.character.v1.CharacterService.GetCharacter:output_type -> api.character.v1.GetCharacterReply
-	7,  // 14: api.character.v1.CharacterService.UpdateCharacter:output_type -> api.character.v1.UpdateCharacterReply
-	9,  // 15: api.character.v1.CharacterService.AllocateStatPoint:output_type -> api.character.v1.AllocateStatPointReply
-	11, // 16: api.character.v1.CharacterService.Revive:output_type -> api.character.v1.ReviveReply
-	13, // [13:17] is the sub-list for method output_type
-	9,  // [9:13] is the sub-list for method input_type
-	9,  // [9:9] is the sub-list for extension type_name
-	9,  // [9:9] is the sub-list for extension extendee
-	0,  // [0:9] is the sub-list for field type_name
+	14, // 2: api.character.v1.Character.equipment:type_name -> api.character.v1.Character.EquipmentEntry
+	0,  // 3: api.character.v1.CreateCharacterRequest.characterClass:type_name -> api.character.v1.CharacterClass
+	3,  // 4: api.character.v1.GetCharacterReply.character:type_name -> api.character.v1.Character
+	3,  // 5: api.character.v1.UpdateCharacterRequest.character:type_name -> api.character.v1.Character
+	3,  // 6: api.character.v1.UpdateCharacterReply.character:type_name -> api.character.v1.Character
+	1,  // 7: api.character.v1.AllocateStatPointRequest.stat:type_name -> api.character.v1.StatType
+	3,  // 8: api.character.v1.AllocateStatPointReply.character:type_name -> api.character.v1.Character
+	3,  // 9: api.character.v1.ReviveReply.character:type_name -> api.character.v1.Character
+	4,  // 10: api.character.v1.CharacterService.CreateCharacter:input_type -> api.character.v1.CreateCharacterRequest
+	6,  // 11: api.character.v1.CharacterService.GetCharacter:input_type -> api.character.v1.GetCharacterRequest
+	8,  // 12: api.character.v1.CharacterService.UpdateCharacter:input_type -> api.character.v1.UpdateCharacterRequest
+	10, // 13: api.character.v1.CharacterService.AllocateStatPoint:input_type -> api.character.v1.AllocateStatPointRequest
+	12, // 14: api.character.v1.CharacterService.Revive:input_type -> api.character.v1.ReviveRequest
+	5,  // 15: api.character.v1.CharacterService.CreateCharacter:output_type -> api.character.v1.CreateCharacterReply
+	7,  // 16: api.character.v1.CharacterService.GetCharacter:output_type -> api.character.v1.GetCharacterReply
+	9,  // 17: api.character.v1.CharacterService.UpdateCharacter:output_type -> api.character.v1.UpdateCharacterReply
+	11, // 18: api.character.v1.CharacterService.AllocateStatPoint:output_type -> api.character.v1.AllocateStatPointReply
+	13, // 19: api.character.v1.CharacterService.Revive:output_type -> api.character.v1.ReviveReply
+	15, // [15:20] is the sub-list for method output_type
+	10, // [10:15] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_api_character_v1_character_proto_init() }
@@ -844,7 +935,7 @@ func file_api_character_v1_character_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_character_v1_character_proto_rawDesc), len(file_api_character_v1_character_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   11,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
