@@ -408,9 +408,11 @@ class ListTasksRequest extends $pb.GeneratedMessage {
 class ListTasksReply extends $pb.GeneratedMessage {
   factory ListTasksReply({
     $core.Iterable<Task>? tasks,
+    $core.String? lastId,
   }) {
     final result = create();
     if (tasks != null) result.tasks.addAll(tasks);
+    if (lastId != null) result.lastId = lastId;
     return result;
   }
 
@@ -428,6 +430,7 @@ class ListTasksReply extends $pb.GeneratedMessage {
       package: const $pb.PackageName(_omitMessageNames ? '' : 'api.task.v1'),
       createEmptyInstance: create)
     ..pPM<Task>(1, _omitFieldNames ? '' : 'tasks', subBuilder: Task.create)
+    ..aOS(2, _omitFieldNames ? '' : 'lastId', protoName: 'lastId')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -452,6 +455,15 @@ class ListTasksReply extends $pb.GeneratedMessage {
   /// The matching tasks.
   @$pb.TagNumber(1)
   $pb.PbList<Task> get tasks => $_getList(0);
+
+  @$pb.TagNumber(2)
+  $core.String get lastId => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set lastId($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasLastId() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearLastId() => $_clearField(2);
 }
 
 /// GetTaskRequest — id of the task to fetch.
@@ -1017,6 +1029,159 @@ class CompleteTaskReply extends $pb.GeneratedMessage {
   static CompleteTaskReply getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<CompleteTaskReply>(create);
   static CompleteTaskReply? _defaultInstance;
+
+  /// The task with updated completion state.
+  @$pb.TagNumber(1)
+  Task get task => $_getN(0);
+  @$pb.TagNumber(1)
+  set task(Task value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasTask() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearTask() => $_clearField(1);
+  @$pb.TagNumber(1)
+  Task ensureTask() => $_ensure(0);
+
+  /// EXP granted for completing this task (includes streak multiplier).
+  @$pb.TagNumber(2)
+  $core.int get expReward => $_getIZ(1);
+  @$pb.TagNumber(2)
+  set expReward($core.int value) => $_setSignedInt32(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasExpReward() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearExpReward() => $_clearField(2);
+
+  /// Gold granted for completing this task.
+  @$pb.TagNumber(3)
+  $core.int get goldReward => $_getIZ(2);
+  @$pb.TagNumber(3)
+  set goldReward($core.int value) => $_setSignedInt32(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasGoldReward() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearGoldReward() => $_clearField(3);
+
+  /// HP change applied on completion (positive heals, negative damages).
+  @$pb.TagNumber(4)
+  $core.int get hpChange => $_getIZ(3);
+  @$pb.TagNumber(4)
+  set hpChange($core.int value) => $_setSignedInt32(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasHpChange() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearHpChange() => $_clearField(4);
+}
+
+/// SkipTaskRequest — id of the task to mark completed.
+class SkipTaskRequest extends $pb.GeneratedMessage {
+  factory SkipTaskRequest({
+    $core.String? id,
+  }) {
+    final result = create();
+    if (id != null) result.id = id;
+    return result;
+  }
+
+  SkipTaskRequest._();
+
+  factory SkipTaskRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory SkipTaskRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'SkipTaskRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'api.task.v1'),
+      createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'id')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SkipTaskRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SkipTaskRequest copyWith(void Function(SkipTaskRequest) updates) =>
+      super.copyWith((message) => updates(message as SkipTaskRequest))
+          as SkipTaskRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static SkipTaskRequest create() => SkipTaskRequest._();
+  @$core.override
+  SkipTaskRequest createEmptyInstance() => create();
+  @$core.pragma('dart2js:noInline')
+  static SkipTaskRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<SkipTaskRequest>(create);
+  static SkipTaskRequest? _defaultInstance;
+
+  /// Task id.
+  @$pb.TagNumber(1)
+  $core.String get id => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set id($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearId() => $_clearField(1);
+}
+
+/// SkipTaskReply — completion result and granted rewards.
+class SkipTaskReply extends $pb.GeneratedMessage {
+  factory SkipTaskReply({
+    Task? task,
+    $core.int? expReward,
+    $core.int? goldReward,
+    $core.int? hpChange,
+  }) {
+    final result = create();
+    if (task != null) result.task = task;
+    if (expReward != null) result.expReward = expReward;
+    if (goldReward != null) result.goldReward = goldReward;
+    if (hpChange != null) result.hpChange = hpChange;
+    return result;
+  }
+
+  SkipTaskReply._();
+
+  factory SkipTaskReply.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory SkipTaskReply.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'SkipTaskReply',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'api.task.v1'),
+      createEmptyInstance: create)
+    ..aOM<Task>(1, _omitFieldNames ? '' : 'task', subBuilder: Task.create)
+    ..aI(2, _omitFieldNames ? '' : 'expReward')
+    ..aI(3, _omitFieldNames ? '' : 'goldReward')
+    ..aI(4, _omitFieldNames ? '' : 'hpChange')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SkipTaskReply clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SkipTaskReply copyWith(void Function(SkipTaskReply) updates) =>
+      super.copyWith((message) => updates(message as SkipTaskReply))
+          as SkipTaskReply;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static SkipTaskReply create() => SkipTaskReply._();
+  @$core.override
+  SkipTaskReply createEmptyInstance() => create();
+  @$core.pragma('dart2js:noInline')
+  static SkipTaskReply getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<SkipTaskReply>(create);
+  static SkipTaskReply? _defaultInstance;
 
   /// The task with updated completion state.
   @$pb.TagNumber(1)

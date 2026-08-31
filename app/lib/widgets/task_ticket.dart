@@ -4,6 +4,7 @@ import 'package:habit_forge_app/core/constants/game_constants.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
+import 'package:habit_forge_app/generated/assets.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.dart';
 
 /// Bright cartoon "task ticket" card (shared by the home / tasks pages).
@@ -95,9 +96,9 @@ class TaskTicket extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                _rewardChip(icon: Icons.bolt_rounded, text: '+$exp', color: AppColors.goldLight),
+                _rewardChip(icon: Assets.imagesSharedIcExp, text: '+$exp', color: AppColors.goldLight),
                 SizedBox(height: 5.h),
-                _rewardChip(icon: Icons.star_rounded, text: '+$gold', color: AppColors.goldLight),
+                _rewardChip(icon: Assets.imagesSharedIcGold, text: '+$gold', color: AppColors.goldLight),
               ],
             ),
           ],
@@ -106,7 +107,7 @@ class TaskTicket extends StatelessWidget {
     );
   }
 
-  Widget _rewardChip({required IconData icon, required String text, required Color color}) {
+  Widget _rewardChip({required icon, required String text, required Color color}) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 2.h),
       decoration: BoxDecoration(
@@ -117,7 +118,11 @@ class TaskTicket extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 12.w, color: AppColors.goldDark),
+          Image.asset(
+            icon,
+            width: 12.w,
+            height: 12.w,
+          ),
           SizedBox(width: 2.w),
           Text(text, style: textStyleBold(fontSize: 11.sp, color: AppColors.textPrimary)),
         ],

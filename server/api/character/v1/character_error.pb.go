@@ -27,15 +27,18 @@ type CharacterErrorReason int32
 
 const (
 	CharacterErrorReason_CHARACTER_ALREADY_EXISTS CharacterErrorReason = 0
+	CharacterErrorReason_CHARACTER_NOT_FOUND      CharacterErrorReason = 1
 )
 
 // Enum value maps for CharacterErrorReason.
 var (
 	CharacterErrorReason_name = map[int32]string{
 		0: "CHARACTER_ALREADY_EXISTS",
+		1: "CHARACTER_NOT_FOUND",
 	}
 	CharacterErrorReason_value = map[string]int32{
 		"CHARACTER_ALREADY_EXISTS": 0,
+		"CHARACTER_NOT_FOUND":      1,
 	}
 )
 
@@ -70,9 +73,10 @@ var File_api_character_v1_character_error_proto protoreflect.FileDescriptor
 
 const file_api_character_v1_character_error_proto_rawDesc = "" +
 	"\n" +
-	"&api/character/v1/character_error.proto\x12\x10api.character.v1\x1a\x13errors/errors.proto*@\n" +
+	"&api/character/v1/character_error.proto\x12\x10api.character.v1\x1a\x13errors/errors.proto*_\n" +
 	"\x14CharacterErrorReason\x12\"\n" +
-	"\x18CHARACTER_ALREADY_EXISTS\x10\x00\x1a\x04\xa8E\x99\x03\x1a\x04\xa0E\xf4\x03B3Z1github.com/habitforge/backend/api/character/v1;v1b\x06proto3"
+	"\x18CHARACTER_ALREADY_EXISTS\x10\x00\x1a\x04\xa8E\x99\x03\x12\x1d\n" +
+	"\x13CHARACTER_NOT_FOUND\x10\x01\x1a\x04\xa8E\x94\x03\x1a\x04\xa0E\xf4\x03B3Z1github.com/habitforge/backend/api/character/v1;v1b\x06proto3"
 
 var (
 	file_api_character_v1_character_error_proto_rawDescOnce sync.Once

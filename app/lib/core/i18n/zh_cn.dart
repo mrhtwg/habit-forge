@@ -88,7 +88,7 @@ const Map<LanKey, String> zhCN = {
   LanKey.reward: '奖励',
   LanKey.dueDateAndPriority: '截止日期与优先级',
   LanKey.pickDate: '选择日期',
-  LanKey.xp: '经验',
+  LanKey.exp: '经验',
   LanKey.hp: '生命值',
   LanKey.attributes: '属性',
   LanKey.statStr: '力量',

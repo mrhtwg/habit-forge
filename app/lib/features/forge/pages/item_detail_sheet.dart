@@ -5,6 +5,7 @@ import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/forge/controllers/forge_controller.dart';
+import 'package:habit_forge_app/generated/protos/shared/v1/shared.pbenum.dart';
 import 'package:habit_forge_app/generated/protos/shop/v1/shop.pb.dart';
 import 'package:habit_forge_app/widgets/shop_item_icon.dart';
 
@@ -62,7 +63,13 @@ class ItemDetailSheet extends StatelessWidget {
               borderRadius: BorderRadius.circular(999),
             ),
             child: Text(
-              item.rarity.tr.toUpperCase(),
+              switch (item.rarity) {
+                EquipmentRarity.EQUIPMENT_RARITY_COMMON => LanKey.common.tr,
+                EquipmentRarity.EQUIPMENT_RARITY_RARE => LanKey.rare.tr,
+                EquipmentRarity.EQUIPMENT_RARITY_EPIC => LanKey.epic.tr,
+                EquipmentRarity.EQUIPMENT_RARITY_LEGENDARY => LanKey.legendary.tr,
+                _ => throw UnimplementedError(),
+              },
               style: textStyleBold(fontSize: 11.sp, color: rarityColor).copyWith(letterSpacing: 0.5),
             ),
           ),
@@ -170,13 +177,13 @@ class ItemDetailSheet extends StatelessWidget {
     );
   }
 
-  Color _rarityColor(String rarity) {
+  Color _rarityColor(EquipmentRarity rarity) {
     switch (rarity) {
-      case 'common':
+      case EquipmentRarity.EQUIPMENT_RARITY_COMMON:
         return AppColors.textSecondary;
-      case 'rare':
+      case EquipmentRarity.EQUIPMENT_RARITY_RARE:
         return AppColors.info;
-      case 'epic':
+      case EquipmentRarity.EQUIPMENT_RARITY_EPIC:
         return AppColors.primaryDark;
       default:
         return AppColors.textSecondary;

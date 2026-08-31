@@ -73,6 +73,13 @@ class CharacterServiceClient extends $grpc.Client {
     return $createUnaryCall(_$revive, request, options: options);
   }
 
+  $grpc.ResponseFuture<$0.EquipItemReply> equipItem(
+    $0.EquipItemRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$equipItem, request, options: options);
+  }
+
   // method descriptors
 
   static final _$createCharacter =
@@ -99,6 +106,11 @@ class CharacterServiceClient extends $grpc.Client {
       '/api.character.v1.CharacterService/Revive',
       ($0.ReviveRequest value) => value.writeToBuffer(),
       $0.ReviveReply.fromBuffer);
+  static final _$equipItem =
+      $grpc.ClientMethod<$0.EquipItemRequest, $0.EquipItemReply>(
+          '/api.character.v1.CharacterService/EquipItem',
+          ($0.EquipItemRequest value) => value.writeToBuffer(),
+          $0.EquipItemReply.fromBuffer);
 }
 
 @$pb.GrpcServiceName('api.character.v1.CharacterService')
@@ -149,6 +161,13 @@ abstract class CharacterServiceBase extends $grpc.Service {
         false,
         ($core.List<$core.int> value) => $0.ReviveRequest.fromBuffer(value),
         ($0.ReviveReply value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.EquipItemRequest, $0.EquipItemReply>(
+        'EquipItem',
+        equipItem_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.EquipItemRequest.fromBuffer(value),
+        ($0.EquipItemReply value) => value.writeToBuffer()));
   }
 
   $async.Future<$0.CreateCharacterReply> createCharacter_Pre(
@@ -193,4 +212,12 @@ abstract class CharacterServiceBase extends $grpc.Service {
 
   $async.Future<$0.ReviveReply> revive(
       $grpc.ServiceCall call, $0.ReviveRequest request);
+
+  $async.Future<$0.EquipItemReply> equipItem_Pre($grpc.ServiceCall $call,
+      $async.Future<$0.EquipItemRequest> $request) async {
+    return equipItem($call, await $request);
+  }
+
+  $async.Future<$0.EquipItemReply> equipItem(
+      $grpc.ServiceCall call, $0.EquipItemRequest request);
 }

@@ -37,9 +37,9 @@ class Toast {
   }
 
   /// Show an error Toast
-  static void error(String message, {int? duration}) {
+  static void error(String msg, {int? duration}) {
     ToastManager.instance.show(
-      message,
+      msg,
       duration: duration,
       icon: Icons.error_rounded,
       iconColor: AppColors.coral,
@@ -47,9 +47,9 @@ class Toast {
   }
 
   /// Show an info Toast
-  static void info(String message, {int? duration}) {
+  static void info(String msg, {int? duration}) {
     ToastManager.instance.show(
-      message,
+      msg,
       duration: duration,
       icon: Icons.info_rounded,
       iconColor: AppColors.info,
@@ -77,9 +77,9 @@ class Toast {
   }
 
   /// Show a normal Toast
-  static void show(String message, {int? duration}) {
+  static void show(String msg, {int? duration}) {
     ToastManager.instance.show(
-      message,
+      msg,
       duration: duration,
       icon: Icons.bolt_rounded,
       iconColor: AppColors.primary,
@@ -87,9 +87,9 @@ class Toast {
   }
 
   /// Show a success Toast
-  static void success(String message, {int? duration}) {
+  static void success(String msg, {int? duration}) {
     ToastManager.instance.show(
-      message,
+      msg,
       duration: duration,
       icon: Icons.check_circle_rounded,
       iconColor: AppColors.green,
@@ -97,9 +97,9 @@ class Toast {
   }
 
   /// Show a warning Toast
-  static void warning(String message, {int? duration}) {
+  static void warning(String msg, {int? duration}) {
     ToastManager.instance.show(
-      message,
+      msg,
       duration: duration,
       icon: Icons.warning_amber_rounded,
       iconColor: AppColors.warning,
@@ -154,7 +154,7 @@ class ToastManager {
 
   /// Show a Toast
   void show(
-    String message, {
+    String msg, {
     int? duration,
     IconData? icon,
     Color? iconColor,
@@ -173,7 +173,7 @@ class ToastManager {
 
     // Create a new Toast with position 0 (at the very bottom)
     final toastItem = _ToastItem(
-      message: message,
+      msg: msg,
       duration: duration ?? ToastConfig.duration,
       position: 0,
       icon: icon ?? Icons.info_rounded,
@@ -200,7 +200,7 @@ class ToastManager {
 
 /// Toast item
 class _ToastItem {
-  final String message;
+  final String msg;
   final int duration;
   final IconData icon;
   final Color iconColor;
@@ -210,7 +210,7 @@ class _ToastItem {
   VoidCallback? _onDismiss;
 
   _ToastItem({
-    required this.message,
+    required this.msg,
     required this.duration,
     required this.icon,
     required this.iconColor,
@@ -245,7 +245,7 @@ class _ToastItem {
     // caller BuildContext is needed (works in sheets, dialogs, startup).
     _overlayEntry = OverlayEntry(
       builder: (context) => _ToastWidget(
-        message: message,
+        msg: msg,
         position: position,
         icon: icon,
         iconColor: iconColor,
@@ -276,7 +276,7 @@ class _ToastItem {
 
 /// Toast widget
 class _ToastWidget extends StatefulWidget {
-  final String message;
+  final String msg;
   final int position;
   final IconData icon;
   final Color iconColor;
@@ -284,7 +284,7 @@ class _ToastWidget extends StatefulWidget {
   final ValueChanged<VoidCallback> onDismiss;
 
   const _ToastWidget({
-    required this.message,
+    required this.msg,
     required this.position,
     required this.icon,
     required this.iconColor,
@@ -353,7 +353,7 @@ class _ToastWidgetState extends State<_ToastWidget> with TickerProviderStateMixi
                   SizedBox(width: 8.w),
                   Flexible(
                     child: Text(
-                      widget.message,
+                      widget.msg,
                       style: textStyleBold(fontSize: 13.sp, color: AppColors.textPrimary)
                           .copyWith(decoration: TextDecoration.none),
                       textAlign: TextAlign.center,

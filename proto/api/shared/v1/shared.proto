@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package api.user.v1;
+package api.shared.v1;
 
-option go_package = "github.com/habitforge/backend/api/user/v1;v1";
+// option go_package = "github.com/habitforge/backend/api/shared/v1;v1";
 
 // SysMaterial — in-game currency types shown in the wallet.
 enum SysMaterial {
@@ -13,3 +13,24 @@ enum SysMaterial {
   // Exp — earned by completing tasks, can be spent on character upgrades.
   SYSMATERIAL_EXP = 2;
 }
+
+// EquipmentSlot — equipment slots a shop item can occupy.
+enum EquipmentSlot {
+  // Unspecified slot; used as the zero value.
+  EQUIPMENT_SLOT_UNSPECIFIED = 0;
+  // Weapon slot.
+  EQUIPMENT_SLOT_WEAPON = 1;
+  // Helmet slot.
+  EQUIPMENT_SLOT_HELMET = 2;
+  // Armor slot.
+  EQUIPMENT_SLOT_ARMOR = 3;
+  // Accessory slot.
+  EQUIPMENT_SLOT_ACCESSORY = 4;
+}
+enum EquipmentRarity {
+  EQUIPMENT_RARITY_COMMON = 0;
+  EQUIPMENT_RARITY_RARE = 1;
+  EQUIPMENT_RARITY_EPIC = 2;
+  EQUIPMENT_RARITY_LEGENDARY = 3;
+}
+

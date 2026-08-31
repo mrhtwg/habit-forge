@@ -171,11 +171,22 @@ final $typed_data.Uint8List createCharacterRequestDescriptor =
 @$core.Deprecated('Use createCharacterReplyDescriptor instead')
 const CreateCharacterReply$json = {
   '1': 'CreateCharacterReply',
+  '2': [
+    {
+      '1': 'character',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.api.character.v1.Character',
+      '10': 'character'
+    },
+  ],
 };
 
 /// Descriptor for `CreateCharacterReply`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List createCharacterReplyDescriptor =
-    $convert.base64Decode('ChRDcmVhdGVDaGFyYWN0ZXJSZXBseQ==');
+final $typed_data.Uint8List createCharacterReplyDescriptor = $convert.base64Decode(
+    'ChRDcmVhdGVDaGFyYWN0ZXJSZXBseRI5CgljaGFyYWN0ZXIYASABKAsyGy5hcGkuY2hhcmFjdG'
+    'VyLnYxLkNoYXJhY3RlclIJY2hhcmFjdGVy');
 
 @$core.Deprecated('Use getCharacterRequestDescriptor instead')
 const GetCharacterRequest$json = {
@@ -317,3 +328,33 @@ const ReviveReply$json = {
 final $typed_data.Uint8List reviveReplyDescriptor = $convert.base64Decode(
     'CgtSZXZpdmVSZXBseRI5CgljaGFyYWN0ZXIYASABKAsyGy5hcGkuY2hhcmFjdGVyLnYxLkNoYX'
     'JhY3RlclIJY2hhcmFjdGVy');
+
+@$core.Deprecated('Use equipItemRequestDescriptor instead')
+const EquipItemRequest$json = {
+  '1': 'EquipItemRequest',
+  '2': [
+    {'1': 'itemId', '3': 1, '4': 1, '5': 9, '10': 'itemId'},
+    {
+      '1': 'slot',
+      '3': 2,
+      '4': 1,
+      '5': 14,
+      '6': '.api.shared.v1.EquipmentSlot',
+      '10': 'slot'
+    },
+  ],
+};
+
+/// Descriptor for `EquipItemRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List equipItemRequestDescriptor = $convert.base64Decode(
+    'ChBFcXVpcEl0ZW1SZXF1ZXN0EhYKBml0ZW1JZBgBIAEoCVIGaXRlbUlkEjAKBHNsb3QYAiABKA'
+    '4yHC5hcGkuc2hhcmVkLnYxLkVxdWlwbWVudFNsb3RSBHNsb3Q=');
+
+@$core.Deprecated('Use equipItemReplyDescriptor instead')
+const EquipItemReply$json = {
+  '1': 'EquipItemReply',
+};
+
+/// Descriptor for `EquipItemReply`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List equipItemReplyDescriptor =
+    $convert.base64Decode('Cg5FcXVpcEl0ZW1SZXBseQ==');

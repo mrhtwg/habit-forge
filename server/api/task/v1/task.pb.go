@@ -959,6 +959,125 @@ func (x *CompleteTaskReply) GetHpChange() int32 {
 	return 0
 }
 
+// SkipTaskRequest — id of the task to mark completed.
+type SkipTaskRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Task id.
+	Id            string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SkipTaskRequest) Reset() {
+	*x = SkipTaskRequest{}
+	mi := &file_api_task_v1_task_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SkipTaskRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SkipTaskRequest) ProtoMessage() {}
+
+func (x *SkipTaskRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_task_v1_task_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SkipTaskRequest.ProtoReflect.Descriptor instead.
+func (*SkipTaskRequest) Descriptor() ([]byte, []int) {
+	return file_api_task_v1_task_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *SkipTaskRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+// SkipTaskReply — completion result and granted rewards.
+type SkipTaskReply struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The task with updated completion state.
+	Task *Task `protobuf:"bytes,1,opt,name=task,proto3" json:"task,omitempty"`
+	// EXP granted for completing this task (includes streak multiplier).
+	ExpReward int32 `protobuf:"varint,2,opt,name=exp_reward,json=expReward,proto3" json:"exp_reward,omitempty"`
+	// Gold granted for completing this task.
+	GoldReward int32 `protobuf:"varint,3,opt,name=gold_reward,json=goldReward,proto3" json:"gold_reward,omitempty"`
+	// HP change applied on completion (positive heals, negative damages).
+	HpChange      int32 `protobuf:"varint,4,opt,name=hp_change,json=hpChange,proto3" json:"hp_change,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SkipTaskReply) Reset() {
+	*x = SkipTaskReply{}
+	mi := &file_api_task_v1_task_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SkipTaskReply) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SkipTaskReply) ProtoMessage() {}
+
+func (x *SkipTaskReply) ProtoReflect() protoreflect.Message {
+	mi := &file_api_task_v1_task_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SkipTaskReply.ProtoReflect.Descriptor instead.
+func (*SkipTaskReply) Descriptor() ([]byte, []int) {
+	return file_api_task_v1_task_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *SkipTaskReply) GetTask() *Task {
+	if x != nil {
+		return x.Task
+	}
+	return nil
+}
+
+func (x *SkipTaskReply) GetExpReward() int32 {
+	if x != nil {
+		return x.ExpReward
+	}
+	return 0
+}
+
+func (x *SkipTaskReply) GetGoldReward() int32 {
+	if x != nil {
+		return x.GoldReward
+	}
+	return 0
+}
+
+func (x *SkipTaskReply) GetHpChange() int32 {
+	if x != nil {
+		return x.HpChange
+	}
+	return 0
+}
+
 var File_api_task_v1_task_proto protoreflect.FileDescriptor
 
 const file_api_task_v1_task_proto_rawDesc = "" +
@@ -1026,6 +1145,15 @@ const file_api_task_v1_task_proto_rawDesc = "" +
 	"exp_reward\x18\x02 \x01(\x05R\texpReward\x12\x1f\n" +
 	"\vgold_reward\x18\x03 \x01(\x05R\n" +
 	"goldReward\x12\x1b\n" +
+	"\thp_change\x18\x04 \x01(\x05R\bhpChange\"!\n" +
+	"\x0fSkipTaskRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"\x93\x01\n" +
+	"\rSkipTaskReply\x12%\n" +
+	"\x04task\x18\x01 \x01(\v2\x11.api.task.v1.TaskR\x04task\x12\x1d\n" +
+	"\n" +
+	"exp_reward\x18\x02 \x01(\x05R\texpReward\x12\x1f\n" +
+	"\vgold_reward\x18\x03 \x01(\x05R\n" +
+	"goldReward\x12\x1b\n" +
 	"\thp_change\x18\x04 \x01(\x05R\bhpChange*c\n" +
 	"\bTaskType\x12\x19\n" +
 	"\x15TASK_TYPE_UNSPECIFIED\x10\x00\x12\x13\n" +
@@ -1036,7 +1164,7 @@ const file_api_task_v1_task_proto_rawDesc = "" +
 	"\x1bTASK_DIFFICULTY_UNSPECIFIED\x10\x00\x12\x18\n" +
 	"\x14TASK_DIFFICULTY_EASY\x10\x01\x12\x1a\n" +
 	"\x16TASK_DIFFICULTY_MEDIUM\x10\x02\x12\x18\n" +
-	"\x14TASK_DIFFICULTY_HARD\x10\x032\xff\x04\n" +
+	"\x14TASK_DIFFICULTY_HARD\x10\x032\xed\x05\n" +
 	"\vTaskService\x12^\n" +
 	"\tListTasks\x12\x1d.api.task.v1.ListTasksRequest\x1a\x1b.api.task.v1.ListTasksReply\"\x15\x82\xd3\xe4\x93\x02\x0f\x12\r/api/v1/tasks\x12]\n" +
 	"\aGetTask\x12\x1b.api.task.v1.GetTaskRequest\x1a\x19.api.task.v1.GetTaskReply\"\x1a\x82\xd3\xe4\x93\x02\x14\x12\x12/api/v1/tasks/{id}\x12d\n" +
@@ -1046,7 +1174,8 @@ const file_api_task_v1_task_proto_rawDesc = "" +
 	"UpdateTask\x12\x1e.api.task.v1.UpdateTaskRequest\x1a\x1c.api.task.v1.UpdateTaskReply\"\x1d\x82\xd3\xe4\x93\x02\x17:\x01*\x1a\x12/api/v1/tasks/{id}\x12f\n" +
 	"\n" +
 	"DeleteTask\x12\x1e.api.task.v1.DeleteTaskRequest\x1a\x1c.api.task.v1.DeleteTaskReply\"\x1a\x82\xd3\xe4\x93\x02\x14*\x12/api/v1/tasks/{id}\x12x\n" +
-	"\fCompleteTask\x12 .api.task.v1.CompleteTaskRequest\x1a\x1e.api.task.v1.CompleteTaskReply\"&\x82\xd3\xe4\x93\x02 :\x01*\"\x1b/api/v1/tasks/{id}/completeB.Z,github.com/habitforge/backend/api/task/v1;v1b\x06proto3"
+	"\fCompleteTask\x12 .api.task.v1.CompleteTaskRequest\x1a\x1e.api.task.v1.CompleteTaskReply\"&\x82\xd3\xe4\x93\x02 :\x01*\"\x1b/api/v1/tasks/{id}/complete\x12l\n" +
+	"\bSkipTask\x12\x1c.api.task.v1.SkipTaskRequest\x1a\x1a.api.task.v1.SkipTaskReply\"&\x82\xd3\xe4\x93\x02 :\x01*\"\x1b/api/v1/tasks/{id}/completeB.Z,github.com/habitforge/backend/api/task/v1;v1b\x06proto3"
 
 var (
 	file_api_task_v1_task_proto_rawDescOnce sync.Once
@@ -1061,7 +1190,7 @@ func file_api_task_v1_task_proto_rawDescGZIP() []byte {
 }
 
 var file_api_task_v1_task_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_api_task_v1_task_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
+var file_api_task_v1_task_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
 var file_api_task_v1_task_proto_goTypes = []any{
 	(TaskType)(0),               // 0: api.task.v1.TaskType
 	(TaskDifficulty)(0),         // 1: api.task.v1.TaskDifficulty
@@ -1078,6 +1207,8 @@ var file_api_task_v1_task_proto_goTypes = []any{
 	(*DeleteTaskReply)(nil),     // 12: api.task.v1.DeleteTaskReply
 	(*CompleteTaskRequest)(nil), // 13: api.task.v1.CompleteTaskRequest
 	(*CompleteTaskReply)(nil),   // 14: api.task.v1.CompleteTaskReply
+	(*SkipTaskRequest)(nil),     // 15: api.task.v1.SkipTaskRequest
+	(*SkipTaskReply)(nil),       // 16: api.task.v1.SkipTaskReply
 }
 var file_api_task_v1_task_proto_depIdxs = []int32{
 	0,  // 0: api.task.v1.Task.type:type_name -> api.task.v1.TaskType
@@ -1091,23 +1222,26 @@ var file_api_task_v1_task_proto_depIdxs = []int32{
 	2,  // 8: api.task.v1.UpdateTaskRequest.task:type_name -> api.task.v1.Task
 	2,  // 9: api.task.v1.UpdateTaskReply.task:type_name -> api.task.v1.Task
 	2,  // 10: api.task.v1.CompleteTaskReply.task:type_name -> api.task.v1.Task
-	3,  // 11: api.task.v1.TaskService.ListTasks:input_type -> api.task.v1.ListTasksRequest
-	5,  // 12: api.task.v1.TaskService.GetTask:input_type -> api.task.v1.GetTaskRequest
-	7,  // 13: api.task.v1.TaskService.CreateTask:input_type -> api.task.v1.CreateTaskRequest
-	9,  // 14: api.task.v1.TaskService.UpdateTask:input_type -> api.task.v1.UpdateTaskRequest
-	11, // 15: api.task.v1.TaskService.DeleteTask:input_type -> api.task.v1.DeleteTaskRequest
-	13, // 16: api.task.v1.TaskService.CompleteTask:input_type -> api.task.v1.CompleteTaskRequest
-	4,  // 17: api.task.v1.TaskService.ListTasks:output_type -> api.task.v1.ListTasksReply
-	6,  // 18: api.task.v1.TaskService.GetTask:output_type -> api.task.v1.GetTaskReply
-	8,  // 19: api.task.v1.TaskService.CreateTask:output_type -> api.task.v1.CreateTaskReply
-	10, // 20: api.task.v1.TaskService.UpdateTask:output_type -> api.task.v1.UpdateTaskReply
-	12, // 21: api.task.v1.TaskService.DeleteTask:output_type -> api.task.v1.DeleteTaskReply
-	14, // 22: api.task.v1.TaskService.CompleteTask:output_type -> api.task.v1.CompleteTaskReply
-	17, // [17:23] is the sub-list for method output_type
-	11, // [11:17] is the sub-list for method input_type
-	11, // [11:11] is the sub-list for extension type_name
-	11, // [11:11] is the sub-list for extension extendee
-	0,  // [0:11] is the sub-list for field type_name
+	2,  // 11: api.task.v1.SkipTaskReply.task:type_name -> api.task.v1.Task
+	3,  // 12: api.task.v1.TaskService.ListTasks:input_type -> api.task.v1.ListTasksRequest
+	5,  // 13: api.task.v1.TaskService.GetTask:input_type -> api.task.v1.GetTaskRequest
+	7,  // 14: api.task.v1.TaskService.CreateTask:input_type -> api.task.v1.CreateTaskRequest
+	9,  // 15: api.task.v1.TaskService.UpdateTask:input_type -> api.task.v1.UpdateTaskRequest
+	11, // 16: api.task.v1.TaskService.DeleteTask:input_type -> api.task.v1.DeleteTaskRequest
+	13, // 17: api.task.v1.TaskService.CompleteTask:input_type -> api.task.v1.CompleteTaskRequest
+	15, // 18: api.task.v1.TaskService.SkipTask:input_type -> api.task.v1.SkipTaskRequest
+	4,  // 19: api.task.v1.TaskService.ListTasks:output_type -> api.task.v1.ListTasksReply
+	6,  // 20: api.task.v1.TaskService.GetTask:output_type -> api.task.v1.GetTaskReply
+	8,  // 21: api.task.v1.TaskService.CreateTask:output_type -> api.task.v1.CreateTaskReply
+	10, // 22: api.task.v1.TaskService.UpdateTask:output_type -> api.task.v1.UpdateTaskReply
+	12, // 23: api.task.v1.TaskService.DeleteTask:output_type -> api.task.v1.DeleteTaskReply
+	14, // 24: api.task.v1.TaskService.CompleteTask:output_type -> api.task.v1.CompleteTaskReply
+	16, // 25: api.task.v1.TaskService.SkipTask:output_type -> api.task.v1.SkipTaskReply
+	19, // [19:26] is the sub-list for method output_type
+	12, // [12:19] is the sub-list for method input_type
+	12, // [12:12] is the sub-list for extension type_name
+	12, // [12:12] is the sub-list for extension extendee
+	0,  // [0:12] is the sub-list for field type_name
 }
 
 func init() { file_api_task_v1_task_proto_init() }
@@ -1121,7 +1255,7 @@ func file_api_task_v1_task_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_task_v1_task_proto_rawDesc), len(file_api_task_v1_task_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   13,
+			NumMessages:   15,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

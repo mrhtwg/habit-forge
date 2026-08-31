@@ -38,19 +38,31 @@ const ShopItem$json = {
     {'1': 'name', '3': 2, '4': 1, '5': 9, '10': 'name'},
     {'1': 'description', '3': 3, '4': 1, '5': 9, '10': 'description'},
     {'1': 'price', '3': 4, '4': 1, '5': 3, '10': 'price'},
-    {'1': 'category', '3': 5, '4': 1, '5': 9, '10': 'category'},
-    {'1': 'rarity', '3': 6, '4': 1, '5': 9, '10': 'rarity'},
-    {'1': 'glb_asset_path', '3': 7, '4': 1, '5': 9, '10': 'glbAssetPath'},
-    {'1': 'is_owned', '3': 8, '4': 1, '5': 8, '10': 'isOwned'},
+    {
+      '1': 'slot',
+      '3': 5,
+      '4': 1,
+      '5': 14,
+      '6': '.api.shared.v1.EquipmentSlot',
+      '10': 'slot'
+    },
+    {
+      '1': 'rarity',
+      '3': 6,
+      '4': 1,
+      '5': 14,
+      '6': '.api.shared.v1.EquipmentRarity',
+      '10': 'rarity'
+    },
   ],
 };
 
 /// Descriptor for `ShopItem`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List shopItemDescriptor = $convert.base64Decode(
     'CghTaG9wSXRlbRIOCgJpZBgBIAEoCVICaWQSEgoEbmFtZRgCIAEoCVIEbmFtZRIgCgtkZXNjcm'
-    'lwdGlvbhgDIAEoCVILZGVzY3JpcHRpb24SFAoFcHJpY2UYBCABKANSBXByaWNlEhoKCGNhdGVn'
-    'b3J5GAUgASgJUghjYXRlZ29yeRIWCgZyYXJpdHkYBiABKAlSBnJhcml0eRIkCg5nbGJfYXNzZX'
-    'RfcGF0aBgHIAEoCVIMZ2xiQXNzZXRQYXRoEhkKCGlzX293bmVkGAggASgIUgdpc093bmVk');
+    'lwdGlvbhgDIAEoCVILZGVzY3JpcHRpb24SFAoFcHJpY2UYBCABKANSBXByaWNlEjAKBHNsb3QY'
+    'BSABKA4yHC5hcGkuc2hhcmVkLnYxLkVxdWlwbWVudFNsb3RSBHNsb3QSNgoGcmFyaXR5GAYgAS'
+    'gOMh4uYXBpLnNoYXJlZC52MS5FcXVpcG1lbnRSYXJpdHlSBnJhcml0eQ==');
 
 @$core.Deprecated('Use dailyDealDescriptor instead')
 const DailyDeal$json = {

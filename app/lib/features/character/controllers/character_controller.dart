@@ -2,24 +2,24 @@ import 'dart:async';
 
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/network/network_registry.dart';
+import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart';
 
 class CharacterController extends GetxController {
-  final _hive = NetworkRegistry.ins;
   String currentAnimation = 'idle';
   Timer? _deathTimer;
 
   /// Spends one available stat point (delegated to the storage layer).
   void allocateStat(String statName) {
-    _hive.allocateStatPoint(_statType(statName));
+    NetworkRegistry.ins.allocateStatPoint(_statType(statName));
   }
 
   /// Revives the character when the death-recovery timer has elapsed.
   Future<void> checkDeathRecovery() async {
-    final char = _hive.character.value;
+    final char = UserService.to.character.value;
     if (char == null || !char.isDead) return;
     if (DateTime.now().isAfter(DateTime(char.deathRecoveryUntil.toInt()))) {
-      await _hive.reviveCharacter();
+      await NetworkRegistry.ins.reviveCharacter();
     }
   }
 
@@ -31,7 +31,7 @@ class CharacterController extends GetxController {
 
   /// Applies damage to the character (delegated to the storage layer).
   void takeDamage(int amount) {
-    _hive.takeDamage(amount);
+    NetworkRegistry.ins.takeDamage(amount);
   }
 
   void updateAnimation(String animation) {

@@ -88,7 +88,7 @@ const Map<LanKey, String> enUS = {
   LanKey.reward: 'Reward',
   LanKey.dueDateAndPriority: 'Due Date & Priority',
   LanKey.pickDate: 'Pick date',
-  LanKey.xp: 'XP',
+  LanKey.exp: 'EXP',
   LanKey.hp: 'HP',
   LanKey.attributes: 'Attributes',
   LanKey.statStr: 'STR',

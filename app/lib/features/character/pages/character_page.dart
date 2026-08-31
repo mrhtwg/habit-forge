@@ -11,6 +11,7 @@ import 'package:habit_forge_app/core/theme/app_spacing.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/character/controllers/character_controller.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart';
+import 'package:habit_forge_app/generated/protos/shared/v1/shared.pbenum.dart';
 import 'package:habit_forge_app/widgets/toast_widget.dart';
 
 class CharacterPage extends GetView<CharacterController> {
@@ -21,8 +22,9 @@ class CharacterPage extends GetView<CharacterController> {
     return Scaffold(
       backgroundColor: AppColors.scaffold,
       body: SafeArea(
+        top: false,
         child: Obx(() {
-          final char = NetworkRegistry.ins.character.value;
+          final char = UserService.to.character.value;
           if (char == null) return const SizedBox();
           return Column(
             children: [
@@ -46,7 +48,6 @@ class CharacterPage extends GetView<CharacterController> {
 
   // ─────────── Equipment ───────────
   Widget _buildEquipmentSection(BuildContext context, Character char) {
-    const slots = ['weapon', 'helmet', 'armor', 'accessory'];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -54,7 +55,9 @@ class CharacterPage extends GetView<CharacterController> {
         SizedBox(height: 10.h),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: slots.map((slot) {
+          children: EquipmentSlot.values
+              .where((slot) => slot.value != EquipmentSlot.EQUIPMENT_SLOT_UNSPECIFIED.value)
+              .map((slot) {
             final equipped = char.equipment[slot];
             return GestureDetector(
               onTap: () => _showEquipSheet(context, slot),
@@ -103,6 +106,7 @@ class CharacterPage extends GetView<CharacterController> {
       ),
       child: Column(
         children: [
+          SizedBox(height: MediaQuery.of(Get.context!).padding.top),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
             child: Row(
@@ -123,7 +127,12 @@ class CharacterPage extends GetView<CharacterController> {
                 ),
                 const Spacer(),
                 Text(
-                  '${LanKey.characterClass(char.characterClass.name).tr.toUpperCase()}',
+                  switch (char.characterClass) {
+                    CharacterClass.CHARACTER_CLASS_WARRIOR => LanKey.warrior.tr.toUpperCase(),
+                    CharacterClass.CHARACTER_CLASS_MAGE => LanKey.mage.tr.toUpperCase(),
+                    CharacterClass.CHARACTER_CLASS_RANGER => LanKey.ranger.tr.toUpperCase(),
+                    _ => '',
+                  },
                   style: textStyleBold(fontSize: 16.sp, color: AppColors.textSecondary),
                 ),
                 const Spacer(),
@@ -156,25 +165,25 @@ class CharacterPage extends GetView<CharacterController> {
                     ),
                   ),
                 ),
-                Positioned(
-                  top: -6,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 3.h),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(color: AppColors.border, width: 2),
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: const [BoxShadow(color: Color(0xFFE9D9BE), offset: Offset(0, 2))],
-                    ),
-                    child: Text(
-                      LanKey.levelClassLabel.trParams({
-                        'level': '${char.level}',
-                        'className': LanKey.characterClass(char.characterClass.name).tr,
-                      }),
-                      style: textStyleBold(fontSize: 12.sp, color: AppColors.textPrimary),
-                    ),
-                  ),
-                ),
+                // Positioned(
+                //   top: 0,
+                //   child: Container(
+                //     padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 3.h),
+                //     decoration: BoxDecoration(
+                //       color: Colors.white,
+                //       border: Border.all(color: AppColors.border, width: 2),
+                //       borderRadius: BorderRadius.circular(12),
+                //       boxShadow: const [BoxShadow(color: Color(0xFFE9D9BE), offset: Offset(0, 2))],
+                //     ),
+                //     child: Text(
+                //       LanKey.levelClassLabel.trParams({
+                //         'level': '${char.level}',
+                //         'className': LanKey.characterClass(char.characterClass.name).tr,
+                //       }),
+                //       style: textStyleBold(fontSize: 12.sp, color: AppColors.textPrimary),
+                //     ),
+                //   ),
+                // ),
               ],
             ),
           ),
@@ -185,7 +194,7 @@ class CharacterPage extends GetView<CharacterController> {
               children: [
                 Row(
                   children: [
-                    Text(LanKey.xp.tr, style: textStyleBold(fontSize: 11.sp, color: AppColors.textSecondary)),
+                    Text(LanKey.exp.tr, style: textStyleBold(fontSize: 11.sp, color: AppColors.textSecondary)),
                     const Spacer(),
                     Text(
                       '${char.currentExp}/${GameConstants.expForLevel(char.level)}',
@@ -293,12 +302,11 @@ class CharacterPage extends GetView<CharacterController> {
     );
   }
 
-  void _showEquipSheet(BuildContext context, String slot) {
-    final hive = NetworkRegistry.ins;
-    final char = hive.character.value;
+  void _showEquipSheet(BuildContext context, EquipmentSlot slot) {
+    final char = UserService.to.character.value;
     if (char == null) return;
 
-    final owned = hive.ownedItemIds;
+    final owned = UserService.to.shopItems;
     if (owned.isEmpty) {
       Toast.show(LanKey.noItemsForSlot.tr);
       return;
@@ -335,22 +343,22 @@ class CharacterPage extends GetView<CharacterController> {
               leading: Icon(Icons.close_rounded, color: AppColors.textMuted, size: 20),
               title: Text(LanKey.noneUnequip.tr, style: textStyleRegular(color: AppColors.textMuted)),
               onTap: () {
-                hive.equipItem('', slot: slot);
+                NetworkRegistry.ins.equipItem('', slot);
                 Get.back();
               },
             ),
             ...owned.map(
-              (itemId) => ListTile(
+              (item) => ListTile(
                 leading: const Icon(Icons.shield_rounded, color: AppColors.primary, size: 24),
                 title: Text(
-                  itemId.replaceAll('_', ' ').toUpperCase(),
+                  item.id.replaceAll('_', ' ').toUpperCase(),
                   style: textStyleRegular(color: AppColors.textPrimary),
                 ),
-                trailing: char.equipment[slot] == itemId
+                trailing: char.equipment[slot] == item
                     ? const Icon(Icons.check_circle_rounded, color: AppColors.green, size: 20)
                     : null,
                 onTap: () {
-                  hive.equipItem(itemId, slot: slot);
+                  NetworkRegistry.ins.equipItem(item.id, slot);
                   Get.back();
                 },
               ),
@@ -361,26 +369,26 @@ class CharacterPage extends GetView<CharacterController> {
     );
   }
 
-  IconData _slotIcon(String slot) {
+  IconData _slotIcon(EquipmentSlot slot) {
     switch (slot) {
-      case 'weapon':
+      case EquipmentSlot.EQUIPMENT_SLOT_WEAPON:
         return Icons.gavel_rounded;
-      case 'helmet':
+      case EquipmentSlot.EQUIPMENT_SLOT_HELMET:
         return Icons.military_tech_rounded;
-      case 'armor':
+      case EquipmentSlot.EQUIPMENT_SLOT_ARMOR:
         return Icons.shield_rounded;
       default:
         return Icons.diamond_rounded;
     }
   }
 
-  String _slotLabel(String slot) {
+  String _slotLabel(EquipmentSlot slot) {
     switch (slot) {
-      case 'weapon':
+      case EquipmentSlot.EQUIPMENT_SLOT_WEAPON:
         return LanKey.weapon.tr;
-      case 'helmet':
+      case EquipmentSlot.EQUIPMENT_SLOT_HELMET:
         return LanKey.helmet.tr;
-      case 'armor':
+      case EquipmentSlot.EQUIPMENT_SLOT_ARMOR:
         return LanKey.armor.tr;
       default:
         return LanKey.trinket.tr;

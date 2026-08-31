@@ -414,6 +414,7 @@ func (x *CreateCharacterRequest) GetCharacterClass() CharacterClass {
 // CreateCharacterReply
 type CreateCharacterReply struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	Character     *Character             `protobuf:"bytes,1,opt,name=character,proto3" json:"character,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -446,6 +447,13 @@ func (x *CreateCharacterReply) ProtoReflect() protoreflect.Message {
 // Deprecated: Use CreateCharacterReply.ProtoReflect.Descriptor instead.
 func (*CreateCharacterReply) Descriptor() ([]byte, []int) {
 	return file_api_character_v1_character_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *CreateCharacterReply) GetCharacter() *Character {
+	if x != nil {
+		return x.Character
+	}
+	return nil
 }
 
 // GetCharacterRequest — no parameters; the character belongs to the current user.
@@ -487,9 +495,8 @@ func (*GetCharacterRequest) Descriptor() ([]byte, []int) {
 
 // GetCharacterReply — the user's character.
 type GetCharacterReply struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The current character state.
-	Character     *Character `protobuf:"bytes,1,opt,name=character,proto3" json:"character,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Character     *Character             `protobuf:"bytes,1,opt,name=character,proto3" json:"character,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -829,8 +836,9 @@ const file_api_character_v1_character_proto_rawDesc = "" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"b\n" +
 	"\x16CreateCharacterRequest\x12H\n" +
-	"\x0echaracterClass\x18\x01 \x01(\x0e2 .api.character.v1.CharacterClassR\x0echaracterClass\"\x16\n" +
-	"\x14CreateCharacterReply\"\x15\n" +
+	"\x0echaracterClass\x18\x01 \x01(\x0e2 .api.character.v1.CharacterClassR\x0echaracterClass\"Q\n" +
+	"\x14CreateCharacterReply\x129\n" +
+	"\tcharacter\x18\x01 \x01(\v2\x1b.api.character.v1.CharacterR\tcharacter\"\x15\n" +
 	"\x13GetCharacterRequest\"N\n" +
 	"\x11GetCharacterReply\x129\n" +
 	"\tcharacter\x18\x01 \x01(\v2\x1b.api.character.v1.CharacterR\tcharacter\"S\n" +
@@ -901,27 +909,28 @@ var file_api_character_v1_character_proto_depIdxs = []int32{
 	2,  // 1: api.character.v1.Character.base_stats:type_name -> api.character.v1.CharacterStats
 	14, // 2: api.character.v1.Character.equipment:type_name -> api.character.v1.Character.EquipmentEntry
 	0,  // 3: api.character.v1.CreateCharacterRequest.characterClass:type_name -> api.character.v1.CharacterClass
-	3,  // 4: api.character.v1.GetCharacterReply.character:type_name -> api.character.v1.Character
-	3,  // 5: api.character.v1.UpdateCharacterRequest.character:type_name -> api.character.v1.Character
-	3,  // 6: api.character.v1.UpdateCharacterReply.character:type_name -> api.character.v1.Character
-	1,  // 7: api.character.v1.AllocateStatPointRequest.stat:type_name -> api.character.v1.StatType
-	3,  // 8: api.character.v1.AllocateStatPointReply.character:type_name -> api.character.v1.Character
-	3,  // 9: api.character.v1.ReviveReply.character:type_name -> api.character.v1.Character
-	4,  // 10: api.character.v1.CharacterService.CreateCharacter:input_type -> api.character.v1.CreateCharacterRequest
-	6,  // 11: api.character.v1.CharacterService.GetCharacter:input_type -> api.character.v1.GetCharacterRequest
-	8,  // 12: api.character.v1.CharacterService.UpdateCharacter:input_type -> api.character.v1.UpdateCharacterRequest
-	10, // 13: api.character.v1.CharacterService.AllocateStatPoint:input_type -> api.character.v1.AllocateStatPointRequest
-	12, // 14: api.character.v1.CharacterService.Revive:input_type -> api.character.v1.ReviveRequest
-	5,  // 15: api.character.v1.CharacterService.CreateCharacter:output_type -> api.character.v1.CreateCharacterReply
-	7,  // 16: api.character.v1.CharacterService.GetCharacter:output_type -> api.character.v1.GetCharacterReply
-	9,  // 17: api.character.v1.CharacterService.UpdateCharacter:output_type -> api.character.v1.UpdateCharacterReply
-	11, // 18: api.character.v1.CharacterService.AllocateStatPoint:output_type -> api.character.v1.AllocateStatPointReply
-	13, // 19: api.character.v1.CharacterService.Revive:output_type -> api.character.v1.ReviveReply
-	15, // [15:20] is the sub-list for method output_type
-	10, // [10:15] is the sub-list for method input_type
-	10, // [10:10] is the sub-list for extension type_name
-	10, // [10:10] is the sub-list for extension extendee
-	0,  // [0:10] is the sub-list for field type_name
+	3,  // 4: api.character.v1.CreateCharacterReply.character:type_name -> api.character.v1.Character
+	3,  // 5: api.character.v1.GetCharacterReply.character:type_name -> api.character.v1.Character
+	3,  // 6: api.character.v1.UpdateCharacterRequest.character:type_name -> api.character.v1.Character
+	3,  // 7: api.character.v1.UpdateCharacterReply.character:type_name -> api.character.v1.Character
+	1,  // 8: api.character.v1.AllocateStatPointRequest.stat:type_name -> api.character.v1.StatType
+	3,  // 9: api.character.v1.AllocateStatPointReply.character:type_name -> api.character.v1.Character
+	3,  // 10: api.character.v1.ReviveReply.character:type_name -> api.character.v1.Character
+	4,  // 11: api.character.v1.CharacterService.CreateCharacter:input_type -> api.character.v1.CreateCharacterRequest
+	6,  // 12: api.character.v1.CharacterService.GetCharacter:input_type -> api.character.v1.GetCharacterRequest
+	8,  // 13: api.character.v1.CharacterService.UpdateCharacter:input_type -> api.character.v1.UpdateCharacterRequest
+	10, // 14: api.character.v1.CharacterService.AllocateStatPoint:input_type -> api.character.v1.AllocateStatPointRequest
+	12, // 15: api.character.v1.CharacterService.Revive:input_type -> api.character.v1.ReviveRequest
+	5,  // 16: api.character.v1.CharacterService.CreateCharacter:output_type -> api.character.v1.CreateCharacterReply
+	7,  // 17: api.character.v1.CharacterService.GetCharacter:output_type -> api.character.v1.GetCharacterReply
+	9,  // 18: api.character.v1.CharacterService.UpdateCharacter:output_type -> api.character.v1.UpdateCharacterReply
+	11, // 19: api.character.v1.CharacterService.AllocateStatPoint:output_type -> api.character.v1.AllocateStatPointReply
+	13, // 20: api.character.v1.CharacterService.Revive:output_type -> api.character.v1.ReviveReply
+	16, // [16:21] is the sub-list for method output_type
+	11, // [11:16] is the sub-list for method input_type
+	11, // [11:11] is the sub-list for extension type_name
+	11, // [11:11] is the sub-list for extension extendee
+	0,  // [0:11] is the sub-list for field type_name
 }
 
 func init() { file_api_character_v1_character_proto_init() }

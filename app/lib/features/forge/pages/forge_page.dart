@@ -166,7 +166,7 @@ class ForgePage extends GetView<ForgeController> {
   // ─────────── Item grid ───────────
   Widget _buildItemGrid(BuildContext context) {
     return Obx(() {
-      final items = controller.filteredItems;
+      // final items = controller.filteredItems;
       return GridView.builder(
         padding: EdgeInsets.fromLTRB(20.w, 14.h, 20.w, 24.h),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -175,9 +175,9 @@ class ForgePage extends GetView<ForgeController> {
           mainAxisSpacing: 12.h,
           childAspectRatio: 0.78,
         ),
-        itemCount: items.length,
+        itemCount: controller.allItems.length,
         itemBuilder: (context, index) {
-          final item = items[index];
+          final item = controller.allItems[index];
           final owned = controller.isOwned(item.id);
           return GestureDetector(
             onTap: () => ItemDetailSheet.show(context, item),

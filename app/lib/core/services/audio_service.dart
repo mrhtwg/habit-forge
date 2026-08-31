@@ -1,5 +1,7 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:get/get.dart';
+import 'package:habit_forge_app/core/common/utils/sp_keys.dart';
+import 'package:habit_forge_app/core/common/utils/sp_utils.dart';
 
 class AudioService extends GetxService {
   static AudioService get to => Get.find();
@@ -22,5 +24,10 @@ class AudioService extends GetxService {
   Future<void> playLevelUp() => play('sounds/level_up.mp3');
   Future<void> playPurchase() => play('sounds/purchase.mp3');
   Future<void> playTap() => play('sounds/tap.mp3');
-  void setEnabled(bool v) => _enabled = v;
+  void setEnabled(bool v) {
+    _enabled = v;
+    SpUtils.ins.putBool(SpKeys.soundEnabled, v);
+  }
+
+  bool get enabled => _enabled;
 }

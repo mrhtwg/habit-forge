@@ -1,5 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:habit_forge_app/core/common/utils/sp_keys.dart';
+import 'package:habit_forge_app/core/common/utils/sp_utils.dart';
 
 class HapticService extends GetxService {
   static HapticService get to => Get.find();
@@ -24,7 +26,12 @@ class HapticService extends GetxService {
     if (_enabled) HapticFeedback.mediumImpact();
   }
 
-  void setEnabled(bool v) => _enabled = v;
+  void setEnabled(bool v) {
+    _enabled = v;
+    SpUtils.ins.putBool(SpKeys.hapticEnabled, v);
+  }
+
+  bool get enabled => _enabled;
 
   void success() {
     if (_enabled) {

@@ -3,12 +3,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/common/animation/frame_sequence_player.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
-import 'package:habit_forge_app/core/network/network_registry.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/profile/controllers/profile_controller.dart';
+import 'package:habit_forge_app/generated/protos/character/v1/character.pbenum.dart';
 import 'package:habit_forge_app/generated/protos/shared/v1/shared.pbenum.dart';
 import 'package:habit_forge_app/widgets/mini_chip.dart';
 
@@ -115,8 +115,7 @@ class ProfilePage extends GetView<ProfileController> {
       ),
       padding: EdgeInsets.fromLTRB(20.w, 14.h + MediaQuery.of(Get.context!).padding.top, 20.w, 20.h),
       child: Obx(() {
-        final char = NetworkRegistry.ins.character.value;
-        final prefs = NetworkRegistry.ins.userPrefs.value;
+        // final char = NetworkRegistry.ins.character.value;
         return Row(
           children: [
             // Knight circular frame (idle animation)
@@ -155,8 +154,13 @@ class ProfilePage extends GetView<ProfileController> {
                     ),
                     child: Text(
                       LanKey.profileLevelClass.trParams({
-                        'level': '${char?.level ?? 1}',
-                        'className': LanKey.characterClass(char?.characterClass.name ?? 'warrior').tr,
+                        'level': '${UserService.to.character.value?.level ?? 1}',
+                        'className': switch (UserService.to.character.value?.characterClass) {
+                          CharacterClass.CHARACTER_CLASS_WARRIOR => LanKey.warrior.tr,
+                          CharacterClass.CHARACTER_CLASS_MAGE => LanKey.mage.tr,
+                          CharacterClass.CHARACTER_CLASS_RANGER => LanKey.ranger.tr,
+                          _ => LanKey.warrior.tr,
+                        },
                       }),
                       style: textStyleBold(fontSize: 12.sp, color: AppColors.primaryDark),
                     ),

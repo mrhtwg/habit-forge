@@ -15,6 +15,7 @@ import 'dart:core' as $core;
 import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:protobuf/protobuf.dart' as $pb;
 
+import '../../shared/v1/shared.pbenum.dart' as $1;
 import 'character.pbenum.dart';
 
 export 'package:protobuf/protobuf.dart' show GeneratedMessageGenericExtensions;
@@ -380,7 +381,13 @@ class CreateCharacterRequest extends $pb.GeneratedMessage {
 
 /// CreateCharacterReply
 class CreateCharacterReply extends $pb.GeneratedMessage {
-  factory CreateCharacterReply() => create();
+  factory CreateCharacterReply({
+    Character? character,
+  }) {
+    final result = create();
+    if (character != null) result.character = character;
+    return result;
+  }
 
   CreateCharacterReply._();
 
@@ -396,6 +403,8 @@ class CreateCharacterReply extends $pb.GeneratedMessage {
       package:
           const $pb.PackageName(_omitMessageNames ? '' : 'api.character.v1'),
       createEmptyInstance: create)
+    ..aOM<Character>(1, _omitFieldNames ? '' : 'character',
+        subBuilder: Character.create)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -416,6 +425,17 @@ class CreateCharacterReply extends $pb.GeneratedMessage {
   static CreateCharacterReply getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<CreateCharacterReply>(create);
   static CreateCharacterReply? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  Character get character => $_getN(0);
+  @$pb.TagNumber(1)
+  set character(Character value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasCharacter() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearCharacter() => $_clearField(1);
+  @$pb.TagNumber(1)
+  Character ensureCharacter() => $_ensure(0);
 }
 
 /// GetCharacterRequest — no parameters; the character belongs to the current user.
@@ -505,7 +525,6 @@ class GetCharacterReply extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<GetCharacterReply>(create);
   static GetCharacterReply? _defaultInstance;
 
-  /// The current character state.
   @$pb.TagNumber(1)
   Character get character => $_getN(0);
   @$pb.TagNumber(1)
@@ -857,6 +876,115 @@ class ReviveReply extends $pb.GeneratedMessage {
   void clearCharacter() => $_clearField(1);
   @$pb.TagNumber(1)
   Character ensureCharacter() => $_ensure(0);
+}
+
+/// EquipItemRequest — no parameters; equips the current user's character.
+class EquipItemRequest extends $pb.GeneratedMessage {
+  factory EquipItemRequest({
+    $core.String? itemId,
+    $1.EquipmentSlot? slot,
+  }) {
+    final result = create();
+    if (itemId != null) result.itemId = itemId;
+    if (slot != null) result.slot = slot;
+    return result;
+  }
+
+  EquipItemRequest._();
+
+  factory EquipItemRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory EquipItemRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'EquipItemRequest',
+      package:
+          const $pb.PackageName(_omitMessageNames ? '' : 'api.character.v1'),
+      createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'itemId', protoName: 'itemId')
+    ..aE<$1.EquipmentSlot>(2, _omitFieldNames ? '' : 'slot',
+        enumValues: $1.EquipmentSlot.values)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  EquipItemRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  EquipItemRequest copyWith(void Function(EquipItemRequest) updates) =>
+      super.copyWith((message) => updates(message as EquipItemRequest))
+          as EquipItemRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static EquipItemRequest create() => EquipItemRequest._();
+  @$core.override
+  EquipItemRequest createEmptyInstance() => create();
+  @$core.pragma('dart2js:noInline')
+  static EquipItemRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<EquipItemRequest>(create);
+  static EquipItemRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get itemId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set itemId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasItemId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearItemId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $1.EquipmentSlot get slot => $_getN(1);
+  @$pb.TagNumber(2)
+  set slot($1.EquipmentSlot value) => $_setField(2, value);
+  @$pb.TagNumber(2)
+  $core.bool hasSlot() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearSlot() => $_clearField(2);
+}
+
+/// EquipItemReply — the equipped character state.
+class EquipItemReply extends $pb.GeneratedMessage {
+  factory EquipItemReply() => create();
+
+  EquipItemReply._();
+
+  factory EquipItemReply.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory EquipItemReply.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'EquipItemReply',
+      package:
+          const $pb.PackageName(_omitMessageNames ? '' : 'api.character.v1'),
+      createEmptyInstance: create)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  EquipItemReply clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  EquipItemReply copyWith(void Function(EquipItemReply) updates) =>
+      super.copyWith((message) => updates(message as EquipItemReply))
+          as EquipItemReply;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static EquipItemReply create() => EquipItemReply._();
+  @$core.override
+  EquipItemReply createEmptyInstance() => create();
+  @$core.pragma('dart2js:noInline')
+  static EquipItemReply getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<EquipItemReply>(create);
+  static EquipItemReply? _defaultInstance;
 }
 
 const $core.bool _omitFieldNames =

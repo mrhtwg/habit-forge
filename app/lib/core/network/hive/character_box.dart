@@ -1,24 +1,26 @@
 import 'package:fixnum/fixnum.dart';
+import 'package:habit_forge_app/core/di/injection_container.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart';
 import 'package:hive/hive.dart';
+import 'package:injectable/injectable.dart';
 import 'package:uuid/uuid.dart';
 
+@singleton
 class CharacterBox {
-  static CharacterBox? _instance;
-  static CharacterBox get ins {
-    if (_instance == null) {
-      _instance = CharacterBox._();
-    }
-    return _instance!;
-  }
+  static CharacterBox get ins => getIt<CharacterBox>();
+
+  CharacterBox();
 
   final _boxKey = 'characterBox';
   final _characterKey = 'character';
 
   late Box _characterBox;
-  CharacterBox._();
 
-  Future<Character> createCharacter(CharacterClass characterClass) async {
+  Future init() async {
+    _characterBox = await Hive.openBox(_boxKey);
+  }
+
+  Character createCharacter(CharacterClass characterClass) {
     Character character = Character()
       ..id = Uuid().v4()
       ..characterClass = characterClass
@@ -31,7 +33,7 @@ class CharacterBox {
     return character;
   }
 
-  Future<Character?> getCharacter() async {
+  Character? getCharacter() {
     final raw = _characterBox.get(_characterKey);
     if (raw == null) {
       return null;
@@ -41,12 +43,7 @@ class CharacterBox {
     return character;
   }
 
-  Future init() async {
-    _characterBox = await Hive.openBox(_boxKey);
-  }
-
-  /// Persists the current character state (level, stats, HP, equipment...).
-  Future<void> save(Character c) async {
-    _characterBox.put(_characterKey, c.writeToBuffer());
+  void clear() {
+    _characterBox.clear();
   }
 }

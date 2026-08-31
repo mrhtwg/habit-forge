@@ -4,6 +4,8 @@ package api.shop.v1;
 
 import "google/api/annotations.proto";
 
+import "api/shared/v1/shared.proto";
+
 option go_package = "github.com/habitforge/backend/api/shop/v1;v1";
 
 // ShopService — Forge shop: items, daily deals, purchases, owned items.
@@ -55,14 +57,10 @@ message ShopItem {
   string description = 3;
   // Price in the currency chosen at purchase time.
   int64 price = 4;
-  // Equipment category: "weapon" | "helmet" | "armor" | "accessory".
-  string category = 5;
-  // Rarity tier: "common" | "rare" | "epic" | "legendary".
-  string rarity = 6;
-  // Path of the 3D model asset (glb) rendered in the app.
-  string glb_asset_path = 7;
-  // Whether the current user already owns this item.
-  bool is_owned = 8;
+  // Equipment slot this item occupies.
+  api.shared.v1.EquipmentSlot slot = 5;
+  // Rarity 
+  api.shared.v1.EquipmentRarity rarity = 6;
 }
 
 // DailyDeal — a rotating discounted item.

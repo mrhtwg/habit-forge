@@ -7,6 +7,7 @@
 package v1
 
 import (
+	v1 "github.com/habitforge/backend/api/shared/v1"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -86,8 +87,8 @@ type ShopItem struct {
 	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
 	// Price in the currency chosen at purchase time.
 	Price int64 `protobuf:"varint,4,opt,name=price,proto3" json:"price,omitempty"`
-	// Equipment category: "weapon" | "helmet" | "armor" | "accessory".
-	Category string `protobuf:"bytes,5,opt,name=category,proto3" json:"category,omitempty"`
+	// Equipment slot this item occupies.
+	Category v1.EquipmentSlot `protobuf:"varint,5,opt,name=category,proto3,enum=api.shared.v1.EquipmentSlot" json:"category,omitempty"`
 	// Rarity tier: "common" | "rare" | "epic" | "legendary".
 	Rarity string `protobuf:"bytes,6,opt,name=rarity,proto3" json:"rarity,omitempty"`
 	// Path of the 3D model asset (glb) rendered in the app.
@@ -156,11 +157,11 @@ func (x *ShopItem) GetPrice() int64 {
 	return 0
 }
 
-func (x *ShopItem) GetCategory() string {
+func (x *ShopItem) GetCategory() v1.EquipmentSlot {
 	if x != nil {
 		return x.Category
 	}
-	return ""
+	return v1.EquipmentSlot(0)
 }
 
 func (x *ShopItem) GetRarity() string {
@@ -620,13 +621,13 @@ var File_api_shop_v1_shop_proto protoreflect.FileDescriptor
 
 const file_api_shop_v1_shop_proto_rawDesc = "" +
 	"\n" +
-	"\x16api/shop/v1/shop.proto\x12\vapi.shop.v1\x1a\x1cgoogle/api/annotations.proto\"\xdb\x01\n" +
+	"\x16api/shop/v1/shop.proto\x12\vapi.shop.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1aapi/shared/v1/shared.proto\"\xf9\x01\n" +
 	"\bShopItem\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
 	"\vdescription\x18\x03 \x01(\tR\vdescription\x12\x14\n" +
-	"\x05price\x18\x04 \x01(\x03R\x05price\x12\x1a\n" +
-	"\bcategory\x18\x05 \x01(\tR\bcategory\x12\x16\n" +
+	"\x05price\x18\x04 \x01(\x03R\x05price\x128\n" +
+	"\bcategory\x18\x05 \x01(\x0e2\x1c.api.shared.v1.EquipmentSlotR\bcategory\x12\x16\n" +
 	"\x06rarity\x18\x06 \x01(\tR\x06rarity\x12$\n" +
 	"\x0eglb_asset_path\x18\a \x01(\tR\fglbAssetPath\x12\x19\n" +
 	"\bis_owned\x18\b \x01(\bR\aisOwned\"n\n" +
@@ -687,25 +688,27 @@ var file_api_shop_v1_shop_proto_goTypes = []any{
 	(*BuyItemReply)(nil),          // 8: api.shop.v1.BuyItemReply
 	(*ListOwnedItemsRequest)(nil), // 9: api.shop.v1.ListOwnedItemsRequest
 	(*ListOwnedItemsReply)(nil),   // 10: api.shop.v1.ListOwnedItemsReply
+	(v1.EquipmentSlot)(0),         // 11: api.shared.v1.EquipmentSlot
 }
 var file_api_shop_v1_shop_proto_depIdxs = []int32{
-	1,  // 0: api.shop.v1.ListShopItemsReply.items:type_name -> api.shop.v1.ShopItem
-	2,  // 1: api.shop.v1.GetDailyDealReply.deal:type_name -> api.shop.v1.DailyDeal
-	0,  // 2: api.shop.v1.BuyItemRequest.currency:type_name -> api.shop.v1.ShopCurrency
-	1,  // 3: api.shop.v1.BuyItemReply.item:type_name -> api.shop.v1.ShopItem
-	3,  // 4: api.shop.v1.ShopService.ListShopItems:input_type -> api.shop.v1.ListShopItemsRequest
-	5,  // 5: api.shop.v1.ShopService.GetDailyDeal:input_type -> api.shop.v1.GetDailyDealRequest
-	7,  // 6: api.shop.v1.ShopService.BuyItem:input_type -> api.shop.v1.BuyItemRequest
-	9,  // 7: api.shop.v1.ShopService.ListOwnedItems:input_type -> api.shop.v1.ListOwnedItemsRequest
-	4,  // 8: api.shop.v1.ShopService.ListShopItems:output_type -> api.shop.v1.ListShopItemsReply
-	6,  // 9: api.shop.v1.ShopService.GetDailyDeal:output_type -> api.shop.v1.GetDailyDealReply
-	8,  // 10: api.shop.v1.ShopService.BuyItem:output_type -> api.shop.v1.BuyItemReply
-	10, // 11: api.shop.v1.ShopService.ListOwnedItems:output_type -> api.shop.v1.ListOwnedItemsReply
-	8,  // [8:12] is the sub-list for method output_type
-	4,  // [4:8] is the sub-list for method input_type
-	4,  // [4:4] is the sub-list for extension type_name
-	4,  // [4:4] is the sub-list for extension extendee
-	0,  // [0:4] is the sub-list for field type_name
+	11, // 0: api.shop.v1.ShopItem.category:type_name -> api.shared.v1.EquipmentSlot
+	1,  // 1: api.shop.v1.ListShopItemsReply.items:type_name -> api.shop.v1.ShopItem
+	2,  // 2: api.shop.v1.GetDailyDealReply.deal:type_name -> api.shop.v1.DailyDeal
+	0,  // 3: api.shop.v1.BuyItemRequest.currency:type_name -> api.shop.v1.ShopCurrency
+	1,  // 4: api.shop.v1.BuyItemReply.item:type_name -> api.shop.v1.ShopItem
+	3,  // 5: api.shop.v1.ShopService.ListShopItems:input_type -> api.shop.v1.ListShopItemsRequest
+	5,  // 6: api.shop.v1.ShopService.GetDailyDeal:input_type -> api.shop.v1.GetDailyDealRequest
+	7,  // 7: api.shop.v1.ShopService.BuyItem:input_type -> api.shop.v1.BuyItemRequest
+	9,  // 8: api.shop.v1.ShopService.ListOwnedItems:input_type -> api.shop.v1.ListOwnedItemsRequest
+	4,  // 9: api.shop.v1.ShopService.ListShopItems:output_type -> api.shop.v1.ListShopItemsReply
+	6,  // 10: api.shop.v1.ShopService.GetDailyDeal:output_type -> api.shop.v1.GetDailyDealReply
+	8,  // 11: api.shop.v1.ShopService.BuyItem:output_type -> api.shop.v1.BuyItemReply
+	10, // 12: api.shop.v1.ShopService.ListOwnedItems:output_type -> api.shop.v1.ListOwnedItemsReply
+	9,  // [9:13] is the sub-list for method output_type
+	5,  // [5:9] is the sub-list for method input_type
+	5,  // [5:5] is the sub-list for extension type_name
+	5,  // [5:5] is the sub-list for extension extendee
+	0,  // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_api_shop_v1_shop_proto_init() }

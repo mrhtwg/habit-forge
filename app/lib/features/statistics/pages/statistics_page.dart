@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
-import 'package:habit_forge_app/core/network/network_registry.dart';
+import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/profile/controllers/profile_controller.dart';
@@ -16,12 +16,12 @@ class StatisticsPage extends GetView<StatisticsController> {
     return Scaffold(
       backgroundColor: AppColors.scaffold,
       body: SafeArea(
+        top: false,
         child: Column(
           children: [
             _buildHeader(),
             Expanded(
               child: Obx(() {
-                final allTasks = NetworkRegistry.ins.tasks;
                 final now = DateTime.now();
 
                 final DateTime currentCutoff = switch (controller.period) {
@@ -37,8 +37,8 @@ class StatisticsPage extends GetView<StatisticsController> {
                 final prevCutoff = periodDuration.inDays > 0 ? currentCutoff.subtract(periodDuration) : currentCutoff;
 
                 final currentCompleted =
-                    allTasks.where((t) => DateTime(t.completedAt.toInt()).isAfter(currentCutoff)).toList();
-                final prevCompleted = allTasks
+                    controller.allTasks.where((t) => DateTime(t.completedAt.toInt()).isAfter(currentCutoff)).toList();
+                final prevCompleted = controller.allTasks
                     .where(
                       (t) =>
                           DateTime(t.completedAt.toInt()).isAfter(prevCutoff) &&
@@ -57,13 +57,13 @@ class StatisticsPage extends GetView<StatisticsController> {
                 }
                 final maxCount = weekdayCounts.reduce((a, b) => a > b ? a : b);
 
-                final streaks = allTasks.where((t) => t.streak > 0).toList()
+                final streaks = controller.allTasks.where((t) => t.streak > 0).toList()
                   ..sort((a, b) => b.streak.compareTo(a.streak));
                 final topStreaks = streaks.take(5).toList();
 
                 final profile = Get.find<ProfileController>();
-                final char = NetworkRegistry.ins.character.value;
-                final totalXp = char?.currentExp ?? 0;
+
+                final totalXp = UserService.to.character.value?.currentExp ?? 0;
 
                 return ListView(
                   padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 24.h),
@@ -84,7 +84,7 @@ class StatisticsPage extends GetView<StatisticsController> {
                         ),
                         SizedBox(width: 10.w),
                         _kpiCard(
-                          '${(profile.totalTasksCompleted / (allTasks.length == 0 ? 1 : allTasks.length) * 100).round()}%',
+                          '${(profile.totalTasksCompleted / (controller.allTasks.length == 0 ? 1 : controller.allTasks.length) * 100).round()}%',
                           LanKey.completion.tr,
                           null,
                           AppColors.info,
@@ -104,7 +104,7 @@ class StatisticsPage extends GetView<StatisticsController> {
                         _kpiCard(
                           '$totalXp',
                           LanKey.totalXP.tr,
-                          LanKey.levelHeroLabel.trParams({'level': '${char?.level ?? 1}'}),
+                          LanKey.levelHeroLabel.trParams({'level': '${UserService.to.character.value?.level ?? 1}'}),
                           AppColors.primaryDark,
                         ),
                       ],
@@ -255,25 +255,28 @@ class StatisticsPage extends GetView<StatisticsController> {
         borderRadius: BorderRadius.only(bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30)),
       ),
       padding: EdgeInsets.fromLTRB(16.w, 10.h, 16.w, 18.h),
-      child: Row(
-        children: [
-          GestureDetector(
-            onTap: () => Get.back(),
-            child: Container(
-              width: 38.w,
-              height: 38.w,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white,
-                border: Border.all(color: AppColors.border, width: 2.5),
-                boxShadow: const [BoxShadow(color: Color(0xFFD6C3A4), offset: Offset(0, 3))],
+      child: Padding(
+        padding: EdgeInsets.only(top: MediaQuery.of(Get.context!).padding.top),
+        child: Row(
+          children: [
+            GestureDetector(
+              onTap: () => Get.back(),
+              child: Container(
+                width: 38.w,
+                height: 38.w,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                  border: Border.all(color: AppColors.border, width: 2.5),
+                  boxShadow: const [BoxShadow(color: Color(0xFFD6C3A4), offset: Offset(0, 3))],
+                ),
+                child: const Icon(Icons.arrow_back_rounded, size: 20, color: AppColors.textPrimary),
               ),
-              child: const Icon(Icons.arrow_back_rounded, size: 20, color: AppColors.textPrimary),
             ),
-          ),
-          SizedBox(width: 10.w),
-          Text(LanKey.statistics.tr, style: textStyleBlack(fontSize: 22.sp, color: AppColors.textPrimary)),
-        ],
+            SizedBox(width: 10.w),
+            Text(LanKey.statistics.tr, style: textStyleBlack(fontSize: 22.sp, color: AppColors.textPrimary)),
+          ],
+        ),
       ),
     );
   }

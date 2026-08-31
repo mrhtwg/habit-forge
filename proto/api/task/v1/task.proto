@@ -47,6 +47,13 @@ service TaskService {
       body: "*"
     };
   }
+  // SkipTask marks a task completed and grants EXP/gold rewards.
+  rpc SkipTask(SkipTaskRequest) returns (SkipTaskReply) {
+    option (google.api.http) = {
+      post: "/api/v1/tasks/{id}/complete"
+      body: "*"
+    };
+  }
 }
 
 // TaskType — habit (daily repeat), daily (weekday repeat), todo (due date).
@@ -133,6 +140,7 @@ message ListTasksRequest {
 message ListTasksReply {
   // The matching tasks.
   repeated Task tasks = 1;
+  string lastId = 2;
 }
 
 // GetTaskRequest — id of the task to fetch.
@@ -190,6 +198,24 @@ message CompleteTaskRequest {
 
 // CompleteTaskReply — completion result and granted rewards.
 message CompleteTaskReply {
+  // The task with updated completion state.
+  Task task = 1;
+  // EXP granted for completing this task (includes streak multiplier).
+  int32 exp_reward = 2;
+  // Gold granted for completing this task.
+  int32 gold_reward = 3;
+  // HP change applied on completion (positive heals, negative damages).
+  int32 hp_change = 4;
+}
+
+// SkipTaskRequest — id of the task to mark completed.
+message SkipTaskRequest {
+  // Task id.
+  string id = 1;
+}
+
+// SkipTaskReply — completion result and granted rewards.
+message SkipTaskReply {
   // The task with updated completion state.
   Task task = 1;
   // EXP granted for completing this task (includes streak multiplier).

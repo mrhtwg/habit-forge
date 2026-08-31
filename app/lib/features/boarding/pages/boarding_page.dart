@@ -79,7 +79,14 @@ class BoardingPage extends GetView<BoardingController> {
 
     final label = switch (step) {
       0 => LanKey.getStarted.tr,
-      1 => LanKey.chooseClass.trParams({'class': LanKey.characterClass(controller.selectedClass.value.name).tr}),
+      1 => LanKey.chooseClass.trParams({
+          'class': switch (controller.selectedClass.value) {
+            CharacterClass.CHARACTER_CLASS_WARRIOR => LanKey.warrior.tr.toUpperCase(),
+            CharacterClass.CHARACTER_CLASS_MAGE => LanKey.mage.tr.toUpperCase(),
+            CharacterClass.CHARACTER_CLASS_RANGER => LanKey.ranger.tr.toUpperCase(),
+            _ => '',
+          },
+        }),
       _ => LanKey.enterTheRealm.tr,
     };
     return SizedBox(
@@ -468,7 +475,13 @@ class BoardingPage extends GetView<BoardingController> {
               _summaryRow(
                 icon: Icons.auto_awesome_rounded,
                 bg: const Color(0xFFF6E6FF),
-                title: LanKey.characterClass(controller.selectedClass.value.name).tr.toUpperCase(),
+                title: switch (controller.selectedClass.value) {
+                  CharacterClass.CHARACTER_CLASS_WARRIOR => LanKey.warrior.tr,
+                  CharacterClass.CHARACTER_CLASS_MAGE => LanKey.mage.tr,
+                  CharacterClass.CHARACTER_CLASS_RANGER => LanKey.ranger.tr,
+                  _ => LanKey.warrior.tr,
+                }
+                    .toUpperCase(),
                 subtitle: LanKey.yourHeroClass.tr,
               ),
               SizedBox(height: 10.h),

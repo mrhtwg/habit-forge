@@ -167,13 +167,14 @@ const ListTasksReply$json = {
       '6': '.api.task.v1.Task',
       '10': 'tasks'
     },
+    {'1': 'lastId', '3': 2, '4': 1, '5': 9, '10': 'lastId'},
   ],
 };
 
 /// Descriptor for `ListTasksReply`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List listTasksReplyDescriptor = $convert.base64Decode(
     'Cg5MaXN0VGFza3NSZXBseRInCgV0YXNrcxgBIAMoCzIRLmFwaS50YXNrLnYxLlRhc2tSBXRhc2'
-    'tz');
+    'tzEhYKBmxhc3RJZBgCIAEoCVIGbGFzdElk');
 
 @$core.Deprecated('Use getTaskRequestDescriptor instead')
 const GetTaskRequest$json = {
@@ -343,3 +344,39 @@ final $typed_data.Uint8List completeTaskReplyDescriptor = $convert.base64Decode(
     'ChFDb21wbGV0ZVRhc2tSZXBseRIlCgR0YXNrGAEgASgLMhEuYXBpLnRhc2sudjEuVGFza1IEdG'
     'FzaxIdCgpleHBfcmV3YXJkGAIgASgFUglleHBSZXdhcmQSHwoLZ29sZF9yZXdhcmQYAyABKAVS'
     'CmdvbGRSZXdhcmQSGwoJaHBfY2hhbmdlGAQgASgFUghocENoYW5nZQ==');
+
+@$core.Deprecated('Use skipTaskRequestDescriptor instead')
+const SkipTaskRequest$json = {
+  '1': 'SkipTaskRequest',
+  '2': [
+    {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
+  ],
+};
+
+/// Descriptor for `SkipTaskRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List skipTaskRequestDescriptor =
+    $convert.base64Decode('Cg9Ta2lwVGFza1JlcXVlc3QSDgoCaWQYASABKAlSAmlk');
+
+@$core.Deprecated('Use skipTaskReplyDescriptor instead')
+const SkipTaskReply$json = {
+  '1': 'SkipTaskReply',
+  '2': [
+    {
+      '1': 'task',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.api.task.v1.Task',
+      '10': 'task'
+    },
+    {'1': 'exp_reward', '3': 2, '4': 1, '5': 5, '10': 'expReward'},
+    {'1': 'gold_reward', '3': 3, '4': 1, '5': 5, '10': 'goldReward'},
+    {'1': 'hp_change', '3': 4, '4': 1, '5': 5, '10': 'hpChange'},
+  ],
+};
+
+/// Descriptor for `SkipTaskReply`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List skipTaskReplyDescriptor = $convert.base64Decode(
+    'Cg1Ta2lwVGFza1JlcGx5EiUKBHRhc2sYASABKAsyES5hcGkudGFzay52MS5UYXNrUgR0YXNrEh'
+    '0KCmV4cF9yZXdhcmQYAiABKAVSCWV4cFJld2FyZBIfCgtnb2xkX3Jld2FyZBgDIAEoBVIKZ29s'
+    'ZFJld2FyZBIbCglocF9jaGFuZ2UYBCABKAVSCGhwQ2hhbmdl');

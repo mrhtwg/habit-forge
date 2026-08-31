@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:habit_forge_app/core/constants/env_constants.dart';
 import 'package:habit_forge_app/core/i18n/app_locale.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
-import 'package:habit_forge_app/core/network/network_registry.dart';
-import 'package:habit_forge_app/core/routes/app_routes.dart';
+import 'package:habit_forge_app/core/services/audio_service.dart';
+import 'package:habit_forge_app/core/services/haptic_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/auth/controllers/auth_controller.dart';
@@ -22,13 +23,11 @@ class SettingsPage extends GetView<SettingsController> {
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
-      body: Obx(() {
-        final prefs = NetworkRegistry.ins.userPrefs.value;
-        if (prefs == null) return const SizedBox();
-        return ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            // Account section
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          // Account section
+          if (!EnvConstants.isHive()) ...[
             _SectionHeader(LanKey.account.tr),
             _SettingsCard(
               child: Column(
@@ -36,12 +35,12 @@ class SettingsPage extends GetView<SettingsController> {
                   ListTile(
                     dense: true,
                     leading: const Icon(Icons.person_outline, color: AppColors.textSecondary),
-                    title: Text(
-                      NetworkRegistry.ins.authMethod.isEmpty
-                          ? LanKey.guest.tr
-                          : NetworkRegistry.ins.authMethod.capitalizeFirst!,
-                      style: textStyleRegular(color: AppColors.textPrimary),
-                    ),
+                    // title: Text(
+                    //   NetworkRegistry.ins.authMethod.isEmpty
+                    //       ? LanKey.guest.tr
+                    //       : NetworkRegistry.ins.authMethod.capitalizeFirst!,
+                    //   style: textStyleRegular(color: AppColors.textPrimary),
+                    // ),
                     subtitle: Text(
                       LanKey.signedIn.tr,
                       style: textStyleRegular(color: AppColors.textMuted, fontSize: 12),
@@ -72,74 +71,66 @@ class SettingsPage extends GetView<SettingsController> {
               ),
             ),
             const SizedBox(height: 20),
-
-            // Preferences section
-            _SectionHeader(LanKey.preferences.tr),
-            _SettingsCard(
-              child: Column(
-                children: [
-                  // _PreferenceRow(
-                  //   label: LanKey.sound.tr,
-                  //   value: prefs.soundEnabled,
-                  //   onChanged: (v) {
-                  //     Get.find<AudioService>().setEnabled(v);
-                  //     NetworkRegistry.ins.saveUserPrefs(prefs.rebuild((p) => p..soundEnabled = v));
-                  //   },
-                  // ),
-                  const Divider(color: AppColors.elevated, height: 1, thickness: 1),
-                  // _PreferenceRow(
-                  //   label: LanKey.haptic.tr,
-                  //   value: prefs.hapticEnabled,
-                  //   onChanged: (v) {
-                  //     Get.find<HapticService>().setEnabled(v);
-                  //     NetworkRegistry.ins.saveUserPrefs(prefs.rebuild((p) => p..hapticEnabled = v));
-                  //   },
-                  // ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // Language section
-            _SectionHeader(LanKey.language.tr),
-            _SettingsCard(
-              child: Column(
-                children: [
-                  _LanguageOption(label: 'English', value: AppLocale.en),
-                  const Divider(color: AppColors.elevated, height: 1, thickness: 1),
-                  _LanguageOption(label: '中文', value: AppLocale.zh),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // Data section
-            _SectionHeader(LanKey.data.tr),
-            _SettingsCard(
-              child: ListTile(
-                leading: Icon(Icons.recycling_outlined, color: AppColors.textPrimary.withValues(alpha: 0.5)),
-                title: Text(
-                  LanKey.resetAllData.tr,
-                  style: textStyleRegular(color: AppColors.red),
-                ),
-                onTap: () async {
-                  final confirmed = await ConfirmDialog.show(
-                    context,
-                    title: LanKey.resetGame.tr,
-                    message: LanKey.resetAllConfirm.tr,
-                    confirmLabel: LanKey.reset.tr,
-                    isDestructive: true,
-                  );
-                  if (confirmed == true) {
-                    await NetworkRegistry.ins.resetAllData();
-                    Get.offAllNamed(Routers.splash);
-                  }
-                },
-              ),
-            ),
           ],
-        );
-      }),
+          // Preferences section
+          _SectionHeader(LanKey.preferences.tr),
+          _SettingsCard(
+            child: Column(
+              children: [
+                _PreferenceRow(
+                  label: LanKey.sound.tr,
+                  value: Get.find<AudioService>().enabled,
+                  onChanged: (v) => Get.find<AudioService>().setEnabled(v),
+                ),
+                const Divider(color: AppColors.elevated, height: 1, thickness: 1),
+                _PreferenceRow(
+                  label: LanKey.haptic.tr,
+                  value: Get.find<HapticService>().enabled,
+                  onChanged: (v) => Get.find<HapticService>().setEnabled(v),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          // Language section
+          _SectionHeader(LanKey.language.tr),
+          _SettingsCard(
+            child: Column(
+              children: [
+                _LanguageOption(label: 'English', value: AppLocale.en),
+                const Divider(color: AppColors.elevated, height: 1, thickness: 1),
+                _LanguageOption(label: '中文', value: AppLocale.zh),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          // Data section
+          _SectionHeader(LanKey.data.tr),
+          _SettingsCard(
+            child: ListTile(
+              leading: Icon(Icons.recycling_outlined, color: AppColors.textPrimary.withValues(alpha: 0.5)),
+              title: Text(
+                LanKey.resetAllData.tr,
+                style: textStyleRegular(color: AppColors.red),
+              ),
+              onTap: () async {
+                final confirmed = await ConfirmDialog.show(
+                  context,
+                  title: LanKey.resetGame.tr,
+                  message: LanKey.resetAllConfirm.tr,
+                  confirmLabel: LanKey.reset.tr,
+                  isDestructive: true,
+                );
+                if (confirmed == true) {
+                  controller.resetAllData();
+                }
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

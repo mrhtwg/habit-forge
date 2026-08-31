@@ -81,6 +81,14 @@ class TaskServiceClient extends $grpc.Client {
     return $createUnaryCall(_$completeTask, request, options: options);
   }
 
+  /// SkipTask marks a task completed and grants EXP/gold rewards.
+  $grpc.ResponseFuture<$0.SkipTaskReply> skipTask(
+    $0.SkipTaskRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$skipTask, request, options: options);
+  }
+
   // method descriptors
 
   static final _$listTasks =
@@ -113,6 +121,11 @@ class TaskServiceClient extends $grpc.Client {
           '/api.task.v1.TaskService/CompleteTask',
           ($0.CompleteTaskRequest value) => value.writeToBuffer(),
           $0.CompleteTaskReply.fromBuffer);
+  static final _$skipTask =
+      $grpc.ClientMethod<$0.SkipTaskRequest, $0.SkipTaskReply>(
+          '/api.task.v1.TaskService/SkipTask',
+          ($0.SkipTaskRequest value) => value.writeToBuffer(),
+          $0.SkipTaskReply.fromBuffer);
 }
 
 @$pb.GrpcServiceName('api.task.v1.TaskService')
@@ -164,6 +177,13 @@ abstract class TaskServiceBase extends $grpc.Service {
             ($core.List<$core.int> value) =>
                 $0.CompleteTaskRequest.fromBuffer(value),
             ($0.CompleteTaskReply value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.SkipTaskRequest, $0.SkipTaskReply>(
+        'SkipTask',
+        skipTask_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.SkipTaskRequest.fromBuffer(value),
+        ($0.SkipTaskReply value) => value.writeToBuffer()));
   }
 
   $async.Future<$0.ListTasksReply> listTasks_Pre($grpc.ServiceCall $call,
@@ -213,4 +233,12 @@ abstract class TaskServiceBase extends $grpc.Service {
 
   $async.Future<$0.CompleteTaskReply> completeTask(
       $grpc.ServiceCall call, $0.CompleteTaskRequest request);
+
+  $async.Future<$0.SkipTaskReply> skipTask_Pre($grpc.ServiceCall $call,
+      $async.Future<$0.SkipTaskRequest> $request) async {
+    return skipTask($call, await $request);
+  }
+
+  $async.Future<$0.SkipTaskReply> skipTask(
+      $grpc.ServiceCall call, $0.SkipTaskRequest request);
 }

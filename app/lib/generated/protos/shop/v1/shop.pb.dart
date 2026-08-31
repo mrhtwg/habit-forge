@@ -15,6 +15,7 @@ import 'dart:core' as $core;
 import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:protobuf/protobuf.dart' as $pb;
 
+import '../../shared/v1/shared.pbenum.dart' as $1;
 import 'shop.pbenum.dart';
 
 export 'package:protobuf/protobuf.dart' show GeneratedMessageGenericExtensions;
@@ -28,20 +29,16 @@ class ShopItem extends $pb.GeneratedMessage {
     $core.String? name,
     $core.String? description,
     $fixnum.Int64? price,
-    $core.String? category,
-    $core.String? rarity,
-    $core.String? glbAssetPath,
-    $core.bool? isOwned,
+    $1.EquipmentSlot? slot,
+    $1.EquipmentRarity? rarity,
   }) {
     final result = create();
     if (id != null) result.id = id;
     if (name != null) result.name = name;
     if (description != null) result.description = description;
     if (price != null) result.price = price;
-    if (category != null) result.category = category;
+    if (slot != null) result.slot = slot;
     if (rarity != null) result.rarity = rarity;
-    if (glbAssetPath != null) result.glbAssetPath = glbAssetPath;
-    if (isOwned != null) result.isOwned = isOwned;
     return result;
   }
 
@@ -62,10 +59,10 @@ class ShopItem extends $pb.GeneratedMessage {
     ..aOS(2, _omitFieldNames ? '' : 'name')
     ..aOS(3, _omitFieldNames ? '' : 'description')
     ..aInt64(4, _omitFieldNames ? '' : 'price')
-    ..aOS(5, _omitFieldNames ? '' : 'category')
-    ..aOS(6, _omitFieldNames ? '' : 'rarity')
-    ..aOS(7, _omitFieldNames ? '' : 'glbAssetPath')
-    ..aOB(8, _omitFieldNames ? '' : 'isOwned')
+    ..aE<$1.EquipmentSlot>(5, _omitFieldNames ? '' : 'slot',
+        enumValues: $1.EquipmentSlot.values)
+    ..aE<$1.EquipmentRarity>(6, _omitFieldNames ? '' : 'rarity',
+        enumValues: $1.EquipmentRarity.values)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -126,45 +123,25 @@ class ShopItem extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   void clearPrice() => $_clearField(4);
 
-  /// Equipment category: "weapon" | "helmet" | "armor" | "accessory".
+  /// Equipment slot this item occupies.
   @$pb.TagNumber(5)
-  $core.String get category => $_getSZ(4);
+  $1.EquipmentSlot get slot => $_getN(4);
   @$pb.TagNumber(5)
-  set category($core.String value) => $_setString(4, value);
+  set slot($1.EquipmentSlot value) => $_setField(5, value);
   @$pb.TagNumber(5)
-  $core.bool hasCategory() => $_has(4);
+  $core.bool hasSlot() => $_has(4);
   @$pb.TagNumber(5)
-  void clearCategory() => $_clearField(5);
+  void clearSlot() => $_clearField(5);
 
-  /// Rarity tier: "common" | "rare" | "epic" | "legendary".
+  /// Rarity
   @$pb.TagNumber(6)
-  $core.String get rarity => $_getSZ(5);
+  $1.EquipmentRarity get rarity => $_getN(5);
   @$pb.TagNumber(6)
-  set rarity($core.String value) => $_setString(5, value);
+  set rarity($1.EquipmentRarity value) => $_setField(6, value);
   @$pb.TagNumber(6)
   $core.bool hasRarity() => $_has(5);
   @$pb.TagNumber(6)
   void clearRarity() => $_clearField(6);
-
-  /// Path of the 3D model asset (glb) rendered in the app.
-  @$pb.TagNumber(7)
-  $core.String get glbAssetPath => $_getSZ(6);
-  @$pb.TagNumber(7)
-  set glbAssetPath($core.String value) => $_setString(6, value);
-  @$pb.TagNumber(7)
-  $core.bool hasGlbAssetPath() => $_has(6);
-  @$pb.TagNumber(7)
-  void clearGlbAssetPath() => $_clearField(7);
-
-  /// Whether the current user already owns this item.
-  @$pb.TagNumber(8)
-  $core.bool get isOwned => $_getBF(7);
-  @$pb.TagNumber(8)
-  set isOwned($core.bool value) => $_setBool(7, value);
-  @$pb.TagNumber(8)
-  $core.bool hasIsOwned() => $_has(7);
-  @$pb.TagNumber(8)
-  void clearIsOwned() => $_clearField(8);
 }
 
 /// DailyDeal — a rotating discounted item.

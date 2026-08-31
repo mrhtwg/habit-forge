@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
-import 'package:habit_forge_app/core/network/network_registry.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/achievements/controllers/achievements_controller.dart';
@@ -16,6 +15,7 @@ class AchievementsPage extends GetView<AchievementsController> {
     return Scaffold(
       backgroundColor: AppColors.scaffold,
       body: SafeArea(
+        top: false,
         child: Column(
           children: [
             _buildHeader(),
@@ -81,42 +81,45 @@ class AchievementsPage extends GetView<AchievementsController> {
         borderRadius: BorderRadius.only(bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30)),
       ),
       padding: EdgeInsets.fromLTRB(16.w, 10.h, 20.w, 18.h),
-      child: Row(
-        children: [
-          GestureDetector(
-            onTap: () => Get.back(),
-            child: Container(
-              width: 38.w,
-              height: 38.w,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white,
-                border: Border.all(color: AppColors.border, width: 2.5),
-                boxShadow: const [BoxShadow(color: Color(0xFFD6C3A4), offset: Offset(0, 3))],
+      child: Padding(
+        padding: EdgeInsets.only(top: MediaQuery.of(Get.context!).padding.top),
+        child: Row(
+          children: [
+            GestureDetector(
+              onTap: () => Get.back(),
+              child: Container(
+                width: 38.w,
+                height: 38.w,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                  border: Border.all(color: AppColors.border, width: 2.5),
+                  boxShadow: const [BoxShadow(color: Color(0xFFD6C3A4), offset: Offset(0, 3))],
+                ),
+                child: const Icon(Icons.arrow_back_rounded, size: 20, color: AppColors.textPrimary),
               ),
-              child: const Icon(Icons.arrow_back_rounded, size: 20, color: AppColors.textPrimary),
             ),
-          ),
-          SizedBox(width: 10.w),
-          Text(LanKey.achievements.tr, style: textStyleBlack(fontSize: 22.sp, color: AppColors.textPrimary)),
-          const Spacer(),
-          Obx(() {
-            final n = NetworkRegistry.ins.achievements.where((a) => a.isUnlocked).length;
-            return Container(
-              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 5.h),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(color: AppColors.border, width: 2),
-                borderRadius: BorderRadius.circular(14),
-                boxShadow: const [BoxShadow(color: Color(0xFFD6C3A4), offset: Offset(0, 3))],
-              ),
-              child: Text(
-                '$n / ${controller.achievementDefs.length}',
-                style: textStyleBold(fontSize: 13.sp, color: AppColors.textSecondary),
-              ),
-            );
-          }),
-        ],
+            SizedBox(width: 10.w),
+            Text(LanKey.achievements.tr, style: textStyleBlack(fontSize: 22.sp, color: AppColors.textPrimary)),
+            const Spacer(),
+            Obx(() {
+              final n = controller.achievements.where((a) => a.isUnlocked).length;
+              return Container(
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 5.h),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(color: AppColors.border, width: 2),
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: const [BoxShadow(color: Color(0xFFD6C3A4), offset: Offset(0, 3))],
+                ),
+                child: Text(
+                  '$n / ${controller.achievements.length}',
+                  style: textStyleBold(fontSize: 13.sp, color: AppColors.textSecondary),
+                ),
+              );
+            }),
+          ],
+        ),
       ),
     );
   }
@@ -124,12 +127,12 @@ class AchievementsPage extends GetView<AchievementsController> {
   Widget _buildList() {
     return ListView.separated(
       padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 24.h),
-      itemCount: controller.achievementDefs.length,
+      itemCount: controller.achievements.length,
       separatorBuilder: (_, __) => SizedBox(height: 10.h),
       itemBuilder: (context, index) {
-        final def = controller.achievementDefs[index];
+        final def = controller.achievements[index];
         Achievement? saved;
-        for (final a in NetworkRegistry.ins.achievements) {
+        for (final a in controller.achievements) {
           if (a.id == def.id) {
             saved = a;
             break;

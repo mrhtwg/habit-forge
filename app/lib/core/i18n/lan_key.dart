@@ -90,7 +90,7 @@ enum LanKey {
   reward, // 'Reward'
   dueDateAndPriority, // 'Due Date & Priority'
   pickDate, // 'Pick date'
-  xp, // 'XP'
+  exp, // 'EXP'
   hp, // 'HP'
   attributes, // 'Attributes'
   statStr, // 'STR'
@@ -246,13 +246,6 @@ enum LanKey {
         'tasks_100' => taskMaster,
         'first_purchase' => shopaholic,
         _ => backFromTheDead,
-      };
-
-  /// Character class label by raw name (warrior | mage | ranger).
-  static LanKey characterClass(String name) => switch (name) {
-        'warrior' => warrior,
-        'mage' => mage,
-        _ => ranger,
       };
 
   /// Difficulty label by raw value (easy | medium | hard).

@@ -21,7 +21,7 @@ class EnvConstants {
   static const String _networkMode = String.fromEnvironment('network', defaultValue: environment);
 
   /// Where game data is stored: 'hive' (local on-device), 'firebase', or 'server'.
-  static get networkMode => switch (_networkMode) {
+  static NetworkMode get networkMode => switch (_networkMode) {
         'hive' => NetworkMode.hive,
         'firebase' => NetworkMode.firebase,
         'server' => NetworkMode.server,
@@ -38,11 +38,11 @@ class EnvConstants {
   static bool isAuthServer() => authMode == server;
 
   /// Whether Firebase is used for cloud data and auth.
-  static bool isFirebase() => networkMode == firebase;
+  static bool isFirebase() => networkMode == NetworkMode.firebase;
 
   /// Whether game data lives in local Hive storage.
-  static bool isHive() => networkMode == hive;
+  static bool isHive() => networkMode == NetworkMode.hive;
 
   /// Whether the self-hosted backend is used for data and auth.
-  static bool isServer() => networkMode == server;
+  static bool isServer() => networkMode == NetworkMode.server;
 }

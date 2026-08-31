@@ -1,5 +1,6 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:habit_forge_app/generated/protos/achievement/v1/achievement.pb.dart';
+import 'package:habit_forge_app/generated/protos/shared/v1/shared.pbenum.dart';
 import 'package:habit_forge_app/generated/protos/shop/v1/shop.pb.dart';
 
 /// Static game catalog served by the storage layer, mimicking a backend that
@@ -91,54 +92,48 @@ class GameCatalog {
       name: 'Flame Sword',
       description: 'A sword wreathed in eternal flame',
       price: Int64(500),
-      category: 'equipment',
-      rarity: 'epic',
-      glbAssetPath: null,
+      slot: EquipmentSlot.EQUIPMENT_SLOT_WEAPON,
+      rarity: EquipmentRarity.EQUIPMENT_RARITY_EPIC,
     ),
     ShopItem(
       id: 'armor_golden',
       name: 'Golden Armor',
       description: 'Shining golden plate armor',
       price: Int64(300),
-      category: 'equipment',
-      rarity: 'rare',
-      glbAssetPath: null,
+      slot: EquipmentSlot.EQUIPMENT_SLOT_WEAPON,
+      rarity: EquipmentRarity.EQUIPMENT_RARITY_RARE,
     ),
     ShopItem(
       id: 'helm_dragon',
       name: 'Dragon Helm',
       description: 'Helm forged from dragon scales',
       price: Int64(250),
-      category: 'equipment',
-      rarity: 'rare',
-      glbAssetPath: null,
+      slot: EquipmentSlot.EQUIPMENT_SLOT_WEAPON,
+      rarity: EquipmentRarity.EQUIPMENT_RARITY_RARE,
     ),
     ShopItem(
       id: 'cloak_shadow',
       name: 'Shadow Cloak',
       description: 'Cloak woven from shadow',
       price: Int64(150),
-      category: 'appearance',
-      rarity: 'common',
-      glbAssetPath: null,
+      slot: EquipmentSlot.EQUIPMENT_SLOT_WEAPON,
+      rarity: EquipmentRarity.EQUIPMENT_RARITY_COMMON,
     ),
     ShopItem(
       id: 'amulet_star',
       name: 'Star Amulet',
       description: 'Amulet that glows like starlight',
       price: Int64(200),
-      category: 'appearance',
-      rarity: 'common',
-      glbAssetPath: null,
+      slot: EquipmentSlot.EQUIPMENT_SLOT_WEAPON,
+      rarity: EquipmentRarity.EQUIPMENT_RARITY_COMMON,
     ),
     ShopItem(
       id: 'staff_arcane',
       name: 'Arcane Staff',
       description: 'A staff crackling with arcane energy',
       price: Int64(350),
-      category: 'equipment',
-      rarity: 'epic',
-      glbAssetPath: null,
+      slot: EquipmentSlot.EQUIPMENT_SLOT_WEAPON,
+      rarity: EquipmentRarity.EQUIPMENT_RARITY_EPIC,
     ),
   ];
 

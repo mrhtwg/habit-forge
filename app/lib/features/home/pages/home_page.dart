@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:habit_forge_app/core/common/animation/frame_sequence_player.dart';
 import 'package:habit_forge_app/core/constants/game_constants.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
-import 'package:habit_forge_app/core/network/network_registry.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
@@ -118,7 +117,7 @@ class HomePage extends GetView<HomeController> {
           ),
           // Hero circular frame + level badge + idle animation
           Obx(() {
-            final char = NetworkRegistry.ins.character.value;
+            final char = UserService.to.character.value;
             return GestureDetector(
               onTap: controller.onCharacterTap,
               child: SizedBox(
@@ -176,7 +175,7 @@ class HomePage extends GetView<HomeController> {
             padding: EdgeInsets.fromLTRB(24.w, 18.h, 24.w, 18.h),
             child: Column(
               children: [
-                _hudBar(label: LanKey.xp.tr, color: AppColors.gold, text: _xpText()),
+                _hudBar(label: LanKey.exp.tr, color: AppColors.gold, text: _xpText()),
                 SizedBox(height: 8.h),
                 _hudBar(label: LanKey.hp.tr, color: AppColors.coral, text: _hpText()),
               ],
@@ -232,7 +231,7 @@ class HomePage extends GetView<HomeController> {
   }
 
   String _hpText() {
-    final char = NetworkRegistry.ins.character.value;
+    final char = UserService.to.character.value;
     return '${char?.currentHp ?? 100}/${GameConstants.maxHp}';
   }
 
@@ -242,7 +241,10 @@ class HomePage extends GetView<HomeController> {
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(label, style: textStyleBold(fontSize: 11.sp, color: AppColors.textSecondary)),
+          SizedBox(
+            width: 20.w,
+            child: Text(label, style: textStyleBold(fontSize: 11.sp, color: AppColors.textSecondary)),
+          ),
           SizedBox(width: 8.w),
           Expanded(
             child: Container(
@@ -266,7 +268,7 @@ class HomePage extends GetView<HomeController> {
           ),
           SizedBox(width: 8.w),
           SizedBox(
-            width: 36.w,
+            width: 50.w,
             child: Text(text, style: textStyleBold(fontSize: 12.sp, color: AppColors.textPrimary)),
           ),
         ],
@@ -275,7 +277,7 @@ class HomePage extends GetView<HomeController> {
   }
 
   double _ratioFor(String label) {
-    final char = NetworkRegistry.ins.character.value;
+    final char = UserService.to.character.value;
     if (label == 'HP') {
       return ((char?.currentHp ?? 100) / GameConstants.maxHp).clamp(0.0, 1.0).toDouble();
     }
@@ -285,7 +287,7 @@ class HomePage extends GetView<HomeController> {
   }
 
   String _xpText() {
-    final char = NetworkRegistry.ins.character.value;
+    final char = UserService.to.character.value;
     final level = char?.level ?? 1;
     final needed = GameConstants.expForLevel(level);
     return '${char?.currentExp ?? 0}/$needed';

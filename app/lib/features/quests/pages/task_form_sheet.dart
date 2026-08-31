@@ -6,7 +6,6 @@ import 'package:habit_forge_app/core/constants/app_constants.dart';
 import 'package:habit_forge_app/core/constants/game_constants.dart';
 import 'package:habit_forge_app/core/extensions/task_extensions.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
-import 'package:habit_forge_app/core/network/network_interface.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/quests/controllers/quests_controller.dart';
@@ -389,13 +388,13 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
                 padding: EdgeInsets.symmetric(vertical: 15.h),
                 onTap: () {
                   if (_titleCtrl.text.trim().isEmpty) {
-                    Toast.warning(LanKey.titleRequired.tr);
+                    Toast.error(LanKey.titleRequired.tr);
                     return;
                   }
 
                   // Only the caller-known fields travel to the storage layer;
                   // ids, timestamps and rewards are owned by the implementation.
-                  final params = CreateTaskParams(
+                  final params = Task(
                     title: _titleCtrl.text.trim(),
                     description: _descCtrl.text.trim().isNotEmpty ? _descCtrl.text.trim() : null,
                     type: _type,

@@ -24,6 +24,7 @@ const OperationTaskServiceCreateTask = "/api.task.v1.TaskService/CreateTask"
 const OperationTaskServiceDeleteTask = "/api.task.v1.TaskService/DeleteTask"
 const OperationTaskServiceGetTask = "/api.task.v1.TaskService/GetTask"
 const OperationTaskServiceListTasks = "/api.task.v1.TaskService/ListTasks"
+const OperationTaskServiceSkipTask = "/api.task.v1.TaskService/SkipTask"
 const OperationTaskServiceUpdateTask = "/api.task.v1.TaskService/UpdateTask"
 
 type TaskServiceHTTPServer interface {
@@ -37,6 +38,8 @@ type TaskServiceHTTPServer interface {
 	GetTask(context.Context, *GetTaskRequest) (*GetTaskReply, error)
 	// ListTasks ListTasks lists tasks for the current user with optional filters.
 	ListTasks(context.Context, *ListTasksRequest) (*ListTasksReply, error)
+	// SkipTask SkipTask marks a task completed and grants EXP/gold rewards.
+	SkipTask(context.Context, *SkipTaskRequest) (*SkipTaskReply, error)
 	// UpdateTask UpdateTask updates an existing task (title, difficulty, tags, skip, etc.).
 	UpdateTask(context.Context, *UpdateTaskRequest) (*UpdateTaskReply, error)
 }
@@ -49,6 +52,7 @@ func RegisterTaskServiceHTTPServer(s *http.Server, srv TaskServiceHTTPServer) {
 	r.PUT("/api/v1/tasks/{id}", _TaskService_UpdateTask0_HTTP_Handler(srv))
 	r.DELETE("/api/v1/tasks/{id}", _TaskService_DeleteTask0_HTTP_Handler(srv))
 	r.POST("/api/v1/tasks/{id}/complete", _TaskService_CompleteTask0_HTTP_Handler(srv))
+	r.POST("/api/v1/tasks/{id}/complete", _TaskService_SkipTask0_HTTP_Handler(srv))
 }
 
 func _TaskService_ListTasks0_HTTP_Handler(srv TaskServiceHTTPServer) func(ctx http.Context) error {
@@ -186,6 +190,31 @@ func _TaskService_CompleteTask0_HTTP_Handler(srv TaskServiceHTTPServer) func(ctx
 	}
 }
 
+func _TaskService_SkipTask0_HTTP_Handler(srv TaskServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in SkipTaskRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTaskServiceSkipTask)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.SkipTask(ctx, req.(*SkipTaskRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*SkipTaskReply)
+		return ctx.Result(200, reply)
+	}
+}
+
 type TaskServiceHTTPClient interface {
 	// CompleteTask CompleteTask marks a task completed and grants EXP/gold rewards.
 	CompleteTask(ctx context.Context, req *CompleteTaskRequest, opts ...http.CallOption) (rsp *CompleteTaskReply, err error)
@@ -197,6 +226,8 @@ type TaskServiceHTTPClient interface {
 	GetTask(ctx context.Context, req *GetTaskRequest, opts ...http.CallOption) (rsp *GetTaskReply, err error)
 	// ListTasks ListTasks lists tasks for the current user with optional filters.
 	ListTasks(ctx context.Context, req *ListTasksRequest, opts ...http.CallOption) (rsp *ListTasksReply, err error)
+	// SkipTask SkipTask marks a task completed and grants EXP/gold rewards.
+	SkipTask(ctx context.Context, req *SkipTaskRequest, opts ...http.CallOption) (rsp *SkipTaskReply, err error)
 	// UpdateTask UpdateTask updates an existing task (title, difficulty, tags, skip, etc.).
 	UpdateTask(ctx context.Context, req *UpdateTaskRequest, opts ...http.CallOption) (rsp *UpdateTaskReply, err error)
 }
@@ -273,6 +304,20 @@ func (c *TaskServiceHTTPClientImpl) ListTasks(ctx context.Context, in *ListTasks
 	opts = append(opts, http.Operation(OperationTaskServiceListTasks))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// SkipTask SkipTask marks a task completed and grants EXP/gold rewards.
+func (c *TaskServiceHTTPClientImpl) SkipTask(ctx context.Context, in *SkipTaskRequest, opts ...http.CallOption) (*SkipTaskReply, error) {
+	var out SkipTaskReply
+	pattern := "/api/v1/tasks/{id}/complete"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationTaskServiceSkipTask))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

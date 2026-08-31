@@ -132,11 +132,11 @@ class AuthController extends GetxController {
   }
 
   void _checkOnboardingAndRoute() {
-    final prefs = NetworkRegistry.ins.userPrefs.value;
-    if (prefs == null) {
-      Get.offAllNamed(Routers.boarding);
-    } else {
-      Get.offAllNamed(Routers.main);
-    }
+    // final prefs = NetworkRegistry.ins.userPrefs.value;
+    // if (prefs == null) {
+    //   Get.offAllNamed(Routers.boarding);
+    // } else {
+    //   Get.offAllNamed(Routers.main);
+    // }
   }
 }

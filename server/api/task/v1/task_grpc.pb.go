@@ -25,6 +25,7 @@ const (
 	TaskService_UpdateTask_FullMethodName   = "/api.task.v1.TaskService/UpdateTask"
 	TaskService_DeleteTask_FullMethodName   = "/api.task.v1.TaskService/DeleteTask"
 	TaskService_CompleteTask_FullMethodName = "/api.task.v1.TaskService/CompleteTask"
+	TaskService_SkipTask_FullMethodName     = "/api.task.v1.TaskService/SkipTask"
 )
 
 // TaskServiceClient is the client API for TaskService service.
@@ -45,6 +46,8 @@ type TaskServiceClient interface {
 	DeleteTask(ctx context.Context, in *DeleteTaskRequest, opts ...grpc.CallOption) (*DeleteTaskReply, error)
 	// CompleteTask marks a task completed and grants EXP/gold rewards.
 	CompleteTask(ctx context.Context, in *CompleteTaskRequest, opts ...grpc.CallOption) (*CompleteTaskReply, error)
+	// SkipTask marks a task completed and grants EXP/gold rewards.
+	SkipTask(ctx context.Context, in *SkipTaskRequest, opts ...grpc.CallOption) (*SkipTaskReply, error)
 }
 
 type taskServiceClient struct {
@@ -115,6 +118,16 @@ func (c *taskServiceClient) CompleteTask(ctx context.Context, in *CompleteTaskRe
 	return out, nil
 }
 
+func (c *taskServiceClient) SkipTask(ctx context.Context, in *SkipTaskRequest, opts ...grpc.CallOption) (*SkipTaskReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SkipTaskReply)
+	err := c.cc.Invoke(ctx, TaskService_SkipTask_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TaskServiceServer is the server API for TaskService service.
 // All implementations must embed UnimplementedTaskServiceServer
 // for forward compatibility.
@@ -133,6 +146,8 @@ type TaskServiceServer interface {
 	DeleteTask(context.Context, *DeleteTaskRequest) (*DeleteTaskReply, error)
 	// CompleteTask marks a task completed and grants EXP/gold rewards.
 	CompleteTask(context.Context, *CompleteTaskRequest) (*CompleteTaskReply, error)
+	// SkipTask marks a task completed and grants EXP/gold rewards.
+	SkipTask(context.Context, *SkipTaskRequest) (*SkipTaskReply, error)
 	mustEmbedUnimplementedTaskServiceServer()
 }
 
@@ -160,6 +175,9 @@ func (UnimplementedTaskServiceServer) DeleteTask(context.Context, *DeleteTaskReq
 }
 func (UnimplementedTaskServiceServer) CompleteTask(context.Context, *CompleteTaskRequest) (*CompleteTaskReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method CompleteTask not implemented")
+}
+func (UnimplementedTaskServiceServer) SkipTask(context.Context, *SkipTaskRequest) (*SkipTaskReply, error) {
+	return nil, status.Error(codes.Unimplemented, "method SkipTask not implemented")
 }
 func (UnimplementedTaskServiceServer) mustEmbedUnimplementedTaskServiceServer() {}
 func (UnimplementedTaskServiceServer) testEmbeddedByValue()                     {}
@@ -290,6 +308,24 @@ func _TaskService_CompleteTask_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TaskService_SkipTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SkipTaskRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TaskServiceServer).SkipTask(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TaskService_SkipTask_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TaskServiceServer).SkipTask(ctx, req.(*SkipTaskRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TaskService_ServiceDesc is the grpc.ServiceDesc for TaskService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -320,6 +356,10 @@ var TaskService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CompleteTask",
 			Handler:    _TaskService_CompleteTask_Handler,
+		},
+		{
+			MethodName: "SkipTask",
+			Handler:    _TaskService_SkipTask_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

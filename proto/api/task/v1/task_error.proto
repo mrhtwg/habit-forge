@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package api.task.v1;
+
+import "errors/errors.proto";
+
+option go_package = "github.com/habitforge/backend/api/task/v1;v1";
+
+// TaskErrorReason — business error codes for the task domain.
+enum TaskErrorReason {
+  option (errors.default_code) = 500;
+
+  TASK_ALREADY_EXISTS = 0 [(errors.code) = 409];
+  TASK_NOT_FOUND = 1 [(errors.code) = 404];
+}

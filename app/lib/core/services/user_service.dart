@@ -1,8 +1,10 @@
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/common/animation/frame_sequence_player.dart';
+import 'package:habit_forge_app/core/common/utils/sp_keys.dart';
 import 'package:habit_forge_app/core/common/utils/sp_utils.dart';
 import 'package:habit_forge_app/core/network/network_registry.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart';
+import 'package:habit_forge_app/generated/protos/shop/v1/shop.pbgrpc.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';
 
 class UserService extends GetxService {
@@ -10,7 +12,12 @@ class UserService extends GetxService {
 
   final gold = 0.obs;
   final gem = 0.obs;
+
+  final shopItems = <ShopItem>[].obs;
+
   final token = ''.obs;
+
+  final soundEnabled = true.obs;
 
   // Initial class, show on splash
   final initialClass = Rxn<CharacterClass>(CharacterClass.CHARACTER_CLASS_WARRIOR);
@@ -42,25 +49,24 @@ class UserService extends GetxService {
   }
 
   Future<UserService> init() async {
-    initialClass.value =
-        CharacterClass.valueOf(SpUtils.ins.getInt('characterClass') ?? CharacterClass.CHARACTER_CLASS_WARRIOR.value);
-    token.value = SpUtils.ins.getString('token') ?? '';
+    initialClass.value = CharacterClass.valueOf(
+        SpUtils.ins.getInt(SpKeys.characterClass) ?? CharacterClass.CHARACTER_CLASS_WARRIOR.value);
+    token.value = SpUtils.ins.getString(SpKeys.token) ?? '';
     return this;
   }
 
   bool isLoggedIn() => token.value.isNotEmpty;
 
-  Future<bool> loadCharacter() async {
+  Future loadCharacter() async {
     final result = await NetworkRegistry.ins.getCharacter();
-    if (character.value == null) {
-      return false;
+    if (result.isSuccess) {
+      character.value = result.data?.character;
+      await SpUtils.ins.putInt(SpKeys.characterClass, character.value!.characterClass.value);
     }
-    SpUtils.ins.putInt('characterClass', character.value!.characterClass.value);
-    return true;
   }
 
   Future<void> saveCharacter(Character c) async {
     character.value = c;
-    await SpUtils.ins.putString('character', c.writeToJson());
+    await SpUtils.ins.putInt(SpKeys.characterClass, c.characterClass.value);
   }
 }
