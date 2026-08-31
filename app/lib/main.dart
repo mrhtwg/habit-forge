@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:habit_forge_app/app.dart';
 import 'package:habit_forge_app/core/common/utils/log.dart';
@@ -6,6 +7,8 @@ import 'package:habit_forge_app/core/common/utils/sp_utils.dart';
 import 'package:habit_forge_app/core/constants/env_constants.dart';
 import 'package:habit_forge_app/core/di/injection_container.dart';
 import 'package:habit_forge_app/core/network/network_bootstrap.dart';
+import 'package:habit_forge_app/core/services/audio_service.dart';
+import 'package:habit_forge_app/core/services/haptic_service.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
@@ -33,8 +36,8 @@ void main() async {
   // when the MaterialApp is built (AppLocale.initialLocale).
   // await Hive.openBox('userBox');
 
-  // Get.put(AudioService());
-  // Get.put(HapticService());
+  Get.put(AudioService());
+  Get.put(HapticService());
   // Get.put(ServerAuthService());
   Get.put(UserService(), permanent: true);
   await UserService.to.init();
@@ -57,5 +60,15 @@ void main() async {
   // }
 
   // Get.put(firebaseAuth);
+
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.light,
+      systemNavigationBarColor: Colors.transparent,
+      systemNavigationBarIconBrightness: Brightness.light,
+    ),
+  );
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   runApp(const HabitForgeApp());
 }

@@ -1,9 +1,11 @@
+import 'package:fixnum/fixnum.dart';
 import 'package:grpc/grpc.dart';
 import 'package:habit_forge_app/core/common/utils/sp_keys.dart';
 import 'package:habit_forge_app/core/common/utils/sp_utils.dart';
 import 'package:habit_forge_app/core/network/api_response.dart';
 import 'package:habit_forge_app/core/network/hive/character_box.dart';
 import 'package:habit_forge_app/core/network/hive/task_box.dart';
+import 'package:habit_forge_app/core/network/hive/user_box.dart';
 import 'package:habit_forge_app/core/network/network_interface.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart';
@@ -11,6 +13,7 @@ import 'package:habit_forge_app/generated/protos/character/v1/character_error.pb
 import 'package:habit_forge_app/generated/protos/shared/v1/shared.pbenum.dart';
 import 'package:habit_forge_app/generated/protos/shop/v1/shop.pb.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.dart';
+import 'package:habit_forge_app/generated/protos/user/v1/user.pb.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:uuid/uuid.dart';
 
@@ -62,22 +65,6 @@ class NetworkHiveImpl implements NetworkInterface {
     }
     final t = await TaskBox.ins.createTask(task);
     return ApiResponse.success(CreateTaskReply(task: t));
-  }
-
-  @override
-  Future<ApiResponse<ListTasksReply>> listTasks({
-    TaskType? type,
-    TaskDifficulty? difficulty,
-    List<String>? tags,
-    bool? onlyDueToday,
-  }) async {
-    final _tasks = TaskBox.ins.listTasks(
-      type: type,
-      difficulty: difficulty,
-      tags: tags,
-      onlyDueToday: onlyDueToday,
-    );
-    return ApiResponse.success(ListTasksReply(tasks: _tasks));
   }
 
   @override
@@ -133,6 +120,22 @@ class NetworkHiveImpl implements NetworkInterface {
   }
 
   @override
+  Future<ApiResponse<ListTasksReply>> listTasks({
+    TaskType? type,
+    TaskDifficulty? difficulty,
+    List<String>? tags,
+    bool? onlyDueToday,
+  }) async {
+    final _tasks = TaskBox.ins.listTasks(
+      type: type,
+      difficulty: difficulty,
+      tags: tags,
+      onlyDueToday: onlyDueToday,
+    );
+    return ApiResponse.success(ListTasksReply(tasks: _tasks));
+  }
+
+  @override
   Future<void> postponeTask(String id) async {
     // final task = _findTask(id);
     // if (task == null) return;
@@ -147,9 +150,14 @@ class NetworkHiveImpl implements NetworkInterface {
   }
 
   @override
-  Future<DailyDeal> refreshDailyDeal() {
-    // TODO: implement refreshDailyDeal
-    throw UnimplementedError();
+  Future<ApiResponse<DailyDeal>> refreshDailyDeal() async {
+    return ApiResponse.success(
+      DailyDeal(
+        itemId: 'sword_flame',
+        discountPercent: 30,
+        expiresAt: Int64(DateTime.now().add(Duration(days: 1)).millisecondsSinceEpoch),
+      ),
+    );
   }
 
   @override
@@ -190,5 +198,10 @@ class NetworkHiveImpl implements NetworkInterface {
   Future<ApiResponse<UpdateTaskReply>> updateTask(String id, Task task) {
     // TODO: implement updateTask
     throw UnimplementedError();
+  }
+
+  @override
+  Future<ApiResponse<GetPrefsReply>> getPrefs() async {
+    return ApiResponse.success(GetPrefsReply(prefs: UserBox.ins.getUserPrefs()));
   }
 }

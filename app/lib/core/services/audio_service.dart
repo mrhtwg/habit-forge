@@ -8,6 +8,8 @@ class AudioService extends GetxService {
   final _player = AudioPlayer();
   bool _enabled = true;
 
+  bool get enabled => _enabled;
+
   Future<void> init() async {}
 
   Future<void> play(String assetPath) async {
@@ -19,15 +21,13 @@ class AudioService extends GetxService {
   }
 
   Future<void> playComplete() => play('sounds/task_complete.mp3');
-
   Future<void> playHpDamage() => play('sounds/hp_damage.mp3');
   Future<void> playLevelUp() => play('sounds/level_up.mp3');
   Future<void> playPurchase() => play('sounds/purchase.mp3');
   Future<void> playTap() => play('sounds/tap.mp3');
+
   void setEnabled(bool v) {
     _enabled = v;
     SpUtils.ins.putBool(SpKeys.soundEnabled, v);
   }
-
-  bool get enabled => _enabled;
 }

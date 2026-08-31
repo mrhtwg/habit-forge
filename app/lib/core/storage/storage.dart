@@ -1,4 +1,5 @@
 import 'package:habit_forge_app/core/constants/env_constants.dart';
+import 'package:habit_forge_app/core/network/network_bootstrap.dart';
 import 'package:habit_forge_app/core/network/network_firebase_impl.dart';
 import 'package:habit_forge_app/core/network/network_hive_impl.dart';
 import 'package:habit_forge_app/core/network/network_interface.dart';
@@ -14,9 +15,9 @@ abstract class Storage {
 
   static Future<NetworkInterface> create() async {
     switch (EnvConstants.networkMode) {
-      case EnvConstants.firebase:
+      case NetworkMode.firebase:
         return NetworkFirebaseImpl();
-      case EnvConstants.server:
+      case NetworkMode.server:
         return NetworkServerImpl();
       default:
         return NetworkHiveImpl();

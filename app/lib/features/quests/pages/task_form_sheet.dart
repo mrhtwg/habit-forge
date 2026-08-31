@@ -23,8 +23,8 @@ class TaskFormSheet extends StatefulWidget {
   @override
   State<TaskFormSheet> createState() => _TaskFormSheetState();
 
-  static void show(BuildContext context, {Task? task}) {
-    Get.bottomSheet(
+  static Future show(BuildContext context, {Task? task}) {
+    return Get.bottomSheet(
       TaskFormSheet(task: task),
       backgroundColor: AppColors.surface,
       shape: const RoundedRectangleBorder(

@@ -45,7 +45,10 @@ class HomePage extends GetView<HomeController> {
                 const Spacer(),
                 if (tasks.isNotEmpty)
                   GestureDetector(
-                    onTap: () => TaskFormSheet.show(Get.context!),
+                    onTap: () async {
+                      await TaskFormSheet.show(Get.context!);
+                      controller.loadTodayTasks();
+                    },
                     child:
                         Text(LanKey.addQuest.tr, style: textStyleBold(fontSize: 18.sp, color: AppColors.primaryDark)),
                   ),

@@ -24,7 +24,7 @@ service UserService {
   }
 }
 
-// UserPrefs — per-user preferences, wallet balances and onboarding state.
+// UserPrefs 
 message UserPrefs {
   // Chosen character class.
   api.character.v1.CharacterClass charactor_class = 1;

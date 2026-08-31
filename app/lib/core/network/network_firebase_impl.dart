@@ -4,6 +4,7 @@ import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart'
 import 'package:habit_forge_app/generated/protos/shared/v1/shared.pbenum.dart';
 import 'package:habit_forge_app/generated/protos/shop/v1/shop.pb.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';
+import 'package:habit_forge_app/generated/protos/user/v1/user.pb.dart';
 
 class NetworkFirebaseImpl implements NetworkInterface {
   @override
@@ -63,6 +64,17 @@ class NetworkFirebaseImpl implements NetworkInterface {
   }
 
   @override
+  Future<ApiResponse<ListTasksReply>> listTasks({
+    TaskType? type,
+    TaskDifficulty? difficulty,
+    List<String>? tags,
+    bool? onlyDueToday,
+  }) {
+    // TODO: implement getAllTasks
+    throw UnimplementedError();
+  }
+
+  @override
   Future<void> postponeTask(String id) {
     // TODO: implement postponeTask
     throw UnimplementedError();
@@ -75,7 +87,7 @@ class NetworkFirebaseImpl implements NetworkInterface {
   }
 
   @override
-  Future<DailyDeal> refreshDailyDeal() {
+  Future<ApiResponse<DailyDeal>> refreshDailyDeal() {
     // TODO: implement refreshDailyDeal
     throw UnimplementedError();
   }
@@ -121,13 +133,8 @@ class NetworkFirebaseImpl implements NetworkInterface {
   }
 
   @override
-  Future<ApiResponse<ListTasksReply>> listTasks({
-    TaskType? type,
-    TaskDifficulty? difficulty,
-    List<String>? tags,
-    bool? onlyDueToday,
-  }) {
-    // TODO: implement getAllTasks
+  Future<ApiResponse<GetPrefsReply>> getPrefs() {
+    // TODO: implement getPrefs
     throw UnimplementedError();
   }
 }

@@ -9,8 +9,8 @@ class CharacterApi extends BaseGrpcApi {
   Future<ApiResponse<CreateCharacterReply>> createCharacter(CharacterClass characterClass) async =>
       call(() => _stub.createCharacter(CreateCharacterRequest(characterClass: characterClass)));
 
-  Future<ApiResponse<GetCharacterReply>> getCharacter() async => call(() => _stub.getCharacter(GetCharacterRequest()));
-
   Future<ApiResponse<EquipItemReply>> equipItem(String itemId, EquipmentSlot slot) async =>
       call(() => _stub.equipItem(EquipItemRequest(itemId: itemId, slot: slot)));
+
+  Future<ApiResponse<GetCharacterReply>> getCharacter() async => call(() => _stub.getCharacter(GetCharacterRequest()));
 }

@@ -50,7 +50,8 @@ class UserService extends GetxService {
 
   Future<UserService> init() async {
     initialClass.value = CharacterClass.valueOf(
-        SpUtils.ins.getInt(SpKeys.characterClass) ?? CharacterClass.CHARACTER_CLASS_WARRIOR.value);
+      SpUtils.ins.getInt(SpKeys.characterClass) ?? CharacterClass.CHARACTER_CLASS_WARRIOR.value,
+    );
     token.value = SpUtils.ins.getString(SpKeys.token) ?? '';
     return this;
   }

@@ -6,19 +6,19 @@ import 'package:habit_forge_app/core/network/network_registry.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/generated/protos/shared/v1/shared.pbenum.dart';
 import 'package:habit_forge_app/generated/protos/shop/v1/shop.pb.dart';
+import 'package:habit_forge_app/widgets/toast_widget.dart';
 
 class ForgeController extends GetxController {
   final allItems = <ShopItem>[].obs;
   final activeCategory = 'appearance'.obs;
   // Daily deal
-  final dailyDeal = Rxn<DailyDeal>();
+  final dailyDeal = DailyDeal().obs;
   final countdown = ''.obs;
 
   Timer? _countdownTimer;
 
   ShopItem? get dailyDealItem {
     final deal = dailyDeal.value;
-    if (deal == null) return null;
     final matches = allItems.where((i) => i.id == deal.itemId);
     return matches.isNotEmpty ? matches.first : null;
   }
@@ -58,15 +58,12 @@ class ForgeController extends GetxController {
       await NetworkRegistry.ins.purchaseItem(item.id, ShopCurrency.SHOP_CURRENCY_GEMS);
 
   Future<void> _initDailyDeal() async {
-    dailyDeal.value = await NetworkRegistry.ins.refreshDailyDeal();
+    final result = await NetworkRegistry.ins.refreshDailyDeal();
+    result.when(onSuccess: (reply) => dailyDeal.value = reply, onFailure: (code, msg) => Toast.error(msg));
   }
 
   void _updateCountdown() {
     final deal = dailyDeal.value;
-    if (deal == null) {
-      countdown.value = '00:00:00';
-      return;
-    }
     final remaining = DateTime(deal.expiresAt.toInt()).difference(DateTime.now());
     if (remaining.isNegative) {
       countdown.value = '00:00:00';

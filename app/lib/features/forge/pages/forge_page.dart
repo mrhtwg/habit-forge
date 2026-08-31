@@ -33,7 +33,7 @@ class ForgePage extends GetView<ForgeController> {
     return Obx(() {
       final deal = controller.dailyDeal.value;
       final item = controller.dailyDealItem;
-      if (deal == null || item == null) return const SizedBox.shrink();
+      if (item == null) return const SizedBox.shrink();
       final original = item.price;
       final discounted = original - (original * deal.discountPercent ~/ 100);
       return Padding(
