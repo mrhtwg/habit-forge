@@ -19,7 +19,7 @@ import '../../character/v1/character.pbenum.dart' as $1;
 
 export 'package:protobuf/protobuf.dart' show GeneratedMessageGenericExtensions;
 
-/// UserPrefs — per-user preferences, wallet balances and onboarding state.
+/// UserPrefs
 class UserPrefs extends $pb.GeneratedMessage {
   factory UserPrefs({
     $1.CharacterClass? charactorClass,

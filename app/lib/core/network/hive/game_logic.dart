@@ -1,6 +1,6 @@
 import 'package:fixnum/fixnum.dart';
-import 'package:habit_forge_app/core/constants/game_constants.dart';
 import 'package:habit_forge_app/core/extensions/date_extensions.dart';
+import 'package:habit_forge_app/core/network/hive/game_constants.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';
 import 'package:habit_forge_app/generated/protos/user/v1/user.pb.dart';

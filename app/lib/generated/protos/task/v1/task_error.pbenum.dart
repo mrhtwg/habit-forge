@@ -20,14 +20,17 @@ class TaskErrorReason extends $pb.ProtobufEnum {
       TaskErrorReason._(0, _omitEnumNames ? '' : 'TASK_ALREADY_EXISTS');
   static const TaskErrorReason TASK_NOT_FOUND =
       TaskErrorReason._(1, _omitEnumNames ? '' : 'TASK_NOT_FOUND');
+  static const TaskErrorReason TASK_ALREADY_COMPLETED =
+      TaskErrorReason._(2, _omitEnumNames ? '' : 'TASK_ALREADY_COMPLETED');
 
   static const $core.List<TaskErrorReason> values = <TaskErrorReason>[
     TASK_ALREADY_EXISTS,
     TASK_NOT_FOUND,
+    TASK_ALREADY_COMPLETED,
   ];
 
   static final $core.List<TaskErrorReason?> _byValue =
-      $pb.ProtobufEnum.$_initByValueList(values, 1);
+      $pb.ProtobufEnum.$_initByValueList(values, 2);
   static TaskErrorReason? valueOf($core.int value) =>
       value < 0 || value >= _byValue.length ? null : _byValue[value];
 

@@ -4,6 +4,8 @@ import 'package:habit_forge_app/core/common/utils/sp_keys.dart';
 import 'package:habit_forge_app/core/common/utils/sp_utils.dart';
 import 'package:habit_forge_app/core/network/api_response.dart';
 import 'package:habit_forge_app/core/network/hive/character_box.dart';
+import 'package:habit_forge_app/core/network/hive/game_constants.dart';
+import 'package:habit_forge_app/core/network/hive/game_logic.dart';
 import 'package:habit_forge_app/core/network/hive/task_box.dart';
 import 'package:habit_forge_app/core/network/hive/user_box.dart';
 import 'package:habit_forge_app/core/network/network_interface.dart';
@@ -26,19 +28,7 @@ class NetworkHiveImpl implements NetworkInterface {
     return true;
   }
 
-  @override
-  Future<ApiResponse<CompleteTaskReply>> completeTask(String id) async {
-    final task = TaskBox.ins.getTask(id);
-    if (task == null) {
-      return ApiResponse.failure(code: TaskErrorReason.TASK_NOT_FOUND.value, message: 'Task not found');
-    }
-    TaskBox.ins.completeTask(task);
-
-    return ApiResponse.success(CompleteTaskReply());
-  }
-
   // ── Character ──
-
   @override
   Future<ApiResponse<CreateCharacterReply>> createCharacter(CharacterClass characterClass) async {
     if (await CharacterBox.ins.getCharacter() != null) {
@@ -47,7 +37,17 @@ class NetworkHiveImpl implements NetworkInterface {
         message: 'Character already exists',
       );
     }
-    final character = CharacterBox.ins.createCharacter(characterClass);
+
+    Character character = Character()
+      ..id = Uuid().v4()
+      ..characterClass = characterClass
+      ..level = 1
+      ..currentExp = Int64(0)
+      ..currentHp = GameConstants.initialHp
+      ..baseStats = CharacterStats()
+      ..availableStatPoints = 0
+      ..isDead = false;
+    CharacterBox.ins.createCharacter(character);
     return ApiResponse.success(CreateCharacterReply(character: character));
   }
 
@@ -65,6 +65,32 @@ class NetworkHiveImpl implements NetworkInterface {
     }
     final t = await TaskBox.ins.createTask(task);
     return ApiResponse.success(CreateTaskReply(task: t));
+  }
+
+  @override
+  Future<ApiResponse<CompleteTaskReply>> completeTask(String id) async {
+    final task = TaskBox.ins.getTask(id);
+    if (task == null) {
+      return ApiResponse.failure(code: TaskErrorReason.TASK_NOT_FOUND.value, message: 'Task not found');
+    }
+    if (task.isCompleted) {
+      return ApiResponse.failure(code: TaskErrorReason.TASK_ALREADY_COMPLETED.value, message: 'Task already completed');
+    }
+
+    final character = CharacterBox.ins.getCharacter();
+    if (character == null) {
+      return ApiResponse.failure(code: CharacterErrorReason.CHARACTER_NOT_FOUND.value, message: 'Character not found');
+    }
+    character.freeze();
+    CharacterBox.ins
+        .updateCharacter(character.rebuild((c) => c..currentExp = character.currentExp + GameLogic.expReward(task)));
+
+    final userPrefs = UserBox.ins.getUserPrefs();
+    userPrefs.freeze();
+    UserBox.ins.updateUserPrefs(userPrefs.rebuild((u) => u..currentGold = u.currentGold + GameLogic.goldReward(task)));
+
+    TaskBox.ins.completeTask(task);
+    return ApiResponse.success(CompleteTaskReply());
   }
 
   @override
@@ -103,11 +129,7 @@ class NetworkHiveImpl implements NetworkInterface {
     await Hive.initFlutter();
     await CharacterBox.ins.init();
     await TaskBox.ins.init();
-    // _userBox = await Hive.openBox('userBox');
-    // _tasksBox = await Hive.openBox('tasksBox');
-    // _shopBox = await Hive.openBox('shopBox');
-    // _achievementBox = await Hive.openBox('achievementBox');
-
+    await UserBox.ins.init();
     if (!UserService.to.isLoggedIn()) {
       final token = Uuid().v4();
       await SpUtils.ins.putString(SpKeys.token, token);

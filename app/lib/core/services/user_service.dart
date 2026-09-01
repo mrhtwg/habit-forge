@@ -26,6 +26,13 @@ class UserService extends GetxService {
 
   final tasks = <Task>[].obs;
 
+  Future<void> loadUserPrefs() async {
+    final result = await NetworkRegistry.ins.getPrefs();
+    if (result.isSuccess) {
+      gold.value = result.data?.prefs.currentGold.toInt() ?? 0;
+    }
+  }
+
   List<String> getCharacterFrame([CharacterClass? characterClass]) {
     CharacterClass? _class = characterClass;
     if (_class == null) {

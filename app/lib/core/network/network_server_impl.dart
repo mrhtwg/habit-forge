@@ -1,4 +1,3 @@
-import 'package:grpc/grpc.dart';
 import 'package:habit_forge_app/core/network/api_response.dart';
 import 'package:habit_forge_app/core/network/grpc/character_api.dart';
 import 'package:habit_forge_app/core/network/grpc/shop_api.dart';
@@ -47,12 +46,6 @@ class NetworkServerImpl implements NetworkInterface {
   }
 
   Future<ApiResponse<GetCharacterReply>> getCharacter() async => await CharacterApi().getCharacter();
-
-  @override
-  Future<ApiResponse<ListTasksReply>> getTodayTasks() {
-    // TODO: implement getTodayTasks
-    throw UnimplementedError();
-  }
 
   @override
   Future<NetworkInterface> init() async {
@@ -129,39 +122,9 @@ class NetworkServerImpl implements NetworkInterface {
     throw UnimplementedError();
   }
 
-  /// Parses "host:port" (or "http://host:port") into a (host, port) record.
-  (String, int) _parseEndpoint(String url) {
-    final cleaned = url.replaceAll(RegExp(r'^https?://'), '');
-    final parts = cleaned.split(':');
-    final host = parts.first;
-    final port = parts.length > 1 ? int.tryParse(parts[1]) ?? 9000 : 9000;
-    return (host, port);
-  }
-
   @override
   Future<ApiResponse<GetPrefsReply>> getPrefs() {
     // TODO: implement getPrefs
     throw UnimplementedError();
-  }
-}
-
-/// Attaches the current JWT to every outgoing gRPC call.
-class _AuthInterceptor extends ClientInterceptor {
-  final String? Function() _token;
-
-  _AuthInterceptor(this._token);
-
-  @override
-  ResponseFuture<R> interceptUnary<Q, R>(
-    ClientMethod<Q, R> method,
-    Q request,
-    CallOptions options,
-    ClientUnaryInvoker<Q, R> invoker,
-  ) {
-    final token = _token();
-    final opts = (token == null || token.isEmpty)
-        ? options
-        : options.mergedWith(CallOptions(metadata: {'authorization': 'Bearer $token'}));
-    return invoker(method, request, opts);
   }
 }

@@ -52,12 +52,6 @@ class NetworkFirebaseImpl implements NetworkInterface {
   }
 
   @override
-  Future<ApiResponse<ListTasksReply>> getTodayTasks() {
-    // TODO: implement getTodayTasks
-    throw UnimplementedError();
-  }
-
-  @override
   Future<NetworkInterface> init() {
     // TODO: implement init
     throw UnimplementedError();

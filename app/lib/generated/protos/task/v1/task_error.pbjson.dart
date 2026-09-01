@@ -21,6 +21,7 @@ const TaskErrorReason$json = {
   '2': [
     {'1': 'TASK_ALREADY_EXISTS', '2': 0, '3': {}},
     {'1': 'TASK_NOT_FOUND', '2': 1, '3': {}},
+    {'1': 'TASK_ALREADY_COMPLETED', '2': 2, '3': {}},
   ],
   '3': {},
 };
@@ -28,4 +29,5 @@ const TaskErrorReason$json = {
 /// Descriptor for `TaskErrorReason`. Decode as a `google.protobuf.EnumDescriptorProto`.
 final $typed_data.Uint8List taskErrorReasonDescriptor = $convert.base64Decode(
     'Cg9UYXNrRXJyb3JSZWFzb24SHQoTVEFTS19BTFJFQURZX0VYSVNUUxAAGgSoRZkDEhgKDlRBU0'
-    'tfTk9UX0ZPVU5EEAEaBKhFlAMaBKBF9AM=');
+    'tfTk9UX0ZPVU5EEAEaBKhFlAMSIAoWVEFTS19BTFJFQURZX0NPTVBMRVRFRBACGgSoRZADGgSg'
+    'RfQD');

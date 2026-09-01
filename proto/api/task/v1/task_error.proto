@@ -12,4 +12,5 @@ enum TaskErrorReason {
 
   TASK_ALREADY_EXISTS = 0 [(errors.code) = 409];
   TASK_NOT_FOUND = 1 [(errors.code) = 404];
+  TASK_ALREADY_COMPLETED = 2 [(errors.code) = 400];
 }

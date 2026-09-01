@@ -1,5 +1,4 @@
 import 'package:fixnum/fixnum.dart';
-import 'package:habit_forge_app/core/common/utils/log.dart';
 import 'package:habit_forge_app/core/di/injection_container.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';
 import 'package:hive/hive.dart';
@@ -36,11 +35,33 @@ class TaskBox {
     List<String>? tags,
     bool? onlyDueToday,
   }) {
-    Log.d('listTasks $type $difficulty $tags $onlyDueToday');
     final _tasks = _taskBox.values.map((e) => Task()..mergeFromBuffer(e)).where((task) {
+      if (type != null && task.type != type) {
+        return false;
+      }
+      if (difficulty != null && task.difficulty != difficulty) {
+        return false;
+      }
+      if (tags != null && !tags.every(task.tags.contains)) {
+        return false;
+      }
+      if (onlyDueToday != null && onlyDueToday == true) {
+        switch (task.type) {
+          case TaskType.TASK_TYPE_HABIT:
+            return true;
+          case TaskType.TASK_TYPE_DAILY:
+            return task.repeatDays.contains(DateTime.now().weekday);
+          case TaskType.TASK_TYPE_TODO:
+            return DateTime(task.dueDate.toInt()) == DateTime.now().day &&
+                DateTime(task.dueDate.toInt()).month == DateTime.now().month &&
+                DateTime(task.dueDate.toInt()).year == DateTime.now().year;
+        }
+
+        return false;
+      }
       return true;
     }).toList();
-
+    _tasks.sort((a, b) => a.createdAt.compareTo(b.createdAt));
     return _tasks;
   }
 

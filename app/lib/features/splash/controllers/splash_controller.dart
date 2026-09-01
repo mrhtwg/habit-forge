@@ -16,6 +16,7 @@ class SplashController extends GetxController {
     }
 
     // Logged in, check character
+    await UserService.to.loadUserPrefs();
     await UserService.to.loadCharacter();
     if (UserService.to.character.value == null) {
       Get.offAllNamed(Routers.boarding);

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/common/animation/frame_sequence_player.dart';
-import 'package:habit_forge_app/core/constants/game_constants.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
+import 'package:habit_forge_app/core/network/hive/game_constants.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
@@ -244,6 +244,7 @@ class HomePage extends GetView<HomeController> {
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          SizedBox(width: 10.w),
           SizedBox(
             width: 20.w,
             child: Text(label, style: textStyleBold(fontSize: 11.sp, color: AppColors.textSecondary)),

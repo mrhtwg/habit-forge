@@ -1,9 +1,7 @@
-import 'package:fixnum/fixnum.dart';
 import 'package:habit_forge_app/core/di/injection_container.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart';
 import 'package:hive/hive.dart';
 import 'package:injectable/injectable.dart';
-import 'package:uuid/uuid.dart';
 
 @singleton
 class CharacterBox {
@@ -20,17 +18,32 @@ class CharacterBox {
     _characterBox = await Hive.openBox(_boxKey);
   }
 
-  Character createCharacter(CharacterClass characterClass) {
-    Character character = Character()
-      ..id = Uuid().v4()
-      ..characterClass = characterClass
-      ..level = 1
-      ..currentExp = Int64(0)
-      ..currentHp = 100
-      ..baseStats = CharacterStats()
-      ..availableStatPoints = 0;
+  void createCharacter(Character character) {
     _characterBox.put(_characterKey, character.writeToBuffer());
-    return character;
+  }
+
+  void updateCharacter(Character character) {
+    _characterBox.put(_characterKey, character.writeToBuffer());
+    // final _c = getCharacter();
+    // if (_c == null) {
+    //   return;
+    // }
+
+    // final _character = _c.rebuild(
+    //   (_character) => _character
+    //     ..characterClass = character.characterClass
+    //     ..level = character.level
+    //     ..currentExp = character.currentExp
+    //     ..currentHp = character.currentHp
+    //     ..baseStats = character.baseStats
+    //     ..availableStatPoints = character.availableStatPoints
+    //     ..equipment.clear()
+    //     ..equipment.addAll(character.equipment)
+    //     ..isDead = character.isDead
+    //     ..deathRecoveryUntil = character.deathRecoveryUntil,
+    // );
+
+    // _characterBox.put(_characterKey, _character.writeToBuffer());
   }
 
   Character? getCharacter() {

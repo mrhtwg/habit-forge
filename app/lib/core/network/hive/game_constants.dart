@@ -4,7 +4,6 @@ import 'package:habit_forge_app/generated/protos/task/v1/task.pbenum.dart';
 
 class GameConstants {
   static const int maxLevel = 50;
-
   static const int maxHp = 100;
   static const int initialHp = 100;
   static const int deathRecoveryMinutes = 30;
