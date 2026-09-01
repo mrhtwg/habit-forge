@@ -9,29 +9,36 @@ import 'package:habit_forge_app/generated/protos/user/v1/user.pb.dart';
 ///
 /// The server implementation delegates the same operations to the backend via
 /// gRPC, so the rules below only run when the backend is not in charge.
+///
+/// Every input message is cloned and frozen first: protobuf's `rebuild` only
+/// works on frozen messages, and we must never freeze (or mutate) the caller's
+/// instance.
 class GameLogic {
   GameLogic._();
 
   // ── Rewards ──
 
   static UserPrefs addCompletedTask(UserPrefs p) =>
-      p.rebuild((x) => x..totalTasksCompleted = p.totalTasksCompleted + 1);
+      (p.clone()..freeze()).rebuild((x) => x..totalTasksCompleted = x.totalTasksCompleted + 1);
 
-  static UserPrefs addGems(UserPrefs p, int amount) => p.rebuild((x) => x..currentGems = p.currentGems + amount);
+  static UserPrefs addGems(UserPrefs p, int amount) =>
+      (p.clone()..freeze()).rebuild((x) => x..currentGems = x.currentGems + amount);
 
   // ── Task ──
 
   // ── Economy ──
 
-  static UserPrefs addGold(UserPrefs p, int amount) => p.rebuild((x) => x..currentGold = p.currentGold + amount);
+  static UserPrefs addGold(UserPrefs p, int amount) =>
+      (p.clone()..freeze()).rebuild((x) => x..currentGold = x.currentGold + amount);
 
   /// Spends one available point on the given attribute.
   static Character allocateStat(Character c, StatType stat) {
     if (c.availableStatPoints <= 0) return c;
-    final s = c.baseStats;
-    return c.rebuild(
+    final frozen = c.clone()..freeze();
+    final s = frozen.baseStats;
+    return frozen.rebuild(
       (x) => x
-        ..availableStatPoints = c.availableStatPoints - 1
+        ..availableStatPoints = frozen.availableStatPoints - 1
         ..baseStats = switch (stat) {
           StatType.STAT_TYPE_STRENGTH => s.rebuild((v) => v..strength = s.strength + 1),
           StatType.STAT_TYPE_INTELLIGENCE => s.rebuild((v) => v..intelligence = s.intelligence + 1),
@@ -47,12 +54,16 @@ class GameLogic {
   /// Marks the task complete and bumps the streak (once per day).
   static Task completeTask(Task task) {
     final now = DateTime.now();
-    final newStreak = DateTime(task.lastStreakDate.toInt()).isToday ? task.streak : task.streak + 1;
-    return task.rebuild(
+    final frozen = task.clone()..freeze();
+    final newStreak =
+        DateTime.fromMillisecondsSinceEpoch(frozen.lastStreakDate.toInt()).isToday ? frozen.streak : frozen.streak + 1;
+    return frozen.rebuild(
       (t) => t
         ..isCompleted = true
         ..streak = newStreak
-        ..lastStreakDate = Int64(now.millisecondsSinceEpoch),
+        ..lastStreakDate = Int64(now.millisecondsSinceEpoch)
+        ..completedAt = Int64(now.millisecondsSinceEpoch)
+        ..updatedAt = Int64(now.millisecondsSinceEpoch),
     );
   }
 
@@ -61,13 +72,14 @@ class GameLogic {
   /// Equips [itemId] into [slot]; an empty [itemId] (or re-equipping the same
   /// item) unequips the slot.
   static Character equip(Character c, String slot, String itemId) {
-    final equipment = Map<String, String>.from(c.equipment);
+    final frozen = c.clone()..freeze();
+    final equipment = Map<String, String>.from(frozen.equipment);
     if (itemId.isEmpty || equipment[slot] == itemId) {
       equipment.remove(slot);
     } else {
       equipment[slot] = itemId;
     }
-    return c.rebuild((x) => x..equipment.addAll(equipment));
+    return frozen.rebuild((x) => x..equipment.addAll(equipment));
   }
 
   /// Base EXP reward for a task, including the streak multiplier.
@@ -78,16 +90,20 @@ class GameLogic {
 
   /// Applies exp and returns (character, newLevel or -1).
   static (Character, int) gainExp(Character c, int exp) {
-    final char = c.rebuild((x) => x..currentExp = c.currentExp + exp);
-    final newLevel = levelForExp(char.currentExp.toInt());
-    if (newLevel <= char.level) return (char, -1);
-    final gained = (newLevel - char.level) * GameConstants.statPointsPerLevel;
+    final frozen = c.clone()..freeze();
+    final newExp = frozen.currentExp + exp;
+    final newLevel = levelForExp(newExp.toInt());
+    if (newLevel <= frozen.level) {
+      return (frozen.rebuild((x) => x..currentExp = newExp), -1);
+    }
+    final gained = (newLevel - frozen.level) * GameConstants.statPointsPerLevel;
     return (
-      char.rebuild(
+      frozen.rebuild(
         (x) => x
+          ..currentExp = newExp
           ..level = newLevel
-          ..availableStatPoints = char.availableStatPoints + gained
-          ..currentHp = (char.currentHp + 20).clamp(0, GameConstants.maxHp),
+          ..availableStatPoints = x.availableStatPoints + gained
+          ..currentHp = (x.currentHp + 20).clamp(0, GameConstants.maxHp),
       ),
       newLevel,
     );
@@ -111,15 +127,16 @@ class GameLogic {
   /// Skips the task and (for todos) pushes the due date to tomorrow.
   static Task postpone(Task task) {
     final tomorrow = DateTime.now().add(const Duration(days: 1));
-    return task.rebuild(
+    final frozen = task.clone()..freeze();
+    return frozen.rebuild(
       (t) => t
         ..isSkipped = true
-        ..dueDate = task.type == TaskType.TASK_TYPE_TODO ? Int64(tomorrow.millisecondsSinceEpoch) : task.dueDate,
+        ..dueDate = frozen.type == TaskType.TASK_TYPE_TODO ? Int64(tomorrow.millisecondsSinceEpoch) : frozen.dueDate,
     );
   }
 
   /// Revives a dead character with the recovery HP.
-  static Character revive(Character c) => c.rebuild(
+  static Character revive(Character c) => (c.clone()..freeze()).rebuild(
         (x) => x
           ..isDead = false
           ..currentHp = GameConstants.deathRecoveryHp
@@ -127,14 +144,15 @@ class GameLogic {
       );
 
   /// Toggles the skipped flag.
-  static Task skip(Task task) => task.rebuild((t) => t..isSkipped = !task.isSkipped);
+  static Task skip(Task task) => (task.clone()..freeze()).rebuild((t) => t..isSkipped = !t.isSkipped);
 
   /// Applies damage; the character dies at 0 HP and schedules recovery.
   static Character takeDamage(Character c, int amount) {
     if (c.isDead) return c;
-    final newHp = (c.currentHp - amount).clamp(0, GameConstants.maxHp);
+    final frozen = c.clone()..freeze();
+    final newHp = (frozen.currentHp - amount).clamp(0, GameConstants.maxHp);
     final dead = newHp <= 0;
-    return c.rebuild(
+    return frozen.rebuild(
       (x) => x
         ..currentHp = newHp
         ..isDead = dead

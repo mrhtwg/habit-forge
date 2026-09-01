@@ -18,7 +18,7 @@ class CharacterController extends GetxController {
   Future<void> checkDeathRecovery() async {
     final char = UserService.to.character.value;
     if (char == null || !char.isDead) return;
-    if (DateTime.now().isAfter(DateTime(char.deathRecoveryUntil.toInt()))) {
+    if (DateTime.now().isAfter(DateTime.fromMillisecondsSinceEpoch(char.deathRecoveryUntil.toInt()))) {
       await NetworkRegistry.ins.reviveCharacter();
     }
   }

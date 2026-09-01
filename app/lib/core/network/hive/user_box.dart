@@ -31,6 +31,18 @@ class UserBox {
     _userBox.put(_boxKey, userPrefs.writeToBuffer());
   }
 
+  static const _ownedKey = 'ownedItemIds';
+
+  List<String> getOwnedItemIds() {
+    final raw = _userBox.get(_ownedKey);
+    if (raw == null) return const [];
+    return (raw as List).cast<String>();
+  }
+
+  void updateOwnedItemIds(List<String> ids) {
+    _userBox.put(_ownedKey, ids);
+  }
+
   void clear() {
     _userBox.clear();
   }

@@ -1,7 +1,9 @@
 import 'package:get/get.dart';
+import 'package:habit_forge_app/core/common/utils/log.dart';
 import 'package:habit_forge_app/core/network/network_registry.dart';
 import 'package:habit_forge_app/core/services/audio_service.dart';
 import 'package:habit_forge_app/core/services/haptic_service.dart';
+import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';
 
 class QuestsController extends GetxController {
@@ -16,6 +18,10 @@ class QuestsController extends GetxController {
 
   void getTasks() async {
     final result = await NetworkRegistry.ins.listTasks();
+    result.when(
+      onSuccess: (reply) => tasks.value = reply.tasks,
+      onFailure: (code, msg) => Log.w('getTasks failed: $msg'),
+    );
   }
 
   List<String> get availableTags {
@@ -49,6 +55,10 @@ class QuestsController extends GetxController {
   Future<void> toggleComplete(Task task) async {
     if (task.isCompleted) return;
     final result = await _hive.completeTask(task.id);
+    if (result.isFailure) return;
+
+    // Refresh the wallet (rewards were granted server-side / in storage).
+    UserService.to.loadUserPrefs();
 
     // Trigger audio/haptic feedback
     final audio = Get.find<AudioService>();

@@ -4,7 +4,6 @@ import 'package:habit_forge_app/core/common/utils/sp_keys.dart';
 import 'package:habit_forge_app/core/common/utils/sp_utils.dart';
 import 'package:habit_forge_app/core/network/network_registry.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart';
-import 'package:habit_forge_app/generated/protos/shop/v1/shop.pbgrpc.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';
 
 class UserService extends GetxService {
@@ -12,8 +11,6 @@ class UserService extends GetxService {
 
   final gold = 0.obs;
   final gem = 0.obs;
-
-  final shopItems = <ShopItem>[].obs;
 
   final token = ''.obs;
 

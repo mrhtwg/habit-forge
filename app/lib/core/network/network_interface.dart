@@ -35,6 +35,8 @@ abstract class NetworkInterface {
   Future<void> postponeTask(String id);
 
   // ── Shop ──
+
+  Future<ApiResponse<ListShopItemsReply>> listShopItems();
   Future<ApiResponse<BuyItemReply>> purchaseItem(String itemId, ShopCurrency currency);
 
   Future<ApiResponse<DailyDeal>> refreshDailyDeal();

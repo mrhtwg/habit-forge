@@ -256,7 +256,7 @@ class TaskTile extends StatelessWidget {
       children.add(const SizedBox(width: 8));
       children.add(
         Text(
-          '📅 ${DateFormat('MMM d', AppLocale.languageCode()).format(DateTime(task.dueDate.toInt()))}',
+          '📅 ${DateFormat('MMM d', AppLocale.languageCode()).format(DateTime.fromMillisecondsSinceEpoch(task.dueDate.toInt()))}',
           style: textStyleRegular(fontSize: 10, color: AppColors.textMuted),
         ),
       );
@@ -460,7 +460,8 @@ class _TaskDetailSheet extends StatelessWidget {
               if (task.type != TaskType.TASK_TYPE_HABIT)
                 _detailChip(
                   AppColors.info,
-                  DateFormat('MMM d, yyyy', AppLocale.languageCode()).format(DateTime(task.dueDate.toInt())),
+                  DateFormat('MMM d, yyyy', AppLocale.languageCode())
+                      .format(DateTime.fromMillisecondsSinceEpoch(task.dueDate.toInt())),
                   Icons.calendar_today_rounded,
                 ),
               _detailChip(

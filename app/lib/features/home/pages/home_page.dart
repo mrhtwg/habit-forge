@@ -178,9 +178,17 @@ class HomePage extends GetView<HomeController> {
             padding: EdgeInsets.fromLTRB(24.w, 18.h, 24.w, 18.h),
             child: Column(
               children: [
-                _hudBar(label: LanKey.exp.tr, color: AppColors.gold, text: _xpText()),
+                _hudBar(
+                  label: LanKey.exp.tr,
+                  text: _xpText(),
+                  barBuilder: _buildExpBar,
+                ),
                 SizedBox(height: 8.h),
-                _hudBar(label: LanKey.hp.tr, color: AppColors.coral, text: _hpText()),
+                _hudBar(
+                  label: LanKey.hp.tr,
+                  text: _hpText(),
+                  barBuilder: _buildHpBar,
+                ),
               ],
             ),
           ),
@@ -238,9 +246,8 @@ class HomePage extends GetView<HomeController> {
     return '${char?.currentHp ?? 100}/${GameConstants.maxHp}';
   }
 
-  Widget _hudBar({required String label, required Color color, required String text}) {
+  Widget _hudBar({required String label, required String text, required Widget Function() barBuilder}) {
     return Obx(() {
-      final ratio = _ratioFor(label);
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -250,26 +257,7 @@ class HomePage extends GetView<HomeController> {
             child: Text(label, style: textStyleBold(fontSize: 11.sp, color: AppColors.textSecondary)),
           ),
           SizedBox(width: 8.w),
-          Expanded(
-            child: Container(
-              height: 14.h,
-              decoration: BoxDecoration(
-                color: const Color(0xFFF3E7CE),
-                border: Border.all(color: AppColors.border, width: 2),
-                borderRadius: BorderRadius.circular(999),
-              ),
-              child: FractionallySizedBox(
-                alignment: Alignment.centerLeft,
-                widthFactor: ratio,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: color,
-                    borderRadius: BorderRadius.circular(999),
-                  ),
-                ),
-              ),
-            ),
-          ),
+          Expanded(child: barBuilder()),
           SizedBox(width: 8.w),
           SizedBox(
             width: 50.w,
@@ -280,14 +268,41 @@ class HomePage extends GetView<HomeController> {
     });
   }
 
-  double _ratioFor(String label) {
+  /// EXP bar with a level-up sequence: on level change the old bar first
+  /// animates to 100%, then resets and the new level's bar animates from 0 to
+  /// its actual progress.
+  Widget _buildExpBar() {
     final char = UserService.to.character.value;
-    if (label == 'HP') {
-      return ((char?.currentHp ?? 100) / GameConstants.maxHp).clamp(0.0, 1.0).toDouble();
-    }
     final level = char?.level ?? 1;
     final needed = GameConstants.expForLevel(level).toDouble();
-    return ((char?.currentExp.toInt() ?? 0) / needed).clamp(0.0, 1.0).toDouble();
+    final ratio = ((char?.currentExp.toInt() ?? 0) / needed).clamp(0.0, 1.0);
+    return _AnimatedExpBar(level: level, ratio: ratio, color: AppColors.gold);
+  }
+
+  /// HP bar: plain smooth transition between values.
+  Widget _buildHpBar() {
+    final char = UserService.to.character.value;
+    final ratio = ((char?.currentHp ?? 100) / GameConstants.maxHp).clamp(0.0, 1.0);
+    return Container(
+      height: 14.h,
+      decoration: BoxDecoration(
+        color: const Color(0xFFF3E7CE),
+        border: Border.all(color: AppColors.border, width: 2),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: AnimatedFractionallySizedBox(
+        duration: const Duration(milliseconds: 600),
+        curve: Curves.easeOutCubic,
+        alignment: Alignment.centerLeft,
+        widthFactor: ratio,
+        child: Container(
+          decoration: BoxDecoration(
+            color: AppColors.coral,
+            borderRadius: BorderRadius.circular(999),
+          ),
+        ),
+      ),
+    );
   }
 
   String _xpText() {
@@ -295,5 +310,100 @@ class HomePage extends GetView<HomeController> {
     final level = char?.level ?? 1;
     final needed = GameConstants.expForLevel(level);
     return '${char?.currentExp ?? 0}/$needed';
+  }
+}
+
+/// An animated EXP bar that plays a level-up sequence: when [level] increases
+/// the fill animates to 100% first, then snaps to zero and animates up to the
+/// new level's [ratio].
+class _AnimatedExpBar extends StatefulWidget {
+  final int level;
+  final double ratio;
+  final Color color;
+
+  const _AnimatedExpBar({required this.level, required this.ratio, required this.color});
+
+  @override
+  State<_AnimatedExpBar> createState() => _AnimatedExpBarState();
+}
+
+class _AnimatedExpBarState extends State<_AnimatedExpBar> with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late Animation<double> _anim;
+  double _shown = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 500));
+    _shown = widget.ratio.clamp(0.0, 1.0);
+    _anim = Tween<double>(begin: _shown, end: _shown).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeOutCubic,
+      ),
+    );
+  }
+
+  @override
+  void didUpdateWidget(covariant _AnimatedExpBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final newRatio = widget.ratio.clamp(0.0, 1.0);
+    if (widget.level != oldWidget.level) {
+      // Level up: fill the old bar to 100%, then reset to 0 and animate the
+      // new level's bar from zero up to its actual progress.
+      _animateTo(
+        1.0,
+        onComplete: () {
+          if (!mounted) return;
+          setState(() => _shown = 0);
+          _animateTo(newRatio);
+        },
+      );
+    } else if (newRatio != oldWidget.ratio) {
+      _animateTo(newRatio);
+    }
+  }
+
+  void _animateTo(double target, {VoidCallback? onComplete}) {
+    _anim = Tween<double>(begin: _shown, end: target).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
+    );
+    _controller.forward(from: 0).whenComplete(() {
+      if (!mounted) return;
+      setState(() => _shown = target);
+      onComplete?.call();
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 14.h,
+      decoration: BoxDecoration(
+        color: const Color(0xFFF3E7CE),
+        border: Border.all(color: AppColors.border, width: 2),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, _) => FractionallySizedBox(
+          alignment: Alignment.centerLeft,
+          widthFactor: _anim.value.clamp(0.0, 1.0),
+          child: Container(
+            decoration: BoxDecoration(
+              color: widget.color,
+              borderRadius: BorderRadius.circular(999),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

@@ -36,13 +36,14 @@ class StatisticsPage extends GetView<StatisticsController> {
                 };
                 final prevCutoff = periodDuration.inDays > 0 ? currentCutoff.subtract(periodDuration) : currentCutoff;
 
-                final currentCompleted =
-                    controller.allTasks.where((t) => DateTime(t.completedAt.toInt()).isAfter(currentCutoff)).toList();
+                final currentCompleted = controller.allTasks
+                    .where((t) => DateTime.fromMillisecondsSinceEpoch(t.completedAt.toInt()).isAfter(currentCutoff))
+                    .toList();
                 final prevCompleted = controller.allTasks
                     .where(
                       (t) =>
-                          DateTime(t.completedAt.toInt()).isAfter(prevCutoff) &&
-                          DateTime(t.completedAt.toInt()).isBefore(currentCutoff),
+                          DateTime.fromMillisecondsSinceEpoch(t.completedAt.toInt()).isAfter(prevCutoff) &&
+                          DateTime.fromMillisecondsSinceEpoch(t.completedAt.toInt()).isBefore(currentCutoff),
                     )
                     .toList();
                 final totalCompleted = currentCompleted.length;
@@ -53,7 +54,7 @@ class StatisticsPage extends GetView<StatisticsController> {
                 const weekdayLabels = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
                 final weekdayCounts = List.filled(7, 0);
                 for (final t in currentCompleted) {
-                  weekdayCounts[(DateTime(t.completedAt.toInt()).weekday - 1) % 7]++;
+                  weekdayCounts[(DateTime.fromMillisecondsSinceEpoch(t.completedAt.toInt()).weekday - 1) % 7]++;
                 }
                 final maxCount = weekdayCounts.reduce((a, b) => a > b ? a : b);
 

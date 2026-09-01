@@ -131,4 +131,10 @@ class NetworkFirebaseImpl implements NetworkInterface {
     // TODO: implement getPrefs
     throw UnimplementedError();
   }
+
+  @override
+  Future<ApiResponse<ListShopItemsReply>> listShopItems() {
+    // TODO: implement listShopItems
+    throw UnimplementedError();
+  }
 }

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/generated/assets.dart';
 import 'package:habit_forge_app/generated/protos/shared/v1/shared.pbenum.dart';
+import 'package:habit_forge_app/widgets/animated_number_text.dart';
 
 class WalletChip extends StatelessWidget {
   final SysMaterial sysMaterial;
@@ -37,14 +39,20 @@ class WalletChip extends StatelessWidget {
             height: 16.w,
           ),
           SizedBox(width: 5.w),
-          Text(
-            switch (sysMaterial) {
-              SysMaterial.SYSMATERIAL_GOLD => UserService.to.gold.value.toString(),
-              SysMaterial.SYSMATERIAL_GEM => UserService.to.gem.value.toString(),
-              _ => '0'
-            },
-            style: textStyleBold(fontSize: 14.sp, color: AppColors.textPrimary),
-          ),
+          // Animated count: eases to the new balance whenever the wallet
+          // changes (e.g. after completing a task on the home screen).
+          Obx(() {
+            final target = switch (sysMaterial) {
+              SysMaterial.SYSMATERIAL_GOLD => UserService.to.gold.value,
+              SysMaterial.SYSMATERIAL_GEM => UserService.to.gem.value,
+              _ => 0,
+            };
+            return AnimatedNumberText(
+              target,
+              duration: const Duration(milliseconds: 2000),
+              style: textStyleBold(fontSize: 14.sp, color: AppColors.textPrimary),
+            );
+          }),
         ],
       ),
     );

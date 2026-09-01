@@ -39,7 +39,7 @@ extension TaskX on Task {
     }
     if (type == TaskType.TASK_TYPE_TODO) {
       final now = DateTime.now();
-      return DateTime(dueDate.toInt()).isBefore(now.add(const Duration(days: 1)));
+      return DateTime.fromMillisecondsSinceEpoch(dueDate.toInt()).isBefore(now.add(const Duration(days: 1)));
     }
     return type == TaskType.TASK_TYPE_HABIT;
   }

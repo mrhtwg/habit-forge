@@ -6,6 +6,8 @@ import 'package:habit_forge_app/core/network/api_response.dart';
 import 'package:habit_forge_app/core/network/hive/character_box.dart';
 import 'package:habit_forge_app/core/network/hive/game_constants.dart';
 import 'package:habit_forge_app/core/network/hive/game_logic.dart';
+import 'package:habit_forge_app/core/network/hive/shop_box.dart';
+import 'package:habit_forge_app/core/network/hive/shop_config.dart';
 import 'package:habit_forge_app/core/network/hive/task_box.dart';
 import 'package:habit_forge_app/core/network/hive/user_box.dart';
 import 'package:habit_forge_app/core/network/network_interface.dart';
@@ -81,16 +83,31 @@ class NetworkHiveImpl implements NetworkInterface {
     if (character == null) {
       return ApiResponse.failure(code: CharacterErrorReason.CHARACTER_NOT_FOUND.value, message: 'Character not found');
     }
-    character.freeze();
-    CharacterBox.ins
-        .updateCharacter(character.rebuild((c) => c..currentExp = character.currentExp + GameLogic.expReward(task)));
 
+    // Rewards (streak-aware EXP + gold).
+    final exp = GameLogic.expReward(task);
+    final gold = GameLogic.goldReward(task);
+
+    // Mark the task complete (streak / completedAt) and persist.
+    final completed = await TaskBox.ins.completeTask(task);
+
+    // Wallet + lifetime completed-task counter.
     final userPrefs = UserBox.ins.getUserPrefs();
-    userPrefs.freeze();
-    UserBox.ins.updateUserPrefs(userPrefs.rebuild((u) => u..currentGold = u.currentGold + GameLogic.goldReward(task)));
+    UserBox.ins.updateUserPrefs(GameLogic.addGold(GameLogic.addCompletedTask(userPrefs), gold));
 
-    TaskBox.ins.completeTask(task);
-    return ApiResponse.success(CompleteTaskReply());
+    // Character: gain EXP and level up (stat points + HP heal on level-up).
+    final (updated, level) = GameLogic.gainExp(character, exp);
+    CharacterBox.ins.updateCharacter(updated);
+    final hpChange = level > 0 ? 20 : 0;
+
+    return ApiResponse.success(
+      CompleteTaskReply(
+        task: completed,
+        expReward: exp,
+        goldReward: gold,
+        hpChange: hpChange,
+      ),
+    );
   }
 
   @override
@@ -130,6 +147,8 @@ class NetworkHiveImpl implements NetworkInterface {
     await CharacterBox.ins.init();
     await TaskBox.ins.init();
     await UserBox.ins.init();
+    await ShopBox.ins.init();
+
     if (!UserService.to.isLoggedIn()) {
       final token = Uuid().v4();
       await SpUtils.ins.putString(SpKeys.token, token);
@@ -138,6 +157,7 @@ class NetworkHiveImpl implements NetworkInterface {
       // (which reads the in-memory value) would still see an empty token.
       UserService.to.token.value = token;
     }
+
     return this;
   }
 
@@ -166,9 +186,25 @@ class NetworkHiveImpl implements NetworkInterface {
   }
 
   @override
-  Future<ApiResponse<BuyItemReply>> purchaseItem(String itemId, ShopCurrency currency) {
-    // TODO: implement purchaseItem
-    throw UnimplementedError();
+  Future<ApiResponse<BuyItemReply>> purchaseItem(String itemId, ShopCurrency currency) async {
+    final item = ShopConfig.shopItems.where((i) => i.id == itemId).firstOrNull;
+    if (item == null) {
+      return ApiResponse.failure(code: StatusCode.notFound, message: 'Item not found');
+    }
+    final owned = UserBox.ins.getOwnedItemIds();
+    if (owned.contains(itemId)) {
+      return ApiResponse.failure(code: StatusCode.alreadyExists, message: 'Item already owned');
+    }
+    final userPrefs = UserBox.ins.getUserPrefs();
+    if (userPrefs.currentGold < item.price) {
+      return ApiResponse.failure(code: StatusCode.failedPrecondition, message: 'Not enough gold');
+    }
+
+    UserBox.ins.updateUserPrefs(GameLogic.addGold(userPrefs, -item.price.toInt()));
+    UserBox.ins.updateOwnedItemIds([...owned, itemId]);
+    return ApiResponse.success(
+      BuyItemReply(item: item, balance: userPrefs.currentGold - item.price),
+    );
   }
 
   @override
@@ -225,5 +261,11 @@ class NetworkHiveImpl implements NetworkInterface {
   @override
   Future<ApiResponse<GetPrefsReply>> getPrefs() async {
     return ApiResponse.success(GetPrefsReply(prefs: UserBox.ins.getUserPrefs()));
+  }
+
+  @override
+  Future<ApiResponse<ListShopItemsReply>> listShopItems() async {
+    final items = await ShopBox.ins.listItems();
+    return ApiResponse.success(ListShopItemsReply(items: items));
   }
 }

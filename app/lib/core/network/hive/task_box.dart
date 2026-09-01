@@ -1,5 +1,6 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:habit_forge_app/core/di/injection_container.dart';
+import 'package:habit_forge_app/core/network/hive/game_logic.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';
 import 'package:hive/hive.dart';
 import 'package:injectable/injectable.dart';
@@ -52,9 +53,9 @@ class TaskBox {
           case TaskType.TASK_TYPE_DAILY:
             return task.repeatDays.contains(DateTime.now().weekday);
           case TaskType.TASK_TYPE_TODO:
-            return DateTime(task.dueDate.toInt()) == DateTime.now().day &&
-                DateTime(task.dueDate.toInt()).month == DateTime.now().month &&
-                DateTime(task.dueDate.toInt()).year == DateTime.now().year;
+            return DateTime.fromMillisecondsSinceEpoch(task.dueDate.toInt()) == DateTime.now().day &&
+                DateTime.fromMillisecondsSinceEpoch(task.dueDate.toInt()).month == DateTime.now().month &&
+                DateTime.fromMillisecondsSinceEpoch(task.dueDate.toInt()).year == DateTime.now().year;
         }
 
         return false;
@@ -92,11 +93,12 @@ class TaskBox {
     return t;
   }
 
-  Future completeTask(Task task) async {
-    task.isCompleted = true;
-    task.completedAt = Int64(DateTime.now().millisecondsSinceEpoch);
-    task.updatedAt = Int64(DateTime.now().millisecondsSinceEpoch);
-    _taskBox.put(task.id, task.writeToBuffer());
+  /// Marks the task complete: applies the streak rule, completion timestamps
+  /// and persists the updated task. Returns the completed task.
+  Future<Task> completeTask(Task task) async {
+    final updated = GameLogic.completeTask(task);
+    _taskBox.put(task.id, updated.writeToBuffer());
+    return updated;
   }
 
   Future deleteTask(String taskId) async {

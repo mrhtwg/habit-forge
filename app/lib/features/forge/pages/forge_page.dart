@@ -175,9 +175,9 @@ class ForgePage extends GetView<ForgeController> {
           mainAxisSpacing: 12.h,
           childAspectRatio: 0.78,
         ),
-        itemCount: controller.allItems.length,
+        itemCount: controller.shopItems.length,
         itemBuilder: (context, index) {
-          final item = controller.allItems[index];
+          final item = controller.shopItems[index];
           final owned = controller.isOwned(item.id);
           return GestureDetector(
             onTap: () => ItemDetailSheet.show(context, item),

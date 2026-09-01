@@ -34,6 +34,7 @@ dependencies:
   get_it: ^9.2.1
   injectable: ^3.0.0
   logger: ^2.6.2
+  yaml: ^3.1.2
 
 dev_dependencies:
   flutter_test:
@@ -63,6 +64,7 @@ flutter:
         - asset: assets/fonts/Caveat-SemiBold.ttf
           weight: 600
   assets:
+    - assets/config/
     - assets/animations/knight_idle/
     - assets/animations/mage_idle/
     - assets/animations/ranger_idle/

@@ -9,7 +9,7 @@ import 'package:habit_forge_app/generated/protos/shop/v1/shop.pb.dart';
 import 'package:habit_forge_app/widgets/toast_widget.dart';
 
 class ForgeController extends GetxController {
-  final allItems = <ShopItem>[].obs;
+  final shopItems = <ShopItem>[].obs;
   final activeCategory = 'appearance'.obs;
   // Daily deal
   final dailyDeal = DailyDeal().obs;
@@ -19,7 +19,7 @@ class ForgeController extends GetxController {
 
   ShopItem? get dailyDealItem {
     final deal = dailyDeal.value;
-    final matches = allItems.where((i) => i.id == deal.itemId);
+    final matches = shopItems.where((i) => i.id == deal.itemId);
     return matches.isNotEmpty ? matches.first : null;
   }
 
@@ -36,7 +36,7 @@ class ForgeController extends GetxController {
     return needed > 0 ? needed : 0;
   }
 
-  bool isOwned(String itemId) => UserService.to.shopItems.contains(itemId);
+  bool isOwned(String itemId) => shopItems.contains(itemId);
 
   @override
   void onClose() {
@@ -47,9 +47,17 @@ class ForgeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+
     _initDailyDeal();
     _updateCountdown();
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (_) => _updateCountdown());
+  }
+
+  Future<void> listItems() async {
+    final result = await NetworkRegistry.ins.listShopItems();
+    if (result.isSuccess) {
+      shopItems.value = result.data!.items;
+    }
   }
 
   /// Delegates the purchase to the storage layer, which validates the balance,
@@ -64,7 +72,7 @@ class ForgeController extends GetxController {
 
   void _updateCountdown() {
     final deal = dailyDeal.value;
-    final remaining = DateTime(deal.expiresAt.toInt()).difference(DateTime.now());
+    final remaining = DateTime.fromMillisecondsSinceEpoch(deal.expiresAt.toInt()).difference(DateTime.now());
     if (remaining.isNegative) {
       countdown.value = '00:00:00';
       return;
