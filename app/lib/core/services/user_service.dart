@@ -74,4 +74,10 @@ class UserService extends GetxService {
     character.value = c;
     await SpUtils.ins.putInt(SpKeys.characterClass, c.characterClass.value);
   }
+
+  Future<void> clearData() async {
+    userPrefs.value.clear();
+    character.value?.clear();
+    tasks.clear();
+  }
 }

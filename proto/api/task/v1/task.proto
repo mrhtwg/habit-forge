@@ -3,6 +3,8 @@ syntax = "proto3";
 package api.task.v1;
 
 import "google/api/annotations.proto";
+import "api/user/v1/user.proto";
+import "api/character/v1/character.proto";
 
 option go_package = "github.com/habitforge/backend/api/task/v1;v1";
 
@@ -200,12 +202,12 @@ message CompleteTaskRequest {
 message CompleteTaskReply {
   // The task with updated completion state.
   Task task = 1;
+
   // EXP granted for completing this task (includes streak multiplier).
-  int32 exp_reward = 2;
-  // Gold granted for completing this task.
-  int32 gold_reward = 3;
-  // HP change applied on completion (positive heals, negative damages).
-  int32 hp_change = 4;
+  api.user.v1.UserPrefs prefs = 2;
+
+  // Character state after completing this task.
+  api.character.v1.Character character = 3;
 }
 
 // SkipTaskRequest — id of the task to mark completed.

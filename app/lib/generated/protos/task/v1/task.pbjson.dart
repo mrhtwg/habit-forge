@@ -333,17 +333,30 @@ const CompleteTaskReply$json = {
       '6': '.api.task.v1.Task',
       '10': 'task'
     },
-    {'1': 'exp_reward', '3': 2, '4': 1, '5': 5, '10': 'expReward'},
-    {'1': 'gold_reward', '3': 3, '4': 1, '5': 5, '10': 'goldReward'},
-    {'1': 'hp_change', '3': 4, '4': 1, '5': 5, '10': 'hpChange'},
+    {
+      '1': 'prefs',
+      '3': 2,
+      '4': 1,
+      '5': 11,
+      '6': '.api.user.v1.UserPrefs',
+      '10': 'prefs'
+    },
+    {
+      '1': 'character',
+      '3': 3,
+      '4': 1,
+      '5': 11,
+      '6': '.api.character.v1.Character',
+      '10': 'character'
+    },
   ],
 };
 
 /// Descriptor for `CompleteTaskReply`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List completeTaskReplyDescriptor = $convert.base64Decode(
     'ChFDb21wbGV0ZVRhc2tSZXBseRIlCgR0YXNrGAEgASgLMhEuYXBpLnRhc2sudjEuVGFza1IEdG'
-    'FzaxIdCgpleHBfcmV3YXJkGAIgASgFUglleHBSZXdhcmQSHwoLZ29sZF9yZXdhcmQYAyABKAVS'
-    'CmdvbGRSZXdhcmQSGwoJaHBfY2hhbmdlGAQgASgFUghocENoYW5nZQ==');
+    'FzaxIsCgVwcmVmcxgCIAEoCzIWLmFwaS51c2VyLnYxLlVzZXJQcmVmc1IFcHJlZnMSOQoJY2hh'
+    'cmFjdGVyGAMgASgLMhsuYXBpLmNoYXJhY3Rlci52MS5DaGFyYWN0ZXJSCWNoYXJhY3Rlcg==');
 
 @$core.Deprecated('Use skipTaskRequestDescriptor instead')
 const SkipTaskRequest$json = {

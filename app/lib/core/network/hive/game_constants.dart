@@ -8,6 +8,7 @@ class GameConstants {
   static const int initialHp = 100;
   static const int deathRecoveryMinutes = 30;
   static const int deathRecoveryHp = 50;
+  static const int completeTaskAddHp = 20;
   static const int statPointsPerLevel = 1;
   GameConstants._();
 

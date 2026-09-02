@@ -15,6 +15,8 @@ import 'dart:core' as $core;
 import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:protobuf/protobuf.dart' as $pb;
 
+import '../../character/v1/character.pb.dart' as $2;
+import '../../user/v1/user.pb.dart' as $1;
 import 'task.pbenum.dart';
 
 export 'package:protobuf/protobuf.dart' show GeneratedMessageGenericExtensions;
@@ -980,15 +982,13 @@ class CompleteTaskRequest extends $pb.GeneratedMessage {
 class CompleteTaskReply extends $pb.GeneratedMessage {
   factory CompleteTaskReply({
     Task? task,
-    $core.int? expReward,
-    $core.int? goldReward,
-    $core.int? hpChange,
+    $1.UserPrefs? prefs,
+    $2.Character? character,
   }) {
     final result = create();
     if (task != null) result.task = task;
-    if (expReward != null) result.expReward = expReward;
-    if (goldReward != null) result.goldReward = goldReward;
-    if (hpChange != null) result.hpChange = hpChange;
+    if (prefs != null) result.prefs = prefs;
+    if (character != null) result.character = character;
     return result;
   }
 
@@ -1006,9 +1006,10 @@ class CompleteTaskReply extends $pb.GeneratedMessage {
       package: const $pb.PackageName(_omitMessageNames ? '' : 'api.task.v1'),
       createEmptyInstance: create)
     ..aOM<Task>(1, _omitFieldNames ? '' : 'task', subBuilder: Task.create)
-    ..aI(2, _omitFieldNames ? '' : 'expReward')
-    ..aI(3, _omitFieldNames ? '' : 'goldReward')
-    ..aI(4, _omitFieldNames ? '' : 'hpChange')
+    ..aOM<$1.UserPrefs>(2, _omitFieldNames ? '' : 'prefs',
+        subBuilder: $1.UserPrefs.create)
+    ..aOM<$2.Character>(3, _omitFieldNames ? '' : 'character',
+        subBuilder: $2.Character.create)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1044,33 +1045,27 @@ class CompleteTaskReply extends $pb.GeneratedMessage {
 
   /// EXP granted for completing this task (includes streak multiplier).
   @$pb.TagNumber(2)
-  $core.int get expReward => $_getIZ(1);
+  $1.UserPrefs get prefs => $_getN(1);
   @$pb.TagNumber(2)
-  set expReward($core.int value) => $_setSignedInt32(1, value);
+  set prefs($1.UserPrefs value) => $_setField(2, value);
   @$pb.TagNumber(2)
-  $core.bool hasExpReward() => $_has(1);
+  $core.bool hasPrefs() => $_has(1);
   @$pb.TagNumber(2)
-  void clearExpReward() => $_clearField(2);
+  void clearPrefs() => $_clearField(2);
+  @$pb.TagNumber(2)
+  $1.UserPrefs ensurePrefs() => $_ensure(1);
 
-  /// Gold granted for completing this task.
+  /// Character state after completing this task.
   @$pb.TagNumber(3)
-  $core.int get goldReward => $_getIZ(2);
+  $2.Character get character => $_getN(2);
   @$pb.TagNumber(3)
-  set goldReward($core.int value) => $_setSignedInt32(2, value);
+  set character($2.Character value) => $_setField(3, value);
   @$pb.TagNumber(3)
-  $core.bool hasGoldReward() => $_has(2);
+  $core.bool hasCharacter() => $_has(2);
   @$pb.TagNumber(3)
-  void clearGoldReward() => $_clearField(3);
-
-  /// HP change applied on completion (positive heals, negative damages).
-  @$pb.TagNumber(4)
-  $core.int get hpChange => $_getIZ(3);
-  @$pb.TagNumber(4)
-  set hpChange($core.int value) => $_setSignedInt32(3, value);
-  @$pb.TagNumber(4)
-  $core.bool hasHpChange() => $_has(3);
-  @$pb.TagNumber(4)
-  void clearHpChange() => $_clearField(4);
+  void clearCharacter() => $_clearField(3);
+  @$pb.TagNumber(3)
+  $2.Character ensureCharacter() => $_ensure(2);
 }
 
 /// SkipTaskRequest — id of the task to mark completed.

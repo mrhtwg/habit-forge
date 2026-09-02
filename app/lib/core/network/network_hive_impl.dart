@@ -86,34 +86,48 @@ class NetworkHiveImpl implements NetworkInterface {
     }
 
     // Rewards (streak-aware EXP + gold).
-    final exp = GameLogic.expReward(task);
-    final gold = GameLogic.goldReward(task);
-
-    // Mark the task complete (streak / completedAt) and persist.
-    final completed = await TaskBox.ins.completeTask(task);
+    final _gainExp = GameLogic.expReward(task);
+    final _gainGold = GameLogic.goldReward(task);
 
     // Wallet + lifetime completed-task counter.
-    final userPrefs = UserBox.ins.getUserPrefs();
-    UserBox.ins.updateUserPrefs(GameLogic.addGold(GameLogic.addCompletedTask(userPrefs), gold));
+    final _userFreezon = UserBox.ins.getUserPrefs()..freeze();
+    final _newUserPrefs = _userFreezon.rebuild(
+      (user) => user
+        ..currentGold = user.currentGold + _gainGold
+        ..todayTasksCompleted = user.totalTasksCompleted + 1,
+    );
+    UserBox.ins.updateUserPrefs(_newUserPrefs);
 
     // Character: gain EXP and level up (stat points + HP heal on level-up).
-    final (updated, level) = GameLogic.gainExp(character, exp);
-    final frozen = updated.clone()..freeze();
-    CharacterBox.ins.updateCharacter(
-      frozen.rebuild(
-        (c) => c
-          ..level = level
-          ..maxExp = Int64(GameConstants.expForLevel(level)),
-      ),
+    // final (updated, level) = GameLogic.gainExp(character, gainExp);
+    // final frozen = updated.clone()..freeze();
+
+    final _charFreezen = character.clone()..freeze();
+
+    int _newLevel = _charFreezen.level;
+    int _newHp = _charFreezen.currentHp;
+    if (GameConstants.expForLevel(_charFreezen.level) <= _charFreezen.currentExp.toInt() + _gainExp) {
+      _newLevel++;
+      _newHp += GameConstants.completeTaskAddHp;
+    }
+    final _newCharacter = _charFreezen.rebuild(
+      (char) => char
+        ..currentExp = char.currentExp + _gainExp
+        ..level = _newLevel
+        ..maxExp = Int64(GameConstants.expForLevel(_newLevel))
+        ..currentHp = _newHp,
     );
-    final hpChange = level > 0 ? 20 : 0;
+
+    CharacterBox.ins.updateCharacter(_newCharacter);
+
+    // Mark the task complete (streak / completedAt) and persist.
+    final newTask = await TaskBox.ins.completeTask(task);
 
     return ApiResponse.success(
       CompleteTaskReply(
-        task: completed,
-        expReward: exp,
-        goldReward: gold,
-        hpChange: hpChange,
+        task: newTask,
+        prefs: _newUserPrefs,
+        character: _newCharacter,
       ),
     );
   }
@@ -230,6 +244,8 @@ class NetworkHiveImpl implements NetworkInterface {
   Future<void> resetAllData() async {
     CharacterBox.ins.clear();
     TaskBox.ins.clear();
+    UserBox.ins.clear();
+    ShopBox.ins.clear();
   }
 
   @override
