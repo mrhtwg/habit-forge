@@ -24,7 +24,7 @@ class ForgeController extends GetxController {
   }
 
   bool canAfford(int price) {
-    return UserService.to.gold >= price;
+    return UserService.to.userPrefs.value.currentGold >= price;
   }
 
   void equip(String itemId) {
@@ -32,7 +32,7 @@ class ForgeController extends GetxController {
   }
 
   int goldShortfall(int price) {
-    final needed = price - UserService.to.gold.value;
+    final needed = price - UserService.to.userPrefs.value.currentGold.toInt();
     return needed > 0 ? needed : 0;
   }
 

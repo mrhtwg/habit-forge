@@ -15,19 +15,24 @@ import 'dart:core' as $core;
 import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:protobuf/protobuf.dart' as $pb;
 
-import '../../character/v1/character.pbenum.dart' as $1;
+import '../../character/v1/character.pbenum.dart' as $2;
+import '../../shop/v1/shop.pb.dart' as $1;
 
 export 'package:protobuf/protobuf.dart' show GeneratedMessageGenericExtensions;
 
 /// UserPrefs
 class UserPrefs extends $pb.GeneratedMessage {
   factory UserPrefs({
-    $1.CharacterClass? charactorClass,
+    $2.CharacterClass? charactorClass,
     $fixnum.Int64? currentGold,
     $fixnum.Int64? currentGems,
     $core.bool? notificationsEnabled,
     $fixnum.Int64? totalTasksCompleted,
+    $fixnum.Int64? totalTasks,
+    $fixnum.Int64? todayTasksCompleted,
+    $fixnum.Int64? todayTasks,
     $fixnum.Int64? firstTaskDate,
+    $core.Iterable<$1.ShopItem>? items,
   }) {
     final result = create();
     if (charactorClass != null) result.charactorClass = charactorClass;
@@ -37,7 +42,12 @@ class UserPrefs extends $pb.GeneratedMessage {
       result.notificationsEnabled = notificationsEnabled;
     if (totalTasksCompleted != null)
       result.totalTasksCompleted = totalTasksCompleted;
+    if (totalTasks != null) result.totalTasks = totalTasks;
+    if (todayTasksCompleted != null)
+      result.todayTasksCompleted = todayTasksCompleted;
+    if (todayTasks != null) result.todayTasks = todayTasks;
     if (firstTaskDate != null) result.firstTaskDate = firstTaskDate;
+    if (items != null) result.items.addAll(items);
     return result;
   }
 
@@ -54,13 +64,18 @@ class UserPrefs extends $pb.GeneratedMessage {
       _omitMessageNames ? '' : 'UserPrefs',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'api.user.v1'),
       createEmptyInstance: create)
-    ..aE<$1.CharacterClass>(1, _omitFieldNames ? '' : 'charactorClass',
-        enumValues: $1.CharacterClass.values)
+    ..aE<$2.CharacterClass>(1, _omitFieldNames ? '' : 'charactorClass',
+        enumValues: $2.CharacterClass.values)
     ..aInt64(2, _omitFieldNames ? '' : 'currentGold')
     ..aInt64(3, _omitFieldNames ? '' : 'currentGems')
     ..aOB(4, _omitFieldNames ? '' : 'notificationsEnabled')
     ..aInt64(5, _omitFieldNames ? '' : 'totalTasksCompleted')
-    ..aInt64(6, _omitFieldNames ? '' : 'firstTaskDate')
+    ..aInt64(6, _omitFieldNames ? '' : 'totalTasks')
+    ..aInt64(7, _omitFieldNames ? '' : 'todayTasksCompleted')
+    ..aInt64(8, _omitFieldNames ? '' : 'todayTasks')
+    ..aInt64(9, _omitFieldNames ? '' : 'firstTaskDate')
+    ..pPM<$1.ShopItem>(10, _omitFieldNames ? '' : 'items',
+        subBuilder: $1.ShopItem.create)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -83,9 +98,9 @@ class UserPrefs extends $pb.GeneratedMessage {
 
   /// Chosen character class.
   @$pb.TagNumber(1)
-  $1.CharacterClass get charactorClass => $_getN(0);
+  $2.CharacterClass get charactorClass => $_getN(0);
   @$pb.TagNumber(1)
-  set charactorClass($1.CharacterClass value) => $_setField(1, value);
+  set charactorClass($2.CharacterClass value) => $_setField(1, value);
   @$pb.TagNumber(1)
   $core.bool hasCharactorClass() => $_has(0);
   @$pb.TagNumber(1)
@@ -131,15 +146,49 @@ class UserPrefs extends $pb.GeneratedMessage {
   @$pb.TagNumber(5)
   void clearTotalTasksCompleted() => $_clearField(5);
 
+  /// Total number of tasks.
+  @$pb.TagNumber(6)
+  $fixnum.Int64 get totalTasks => $_getI64(5);
+  @$pb.TagNumber(6)
+  set totalTasks($fixnum.Int64 value) => $_setInt64(5, value);
+  @$pb.TagNumber(6)
+  $core.bool hasTotalTasks() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearTotalTasks() => $_clearField(6);
+
+  /// Today's count of completed tasks.
+  @$pb.TagNumber(7)
+  $fixnum.Int64 get todayTasksCompleted => $_getI64(6);
+  @$pb.TagNumber(7)
+  set todayTasksCompleted($fixnum.Int64 value) => $_setInt64(6, value);
+  @$pb.TagNumber(7)
+  $core.bool hasTodayTasksCompleted() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearTodayTasksCompleted() => $_clearField(7);
+
+  /// Today's number of tasks.
+  @$pb.TagNumber(8)
+  $fixnum.Int64 get todayTasks => $_getI64(7);
+  @$pb.TagNumber(8)
+  set todayTasks($fixnum.Int64 value) => $_setInt64(7, value);
+  @$pb.TagNumber(8)
+  $core.bool hasTodayTasks() => $_has(7);
+  @$pb.TagNumber(8)
+  void clearTodayTasks() => $_clearField(8);
+
   /// Date of the first completed task, unix millis.
-  @$pb.TagNumber(6)
-  $fixnum.Int64 get firstTaskDate => $_getI64(5);
-  @$pb.TagNumber(6)
-  set firstTaskDate($fixnum.Int64 value) => $_setInt64(5, value);
-  @$pb.TagNumber(6)
-  $core.bool hasFirstTaskDate() => $_has(5);
-  @$pb.TagNumber(6)
-  void clearFirstTaskDate() => $_clearField(6);
+  @$pb.TagNumber(9)
+  $fixnum.Int64 get firstTaskDate => $_getI64(8);
+  @$pb.TagNumber(9)
+  set firstTaskDate($fixnum.Int64 value) => $_setInt64(8, value);
+  @$pb.TagNumber(9)
+  $core.bool hasFirstTaskDate() => $_has(8);
+  @$pb.TagNumber(9)
+  void clearFirstTaskDate() => $_clearField(9);
+
+  /// List of item IDs owned by the user.
+  @$pb.TagNumber(10)
+  $pb.PbList<$1.ShopItem> get items => $_getList(9);
 }
 
 /// GetPrefsRequest — no parameters.

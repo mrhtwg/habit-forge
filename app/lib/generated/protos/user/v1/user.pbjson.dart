@@ -43,7 +43,24 @@ const UserPrefs$json = {
       '5': 3,
       '10': 'totalTasksCompleted'
     },
-    {'1': 'first_task_date', '3': 6, '4': 1, '5': 3, '10': 'firstTaskDate'},
+    {'1': 'total_tasks', '3': 6, '4': 1, '5': 3, '10': 'totalTasks'},
+    {
+      '1': 'today_tasks_completed',
+      '3': 7,
+      '4': 1,
+      '5': 3,
+      '10': 'todayTasksCompleted'
+    },
+    {'1': 'today_tasks', '3': 8, '4': 1, '5': 3, '10': 'todayTasks'},
+    {'1': 'first_task_date', '3': 9, '4': 1, '5': 3, '10': 'firstTaskDate'},
+    {
+      '1': 'items',
+      '3': 10,
+      '4': 3,
+      '5': 11,
+      '6': '.api.shop.v1.ShopItem',
+      '10': 'items'
+    },
   ],
 };
 
@@ -53,8 +70,11 @@ final $typed_data.Uint8List userPrefsDescriptor = $convert.base64Decode(
     '5DaGFyYWN0ZXJDbGFzc1IOY2hhcmFjdG9yQ2xhc3MSIQoMY3VycmVudF9nb2xkGAIgASgDUgtj'
     'dXJyZW50R29sZBIhCgxjdXJyZW50X2dlbXMYAyABKANSC2N1cnJlbnRHZW1zEjMKFW5vdGlmaW'
     'NhdGlvbnNfZW5hYmxlZBgEIAEoCFIUbm90aWZpY2F0aW9uc0VuYWJsZWQSMgoVdG90YWxfdGFz'
-    'a3NfY29tcGxldGVkGAUgASgDUhN0b3RhbFRhc2tzQ29tcGxldGVkEiYKD2ZpcnN0X3Rhc2tfZG'
-    'F0ZRgGIAEoA1INZmlyc3RUYXNrRGF0ZQ==');
+    'a3NfY29tcGxldGVkGAUgASgDUhN0b3RhbFRhc2tzQ29tcGxldGVkEh8KC3RvdGFsX3Rhc2tzGA'
+    'YgASgDUgp0b3RhbFRhc2tzEjIKFXRvZGF5X3Rhc2tzX2NvbXBsZXRlZBgHIAEoA1ITdG9kYXlU'
+    'YXNrc0NvbXBsZXRlZBIfCgt0b2RheV90YXNrcxgIIAEoA1IKdG9kYXlUYXNrcxImCg9maXJzdF'
+    '90YXNrX2RhdGUYCSABKANSDWZpcnN0VGFza0RhdGUSKwoFaXRlbXMYCiADKAsyFS5hcGkuc2hv'
+    'cC52MS5TaG9wSXRlbVIFaXRlbXM=');
 
 @$core.Deprecated('Use getPrefsRequestDescriptor instead')
 const GetPrefsRequest$json = {

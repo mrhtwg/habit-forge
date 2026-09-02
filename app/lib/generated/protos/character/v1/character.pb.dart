@@ -151,6 +151,7 @@ class Character extends $pb.GeneratedMessage {
     CharacterClass? characterClass,
     $core.int? level,
     $fixnum.Int64? currentExp,
+    $fixnum.Int64? maxExp,
     $core.int? currentHp,
     CharacterStats? baseStats,
     $core.int? availableStatPoints,
@@ -163,6 +164,7 @@ class Character extends $pb.GeneratedMessage {
     if (characterClass != null) result.characterClass = characterClass;
     if (level != null) result.level = level;
     if (currentExp != null) result.currentExp = currentExp;
+    if (maxExp != null) result.maxExp = maxExp;
     if (currentHp != null) result.currentHp = currentHp;
     if (baseStats != null) result.baseStats = baseStats;
     if (availableStatPoints != null)
@@ -193,17 +195,18 @@ class Character extends $pb.GeneratedMessage {
         protoName: 'character_Class', enumValues: CharacterClass.values)
     ..aI(3, _omitFieldNames ? '' : 'level')
     ..aInt64(4, _omitFieldNames ? '' : 'currentExp')
-    ..aI(5, _omitFieldNames ? '' : 'currentHp')
-    ..aOM<CharacterStats>(6, _omitFieldNames ? '' : 'baseStats',
+    ..aInt64(5, _omitFieldNames ? '' : 'maxExp')
+    ..aI(6, _omitFieldNames ? '' : 'currentHp')
+    ..aOM<CharacterStats>(7, _omitFieldNames ? '' : 'baseStats',
         subBuilder: CharacterStats.create)
-    ..aI(7, _omitFieldNames ? '' : 'availableStatPoints')
-    ..m<$core.String, $core.String>(8, _omitFieldNames ? '' : 'equipment',
+    ..aI(8, _omitFieldNames ? '' : 'availableStatPoints')
+    ..m<$core.String, $core.String>(9, _omitFieldNames ? '' : 'equipment',
         entryClassName: 'Character.EquipmentEntry',
         keyFieldType: $pb.PbFieldType.OS,
         valueFieldType: $pb.PbFieldType.OS,
         packageName: const $pb.PackageName('api.character.v1'))
-    ..aOB(9, _omitFieldNames ? '' : 'isDead')
-    ..aInt64(10, _omitFieldNames ? '' : 'deathRecoveryUntil')
+    ..aOB(10, _omitFieldNames ? '' : 'isDead')
+    ..aInt64(11, _omitFieldNames ? '' : 'deathRecoveryUntil')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -264,61 +267,71 @@ class Character extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   void clearCurrentExp() => $_clearField(4);
 
+  /// max EXP for this level.
+  @$pb.TagNumber(5)
+  $fixnum.Int64 get maxExp => $_getI64(4);
+  @$pb.TagNumber(5)
+  set maxExp($fixnum.Int64 value) => $_setInt64(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasMaxExp() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearMaxExp() => $_clearField(5);
+
   /// Current HP (max 100); reaches 0 when dead.
-  @$pb.TagNumber(5)
-  $core.int get currentHp => $_getIZ(4);
-  @$pb.TagNumber(5)
-  set currentHp($core.int value) => $_setSignedInt32(4, value);
-  @$pb.TagNumber(5)
-  $core.bool hasCurrentHp() => $_has(4);
-  @$pb.TagNumber(5)
-  void clearCurrentHp() => $_clearField(5);
+  @$pb.TagNumber(6)
+  $core.int get currentHp => $_getIZ(5);
+  @$pb.TagNumber(6)
+  set currentHp($core.int value) => $_setSignedInt32(5, value);
+  @$pb.TagNumber(6)
+  $core.bool hasCurrentHp() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearCurrentHp() => $_clearField(6);
 
   /// Base attribute values.
-  @$pb.TagNumber(6)
-  CharacterStats get baseStats => $_getN(5);
-  @$pb.TagNumber(6)
-  set baseStats(CharacterStats value) => $_setField(6, value);
-  @$pb.TagNumber(6)
-  $core.bool hasBaseStats() => $_has(5);
-  @$pb.TagNumber(6)
-  void clearBaseStats() => $_clearField(6);
-  @$pb.TagNumber(6)
-  CharacterStats ensureBaseStats() => $_ensure(5);
+  @$pb.TagNumber(7)
+  CharacterStats get baseStats => $_getN(6);
+  @$pb.TagNumber(7)
+  set baseStats(CharacterStats value) => $_setField(7, value);
+  @$pb.TagNumber(7)
+  $core.bool hasBaseStats() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearBaseStats() => $_clearField(7);
+  @$pb.TagNumber(7)
+  CharacterStats ensureBaseStats() => $_ensure(6);
 
   /// Unspent stat points available for allocation (1 per level).
-  @$pb.TagNumber(7)
-  $core.int get availableStatPoints => $_getIZ(6);
-  @$pb.TagNumber(7)
-  set availableStatPoints($core.int value) => $_setSignedInt32(6, value);
-  @$pb.TagNumber(7)
-  $core.bool hasAvailableStatPoints() => $_has(6);
-  @$pb.TagNumber(7)
-  void clearAvailableStatPoints() => $_clearField(7);
+  @$pb.TagNumber(8)
+  $core.int get availableStatPoints => $_getIZ(7);
+  @$pb.TagNumber(8)
+  set availableStatPoints($core.int value) => $_setSignedInt32(7, value);
+  @$pb.TagNumber(8)
+  $core.bool hasAvailableStatPoints() => $_has(7);
+  @$pb.TagNumber(8)
+  void clearAvailableStatPoints() => $_clearField(8);
 
   /// Equipped items: equipment slot -> shop item id (weapon/helmet/armor/accessory).
-  @$pb.TagNumber(8)
-  $pb.PbMap<$core.String, $core.String> get equipment => $_getMap(7);
+  @$pb.TagNumber(9)
+  $pb.PbMap<$core.String, $core.String> get equipment => $_getMap(8);
 
   /// Whether the character is dead (unusable until revived).
-  @$pb.TagNumber(9)
-  $core.bool get isDead => $_getBF(8);
-  @$pb.TagNumber(9)
-  set isDead($core.bool value) => $_setBool(8, value);
-  @$pb.TagNumber(9)
-  $core.bool hasIsDead() => $_has(8);
-  @$pb.TagNumber(9)
-  void clearIsDead() => $_clearField(9);
+  @$pb.TagNumber(10)
+  $core.bool get isDead => $_getBF(9);
+  @$pb.TagNumber(10)
+  set isDead($core.bool value) => $_setBool(9, value);
+  @$pb.TagNumber(10)
+  $core.bool hasIsDead() => $_has(9);
+  @$pb.TagNumber(10)
+  void clearIsDead() => $_clearField(10);
 
   /// Time when the death recovery finishes, unix millis.
-  @$pb.TagNumber(10)
-  $fixnum.Int64 get deathRecoveryUntil => $_getI64(9);
-  @$pb.TagNumber(10)
-  set deathRecoveryUntil($fixnum.Int64 value) => $_setInt64(9, value);
-  @$pb.TagNumber(10)
-  $core.bool hasDeathRecoveryUntil() => $_has(9);
-  @$pb.TagNumber(10)
-  void clearDeathRecoveryUntil() => $_clearField(10);
+  @$pb.TagNumber(11)
+  $fixnum.Int64 get deathRecoveryUntil => $_getI64(10);
+  @$pb.TagNumber(11)
+  set deathRecoveryUntil($fixnum.Int64 value) => $_setInt64(10, value);
+  @$pb.TagNumber(11)
+  $core.bool hasDeathRecoveryUntil() => $_has(10);
+  @$pb.TagNumber(11)
+  void clearDeathRecoveryUntil() => $_clearField(11);
 }
 
 /// CreateCharacterRequest

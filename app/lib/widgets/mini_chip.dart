@@ -38,8 +38,8 @@ class MiniChip extends StatelessWidget {
           SizedBox(width: 4.w),
           Text(
             switch (sysMaterial) {
-              SysMaterial.SYSMATERIAL_GOLD => UserService.to.gold.value.toString(),
-              SysMaterial.SYSMATERIAL_GEM => UserService.to.gem.value.toString(),
+              SysMaterial.SYSMATERIAL_GOLD => UserService.to.userPrefs.value.currentGold.toString(),
+              SysMaterial.SYSMATERIAL_GEM => UserService.to.userPrefs.value.currentGems.toString(),
               _ => '0'
             },
             style: textStyleBold(fontSize: 12.sp, color: AppColors.textPrimary),

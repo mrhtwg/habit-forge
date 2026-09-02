@@ -43,8 +43,8 @@ class WalletChip extends StatelessWidget {
           // changes (e.g. after completing a task on the home screen).
           Obx(() {
             final target = switch (sysMaterial) {
-              SysMaterial.SYSMATERIAL_GOLD => UserService.to.gold.value,
-              SysMaterial.SYSMATERIAL_GEM => UserService.to.gem.value,
+              SysMaterial.SYSMATERIAL_GOLD => UserService.to.userPrefs.value.currentGold.toInt(),
+              SysMaterial.SYSMATERIAL_GEM => UserService.to.userPrefs.value.currentGems.toInt(),
               _ => 0,
             };
             return AnimatedNumberText(

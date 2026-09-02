@@ -26,7 +26,7 @@ class ProfileController extends GetxController {
     return completed / total;
   }
 
-  int get currentGold => UserService.to.gold.value;
+  int get currentGold => UserService.to.userPrefs.value.currentGold.toInt();
   int get currentLevel => UserService.to.character.value?.level ?? 1;
   int get maxStreak => tasks.fold(0, (max, t) => t.streak > max ? t.streak : max);
 }

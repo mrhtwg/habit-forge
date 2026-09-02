@@ -46,6 +46,7 @@ class NetworkHiveImpl implements NetworkInterface {
       ..level = 1
       ..currentExp = Int64(0)
       ..currentHp = GameConstants.initialHp
+      ..maxExp = Int64(GameConstants.expForLevel(1))
       ..baseStats = CharacterStats()
       ..availableStatPoints = 0
       ..isDead = false;
@@ -97,7 +98,14 @@ class NetworkHiveImpl implements NetworkInterface {
 
     // Character: gain EXP and level up (stat points + HP heal on level-up).
     final (updated, level) = GameLogic.gainExp(character, exp);
-    CharacterBox.ins.updateCharacter(updated);
+    final frozen = updated.clone()..freeze();
+    CharacterBox.ins.updateCharacter(
+      frozen.rebuild(
+        (c) => c
+          ..level = level
+          ..maxExp = Int64(GameConstants.expForLevel(level)),
+      ),
+    );
     final hpChange = level > 0 ? 20 : 0;
 
     return ApiResponse.success(

@@ -306,7 +306,7 @@ class CharacterPage extends GetView<CharacterController> {
     final char = UserService.to.character.value;
     if (char == null) return;
 
-    final owned = UserService.to.shopItems;
+    final owned = UserService.to.userPrefs.value.items;
     if (owned.isEmpty) {
       Toast.show(LanKey.noItemsForSlot.tr);
       return;

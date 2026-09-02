@@ -274,8 +274,8 @@ class HomePage extends GetView<HomeController> {
   Widget _buildExpBar() {
     final char = UserService.to.character.value;
     final level = char?.level ?? 1;
-    final needed = GameConstants.expForLevel(level).toDouble();
-    final ratio = ((char?.currentExp.toInt() ?? 0) / needed).clamp(0.0, 1.0);
+    // final needed = GameConstants.expForLevel(level).toDouble();
+    final ratio = ((char?.currentExp.toInt() ?? 0) / (char?.maxExp.toInt() ?? 0)).clamp(0.0, 1.0);
     return _AnimatedExpBar(level: level, ratio: ratio, color: AppColors.gold);
   }
 

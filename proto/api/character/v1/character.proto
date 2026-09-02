@@ -110,18 +110,20 @@ message Character {
   int32 level = 3;
   // EXP accumulated toward the next level.
   int64 current_exp = 4;
+  // max EXP for this level.
+  int64 max_exp = 5;
   // Current HP (max 100); reaches 0 when dead.
-  int32 current_hp = 5;
+  int32 current_hp = 6;
   // Base attribute values.
-  CharacterStats base_stats = 6;
+  CharacterStats base_stats = 7;
   // Unspent stat points available for allocation (1 per level).
-  int32 available_stat_points = 7;
+  int32 available_stat_points = 8;
   // Equipped items: equipment slot -> shop item id (weapon/helmet/armor/accessory).
-  map<string, string> equipment = 8;
+  map<string, string> equipment = 9;
   // Whether the character is dead (unusable until revived).
-  bool is_dead = 9;
+  bool is_dead = 10;
   // Time when the death recovery finishes, unix millis.
-  int64 death_recovery_until = 10;
+  int64 death_recovery_until = 11;
 }
 
 // CreateCharacterRequest

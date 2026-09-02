@@ -88,10 +88,11 @@ const Character$json = {
     },
     {'1': 'level', '3': 3, '4': 1, '5': 5, '10': 'level'},
     {'1': 'current_exp', '3': 4, '4': 1, '5': 3, '10': 'currentExp'},
-    {'1': 'current_hp', '3': 5, '4': 1, '5': 5, '10': 'currentHp'},
+    {'1': 'max_exp', '3': 5, '4': 1, '5': 3, '10': 'maxExp'},
+    {'1': 'current_hp', '3': 6, '4': 1, '5': 5, '10': 'currentHp'},
     {
       '1': 'base_stats',
-      '3': 6,
+      '3': 7,
       '4': 1,
       '5': 11,
       '6': '.api.character.v1.CharacterStats',
@@ -99,23 +100,23 @@ const Character$json = {
     },
     {
       '1': 'available_stat_points',
-      '3': 7,
+      '3': 8,
       '4': 1,
       '5': 5,
       '10': 'availableStatPoints'
     },
     {
       '1': 'equipment',
-      '3': 8,
+      '3': 9,
       '4': 3,
       '5': 11,
       '6': '.api.character.v1.Character.EquipmentEntry',
       '10': 'equipment'
     },
-    {'1': 'is_dead', '3': 9, '4': 1, '5': 8, '10': 'isDead'},
+    {'1': 'is_dead', '3': 10, '4': 1, '5': 8, '10': 'isDead'},
     {
       '1': 'death_recovery_until',
-      '3': 10,
+      '3': 11,
       '4': 1,
       '5': 3,
       '10': 'deathRecoveryUntil'
@@ -138,14 +139,14 @@ const Character_EquipmentEntry$json = {
 final $typed_data.Uint8List characterDescriptor = $convert.base64Decode(
     'CglDaGFyYWN0ZXISDgoCaWQYASABKAlSAmlkEkkKD2NoYXJhY3Rlcl9DbGFzcxgCIAEoDjIgLm'
     'FwaS5jaGFyYWN0ZXIudjEuQ2hhcmFjdGVyQ2xhc3NSDmNoYXJhY3RlckNsYXNzEhQKBWxldmVs'
-    'GAMgASgFUgVsZXZlbBIfCgtjdXJyZW50X2V4cBgEIAEoA1IKY3VycmVudEV4cBIdCgpjdXJyZW'
-    '50X2hwGAUgASgFUgljdXJyZW50SHASPwoKYmFzZV9zdGF0cxgGIAEoCzIgLmFwaS5jaGFyYWN0'
-    'ZXIudjEuQ2hhcmFjdGVyU3RhdHNSCWJhc2VTdGF0cxIyChVhdmFpbGFibGVfc3RhdF9wb2ludH'
-    'MYByABKAVSE2F2YWlsYWJsZVN0YXRQb2ludHMSSAoJZXF1aXBtZW50GAggAygLMiouYXBpLmNo'
-    'YXJhY3Rlci52MS5DaGFyYWN0ZXIuRXF1aXBtZW50RW50cnlSCWVxdWlwbWVudBIXCgdpc19kZW'
-    'FkGAkgASgIUgZpc0RlYWQSMAoUZGVhdGhfcmVjb3ZlcnlfdW50aWwYCiABKANSEmRlYXRoUmVj'
-    'b3ZlcnlVbnRpbBo8Cg5FcXVpcG1lbnRFbnRyeRIQCgNrZXkYASABKAlSA2tleRIUCgV2YWx1ZR'
-    'gCIAEoCVIFdmFsdWU6AjgB');
+    'GAMgASgFUgVsZXZlbBIfCgtjdXJyZW50X2V4cBgEIAEoA1IKY3VycmVudEV4cBIXCgdtYXhfZX'
+    'hwGAUgASgDUgZtYXhFeHASHQoKY3VycmVudF9ocBgGIAEoBVIJY3VycmVudEhwEj8KCmJhc2Vf'
+    'c3RhdHMYByABKAsyIC5hcGkuY2hhcmFjdGVyLnYxLkNoYXJhY3RlclN0YXRzUgliYXNlU3RhdH'
+    'MSMgoVYXZhaWxhYmxlX3N0YXRfcG9pbnRzGAggASgFUhNhdmFpbGFibGVTdGF0UG9pbnRzEkgK'
+    'CWVxdWlwbWVudBgJIAMoCzIqLmFwaS5jaGFyYWN0ZXIudjEuQ2hhcmFjdGVyLkVxdWlwbWVudE'
+    'VudHJ5UgllcXVpcG1lbnQSFwoHaXNfZGVhZBgKIAEoCFIGaXNEZWFkEjAKFGRlYXRoX3JlY292'
+    'ZXJ5X3VudGlsGAsgASgDUhJkZWF0aFJlY292ZXJ5VW50aWwaPAoORXF1aXBtZW50RW50cnkSEA'
+    'oDa2V5GAEgASgJUgNrZXkSFAoFdmFsdWUYAiABKAlSBXZhbHVlOgI4AQ==');
 
 @$core.Deprecated('Use createCharacterRequestDescriptor instead')
 const CreateCharacterRequest$json = {

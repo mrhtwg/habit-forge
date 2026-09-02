@@ -3,7 +3,9 @@ syntax = "proto3";
 package api.user.v1;
 
 import "google/api/annotations.proto";
+
 import "api/character/v1/character.proto";
+import "api/shop/v1/shop.proto";
 
 option go_package = "github.com/habitforge/backend/api/user/v1;v1";
 
@@ -36,8 +38,16 @@ message UserPrefs {
   bool notifications_enabled = 4;
   // Lifetime count of completed tasks.
   int64 total_tasks_completed = 5;
+  // Total number of tasks.
+  int64 total_tasks = 6;
+  // Today's count of completed tasks.
+  int64 today_tasks_completed = 7;
+  // Today's number of tasks.
+  int64 today_tasks = 8;
   // Date of the first completed task, unix millis.
-  int64 first_task_date = 6;
+  int64 first_task_date = 9;
+  // List of item IDs owned by the user.
+  repeated api.shop.v1.ShopItem items = 10;
 }
 
 // GetPrefsRequest — no parameters.

@@ -24,26 +24,6 @@ class CharacterBox {
 
   void updateCharacter(Character character) {
     _characterBox.put(_characterKey, character.writeToBuffer());
-    // final _c = getCharacter();
-    // if (_c == null) {
-    //   return;
-    // }
-
-    // final _character = _c.rebuild(
-    //   (_character) => _character
-    //     ..characterClass = character.characterClass
-    //     ..level = character.level
-    //     ..currentExp = character.currentExp
-    //     ..currentHp = character.currentHp
-    //     ..baseStats = character.baseStats
-    //     ..availableStatPoints = character.availableStatPoints
-    //     ..equipment.clear()
-    //     ..equipment.addAll(character.equipment)
-    //     ..isDead = character.isDead
-    //     ..deathRecoveryUntil = character.deathRecoveryUntil,
-    // );
-
-    // _characterBox.put(_characterKey, _character.writeToBuffer());
   }
 
   Character? getCharacter() {

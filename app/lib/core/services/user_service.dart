@@ -5,12 +5,12 @@ import 'package:habit_forge_app/core/common/utils/sp_utils.dart';
 import 'package:habit_forge_app/core/network/network_registry.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';
+import 'package:habit_forge_app/generated/protos/user/v1/user.pb.dart';
 
 class UserService extends GetxService {
   static UserService get to => Get.find();
 
-  final gold = 0.obs;
-  final gem = 0.obs;
+  final userPrefs = UserPrefs().obs;
 
   final token = ''.obs;
 
@@ -26,7 +26,7 @@ class UserService extends GetxService {
   Future<void> loadUserPrefs() async {
     final result = await NetworkRegistry.ins.getPrefs();
     if (result.isSuccess) {
-      gold.value = result.data?.prefs.currentGold.toInt() ?? 0;
+      userPrefs.value = result.data?.prefs ?? UserPrefs();
     }
   }
 
