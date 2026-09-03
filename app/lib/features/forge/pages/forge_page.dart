@@ -7,8 +7,11 @@ import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/forge/controllers/forge_controller.dart';
 import 'package:habit_forge_app/features/forge/pages/item_detail_sheet.dart';
 import 'package:habit_forge_app/generated/protos/shared/v1/shared.pbenum.dart';
+import 'package:habit_forge_app/generated/protos/shop/v1/shop.pb.dart';
 import 'package:habit_forge_app/widgets/shop_item_icon.dart';
 import 'package:habit_forge_app/widgets/wallet_chip.dart';
+import 'package:habit_forge_app/core/network/hive/shop_config.dart';
+import 'package:habit_forge_app/generated/assets.dart';
 
 class ForgePage extends GetView<ForgeController> {
   const ForgePage({super.key});
@@ -17,13 +20,23 @@ class ForgePage extends GetView<ForgeController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.scaffold,
-      body: Column(
-        children: [
-          _buildSkyHeader(),
-          _buildDealBanner(context),
-          _buildSegmented(),
-          Expanded(child: _buildItemGrid(context)),
-        ],
+      body: DefaultTabController(
+        length: 2,
+        child: Column(
+          children: [
+            _buildSkyHeader(),
+            _buildDealBanner(context),
+            _buildCategoryTabs(),
+            Expanded(
+              child: TabBarView(
+                children: [
+                  _buildItemGridFor('appearance'),
+                  _buildItemGridFor('equipment'),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -163,10 +176,10 @@ class ForgePage extends GetView<ForgeController> {
     });
   }
 
-  // ─────────── Item grid ───────────
-  Widget _buildItemGrid(BuildContext context) {
+  // ─────────── Swipeable category pager (appearance / equipment) ───────────
+  Widget _buildItemGridFor(String category) {
     return Obx(() {
-      // final items = controller.filteredItems;
+      final items = controller.shopItems.where((i) => ShopConfig.categoryOf(i.id) == category).toList();
       return GridView.builder(
         padding: EdgeInsets.fromLTRB(20.w, 14.h, 20.w, 24.h),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -175,9 +188,9 @@ class ForgePage extends GetView<ForgeController> {
           mainAxisSpacing: 12.h,
           childAspectRatio: 0.78,
         ),
-        itemCount: controller.shopItems.length,
+        itemCount: items.length,
         itemBuilder: (context, index) {
-          final item = controller.shopItems[index];
+          final item = items[index];
           final owned = controller.isOwned(item.id);
           return GestureDetector(
             onTap: () => ItemDetailSheet.show(context, item),
@@ -227,19 +240,22 @@ class ForgePage extends GetView<ForgeController> {
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Container(
-                          width: 14.w,
-                          height: 14.w,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: AppColors.gold,
-                            border: Border.all(color: AppColors.border, width: 1.5),
-                          ),
+                        Image.asset(
+                          ShopConfig.currencyOf(item.id) == ShopCurrency.SHOP_CURRENCY_GEMS
+                              ? Assets.imagesSharedIcGem
+                              : Assets.imagesSharedIcGold,
+                          width: 15.w,
+                          height: 15.w,
                         ),
                         SizedBox(width: 4.w),
                         Text(
                           '${item.price}',
-                          style: textStyleBold(fontSize: 14.sp, color: const Color(0xFFC97700)),
+                          style: textStyleBold(
+                            fontSize: 14.sp,
+                            color: ShopConfig.currencyOf(item.id) == ShopCurrency.SHOP_CURRENCY_GEMS
+                                ? AppColors.info
+                                : const Color(0xFFC97700),
+                          ),
                         ),
                       ],
                     ),
@@ -253,8 +269,8 @@ class ForgePage extends GetView<ForgeController> {
   }
 
   // ─────────── Category segment ───────────
-  Widget _buildSegmented() {
-    const options = [(LanKey.appearance, 'appearance'), (LanKey.equipment, 'equipment')];
+  // ─────────── Category tabs: Appearance / Equipment ───────────
+  Widget _buildCategoryTabs() {
     return Padding(
       padding: EdgeInsets.fromLTRB(20.w, 14.h, 20.w, 0),
       child: Container(
@@ -264,33 +280,22 @@ class ForgePage extends GetView<ForgeController> {
           border: Border.all(color: AppColors.border, width: 2),
           borderRadius: BorderRadius.circular(999),
         ),
-        child: Row(
-          children: options.map((opt) {
-            return Expanded(
-              child: Obx(() {
-                final isActive = controller.activeCategory.value == opt.$2;
-                return GestureDetector(
-                  onTap: () => controller.activeCategory.value = opt.$2,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(vertical: 8.h),
-                    decoration: BoxDecoration(
-                      color: isActive ? Colors.white : Colors.transparent,
-                      borderRadius: BorderRadius.circular(999),
-                      boxShadow: isActive ? const [BoxShadow(color: Color(0xFFE4D2B0), offset: Offset(0, 2))] : null,
-                    ),
-                    child: Text(
-                      opt.$1.tr,
-                      textAlign: TextAlign.center,
-                      style: textStyleBold(
-                        fontSize: 13.sp,
-                        color: isActive ? AppColors.textPrimary : AppColors.textSecondary,
-                      ),
-                    ),
-                  ),
-                );
-              }),
-            );
-          }).toList(),
+        child: TabBar(
+          indicatorSize: TabBarIndicatorSize.tab,
+          dividerHeight: 0,
+          indicator: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(999),
+            boxShadow: const [BoxShadow(color: Color(0xFFE4D2B0), offset: Offset(0, 2))],
+          ),
+          labelColor: AppColors.textPrimary,
+          unselectedLabelColor: AppColors.textSecondary,
+          labelStyle: textStyleBold(fontSize: 13.sp),
+          unselectedLabelStyle: textStyleBold(fontSize: 13.sp, color: AppColors.textSecondary),
+          tabs: [
+            Tab(text: LanKey.appearance.tr),
+            Tab(text: LanKey.equipment.tr),
+          ],
         ),
       ),
     );

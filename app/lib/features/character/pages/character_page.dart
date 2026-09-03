@@ -210,8 +210,10 @@ class CharacterPage extends GetView<CharacterController> {
                     border: Border.all(color: AppColors.border, width: 2),
                     borderRadius: BorderRadius.circular(999),
                   ),
-                  child: FractionallySizedBox(
+                  child: AnimatedFractionallySizedBox(
                     alignment: Alignment.centerLeft,
+                    duration: const Duration(milliseconds: 600),
+                    curve: Curves.easeOutCubic,
                     widthFactor:
                         (char.currentExp.toInt() / GameConstants.expForLevel(char.level)).clamp(0.0, 1.0).toDouble(),
                     child: Container(

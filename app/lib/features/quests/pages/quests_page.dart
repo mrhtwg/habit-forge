@@ -21,13 +21,20 @@ class QuestsPage extends GetView<QuestsController> {
       backgroundColor: AppColors.scaffold,
       body: Stack(
         children: [
-          Column(
-            children: [
-              _buildSkyHeader(),
-              _buildSegmentedFilter(),
-              _buildTagChips(),
-              Expanded(child: _buildTaskList(context)),
-            ],
+          DefaultTabController(
+            length: 4,
+            child: Column(
+              children: [
+                _buildSkyHeader(),
+                _buildCategoryTabs(),
+                _buildTagChips(),
+                Expanded(
+                  child: TabBarView(
+                    children: List.generate(4, (index) => _buildTaskPage(context, index)),
+                  ),
+                ),
+              ],
+            ),
           ),
           // Add task FAB
           Positioned(
@@ -73,14 +80,8 @@ class QuestsPage extends GetView<QuestsController> {
     );
   }
 
-  // ─────────── Segmented filter: All / Habit / Daily / ToDo ───────────
-  Widget _buildSegmentedFilter() {
-    final options = <(String, TaskType?)>[
-      (LanKey.all.tr, null),
-      (LanKey.habit.tr, TaskType.TASK_TYPE_HABIT),
-      (LanKey.daily.tr, TaskType.TASK_TYPE_DAILY),
-      (LanKey.todoFilter.tr, TaskType.TASK_TYPE_TODO),
-    ];
+  // ─────────── Category tabs: All / Habit / Daily / ToDo ───────────
+  Widget _buildCategoryTabs() {
     return Padding(
       padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 0),
       child: Container(
@@ -90,41 +91,24 @@ class QuestsPage extends GetView<QuestsController> {
           border: Border.all(color: AppColors.border, width: 2),
           borderRadius: BorderRadius.circular(999),
         ),
-        child: Row(
-          children: options.map((opt) {
-            return Expanded(
-              child: Obx(() {
-                final isActive = (opt.$2 == null && controller.showAll.value) ||
-                    (opt.$2 != null && !controller.showAll.value && controller.activeType.value == opt.$2);
-                return GestureDetector(
-                  onTap: () {
-                    if (opt.$2 == null) {
-                      controller.showAll.value = true;
-                    } else {
-                      controller.showAll.value = false;
-                      controller.activeType.value = opt.$2!;
-                    }
-                  },
-                  child: Container(
-                    padding: EdgeInsets.symmetric(vertical: 8.h),
-                    decoration: BoxDecoration(
-                      color: isActive ? Colors.white : Colors.transparent,
-                      borderRadius: BorderRadius.circular(999),
-                      boxShadow: isActive ? const [BoxShadow(color: Color(0xFFE4D2B0), offset: Offset(0, 2))] : null,
-                    ),
-                    child: Text(
-                      opt.$1,
-                      textAlign: TextAlign.center,
-                      style: textStyleBold(
-                        fontSize: 13.sp,
-                        color: isActive ? AppColors.textPrimary : AppColors.textSecondary,
-                      ),
-                    ),
-                  ),
-                );
-              }),
-            );
-          }).toList(),
+        child: TabBar(
+          indicatorSize: TabBarIndicatorSize.tab,
+          dividerHeight: 0,
+          indicator: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(999),
+            boxShadow: const [BoxShadow(color: Color(0xFFE4D2B0), offset: Offset(0, 2))],
+          ),
+          labelColor: AppColors.textPrimary,
+          unselectedLabelColor: AppColors.textSecondary,
+          labelStyle: textStyleBold(fontSize: 13.sp),
+          unselectedLabelStyle: textStyleBold(fontSize: 13.sp, color: AppColors.textSecondary),
+          tabs: [
+            Tab(text: LanKey.all.tr),
+            Tab(text: LanKey.habit.tr),
+            Tab(text: LanKey.daily.tr),
+            Tab(text: LanKey.todoFilter.tr),
+          ],
         ),
       ),
     );
@@ -207,17 +191,23 @@ class QuestsPage extends GetView<QuestsController> {
     );
   }
 
-  // ─────────── Task list ───────────
-  Widget _buildTaskList(BuildContext context) {
+  Widget _buildTaskPage(BuildContext context, int index) {
+    // Page order matches the tabs: all / habit / daily / todo.
+    final type = switch (index) {
+      1 => TaskType.TASK_TYPE_HABIT,
+      2 => TaskType.TASK_TYPE_DAILY,
+      3 => TaskType.TASK_TYPE_TODO,
+      _ => null,
+    };
     return Obx(() {
-      final tasks = controller.filteredTasks;
+      final tasks = controller.tasksFor(type);
       if (tasks.isEmpty) return _buildEmptyState(context);
       return ListView.separated(
         padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 90.h),
         itemCount: tasks.length,
         separatorBuilder: (_, __) => SizedBox(height: 10.h),
-        itemBuilder: (context, index) {
-          final task = tasks[index];
+        itemBuilder: (context, i) {
+          final task = tasks[i];
           return TaskTicket(
             task: task,
             onComplete: () => controller.toggleComplete(task),

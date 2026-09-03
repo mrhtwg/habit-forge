@@ -10,6 +10,7 @@ import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/home/controllers/home_controller.dart';
 import 'package:habit_forge_app/features/quests/pages/task_form_sheet.dart';
 import 'package:habit_forge_app/generated/protos/shared/v1/shared.pbenum.dart';
+import 'package:habit_forge_app/widgets/animated_number_text.dart';
 import 'package:habit_forge_app/widgets/pressable_button.dart';
 import 'package:habit_forge_app/widgets/task_ticket.dart';
 import 'package:habit_forge_app/widgets/wallet_chip.dart';
@@ -180,13 +181,16 @@ class HomePage extends GetView<HomeController> {
               children: [
                 _hudBar(
                   label: LanKey.exp.tr,
-                  text: _xpText(),
+                  textBuilder: _xpTextWidget,
+                  textWidth: 50.w,
                   barBuilder: _buildExpBar,
                 ),
                 SizedBox(height: 8.h),
                 _hudBar(
                   label: LanKey.hp.tr,
-                  text: _hpText(),
+                  textBuilder: _hpTextWidget,
+                  // Same readout width as the EXP row so both bars align.
+                  textWidth: 50.w,
                   barBuilder: _buildHpBar,
                 ),
               ],
@@ -241,12 +245,21 @@ class HomePage extends GetView<HomeController> {
     );
   }
 
-  String _hpText() {
+  Widget _hpTextWidget() {
     final char = UserService.to.character.value;
-    return '${char?.currentHp ?? 100}/${GameConstants.maxHp}';
+    final hp = char?.currentHp ?? 100;
+    return Text(
+      '$hp/${GameConstants.maxHp}',
+      style: textStyleBold(fontSize: 12.sp, color: AppColors.textPrimary),
+    );
   }
 
-  Widget _hudBar({required String label, required String text, required Widget Function() barBuilder}) {
+  Widget _hudBar({
+    required String label,
+    required Widget Function() textBuilder,
+    required double textWidth,
+    required Widget Function() barBuilder,
+  }) {
     return Obx(() {
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -260,8 +273,8 @@ class HomePage extends GetView<HomeController> {
           Expanded(child: barBuilder()),
           SizedBox(width: 8.w),
           SizedBox(
-            width: 50.w,
-            child: Text(text, style: textStyleBold(fontSize: 12.sp, color: AppColors.textPrimary)),
+            width: textWidth,
+            child: Align(alignment: Alignment.centerRight, child: textBuilder()),
           ),
         ],
       );
@@ -305,11 +318,20 @@ class HomePage extends GetView<HomeController> {
     );
   }
 
-  String _xpText() {
+  /// Animated EXP readout (level-internal progress over the level's need),
+  /// easing to the new value the same way the wallet chip does.
+  Widget _xpTextWidget() {
     final char = UserService.to.character.value;
-    final level = char?.level ?? 1;
-    final needed = GameConstants.expForLevel(level);
-    return '${char?.currentExp ?? 0}/$needed';
+    final exp = char?.currentExp.toInt() ?? 0;
+    final needed = char?.maxExp.toInt() ?? GameConstants.expForLevel(char?.level ?? 1);
+    final style = textStyleBold(fontSize: 12.sp, color: AppColors.textPrimary);
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        AnimatedNumberText(exp, style: style),
+        Text('/$needed', style: style),
+      ],
+    );
   }
 }
 

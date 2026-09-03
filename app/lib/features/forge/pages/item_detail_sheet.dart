@@ -5,6 +5,7 @@ import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/forge/controllers/forge_controller.dart';
+import 'package:habit_forge_app/generated/assets.dart';
 import 'package:habit_forge_app/generated/protos/shared/v1/shared.pbenum.dart';
 import 'package:habit_forge_app/generated/protos/shop/v1/shop.pb.dart';
 import 'package:habit_forge_app/widgets/shop_item_icon.dart';
@@ -18,8 +19,9 @@ class ItemDetailSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<ForgeController>();
     final owned = controller.isOwned(item.id);
-    final affordable = controller.canAfford(item.price.toInt());
-    final shortfall = controller.goldShortfall(item.price.toInt());
+    final affordable = controller.canAfford(item);
+    final shortfall = controller.shortfall(item);
+    final isSkin = controller.isSkin(item);
     final rarityColor = _rarityColor(item.rarity);
 
     return Padding(
@@ -91,7 +93,7 @@ class ItemDetailSheet extends StatelessWidget {
             child: SizedBox(
               width: double.infinity,
               height: 52.h,
-              child: _buildActionButton(controller, owned, affordable, shortfall),
+              child: _buildActionButton(controller, owned, affordable, shortfall, isSkin),
             ),
           ),
           SizedBox(height: 28.h),
@@ -100,37 +102,60 @@ class ItemDetailSheet extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButton(ForgeController controller, bool owned, bool affordable, int shortfall) {
+  Widget _buildActionButton(
+    ForgeController controller,
+    bool owned,
+    bool affordable,
+    int shortfall,
+    bool isSkin,
+  ) {
     final VoidCallback? onTap;
     final Color bg;
     final Color fg;
     final String label;
     final bool showPrice;
+    final bool payWithGems = controller.currencyOf(item) == ShopCurrency.SHOP_CURRENCY_GEMS;
 
     if (owned) {
-      onTap = () {
-        controller.equip(item.id);
-        Get.back();
-      };
-      bg = AppColors.primary;
-      fg = Colors.white;
-      label = LanKey.equip.tr;
-      showPrice = false;
+      if (isSkin) {
+        // Skins are cosmetic unlocks; equipping them belongs to the future
+        // Rive character system. For now just show "Owned".
+        onTap = null;
+        bg = AppColors.textSecondary;
+        fg = Colors.white;
+        label = LanKey.owned.tr;
+        showPrice = false;
+      } else {
+        onTap = () {
+          controller.equip(item);
+          Get.back();
+        };
+        bg = AppColors.primary;
+        fg = Colors.white;
+        label = LanKey.equip.tr;
+        showPrice = false;
+      }
     } else if (!affordable) {
       onTap = () {
-        Toast.warning(LanKey.notEnoughGold.trParams({'shortfall': '$shortfall'}));
+        if (payWithGems) {
+          Toast.warning(LanKey.notEnoughGems.trParams({'shortfall': '$shortfall'}));
+        } else {
+          Toast.warning(LanKey.notEnoughGold.trParams({'shortfall': '$shortfall'}));
+        }
       };
       bg = AppColors.coral;
       fg = Colors.white;
-      label = LanKey.needMoreGold.trParams({'shortfall': '$shortfall'});
+      label = payWithGems
+          ? LanKey.needMoreGems.trParams({'shortfall': '$shortfall'})
+          : LanKey.needMoreGold.trParams({'shortfall': '$shortfall'});
       showPrice = false;
     } else {
       onTap = () async {
         final result = await controller.purchase(item);
         if (result.isSuccess) Get.back();
       };
-      bg = AppColors.gold;
-      fg = AppColors.textPrimary;
+      bg = payWithGems ? AppColors.info : AppColors.gold;
+      fg = payWithGems ? Colors.white : AppColors.textPrimary;
       label = LanKey.buy.tr;
       showPrice = true;
     }
@@ -148,16 +173,12 @@ class ItemDetailSheet extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (showPrice) ...[
-              Container(
-                width: 16.w,
-                height: 16.w,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: AppColors.gold,
-                  border: Border.all(color: AppColors.border, width: 1.2),
-                ),
+              Image.asset(
+                payWithGems ? Assets.imagesSharedIcGem : Assets.imagesSharedIcGold,
+                width: 18.w,
+                height: 18.w,
               ),
-              SizedBox(width: 5.w),
+              SizedBox(width: 6.w),
             ],
             Text(
               showPrice ? '$label · ${item.price}' : label,

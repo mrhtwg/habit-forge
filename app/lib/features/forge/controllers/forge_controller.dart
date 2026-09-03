@@ -2,14 +2,15 @@ import 'dart:async';
 
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/network/api_response.dart';
+import 'package:habit_forge_app/core/network/hive/shop_config.dart';
 import 'package:habit_forge_app/core/network/network_registry.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
-import 'package:habit_forge_app/generated/protos/shared/v1/shared.pbenum.dart';
 import 'package:habit_forge_app/generated/protos/shop/v1/shop.pb.dart';
 import 'package:habit_forge_app/widgets/toast_widget.dart';
 
 class ForgeController extends GetxController {
   final shopItems = <ShopItem>[].obs;
+  final ownedIds = <String>[].obs;
   final activeCategory = 'appearance'.obs;
   // Daily deal
   final dailyDeal = DailyDeal().obs;
@@ -23,20 +24,39 @@ class ForgeController extends GetxController {
     return matches.isNotEmpty ? matches.first : null;
   }
 
-  bool canAfford(int price) {
-    return UserService.to.userPrefs.value.currentGold >= price;
+  /// The currency this item is bought with (skins -> gems, else gold).
+  ShopCurrency currencyOf(ShopItem item) => ShopConfig.currencyOf(item.id);
+
+  /// Whether the item is a character skin (bought with gems, not equipped to a
+  /// weapon/helmet/armor/accessory slot).
+  bool isSkin(ShopItem item) => ShopConfig.isSkin(item.id);
+
+  /// Current balance in the item's currency.
+  int balanceOf(ShopItem item) {
+    final prefs = UserService.to.userPrefs.value;
+    return currencyOf(item) == ShopCurrency.SHOP_CURRENCY_GEMS ? prefs.currentGems.toInt() : prefs.currentGold.toInt();
   }
 
-  void equip(String itemId) {
-    NetworkRegistry.ins.equipItem(itemId, EquipmentSlot.EQUIPMENT_SLOT_WEAPON);
-  }
+  bool canAfford(ShopItem item) => balanceOf(item) >= item.price.toInt();
 
-  int goldShortfall(int price) {
-    final needed = price - UserService.to.userPrefs.value.currentGold.toInt();
+  int shortfall(ShopItem item) {
+    final needed = item.price.toInt() - balanceOf(item);
     return needed > 0 ? needed : 0;
   }
 
-  bool isOwned(String itemId) => shopItems.contains(itemId);
+  /// Equips an owned item into its own slot (skins have no equipment slot).
+  void equip(ShopItem item) {
+    NetworkRegistry.ins.equipItem(item.id, item.slot);
+    UserService.to.loadCharacter();
+  }
+
+  bool isOwned(String itemId) => ownedIds.contains(itemId);
+
+  /// Items shown in the active category tab.
+  List<ShopItem> get filteredItems {
+    final category = activeCategory.value;
+    return shopItems.where((i) => ShopConfig.categoryOf(i.id) == category).toList();
+  }
 
   @override
   void onClose() {
@@ -49,6 +69,7 @@ class ForgeController extends GetxController {
     super.onInit();
 
     listItems();
+    loadOwned();
     _initDailyDeal();
     _updateCountdown();
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (_) => _updateCountdown());
@@ -61,12 +82,20 @@ class ForgeController extends GetxController {
     }
   }
 
-  /// Delegates the purchase to the storage layer, which validates the balance,
-  /// charges the wallet and marks the item as owned.
+  Future<void> loadOwned() async {
+    final result = await NetworkRegistry.ins.listOwnedItems();
+    if (result.isSuccess) {
+      ownedIds.value = result.data!.itemIds;
+    }
+  }
+
+  /// Delegates the purchase to the storage layer (the item's own currency
+  /// decides gold vs gems), then refreshes wallet + owned + catalog.
   Future<ApiResponse<BuyItemReply>> purchase(ShopItem item) async {
-    final result = await NetworkRegistry.ins.purchaseItem(item.id, ShopCurrency.SHOP_CURRENCY_GEMS);
+    final result = await NetworkRegistry.ins.purchaseItem(item.id, currencyOf(item));
     if (result.isSuccess) {
       await UserService.to.loadUserPrefs();
+      await loadOwned();
       listItems();
     }
     return result;

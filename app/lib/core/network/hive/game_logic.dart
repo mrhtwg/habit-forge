@@ -93,23 +93,36 @@ class GameLogic {
   }
 
   /// Applies exp and returns (character, newLevel or -1).
+  ///
+  /// EXP is per-level: the bar always shows the progress inside the current
+  /// level ([0, expForLevel(level))), e.g. level 1 needs 100 EXP to reach
+  /// level 2, level 2 needs 160, ... Crossing the threshold spends that
+  /// amount and the remainder carries into the next level. At max level the
+  /// bar is capped full (no overflow).
   static (Character, int) gainExp(Character c, int exp) {
     final frozen = c.deepCopy()..freeze();
-    final newExp = frozen.currentExp + exp;
-    final newLevel = levelForExp(newExp.toInt());
-    if (newLevel <= frozen.level) {
-      return (frozen.rebuild((x) => x..currentExp = newExp), -1);
+    var remaining = frozen.currentExp.toInt() + exp;
+    var level = frozen.level;
+    while (level < GameConstants.maxLevel && remaining >= GameConstants.expForLevel(level)) {
+      remaining -= GameConstants.expForLevel(level);
+      level++;
     }
-    final gained = (newLevel - frozen.level) * GameConstants.statPointsPerLevel;
+    if (level <= frozen.level) {
+      return (frozen.rebuild((x) => x..currentExp = Int64(remaining)), -1);
+    }
+    final gained = (level - frozen.level) * GameConstants.statPointsPerLevel;
+    final maxForLevel = GameConstants.expForLevel(level);
+    final cappedExp = level >= GameConstants.maxLevel ? remaining.clamp(0, maxForLevel) : remaining;
     return (
       frozen.rebuild(
         (x) => x
-          ..currentExp = newExp
-          ..level = newLevel
+          ..currentExp = Int64(cappedExp)
+          ..level = level
+          ..maxExp = Int64(maxForLevel)
           ..availableStatPoints = x.availableStatPoints + gained
-          ..currentHp = (x.currentHp + 20).clamp(0, GameConstants.maxHp),
+          ..currentHp = (x.currentHp + GameConstants.completeTaskAddHp).clamp(0, GameConstants.maxHp),
       ),
-      newLevel,
+      level,
     );
   }
 

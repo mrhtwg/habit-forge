@@ -274,7 +274,7 @@ void main() {
         title: 'level rush',
         type: TaskType.TASK_TYPE_HABIT,
         difficulty: TaskDifficulty.TASK_DIFFICULTY_HARD,
-        customExpReward: 600,
+        customExpReward: 1000,
       ),
     );
     await api.completeTask(leveller.data!.task.id);

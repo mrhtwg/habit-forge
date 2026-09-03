@@ -64,51 +64,79 @@ achievement_defs:
 
 equipment:
   - id: sword_flame
-    slot: 'weapon'
+    slot: "weapon"
     name: Flame Sword
     description: A sword wreathed in eternal flame
     price: 500
-    rarity: 'epic'
-    icon: 'sword_flame.png'
+    rarity: "epic"
+    icon: "sword_flame.png"
 
   - id: armor_golden
-    slot: 'armor'
+    slot: "armor"
     name: Golden Armor
     description: Shining golden plate armor
     price: 300
-    rarity: 'rare'
-    icon: 'armor_golden.png'
+    rarity: "rare"
+    icon: "armor_golden.png"
 
   - id: helm_dragon
-    slot: 'helmet'
+    slot: "helmet"
     name: Dragon Helm
     description: Helm forged from dragon scales
     price: 250
-    rarity: 'rare'
-    icon: 'helm_dragon.png'
+    rarity: "rare"
+    icon: "helm_dragon.png"
 
   - id: staff_arcane
-    slot: 'weapon'
+    slot: "weapon"
     name: Arcane Staff
     description: A staff crackling with arcane energy
     price: 350
-    rarity: 'epic'
-    icon: 'staff_arcane.png'
+    rarity: "epic"
+    icon: "staff_arcane.png"
 
 appearance:
   - id: cloak_shadow
-    slot: 'accessory'
+    slot: "accessory"
     name: Shadow Cloak
     description: Cloak woven from shadow
     price: 150
-    rarity: 'common'
-    icon: 'cloak_shadow.png'
-    
+    rarity: "common"
+    icon: "cloak_shadow.png"
+
   - id: amulet_star
-    slot: 'accessory'
+    slot: "accessory"
     name: Star Amulet
     description: Amulet that glows like starlight
     price: 200
-    rarity: 'common'
-    icon: 'amulet_star.png'
+    rarity: "common"
+    icon: "amulet_star.png"
 
+skins:
+  - id: skin_shadow
+    name: Shadow Rogue
+    description: A sleek shadow-tinted recolor of your hero
+    price: 20
+    rarity: "common"
+    icon: "skin_shadow.png"
+
+  - id: skin_golden
+    name: Golden Knight
+    description: Shining golden recolor, fit for a champion
+    price: 30
+    rarity: "rare"
+    icon: "skin_golden.png"
+
+  - id: skin_forest
+    name: Forest Ranger
+    description: Earthy green recolor blending into the wilds
+    price: 30
+    rarity: "rare"
+    icon: "skin_forest.png"
+
+  - id: skin_dragon
+    name: Dragonheart
+    description: Fiery ember recolor, touched by dragon blood
+    price: 50
+    rarity: "epic"
+    icon: "skin_dragon.png"

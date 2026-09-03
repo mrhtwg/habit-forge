@@ -125,98 +125,100 @@ class AchievementsPage extends GetView<AchievementsController> {
   }
 
   Widget _buildList() {
-    return ListView.separated(
-      padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 24.h),
-      itemCount: controller.achievements.length,
-      separatorBuilder: (_, __) => SizedBox(height: 10.h),
-      itemBuilder: (context, index) {
-        final def = controller.achievements[index];
-        Achievement? saved;
-        for (final a in controller.achievements) {
-          if (a.id == def.id) {
-            saved = a;
-            break;
+    return Obx(() {
+      return ListView.separated(
+        padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 24.h),
+        itemCount: controller.achievements.length,
+        separatorBuilder: (_, __) => SizedBox(height: 10.h),
+        itemBuilder: (context, index) {
+          final def = controller.achievements[index];
+          Achievement? saved;
+          for (final a in controller.achievements) {
+            if (a.id == def.id) {
+              saved = a;
+              break;
+            }
           }
-        }
-        final unlocked = saved?.isUnlocked ?? false;
-        return Container(
-          padding: EdgeInsets.all(14.w),
-          decoration: BoxDecoration(
-            color: unlocked ? Colors.white : const Color(0xFFF4EFE2),
-            border: Border.all(color: unlocked ? AppColors.border : AppColors.textMuted, width: 2),
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: const [BoxShadow(color: Color(0xFFEFDFC4), offset: Offset(0, 4))],
-          ),
-          child: Row(
-            children: [
-              // Icon badge
-              Container(
-                width: 54.w,
-                height: 54.w,
-                decoration: BoxDecoration(
-                  color: unlocked ? _achievementColor(def.id).withValues(alpha: 0.2) : const Color(0xFFE8E0CE),
-                  border: Border.all(color: AppColors.border, width: 2),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Icon(
-                  unlocked ? _achievementIcon(def.id) : Icons.lock_rounded,
-                  size: 30.w,
-                  color: unlocked ? _achievementColor(def.id) : AppColors.textMuted,
-                ),
-              ),
-              SizedBox(width: 12.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      unlocked ? LanKey.achievementTitle(def.id).tr : '???',
-                      style: textStyleBold(
-                        fontSize: 14.sp,
-                        color: unlocked ? AppColors.textPrimary : AppColors.textMuted,
-                      ),
-                    ),
-                    SizedBox(height: 3.h),
-                    Text(
-                      LanKey.achievementDescription(def.id).tr,
-                      style: textStyleMedium(fontSize: 11.5.sp, color: AppColors.textSecondary),
-                    ),
-                  ],
-                ),
-              ),
-              // Gem reward
-              if (unlocked)
+          final unlocked = saved?.isUnlocked ?? false;
+          return Container(
+            padding: EdgeInsets.all(14.w),
+            decoration: BoxDecoration(
+              color: unlocked ? Colors.white : const Color(0xFFF4EFE2),
+              border: Border.all(color: unlocked ? AppColors.border : AppColors.textMuted, width: 2),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: const [BoxShadow(color: Color(0xFFEFDFC4), offset: Offset(0, 4))],
+            ),
+            child: Row(
+              children: [
+                // Icon badge
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
+                  width: 54.w,
+                  height: 54.w,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFEAF4FF),
-                    border: Border.all(color: AppColors.border, width: 1.2),
-                    borderRadius: BorderRadius.circular(8),
+                    color: unlocked ? _achievementColor(def.id).withValues(alpha: 0.2) : const Color(0xFFE8E0CE),
+                    border: Border.all(color: AppColors.border, width: 2),
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
+                  child: Icon(
+                    unlocked ? _achievementIcon(def.id) : Icons.lock_rounded,
+                    size: 30.w,
+                    color: unlocked ? _achievementColor(def.id) : AppColors.textMuted,
+                  ),
+                ),
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        width: 12.w,
-                        height: 12.w,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: const Color(0xFF7ED0FF),
-                          border: Border.all(color: AppColors.border, width: 1),
+                      Text(
+                        unlocked ? LanKey.achievementTitle(def.id).tr : '???',
+                        style: textStyleBold(
+                          fontSize: 14.sp,
+                          color: unlocked ? AppColors.textPrimary : AppColors.textMuted,
                         ),
                       ),
-                      SizedBox(width: 3.w),
+                      SizedBox(height: 3.h),
                       Text(
-                        '+${def.gemReward}',
-                        style: textStyleBold(fontSize: 11.sp, color: AppColors.textPrimary),
+                        LanKey.achievementDescription(def.id).tr,
+                        style: textStyleMedium(fontSize: 11.5.sp, color: AppColors.textSecondary),
                       ),
                     ],
                   ),
                 ),
-            ],
-          ),
-        );
-      },
-    );
+                // Gem reward
+                if (unlocked)
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEAF4FF),
+                      border: Border.all(color: AppColors.border, width: 1.2),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 12.w,
+                          height: 12.w,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: const Color(0xFF7ED0FF),
+                            border: Border.all(color: AppColors.border, width: 1),
+                          ),
+                        ),
+                        SizedBox(width: 3.w),
+                        Text(
+                          '+${def.gemReward}',
+                          style: textStyleBold(fontSize: 11.sp, color: AppColors.textPrimary),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+          );
+        },
+      );
+    });
   }
 }

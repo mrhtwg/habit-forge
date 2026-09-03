@@ -26,6 +26,14 @@ class ShopItemIcon extends StatelessWidget {
         return const Color(0xFFF1E8FF);
       case 'amulet_star':
         return AppColors.goldLight;
+      case 'skin_shadow':
+        return const Color(0xFFE3E0F5);
+      case 'skin_golden':
+        return AppColors.goldLight;
+      case 'skin_forest':
+        return const Color(0xFFE1F3E4);
+      case 'skin_dragon':
+        return const Color(0xFFFFE5E0);
       default:
         return const Color(0xFFEAF0FF);
     }
@@ -45,6 +53,14 @@ class ShopItemIcon extends StatelessWidget {
         return PhosphorIcons.star(PhosphorIconsStyle.fill);
       case 'staff_arcane':
         return PhosphorIcons.sparkle(PhosphorIconsStyle.fill);
+      case 'skin_shadow':
+        return PhosphorIcons.user(PhosphorIconsStyle.fill);
+      case 'skin_golden':
+        return PhosphorIcons.user(PhosphorIconsStyle.fill);
+      case 'skin_forest':
+        return PhosphorIcons.user(PhosphorIconsStyle.fill);
+      case 'skin_dragon':
+        return PhosphorIcons.user(PhosphorIconsStyle.fill);
       default:
         return PhosphorIcons.package(PhosphorIconsStyle.fill);
     }

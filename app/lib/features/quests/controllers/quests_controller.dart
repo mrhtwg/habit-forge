@@ -38,8 +38,10 @@ class QuestsController extends GetxController {
     return tags.toList()..sort();
   }
 
-  List<Task> get filteredTasks {
-    Iterable<Task> list = showAll.value ? tasks : tasks.where((t) => t.type == activeType.value);
+  /// Tasks of one category (null = all types), further filtered by the
+  /// active tag chip. Used by the swipeable category pages.
+  List<Task> tasksFor(TaskType? type) {
+    Iterable<Task> list = type == null ? tasks : tasks.where((t) => t.type == type);
     if (activeTag.value != 'all') {
       list = list.where((t) => t.tags.contains(activeTag.value));
     }

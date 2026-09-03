@@ -119,34 +119,11 @@ class NetworkHiveImpl implements NetworkInterface {
     );
     UserBox.ins.updateUserPrefs(_newUserPrefs);
 
-    final _charClone = character.deepCopy()..freeze();
-
-    // Leveling: currentExp is the character's cumulative EXP and is never
-    // deducted on level-up — the UI shows the raw total over the EXP needed
-    // for the next level (currentExp / expForLevel(level), e.g. 110/160).
-    // The character levels up once the cumulative total reaches the next
-    // level's requirement (expForLevel(level)); maxExp mirrors that
-    // requirement so the frontend can refresh both values.
-    final levelBefore = _charClone.level;
-    final newTotalExp = _charClone.currentExp.toInt() + _gainExp;
-    var newLevel = levelBefore;
-    while (newLevel < GameConstants.maxLevel && newTotalExp >= GameConstants.expForLevel(newLevel)) {
-      newLevel++;
-    }
-    final leveledUp = newLevel > levelBefore;
-    final newHp = leveledUp
-        ? (_charClone.currentHp + GameConstants.completeTaskAddHp).clamp(0, GameConstants.maxHp)
-        : _charClone.currentHp;
-    final _newCharacter = _charClone.rebuild(
-      (char) => char
-        ..currentExp = Int64(newTotalExp.clamp(0, GameConstants.expForLevel(GameConstants.maxLevel)))
-        ..level = newLevel
-        ..maxExp = Int64(GameConstants.expForLevel(newLevel))
-        ..currentHp = newHp
-        ..availableStatPoints = char.availableStatPoints + (newLevel - levelBefore) * GameConstants.statPointsPerLevel,
-    );
-
-    CharacterBox.ins.updateCharacter(_newCharacter);
+    // Leveling (see GameLogic.gainExp): EXP lives inside the current level
+    // (0..expForLevel(level)); crossing the threshold spends it and levels up
+    // with the remainder carrying over. maxExp mirrors the next level's need.
+    final (newCharacter, newLevel) = GameLogic.gainExp(character, _gainExp);
+    CharacterBox.ins.updateCharacter(newCharacter);
 
     // Mark the task complete (streak / completedAt) and persist.
     final newTask = await TaskBox.ins.completeTask(task);
@@ -155,14 +132,14 @@ class NetworkHiveImpl implements NetworkInterface {
     await _unlockEligibleAchievements(
       totalTasks: _newUserPrefs.totalTasksCompleted.toInt(),
       streak: newTask.streak,
-      level: _newCharacter.level,
+      level: newCharacter.level,
     );
 
     return ApiResponse.success(
       CompleteTaskReply(
         task: newTask,
         prefs: _newUserPrefs,
-        character: _newCharacter,
+        character: newCharacter,
       ),
     );
   }
@@ -300,16 +277,28 @@ class NetworkHiveImpl implements NetworkInterface {
     if (owned.contains(itemId)) {
       return ApiResponse.failure(code: StatusCode.alreadyExists, message: 'Item already owned');
     }
+
+    // The item itself defines its currency (config.yml): skins cost gems,
+    // equipment/accessories cost gold. The caller's hint is ignored.
+    final payWithGems = ShopConfig.currencyOf(itemId) == ShopCurrency.SHOP_CURRENCY_GEMS;
     final userPrefs = UserBox.ins.getUserPrefs();
+    if (payWithGems) {
+      if (userPrefs.currentGems < item.price) {
+        return ApiResponse.failure(code: StatusCode.failedPrecondition, message: 'Not enough gems');
+      }
+      final updated = GameLogic.addGems(userPrefs, -item.price.toInt());
+      UserBox.ins.updateUserPrefs(updated);
+      UserBox.ins.updateOwnedItemIds([...owned, itemId]);
+      return ApiResponse.success(BuyItemReply(item: item, balance: updated.currentGems));
+    }
+
     if (userPrefs.currentGold < item.price) {
       return ApiResponse.failure(code: StatusCode.failedPrecondition, message: 'Not enough gold');
     }
-
-    UserBox.ins.updateUserPrefs(GameLogic.addGold(userPrefs, -item.price.toInt()));
+    final updated = GameLogic.addGold(userPrefs, -item.price.toInt());
+    UserBox.ins.updateUserPrefs(updated);
     UserBox.ins.updateOwnedItemIds([...owned, itemId]);
-    return ApiResponse.success(
-      BuyItemReply(item: item, balance: userPrefs.currentGold - item.price),
-    );
+    return ApiResponse.success(BuyItemReply(item: item, balance: updated.currentGold));
   }
 
   @override
