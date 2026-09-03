@@ -8,6 +8,7 @@ import 'package:habit_forge_app/features/forge/controllers/forge_controller.dart
 import 'package:habit_forge_app/generated/protos/shared/v1/shared.pbenum.dart';
 import 'package:habit_forge_app/generated/protos/shop/v1/shop.pb.dart';
 import 'package:habit_forge_app/widgets/shop_item_icon.dart';
+import 'package:habit_forge_app/widgets/toast_widget.dart';
 
 class ItemDetailSheet extends StatelessWidget {
   final ShopItem item;
@@ -117,16 +118,7 @@ class ItemDetailSheet extends StatelessWidget {
       showPrice = false;
     } else if (!affordable) {
       onTap = () {
-        Get.snackbar(
-          '',
-          LanKey.notEnoughGold.trParams({'shortfall': '$shortfall'}),
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: AppColors.surface,
-          colorText: AppColors.red,
-          duration: const Duration(seconds: 2),
-          margin: const EdgeInsets.all(16),
-          borderRadius: 12,
-        );
+        Toast.warning(LanKey.notEnoughGold.trParams({'shortfall': '$shortfall'}));
       };
       bg = AppColors.coral;
       fg = Colors.white;

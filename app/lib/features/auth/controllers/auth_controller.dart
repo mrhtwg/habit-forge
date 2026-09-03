@@ -6,6 +6,7 @@ import 'package:habit_forge_app/core/network/network_registry.dart';
 import 'package:habit_forge_app/core/services/firebase_auth_service.dart';
 import 'package:habit_forge_app/core/services/server_auth_service.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
+import 'package:habit_forge_app/widgets/toast_widget.dart';
 
 class AuthController extends GetxController {
   static AuthController get to => Get.find();
@@ -19,7 +20,7 @@ class AuthController extends GetxController {
     try {
       final error = await FirebaseAuthService.to.loginWithApple();
       if (error != null) {
-        Get.snackbar(LanKey.appleLoginFailed.tr, error);
+        Toast.error('${LanKey.appleLoginFailed.tr}: $error');
         return false;
       }
       isLoggedIn.value = true;
@@ -42,7 +43,7 @@ class AuthController extends GetxController {
         error = await FirebaseAuthService.to.loginWithEmail(email, password);
       }
       if (error != null) {
-        Get.snackbar(LanKey.loginFailed.tr, error);
+        Toast.error('${LanKey.loginFailed.tr}: $error');
         return false;
       }
       isLoggedIn.value = true;
@@ -59,7 +60,7 @@ class AuthController extends GetxController {
     try {
       final error = await FirebaseAuthService.to.loginWithGoogle();
       if (error != null) {
-        Get.snackbar(LanKey.googleLoginFailed.tr, error);
+        Toast.error('${LanKey.googleLoginFailed.tr}: $error');
         return false;
       }
       isLoggedIn.value = true;
@@ -102,7 +103,7 @@ class AuthController extends GetxController {
         error = await FirebaseAuthService.to.registerWithEmail(email, password);
       }
       if (error != null) {
-        Get.snackbar(LanKey.registrationFailed.tr, error);
+        Toast.error('${LanKey.registrationFailed.tr}: $error');
         return false;
       }
       isLoggedIn.value = true;
