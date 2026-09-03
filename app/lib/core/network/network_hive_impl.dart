@@ -84,6 +84,12 @@ class NetworkHiveImpl implements NetworkInterface {
     if (character == null) {
       return ApiResponse.failure(code: CharacterErrorReason.CHARACTER_NOT_FOUND.value, message: 'Character not found');
     }
+    if (character.isDead) {
+      return ApiResponse.failure(
+        code: StatusCode.failedPrecondition,
+        message: 'Character is dead — revive first',
+      );
+    }
 
     // Rewards (streak-aware EXP + gold).
     final _gainExp = GameLogic.expReward(task);
@@ -94,28 +100,38 @@ class NetworkHiveImpl implements NetworkInterface {
     final _newUserPrefs = _userFreezon.rebuild(
       (user) => user
         ..currentGold = user.currentGold + _gainGold
-        ..todayTasksCompleted = user.totalTasksCompleted + 1,
+        ..todayTasksCompleted = user.todayTasksCompleted + 1
+        ..totalTasksCompleted = user.totalTasksCompleted + 1
+        ..firstTaskDate =
+            user.firstTaskDate == Int64(0) ? Int64(DateTime.now().millisecondsSinceEpoch) : user.firstTaskDate,
     );
     UserBox.ins.updateUserPrefs(_newUserPrefs);
 
-    // Character: gain EXP and level up (stat points + HP heal on level-up).
-    // final (updated, level) = GameLogic.gainExp(character, gainExp);
-    // final frozen = updated.clone()..freeze();
+    final _charClone = character.deepCopy()..freeze();
 
-    final _charFreezen = character.clone()..freeze();
-
-    int _newLevel = _charFreezen.level;
-    int _newHp = _charFreezen.currentHp;
-    if (GameConstants.expForLevel(_charFreezen.level) <= _charFreezen.currentExp.toInt() + _gainExp) {
-      _newLevel++;
-      _newHp += GameConstants.completeTaskAddHp;
+    // Leveling: currentExp is the character's cumulative EXP and is never
+    // deducted on level-up — the UI shows the raw total over the EXP needed
+    // for the next level (currentExp / expForLevel(level), e.g. 110/160).
+    // The character levels up once the cumulative total reaches the next
+    // level's requirement (expForLevel(level)); maxExp mirrors that
+    // requirement so the frontend can refresh both values.
+    final newTotalExp = _charClone.currentExp.toInt() + _gainExp;
+    var newLevel = _charClone.level;
+    while (newLevel < GameConstants.maxLevel && newTotalExp >= GameConstants.expForLevel(newLevel)) {
+      newLevel++;
     }
-    final _newCharacter = _charFreezen.rebuild(
+    final leveledUp = newLevel > _charClone.level;
+    final newHp = leveledUp
+        ? (_charClone.currentHp + GameConstants.completeTaskAddHp).clamp(0, GameConstants.maxHp)
+        : _charClone.currentHp;
+    final _newCharacter = _charClone.rebuild(
       (char) => char
-        ..currentExp = char.currentExp + _gainExp
-        ..level = _newLevel
-        ..maxExp = Int64(GameConstants.expForLevel(_newLevel))
-        ..currentHp = _newHp,
+        ..currentExp = Int64(newTotalExp.clamp(0, GameConstants.expForLevel(GameConstants.maxLevel)))
+        ..level = newLevel
+        ..maxExp = Int64(GameConstants.expForLevel(newLevel))
+        ..currentHp = newHp
+        ..availableStatPoints =
+            char.availableStatPoints + (newLevel - char.level) * GameConstants.statPointsPerLevel,
     );
 
     CharacterBox.ins.updateCharacter(_newCharacter);
@@ -170,6 +186,15 @@ class NetworkHiveImpl implements NetworkInterface {
     await TaskBox.ins.init();
     await UserBox.ins.init();
     await ShopBox.ins.init();
+
+    // Hive mode: settle overdue-task HP penalties at startup (once per day).
+    final penalty = TaskBox.ins.collectOverduePenalty();
+    if (penalty > 0) {
+      final character = CharacterBox.ins.getCharacter();
+      if (character != null && !character.isDead) {
+        CharacterBox.ins.updateCharacter(GameLogic.takeDamage(character, penalty));
+      }
+    }
 
     if (!UserService.to.isLoggedIn()) {
       final token = Uuid().v4();

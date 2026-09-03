@@ -19,22 +19,22 @@ class GameLogic {
   // ── Rewards ──
 
   static UserPrefs addCompletedTask(UserPrefs p) =>
-      (p.clone()..freeze()).rebuild((x) => x..totalTasksCompleted = x.totalTasksCompleted + 1);
+      (p.deepCopy()..freeze()).rebuild((x) => x..totalTasksCompleted = x.totalTasksCompleted + 1);
 
   static UserPrefs addGems(UserPrefs p, int amount) =>
-      (p.clone()..freeze()).rebuild((x) => x..currentGems = x.currentGems + amount);
+      (p.deepCopy()..freeze()).rebuild((x) => x..currentGems = x.currentGems + amount);
 
   // ── Task ──
 
   // ── Economy ──
 
   static UserPrefs addGold(UserPrefs p, int amount) =>
-      (p.clone()..freeze()).rebuild((x) => x..currentGold = x.currentGold + amount);
+      (p.deepCopy()..freeze()).rebuild((x) => x..currentGold = x.currentGold + amount);
 
   /// Spends one available point on the given attribute.
   static Character allocateStat(Character c, StatType stat) {
     if (c.availableStatPoints <= 0) return c;
-    final frozen = c.clone()..freeze();
+    final frozen = c.deepCopy()..freeze();
     final s = frozen.baseStats;
     return frozen.rebuild(
       (x) => x
@@ -54,7 +54,7 @@ class GameLogic {
   /// Marks the task complete and bumps the streak (once per day).
   static Task completeTask(Task task) {
     final now = DateTime.now();
-    final frozen = task.clone()..freeze();
+    final frozen = task.deepCopy()..freeze();
     final newStreak =
         DateTime.fromMillisecondsSinceEpoch(frozen.lastStreakDate.toInt()).isToday ? frozen.streak : frozen.streak + 1;
     return frozen.rebuild(
@@ -72,7 +72,7 @@ class GameLogic {
   /// Equips [itemId] into [slot]; an empty [itemId] (or re-equipping the same
   /// item) unequips the slot.
   static Character equip(Character c, String slot, String itemId) {
-    final frozen = c.clone()..freeze();
+    final frozen = c.deepCopy()..freeze();
     final equipment = Map<String, String>.from(frozen.equipment);
     if (itemId.isEmpty || equipment[slot] == itemId) {
       equipment.remove(slot);
@@ -90,7 +90,7 @@ class GameLogic {
 
   /// Applies exp and returns (character, newLevel or -1).
   static (Character, int) gainExp(Character c, int exp) {
-    final frozen = c.clone()..freeze();
+    final frozen = c.deepCopy()..freeze();
     final newExp = frozen.currentExp + exp;
     final newLevel = levelForExp(newExp.toInt());
     if (newLevel <= frozen.level) {
@@ -127,7 +127,7 @@ class GameLogic {
   /// Skips the task and (for todos) pushes the due date to tomorrow.
   static Task postpone(Task task) {
     final tomorrow = DateTime.now().add(const Duration(days: 1));
-    final frozen = task.clone()..freeze();
+    final frozen = task.deepCopy()..freeze();
     return frozen.rebuild(
       (t) => t
         ..isSkipped = true
@@ -136,7 +136,7 @@ class GameLogic {
   }
 
   /// Revives a dead character with the recovery HP.
-  static Character revive(Character c) => (c.clone()..freeze()).rebuild(
+  static Character revive(Character c) => (c.deepCopy()..freeze()).rebuild(
         (x) => x
           ..isDead = false
           ..currentHp = GameConstants.deathRecoveryHp
@@ -144,12 +144,12 @@ class GameLogic {
       );
 
   /// Toggles the skipped flag.
-  static Task skip(Task task) => (task.clone()..freeze()).rebuild((t) => t..isSkipped = !t.isSkipped);
+  static Task skip(Task task) => (task.deepCopy()..freeze()).rebuild((t) => t..isSkipped = !t.isSkipped);
 
   /// Applies damage; the character dies at 0 HP and schedules recovery.
   static Character takeDamage(Character c, int amount) {
     if (c.isDead) return c;
-    final frozen = c.clone()..freeze();
+    final frozen = c.deepCopy()..freeze();
     final newHp = (frozen.currentHp - amount).clamp(0, GameConstants.maxHp);
     final dead = newHp <= 0;
     return frozen.rebuild(

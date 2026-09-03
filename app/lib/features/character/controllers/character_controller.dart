@@ -29,11 +29,6 @@ class CharacterController extends GetxController {
     super.dispose();
   }
 
-  /// Applies damage to the character (delegated to the storage layer).
-  void takeDamage(int amount) {
-    NetworkRegistry.ins.takeDamage(amount);
-  }
-
   void updateAnimation(String animation) {
     currentAnimation = animation;
     update();
