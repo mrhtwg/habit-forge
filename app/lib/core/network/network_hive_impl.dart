@@ -9,11 +9,10 @@ import 'package:habit_forge_app/core/network/hive/shop_config.dart';
 import 'package:habit_forge_app/core/network/hive/task_box.dart';
 import 'package:habit_forge_app/core/network/hive/user_box.dart';
 import 'package:habit_forge_app/core/network/network_interface.dart';
-import 'package:habit_forge_app/generated/protos/auth/v1/auth.pb.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/generated/protos/achievement/v1/achievement.pb.dart';
+import 'package:habit_forge_app/generated/protos/auth/v1/auth.pb.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart';
-import 'package:habit_forge_app/generated/protos/character/v1/character_error.pbenum.dart';
 import 'package:habit_forge_app/generated/protos/shared/v1/shared.pbenum.dart';
 import 'package:habit_forge_app/generated/protos/shop/v1/shop.pb.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.dart';
@@ -24,9 +23,9 @@ import 'package:uuid/uuid.dart';
 class NetworkHiveImpl implements NetworkInterface {
   @override
   Future<bool> allocateStatPoint(StatType stat) async {
-    // final char = character.value;
-    // if (char == null || char.availableStatPoints <= 0) return false;
-    // saveCharacter(GameLogic.allocateStat(char, stat));
+    final char = CharacterBox.ins.getCharacter();
+    if (char == null || char.availableStatPoints <= 0) return false;
+    CharacterBox.ins.updateCharacter(GameLogic.allocateStat(char, stat));
     return true;
   }
 
@@ -35,7 +34,7 @@ class NetworkHiveImpl implements NetworkInterface {
   Future<ApiResponse<CreateCharacterReply>> createCharacter(CharacterClass characterClass) async {
     if (await CharacterBox.ins.getCharacter() != null) {
       return ApiResponse.failure(
-        code: CharacterErrorReason.CHARACTER_ALREADY_EXISTS.value,
+        code: StatusCode.alreadyExists,
         message: 'Character already exists',
       );
     }
@@ -74,15 +73,15 @@ class NetworkHiveImpl implements NetworkInterface {
   Future<ApiResponse<CompleteTaskReply>> completeTask(String id) async {
     final task = TaskBox.ins.getTask(id);
     if (task == null) {
-      return ApiResponse.failure(code: TaskErrorReason.TASK_NOT_FOUND.value, message: 'Task not found');
+      return ApiResponse.failure(code: StatusCode.notFound, message: 'Task not found');
     }
     if (task.isCompleted) {
-      return ApiResponse.failure(code: TaskErrorReason.TASK_ALREADY_COMPLETED.value, message: 'Task already completed');
+      return ApiResponse.failure(code: StatusCode.failedPrecondition, message: 'Task already completed');
     }
 
     final character = CharacterBox.ins.getCharacter();
     if (character == null) {
-      return ApiResponse.failure(code: CharacterErrorReason.CHARACTER_NOT_FOUND.value, message: 'Character not found');
+      return ApiResponse.failure(code: StatusCode.notFound, message: 'Character not found');
     }
     if (character.isDead) {
       return ApiResponse.failure(
@@ -115,12 +114,13 @@ class NetworkHiveImpl implements NetworkInterface {
     // The character levels up once the cumulative total reaches the next
     // level's requirement (expForLevel(level)); maxExp mirrors that
     // requirement so the frontend can refresh both values.
+    final levelBefore = _charClone.level;
     final newTotalExp = _charClone.currentExp.toInt() + _gainExp;
-    var newLevel = _charClone.level;
+    var newLevel = levelBefore;
     while (newLevel < GameConstants.maxLevel && newTotalExp >= GameConstants.expForLevel(newLevel)) {
       newLevel++;
     }
-    final leveledUp = newLevel > _charClone.level;
+    final leveledUp = newLevel > levelBefore;
     final newHp = leveledUp
         ? (_charClone.currentHp + GameConstants.completeTaskAddHp).clamp(0, GameConstants.maxHp)
         : _charClone.currentHp;
@@ -130,14 +130,20 @@ class NetworkHiveImpl implements NetworkInterface {
         ..level = newLevel
         ..maxExp = Int64(GameConstants.expForLevel(newLevel))
         ..currentHp = newHp
-        ..availableStatPoints =
-            char.availableStatPoints + (newLevel - char.level) * GameConstants.statPointsPerLevel,
+        ..availableStatPoints = char.availableStatPoints + (newLevel - levelBefore) * GameConstants.statPointsPerLevel,
     );
 
     CharacterBox.ins.updateCharacter(_newCharacter);
 
     // Mark the task complete (streak / completedAt) and persist.
     final newTask = await TaskBox.ins.completeTask(task);
+
+    // Achievements: total_tasks / streak / level conditions.
+    await _unlockEligibleAchievements(
+      totalTasks: _newUserPrefs.totalTasksCompleted.toInt(),
+      streak: newTask.streak,
+      level: _newCharacter.level,
+    );
 
     return ApiResponse.success(
       CompleteTaskReply(
@@ -148,6 +154,35 @@ class NetworkHiveImpl implements NetworkInterface {
     );
   }
 
+  /// Unlocks every achievement whose condition is met by the given metrics,
+  /// granting its gem reward. Runs after task completion.
+  Future<void> _unlockEligibleAchievements({
+    required int totalTasks,
+    required int streak,
+    required int level,
+  }) async {
+    final unlockedIds = UserBox.ins.getAchievements().map((a) => a.id).toSet();
+    for (final def in ShopConfig.achievementDefs) {
+      if (unlockedIds.contains(def.id)) continue;
+      final met = switch (def.conditionType) {
+        'total_tasks' => totalTasks >= def.threshold,
+        'streak' => streak >= def.threshold,
+        'level' => level >= def.threshold,
+        _ => false,
+      };
+      if (!met) continue;
+
+      final unlocked = def.deepCopy()
+        ..isUnlocked = true
+        ..unlockedAt = Int64(DateTime.now().millisecondsSinceEpoch);
+      UserBox.ins.updateAchievement(unlocked);
+      if (unlocked.gemReward > 0) {
+        final prefs = UserBox.ins.getUserPrefs();
+        UserBox.ins.updateUserPrefs(GameLogic.addGems(prefs, unlocked.gemReward.toInt()));
+      }
+    }
+  }
+
   @override
   Future<ApiResponse<DeleteTaskReply>> deleteTask(String id) async {
     // _tasksBox.delete('task_$id');
@@ -156,19 +191,36 @@ class NetworkHiveImpl implements NetworkInterface {
   }
 
   @override
-  Future<ApiResponse<EquipItemReply>> equipItem(String itemId, EquipmentSlot slot) {
-    // final char = character.value;
-    // if (char != null) saveCharacter(GameLogic.equip(char, slot, itemId));
-    // TODO: implement equipItem
-    throw UnimplementedError();
+  Future<ApiResponse<EquipItemReply>> equipItem(String itemId, EquipmentSlot slot) async {
+    final char = CharacterBox.ins.getCharacter();
+    if (char == null) {
+      return ApiResponse.failure(code: StatusCode.notFound, message: 'Character not found');
+    }
+    final owned = UserBox.ins.getOwnedItemIds();
+    if (itemId.isNotEmpty && !owned.contains(itemId)) {
+      return ApiResponse.failure(code: StatusCode.failedPrecondition, message: 'Item not owned');
+    }
+    final slotKey = _slotKey(slot);
+    CharacterBox.ins.updateCharacter(GameLogic.equip(char, slotKey, itemId));
+    return ApiResponse.success(EquipItemReply(), 'Equipped');
   }
+
+  /// Maps an [EquipmentSlot] to the equipment-map key used on the character.
+  static String _slotKey(EquipmentSlot slot) => switch (slot) {
+        EquipmentSlot.EQUIPMENT_SLOT_WEAPON => 'weapon',
+        EquipmentSlot.EQUIPMENT_SLOT_HELMET => 'helmet',
+        EquipmentSlot.EQUIPMENT_SLOT_ARMOR => 'armor',
+        EquipmentSlot.EQUIPMENT_SLOT_ACCESSORY => 'accessory',
+        EquipmentSlot.EQUIPMENT_SLOT_UNSPECIFIED => 'unspecified',
+        _ => 'unspecified',
+      };
 
   @override
   Future<ApiResponse<GetCharacterReply>> getCharacter() async {
     final char = await CharacterBox.ins.getCharacter();
     if (char == null) {
       return ApiResponse.fromGrpcError(
-        CharacterErrorReason.CHARACTER_NOT_FOUND.value,
+        StatusCode.notFound,
         'Character not found',
         errorReasonValue: null,
         reason: null,
@@ -248,16 +300,19 @@ class NetworkHiveImpl implements NetworkInterface {
   }
 
   @override
-  Future<void> reviveCharacter() {
-    // TODO: implement reviveCharacter
-    throw UnimplementedError();
+  Future<void> reviveCharacter() async {
+    final char = CharacterBox.ins.getCharacter();
+    if (char == null || !char.isDead) return;
+    final recoveryAt = DateTime.fromMillisecondsSinceEpoch(char.deathRecoveryUntil.toInt());
+    if (DateTime.now().isBefore(recoveryAt)) return; // still recovering
+    CharacterBox.ins.updateCharacter(GameLogic.revive(char));
   }
 
   @override
   Future<ApiResponse<SkipTaskReply>> skipTask(String id) async {
     final task = TaskBox.ins.getTask(id);
     if (task == null) {
-      return ApiResponse.failure(code: TaskErrorReason.TASK_NOT_FOUND.value, message: 'Task not found');
+      return ApiResponse.failure(code: StatusCode.notFound, message: 'Task not found');
     }
     final updated = await TaskBox.ins.skipTask(task);
     return ApiResponse.success(SkipTaskReply(task: updated));
@@ -298,6 +353,12 @@ class NetworkHiveImpl implements NetworkInterface {
 
   @override
   Future<ApiResponse<ListAchievementsReply>> listAchievements() async {
-    return ApiResponse.success(ListAchievementsReply(achievements: ShopConfig.achievementDefs));
+    final unlocked = UserBox.ins.getAchievements();
+    final merged = <Achievement>[];
+    for (final def in ShopConfig.achievementDefs) {
+      final match = unlocked.where((a) => a.id == def.id);
+      merged.add(match.isNotEmpty ? match.first : def);
+    }
+    return ApiResponse.success(ListAchievementsReply(achievements: merged));
   }
 }

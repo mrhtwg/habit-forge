@@ -79,7 +79,11 @@ class GameLogic {
     } else {
       equipment[slot] = itemId;
     }
-    return frozen.rebuild((x) => x..equipment.addAll(equipment));
+    return frozen.rebuild((x) {
+      // Replace the whole map: addAll alone would leave removed slots behind.
+      x.equipment.clear();
+      x.equipment.addAll(equipment);
+    });
   }
 
   /// Base EXP reward for a task, including the streak multiplier.
