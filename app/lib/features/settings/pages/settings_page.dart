@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:habit_forge_app/core/constants/env_constants.dart';
 import 'package:habit_forge_app/core/i18n/app_locale.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/services/audio_service.dart';
@@ -144,29 +145,32 @@ class SettingsPage extends GetView<SettingsController> {
                   ),
                   const SizedBox(height: 20),
 
-                  // Data section
-                  _SectionHeader(LanKey.data.tr),
-                  _SettingsCard(
-                    child: ListTile(
-                      leading: Icon(Icons.recycling_outlined, color: AppColors.textPrimary.withValues(alpha: 0.5)),
-                      title: Text(
-                        LanKey.resetAllData.tr,
-                        style: textStyleRegular(color: AppColors.red),
+                  // Data section — wiping local data only makes sense in hive
+                  // mode (server/firebase sessions live on the backend).
+                  if (EnvConstants.isHive()) ...[
+                    _SectionHeader(LanKey.data.tr),
+                    _SettingsCard(
+                      child: ListTile(
+                        leading: Icon(Icons.recycling_outlined, color: AppColors.textPrimary.withValues(alpha: 0.5)),
+                        title: Text(
+                          LanKey.resetAllData.tr,
+                          style: textStyleRegular(color: AppColors.red),
+                        ),
+                        onTap: () async {
+                          final confirmed = await ConfirmDialog.show(
+                            context,
+                            title: LanKey.resetGame.tr,
+                            message: LanKey.resetAllConfirm.tr,
+                            confirmLabel: LanKey.reset.tr,
+                            isDestructive: true,
+                          );
+                          if (confirmed == true) {
+                            controller.resetAllData();
+                          }
+                        },
                       ),
-                      onTap: () async {
-                        final confirmed = await ConfirmDialog.show(
-                          context,
-                          title: LanKey.resetGame.tr,
-                          message: LanKey.resetAllConfirm.tr,
-                          confirmLabel: LanKey.reset.tr,
-                          isDestructive: true,
-                        );
-                        if (confirmed == true) {
-                          controller.resetAllData();
-                        }
-                      },
                     ),
-                  ),
+                  ],
                 ],
               ),
             ),

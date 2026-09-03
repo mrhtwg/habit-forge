@@ -1,7 +1,5 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:grpc/grpc.dart';
-import 'package:habit_forge_app/core/common/utils/sp_keys.dart';
-import 'package:habit_forge_app/core/common/utils/sp_utils.dart';
 import 'package:habit_forge_app/core/network/api_response.dart';
 import 'package:habit_forge_app/core/network/hive/character_box.dart';
 import 'package:habit_forge_app/core/network/hive/game_constants.dart';
@@ -11,7 +9,9 @@ import 'package:habit_forge_app/core/network/hive/shop_config.dart';
 import 'package:habit_forge_app/core/network/hive/task_box.dart';
 import 'package:habit_forge_app/core/network/hive/user_box.dart';
 import 'package:habit_forge_app/core/network/network_interface.dart';
+import 'package:habit_forge_app/generated/protos/auth/v1/auth.pb.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
+import 'package:habit_forge_app/generated/protos/achievement/v1/achievement.pb.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character_error.pbenum.dart';
 import 'package:habit_forge_app/generated/protos/shared/v1/shared.pbenum.dart';
@@ -196,16 +196,17 @@ class NetworkHiveImpl implements NetworkInterface {
       }
     }
 
-    if (!UserService.to.isLoggedIn()) {
-      final token = Uuid().v4();
-      await SpUtils.ins.putString(SpKeys.token, token);
-      // Keep the in-memory token in sync: UserService.token was loaded in
-      // main() before this init ran, so without this the splash login check
-      // (which reads the in-memory value) would still see an empty token.
-      UserService.to.token.value = token;
-    }
-
     return this;
+  }
+
+  // ── Auth ──
+
+  /// Guest auto-login: hive mints a local session token immediately.
+  @override
+  Future<ApiResponse<LoginReply>> login(String provider) async {
+    final token = Uuid().v4();
+    await UserService.to.setSessionToken(token);
+    return ApiResponse.success(LoginReply(token: token), 'Signed in');
   }
 
   @override
@@ -222,14 +223,6 @@ class NetworkHiveImpl implements NetworkInterface {
       onlyDueToday: onlyDueToday,
     );
     return ApiResponse.success(ListTasksReply(tasks: _tasks));
-  }
-
-  @override
-  Future<void> postponeTask(String id) async {
-    // final task = _findTask(id);
-    // if (task == null) return;
-    // _tasksBox.put('task_$id', _json.encode(GameLogic.postpone(task).writeToJsonMap()));
-    // _loadTasks();
   }
 
   @override
@@ -255,50 +248,19 @@ class NetworkHiveImpl implements NetworkInterface {
   }
 
   @override
-  Future<ApiResponse<DailyDeal>> refreshDailyDeal() async {
-    return ApiResponse.success(
-      DailyDeal(
-        itemId: 'sword_flame',
-        discountPercent: 30,
-        expiresAt: Int64(DateTime.now().add(Duration(days: 1)).millisecondsSinceEpoch),
-      ),
-    );
-  }
-
-  @override
-  Future<void> resetAllData() async {
-    CharacterBox.ins.clear();
-    TaskBox.ins.clear();
-    UserBox.ins.clear();
-    ShopBox.ins.clear();
-  }
-
-  @override
   Future<void> reviveCharacter() {
     // TODO: implement reviveCharacter
     throw UnimplementedError();
   }
 
   @override
-  void saveAuthToken(String? token) {
-    // TODO: implement saveAuthToken
-  }
-
-  @override
-  void setLoggedIn(bool value, {String method = ''}) {
-    // TODO: implement setLoggedIn
-  }
-
-  @override
-  Future<ApiResponse<SkipTaskReply>> skipTask(String id) {
-    // TODO: implement skipTask
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> takeDamage(int amount) {
-    // TODO: implement takeDamage
-    throw UnimplementedError();
+  Future<ApiResponse<SkipTaskReply>> skipTask(String id) async {
+    final task = TaskBox.ins.getTask(id);
+    if (task == null) {
+      return ApiResponse.failure(code: TaskErrorReason.TASK_NOT_FOUND.value, message: 'Task not found');
+    }
+    final updated = await TaskBox.ins.skipTask(task);
+    return ApiResponse.success(SkipTaskReply(task: updated));
   }
 
   @override
@@ -316,5 +278,26 @@ class NetworkHiveImpl implements NetworkInterface {
   Future<ApiResponse<ListShopItemsReply>> listShopItems() async {
     final items = await ShopBox.ins.listItems();
     return ApiResponse.success(ListShopItemsReply(items: items));
+  }
+
+  @override
+  Future<ApiResponse<ListOwnedItemsReply>> listOwnedItems() async {
+    return ApiResponse.success(ListOwnedItemsReply(itemIds: UserBox.ins.getOwnedItemIds()));
+  }
+
+  @override
+  Future<ApiResponse<DailyDeal>> getDailyDeal() async {
+    return ApiResponse.success(
+      DailyDeal(
+        itemId: 'sword_flame',
+        discountPercent: 30,
+        expiresAt: Int64(DateTime.now().add(const Duration(days: 1)).millisecondsSinceEpoch),
+      ),
+    );
+  }
+
+  @override
+  Future<ApiResponse<ListAchievementsReply>> listAchievements() async {
+    return ApiResponse.success(ListAchievementsReply(achievements: ShopConfig.achievementDefs));
   }
 }

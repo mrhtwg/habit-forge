@@ -62,6 +62,18 @@ class UserService extends GetxService {
 
   bool isLoggedIn() => token.value.isNotEmpty;
 
+  /// Persists the session token (SharedPreferences) and mirrors it into the
+  /// reactive [token]. Pass null/empty to clear the session.
+  Future<void> setSessionToken(String? token) async {
+    final value = token ?? '';
+    if (value.isEmpty) {
+      await SpUtils.ins.remove(SpKeys.token);
+    } else {
+      await SpUtils.ins.putString(SpKeys.token, value);
+    }
+    this.token.value = value;
+  }
+
   Future loadCharacter() async {
     final result = await NetworkRegistry.ins.getCharacter();
     if (result.isSuccess) {

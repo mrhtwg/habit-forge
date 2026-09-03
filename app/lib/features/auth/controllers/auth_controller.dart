@@ -1,8 +1,8 @@
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/constants/env_constants.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
-import 'package:habit_forge_app/core/network/network_registry.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
+import 'package:habit_forge_app/core/network/network_registry.dart';
 import 'package:habit_forge_app/core/services/firebase_auth_service.dart';
 import 'package:habit_forge_app/core/services/server_auth_service.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
@@ -22,7 +22,6 @@ class AuthController extends GetxController {
         Get.snackbar(LanKey.appleLoginFailed.tr, error);
         return false;
       }
-      NetworkRegistry.ins.setLoggedIn(true, method: 'apple');
       isLoggedIn.value = true;
       _checkOnboardingAndRoute();
       return true;
@@ -46,7 +45,6 @@ class AuthController extends GetxController {
         Get.snackbar(LanKey.loginFailed.tr, error);
         return false;
       }
-      NetworkRegistry.ins.setLoggedIn(true, method: 'email');
       isLoggedIn.value = true;
       _checkOnboardingAndRoute();
       return true;
@@ -64,7 +62,6 @@ class AuthController extends GetxController {
         Get.snackbar(LanKey.googleLoginFailed.tr, error);
         return false;
       }
-      NetworkRegistry.ins.setLoggedIn(true, method: 'google');
       isLoggedIn.value = true;
       _checkOnboardingAndRoute();
       return true;
@@ -80,7 +77,7 @@ class AuthController extends GetxController {
     } else {
       await FirebaseAuthService.to.signOut();
     }
-    NetworkRegistry.ins.setLoggedIn(false);
+    await UserService.to.setSessionToken(null);
     isLoggedIn.value = false;
     // Hive (local) mode has no real login — return to onboarding instead of the login page.
     Get.offAllNamed(EnvConstants.isHive() ? Routers.boarding : Routers.login);
@@ -108,7 +105,6 @@ class AuthController extends GetxController {
         Get.snackbar(LanKey.registrationFailed.tr, error);
         return false;
       }
-      NetworkRegistry.ins.setLoggedIn(true, method: 'email');
       isLoggedIn.value = true;
       Get.offAllNamed(Routers.boarding);
       return true;
@@ -118,8 +114,10 @@ class AuthController extends GetxController {
   }
 
   /// Skip login as guest
-  void skipLogin() {
-    NetworkRegistry.ins.setLoggedIn(true, method: 'guest');
+  /// Guest login: hive mode mints a local token through the auth facade.
+  Future<void> skipLogin() async {
+    final result = await NetworkRegistry.ins.login('guest');
+    if (result.isFailure) return;
     isLoggedIn.value = true;
     Get.offAllNamed(Routers.boarding);
   }

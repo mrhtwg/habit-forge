@@ -108,6 +108,14 @@ class TaskBox {
     return updated;
   }
 
+  /// Skips the task (marked skipped; todos get their due date pushed to
+  /// tomorrow) and persists it. Returns the updated task.
+  Future<Task> skipTask(Task task) async {
+    final updated = GameLogic.postpone(task);
+    _taskBox.put(task.id, updated.writeToBuffer());
+    return updated;
+  }
+
   Future deleteTask(String taskId) async {
     _taskBox.delete(taskId);
   }

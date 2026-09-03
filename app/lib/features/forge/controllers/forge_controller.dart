@@ -66,7 +66,7 @@ class ForgeController extends GetxController {
       await NetworkRegistry.ins.purchaseItem(item.id, ShopCurrency.SHOP_CURRENCY_GEMS);
 
   Future<void> _initDailyDeal() async {
-    final result = await NetworkRegistry.ins.refreshDailyDeal();
+    final result = await NetworkRegistry.ins.getDailyDeal();
     result.when(onSuccess: (reply) => dailyDeal.value = reply, onFailure: (code, msg) => Toast.error(msg));
   }
 

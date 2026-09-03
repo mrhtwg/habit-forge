@@ -41,8 +41,9 @@ class HomeController extends GetxController {
     NetworkRegistry.ins.deleteTask(id);
   }
 
+  /// Skips the task (marked skipped; todos get due date pushed to tomorrow).
   void onTaskPostpone(Task task) {
-    NetworkRegistry.ins.postponeTask(task.id);
+    NetworkRegistry.ins.skipTask(task.id);
   }
 
   void onTaskSkip(Task task) {

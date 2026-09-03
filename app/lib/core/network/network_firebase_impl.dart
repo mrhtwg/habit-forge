@@ -1,12 +1,26 @@
 import 'package:habit_forge_app/core/network/api_response.dart';
 import 'package:habit_forge_app/core/network/network_interface.dart';
+import 'package:habit_forge_app/generated/protos/achievement/v1/achievement.pb.dart';
+import 'package:habit_forge_app/generated/protos/auth/v1/auth.pb.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart';
 import 'package:habit_forge_app/generated/protos/shared/v1/shared.pbenum.dart';
 import 'package:habit_forge_app/generated/protos/shop/v1/shop.pb.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';
 import 'package:habit_forge_app/generated/protos/user/v1/user.pb.dart';
 
+/// Firestore-backed storage (firebase mode).
+///
+/// NOTE: this mode is being phased out — the final app targets the Go backend
+/// (server mode). The methods below are placeholders until Firebase support is
+/// either finished or removed.
 class NetworkFirebaseImpl implements NetworkInterface {
+  @override
+  Future<ApiResponse<LoginReply>> login(String provider) {
+    // Auth is owned by FirebaseAuthService; this facade login is unused here.
+    // TODO: implement login
+    throw UnimplementedError();
+  }
+
   @override
   Future<bool> allocateStatPoint(StatType stat) {
     // TODO: implement allocateStatPoint
@@ -39,8 +53,6 @@ class NetworkFirebaseImpl implements NetworkInterface {
 
   @override
   Future<ApiResponse<EquipItemReply>> equipItem(String itemId, EquipmentSlot slot) {
-    // final char = character.value;
-    // if (char != null) saveCharacter(GameLogic.equip(char, slot, itemId));
     // TODO: implement equipItem
     throw UnimplementedError();
   }
@@ -64,13 +76,7 @@ class NetworkFirebaseImpl implements NetworkInterface {
     List<String>? tags,
     bool? onlyDueToday,
   }) {
-    // TODO: implement getAllTasks
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> postponeTask(String id) {
-    // TODO: implement postponeTask
+    // TODO: implement listTasks
     throw UnimplementedError();
   }
 
@@ -81,14 +87,8 @@ class NetworkFirebaseImpl implements NetworkInterface {
   }
 
   @override
-  Future<ApiResponse<DailyDeal>> refreshDailyDeal() {
-    // TODO: implement refreshDailyDeal
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> resetAllData() {
-    // TODO: implement resetAllData
+  Future<ApiResponse<DailyDeal>> getDailyDeal() {
+    // TODO: implement getDailyDeal
     throw UnimplementedError();
   }
 
@@ -99,24 +99,8 @@ class NetworkFirebaseImpl implements NetworkInterface {
   }
 
   @override
-  void saveAuthToken(String? token) {
-    // TODO: implement saveAuthToken
-  }
-
-  @override
-  void setLoggedIn(bool value, {String method = ''}) {
-    // TODO: implement setLoggedIn
-  }
-
-  @override
   Future<ApiResponse<SkipTaskReply>> skipTask(String id) {
     // TODO: implement skipTask
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> takeDamage(int amount) {
-    // TODO: implement takeDamage
     throw UnimplementedError();
   }
 
@@ -135,6 +119,18 @@ class NetworkFirebaseImpl implements NetworkInterface {
   @override
   Future<ApiResponse<ListShopItemsReply>> listShopItems() {
     // TODO: implement listShopItems
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<ApiResponse<ListOwnedItemsReply>> listOwnedItems() {
+    // TODO: implement listOwnedItems
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<ApiResponse<ListAchievementsReply>> listAchievements() {
+    // TODO: implement listAchievements
     throw UnimplementedError();
   }
 }

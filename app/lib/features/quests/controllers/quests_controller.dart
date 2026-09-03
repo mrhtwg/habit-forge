@@ -48,8 +48,9 @@ class QuestsController extends GetxController {
     await _hive.deleteTask(id);
   }
 
+  /// Skips the task (marked skipped; todos get due date pushed to tomorrow).
   Future<void> onTaskPostpone(Task task) async {
-    await _hive.postponeTask(task.id);
+    await _hive.skipTask(task.id);
   }
 
   Future<void> toggleComplete(Task task) async {

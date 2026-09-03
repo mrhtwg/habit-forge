@@ -19,6 +19,7 @@ import '../network/hive/character_box.dart' as _i545;
 import '../network/hive/shop_box.dart' as _i1070;
 import '../network/hive/task_box.dart' as _i165;
 import '../network/hive/user_box.dart' as _i70;
+import '../services/data_reset_service.dart' as _i208;
 
 // initializes the registration of main-scope dependencies inside of GetIt
 _i174.GetIt $initGetIt(
@@ -37,5 +38,6 @@ _i174.GetIt $initGetIt(
   gh.singleton<_i1070.ShopBox>(() => _i1070.ShopBox());
   gh.singleton<_i165.TaskBox>(() => _i165.TaskBox());
   gh.singleton<_i70.UserBox>(() => _i70.UserBox());
+  gh.singleton<_i208.DataResetService>(() => _i208.DataResetService());
   return getIt;
 }
