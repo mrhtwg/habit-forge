@@ -86,6 +86,7 @@ enum LanKey {
   saveChanges, // 'Save Changes'
   repeatOn, // 'Repeat on'
   selectAtLeastOneDay, // 'Select at least one day'
+  dueDateRequired, // 'Please pick a due date'
   missPenalty, // 'Miss penalty: '
   reward, // 'Reward'
   dueDateAndPriority, // 'Due Date & Priority'

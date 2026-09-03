@@ -102,6 +102,12 @@ class TaskBox {
 
   /// Marks the task complete: applies the streak rule, completion timestamps
   /// and persists the updated task. Returns the completed task.
+  /// Persists an edited task (id/timestamps kept by the caller's payload).
+  Future<Task> updateTask(Task task) async {
+    _taskBox.put(task.id, task.writeToBuffer());
+    return task;
+  }
+
   Future<Task> completeTask(Task task) async {
     final updated = GameLogic.completeTask(task);
     _taskBox.put(task.id, updated.writeToBuffer());

@@ -48,6 +48,7 @@ class ForgeController extends GetxController {
   void onInit() {
     super.onInit();
 
+    listItems();
     _initDailyDeal();
     _updateCountdown();
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (_) => _updateCountdown());
@@ -62,8 +63,14 @@ class ForgeController extends GetxController {
 
   /// Delegates the purchase to the storage layer, which validates the balance,
   /// charges the wallet and marks the item as owned.
-  Future<ApiResponse<BuyItemReply>> purchase(ShopItem item) async =>
-      await NetworkRegistry.ins.purchaseItem(item.id, ShopCurrency.SHOP_CURRENCY_GEMS);
+  Future<ApiResponse<BuyItemReply>> purchase(ShopItem item) async {
+    final result = await NetworkRegistry.ins.purchaseItem(item.id, ShopCurrency.SHOP_CURRENCY_GEMS);
+    if (result.isSuccess) {
+      await UserService.to.loadUserPrefs();
+      listItems();
+    }
+    return result;
+  }
 
   Future<void> _initDailyDeal() async {
     final result = await NetworkRegistry.ins.getDailyDeal();

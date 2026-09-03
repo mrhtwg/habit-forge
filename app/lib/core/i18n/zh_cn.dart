@@ -84,6 +84,7 @@ const Map<LanKey, String> zhCN = {
   LanKey.saveChanges: '保存修改',
   LanKey.repeatOn: '重复日',
   LanKey.selectAtLeastOneDay: '请至少选择一天',
+  LanKey.dueDateRequired: '请选择截止日期',
   LanKey.missPenalty: '错过惩罚：',
   LanKey.reward: '奖励',
   LanKey.dueDateAndPriority: '截止日期与优先级',

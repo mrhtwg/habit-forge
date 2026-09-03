@@ -9,9 +9,11 @@ class CharacterController extends GetxController {
   String currentAnimation = 'idle';
   Timer? _deathTimer;
 
-  /// Spends one available stat point (delegated to the storage layer).
-  void allocateStat(String statName) {
-    NetworkRegistry.ins.allocateStatPoint(_statType(statName));
+  /// Spends one available stat point (delegated to the storage layer), then
+  /// refreshes the shared character mirror so other pages see the change.
+  Future<void> allocateStat(String statName) async {
+    await NetworkRegistry.ins.allocateStatPoint(_statType(statName));
+    await UserService.to.loadCharacter();
   }
 
   /// Revives the character when the death-recovery timer has elapsed.
@@ -20,6 +22,7 @@ class CharacterController extends GetxController {
     if (char == null || !char.isDead) return;
     if (DateTime.now().isAfter(DateTime.fromMillisecondsSinceEpoch(char.deathRecoveryUntil.toInt()))) {
       await NetworkRegistry.ins.reviveCharacter();
+      await UserService.to.loadCharacter();
     }
   }
 

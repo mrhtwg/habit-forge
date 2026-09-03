@@ -57,16 +57,29 @@ class NetworkHiveImpl implements NetworkInterface {
 
   @override
   Future<ApiResponse<CreateTaskReply>> createTask(Task task) async {
-    if (task.title.trim().isEmpty ||
-        task.type.value == TaskType.TASK_TYPE_UNSPECIFIED ||
-        task.difficulty == TaskDifficulty.TASK_DIFFICULTY_UNSPECIFIED) {
-      return ApiResponse.failure(
-        code: StatusCode.invalidArgument,
-        message: StatusCode.name(StatusCode.invalidArgument)!,
-      );
+    final reason = _invalidTaskShape(task);
+    if (reason != null) {
+      return ApiResponse.failure(code: StatusCode.invalidArgument, message: reason);
     }
     final t = await TaskBox.ins.createTask(task);
     return ApiResponse.success(CreateTaskReply(task: t));
+  }
+
+  /// Task-shape rules shared by create/update (both ends must enforce them):
+  /// dailies need at least one repeat day, todos need a due date.
+  static String? _invalidTaskShape(Task t) {
+    if (t.title.trim().isEmpty ||
+        t.type.value == TaskType.TASK_TYPE_UNSPECIFIED ||
+        t.difficulty == TaskDifficulty.TASK_DIFFICULTY_UNSPECIFIED) {
+      return 'Title, type and difficulty are required';
+    }
+    if (t.type == TaskType.TASK_TYPE_DAILY && t.repeatDays.isEmpty) {
+      return 'Daily tasks require at least one repeat day';
+    }
+    if (t.type == TaskType.TASK_TYPE_TODO && t.dueDate.toInt() <= 0) {
+      return 'Todo tasks require a due date';
+    }
+    return null;
   }
 
   @override
@@ -319,9 +332,32 @@ class NetworkHiveImpl implements NetworkInterface {
   }
 
   @override
-  Future<ApiResponse<UpdateTaskReply>> updateTask(String id, Task task) {
-    // TODO: implement updateTask
-    throw UnimplementedError();
+  Future<ApiResponse<UpdateTaskReply>> updateTask(String id, Task task) async {
+    final current = TaskBox.ins.getTask(id);
+    if (current == null) {
+      return ApiResponse.failure(code: StatusCode.notFound, message: 'Task not found');
+    }
+    final reason = _invalidTaskShape(task);
+    if (reason != null) {
+      return ApiResponse.failure(code: StatusCode.invalidArgument, message: reason);
+    }
+    final now = Int64(DateTime.now().millisecondsSinceEpoch);
+    final updated = (current.deepCopy()..freeze()).rebuild((t) {
+      t.title = task.title;
+      t.description = task.description;
+      t.type = task.type;
+      t.difficulty = task.difficulty;
+      t.tags.clear();
+      t.tags.addAll(task.tags);
+      t.dueDate = task.dueDate;
+      t.repeatDays.clear();
+      t.repeatDays.addAll(task.repeatDays);
+      t.priority = task.priority;
+      t.hpPenalty = task.hpPenalty;
+      t.updatedAt = now;
+    });
+    await TaskBox.ins.updateTask(updated);
+    return ApiResponse.success(UpdateTaskReply(task: updated));
   }
 
   @override

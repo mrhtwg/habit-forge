@@ -87,9 +87,13 @@ class UserService extends GetxService {
     await SpUtils.ins.putInt(SpKeys.characterClass, c.characterClass.value);
   }
 
+  /// Resets the in-memory session state (used by "Reset All Data" so the
+  /// next splash run starts as a brand-new player).
   Future<void> clearData() async {
-    userPrefs.value.clear();
-    character.value?.clear();
+    token.value = '';
+    userPrefs.value = UserPrefs();
+    character.value = null;
     tasks.clear();
+    initialClass.value = CharacterClass.CHARACTER_CLASS_WARRIOR;
   }
 }

@@ -391,6 +391,16 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
                     Toast.error(LanKey.titleRequired.tr);
                     return;
                   }
+                  // Daily tasks require at least one repeat day.
+                  if (_type == TaskType.TASK_TYPE_DAILY && _repeatDays.isEmpty) {
+                    Toast.warning(LanKey.selectAtLeastOneDay.tr);
+                    return;
+                  }
+                  // Todo tasks require a due date (0 means not set).
+                  if (_type == TaskType.TASK_TYPE_TODO && (_dueDate == null || _dueDate!.toInt() <= 0)) {
+                    Toast.warning(LanKey.dueDateRequired.tr);
+                    return;
+                  }
 
                   // Only the caller-known fields travel to the storage layer;
                   // ids, timestamps and rewards are owned by the implementation.

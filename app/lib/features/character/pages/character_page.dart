@@ -344,6 +344,7 @@ class CharacterPage extends GetView<CharacterController> {
               title: Text(LanKey.noneUnequip.tr, style: textStyleRegular(color: AppColors.textMuted)),
               onTap: () {
                 NetworkRegistry.ins.equipItem('', slot);
+                UserService.to.loadCharacter();
                 Get.back();
               },
             ),
@@ -359,6 +360,7 @@ class CharacterPage extends GetView<CharacterController> {
                     : null,
                 onTap: () {
                   NetworkRegistry.ins.equipItem(item.id, slot);
+                  UserService.to.loadCharacter();
                   Get.back();
                 },
               ),

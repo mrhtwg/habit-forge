@@ -16,6 +16,12 @@ class QuestsController extends GetxController {
 
   final tasks = <Task>[].obs;
 
+  @override
+  void onInit() {
+    super.onInit();
+    getTasks();
+  }
+
   void getTasks() async {
     final result = await NetworkRegistry.ins.listTasks();
     result.when(
@@ -42,15 +48,18 @@ class QuestsController extends GetxController {
 
   Future<void> createTask(Task task) async {
     await NetworkRegistry.ins.createTask(task);
+    getTasks();
   }
 
   Future<void> deleteTask(String id) async {
     await _hive.deleteTask(id);
+    getTasks();
   }
 
   /// Skips the task (marked skipped; todos get due date pushed to tomorrow).
   Future<void> onTaskPostpone(Task task) async {
     await _hive.skipTask(task.id);
+    getTasks();
   }
 
   Future<void> toggleComplete(Task task) async {
@@ -58,8 +67,10 @@ class QuestsController extends GetxController {
     final result = await _hive.completeTask(task.id);
     if (result.isFailure) return;
 
-    // Refresh the wallet (rewards were granted server-side / in storage).
+    // Refresh the shared mirrors (wallet + character EXP/level) and the list.
     UserService.to.loadUserPrefs();
+    UserService.to.loadCharacter();
+    getTasks();
 
     // Trigger audio/haptic feedback
     final audio = Get.find<AudioService>();
@@ -80,9 +91,11 @@ class QuestsController extends GetxController {
 
   Future<void> toggleSkip(Task task) async {
     await _hive.skipTask(task.id);
+    getTasks();
   }
 
   Future<void> updateTask(String id, Task task) async {
     await _hive.updateTask(id, task);
+    getTasks();
   }
 }

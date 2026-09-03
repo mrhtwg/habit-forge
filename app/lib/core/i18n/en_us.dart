@@ -84,6 +84,7 @@ const Map<LanKey, String> enUS = {
   LanKey.saveChanges: 'Save Changes',
   LanKey.repeatOn: 'Repeat on',
   LanKey.selectAtLeastOneDay: 'Select at least one day',
+  LanKey.dueDateRequired: 'Please pick a due date',
   LanKey.missPenalty: 'Miss penalty: ',
   LanKey.reward: 'Reward',
   LanKey.dueDateAndPriority: 'Due Date & Priority',
