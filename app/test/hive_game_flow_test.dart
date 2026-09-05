@@ -195,7 +195,7 @@ void main() {
     expect(CharacterBox.ins.getCharacter()!.isDead, isTrue);
 
     // Simulate 30 minutes passing, then revive.
-    final recoveryDone = (char.clone()..freeze()).rebuild(
+    final recoveryDone = (char.deepCopy()..freeze()).rebuild(
       (c) => c..deathRecoveryUntil = Int64(DateTime.now().subtract(const Duration(minutes: 1)).millisecondsSinceEpoch),
     );
     CharacterBox.ins.updateCharacter(recoveryDone);

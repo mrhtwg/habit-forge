@@ -12,6 +12,7 @@ import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/character/controllers/character_controller.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart';
 import 'package:habit_forge_app/generated/protos/shared/v1/shared.pbenum.dart';
+import 'package:habit_forge_app/widgets/hud_bar.dart';
 import 'package:habit_forge_app/widgets/toast_widget.dart';
 
 class CharacterPage extends GetView<CharacterController> {
@@ -165,71 +166,24 @@ class CharacterPage extends GetView<CharacterController> {
                     ),
                   ),
                 ),
-                // Positioned(
-                //   top: 0,
-                //   child: Container(
-                //     padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 3.h),
-                //     decoration: BoxDecoration(
-                //       color: Colors.white,
-                //       border: Border.all(color: AppColors.border, width: 2),
-                //       borderRadius: BorderRadius.circular(12),
-                //       boxShadow: const [BoxShadow(color: Color(0xFFE9D9BE), offset: Offset(0, 2))],
-                //     ),
-                //     child: Text(
-                //       LanKey.levelClassLabel.trParams({
-                //         'level': '${char.level}',
-                //         'className': LanKey.characterClass(char.characterClass.name).tr,
-                //       }),
-                //       style: textStyleBold(fontSize: 12.sp, color: AppColors.textPrimary),
-                //     ),
-                //   ),
-                // ),
               ],
             ),
           ),
           // XP progress
           Padding(
-            padding: EdgeInsets.fromLTRB(28.w, 10.h, 28.w, 16.h),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Text(LanKey.exp.tr, style: textStyleBold(fontSize: 11.sp, color: AppColors.textSecondary)),
-                    const Spacer(),
-                    Text(
-                      '${char.currentExp}/${GameConstants.expForLevel(char.level)}',
-                      style: textStyleBold(fontSize: 12.sp, color: AppColors.textPrimary),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 6.h),
-                Container(
-                  height: 14.h,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF3E7CE),
-                    border: Border.all(color: AppColors.border, width: 2),
-                    borderRadius: BorderRadius.circular(999),
-                  ),
-                  child: AnimatedFractionallySizedBox(
-                    alignment: Alignment.centerLeft,
-                    duration: const Duration(milliseconds: 600),
-                    curve: Curves.easeOutCubic,
-                    widthFactor:
-                        (char.currentExp.toInt() / GameConstants.expForLevel(char.level)).clamp(0.0, 1.0).toDouble(),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(colors: [AppColors.gold, AppColors.goldDark]),
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 6.w),
+            child: HudBar(label: LanKey.exp.tr, color: AppColors.gold, text: _xpText()),
           ),
         ],
       ),
     );
+  }
+
+  String _xpText() {
+    final char = UserService.to.character.value;
+    final level = char?.level ?? 1;
+    final needed = GameConstants.expForLevel(level);
+    return '${char?.currentExp ?? 0}/$needed';
   }
 
   // ─────────── Attributes ───────────

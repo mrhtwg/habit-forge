@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
+import 'package:habit_forge_app/core/network/hive/shop_config.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/forge/controllers/forge_controller.dart';
 import 'package:habit_forge_app/features/forge/pages/item_detail_sheet.dart';
+import 'package:habit_forge_app/generated/assets.dart';
 import 'package:habit_forge_app/generated/protos/shared/v1/shared.pbenum.dart';
 import 'package:habit_forge_app/generated/protos/shop/v1/shop.pb.dart';
 import 'package:habit_forge_app/widgets/shop_item_icon.dart';
 import 'package:habit_forge_app/widgets/wallet_chip.dart';
-import 'package:habit_forge_app/core/network/hive/shop_config.dart';
-import 'package:habit_forge_app/generated/assets.dart';
 
 class ForgePage extends GetView<ForgeController> {
   const ForgePage({super.key});
@@ -290,6 +290,7 @@ class ForgePage extends GetView<ForgeController> {
           ),
           labelColor: AppColors.textPrimary,
           unselectedLabelColor: AppColors.textSecondary,
+          overlayColor: WidgetStateProperty.all(Colors.transparent),
           labelStyle: textStyleBold(fontSize: 13.sp),
           unselectedLabelStyle: textStyleBold(fontSize: 13.sp, color: AppColors.textSecondary),
           tabs: [

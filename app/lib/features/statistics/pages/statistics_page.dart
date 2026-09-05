@@ -283,6 +283,7 @@ class StatisticsPage extends GetView<StatisticsController> {
             borderRadius: BorderRadius.circular(999),
             boxShadow: const [BoxShadow(color: Color(0xFFE4D2B0), offset: Offset(0, 2))],
           ),
+          overlayColor: WidgetStateProperty.all(Colors.transparent),
           labelColor: AppColors.textPrimary,
           unselectedLabelColor: AppColors.textSecondary,
           labelStyle: textStyleBold(fontSize: 13.sp),

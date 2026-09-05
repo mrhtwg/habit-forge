@@ -10,7 +10,7 @@ import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/home/controllers/home_controller.dart';
 import 'package:habit_forge_app/features/quests/pages/task_form_sheet.dart';
 import 'package:habit_forge_app/generated/protos/shared/v1/shared.pbenum.dart';
-import 'package:habit_forge_app/widgets/animated_number_text.dart';
+import 'package:habit_forge_app/widgets/hud_bar.dart';
 import 'package:habit_forge_app/widgets/pressable_button.dart';
 import 'package:habit_forge_app/widgets/task_ticket.dart';
 import 'package:habit_forge_app/widgets/wallet_chip.dart';
@@ -179,20 +179,9 @@ class HomePage extends GetView<HomeController> {
             padding: EdgeInsets.fromLTRB(24.w, 18.h, 24.w, 18.h),
             child: Column(
               children: [
-                _hudBar(
-                  label: LanKey.exp.tr,
-                  textBuilder: _xpTextWidget,
-                  textWidth: 50.w,
-                  barBuilder: _buildExpBar,
-                ),
+                HudBar(label: LanKey.exp.tr, color: AppColors.gold, text: _xpText()),
                 SizedBox(height: 8.h),
-                _hudBar(
-                  label: LanKey.hp.tr,
-                  textBuilder: _hpTextWidget,
-                  // Same readout width as the EXP row so both bars align.
-                  textWidth: 50.w,
-                  barBuilder: _buildHpBar,
-                ),
+                HudBar(label: LanKey.hp.tr, color: AppColors.coral, text: _hpText()),
               ],
             ),
           ),
@@ -245,22 +234,9 @@ class HomePage extends GetView<HomeController> {
     );
   }
 
-  Widget _hpTextWidget() {
-    final char = UserService.to.character.value;
-    final hp = char?.currentHp ?? 100;
-    return Text(
-      '$hp/${GameConstants.maxHp}',
-      style: textStyleBold(fontSize: 12.sp, color: AppColors.textPrimary),
-    );
-  }
-
-  Widget _hudBar({
-    required String label,
-    required Widget Function() textBuilder,
-    required double textWidth,
-    required Widget Function() barBuilder,
-  }) {
+  Widget _hudBar({required String label, required Color color, required String text}) {
     return Obx(() {
+      final ratio = _ratioFor(label);
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -270,68 +246,56 @@ class HomePage extends GetView<HomeController> {
             child: Text(label, style: textStyleBold(fontSize: 11.sp, color: AppColors.textSecondary)),
           ),
           SizedBox(width: 8.w),
-          Expanded(child: barBuilder()),
+          Expanded(
+            child: Container(
+              height: 14.h,
+              decoration: BoxDecoration(
+                color: const Color(0xFFF3E7CE),
+                border: Border.all(color: AppColors.border, width: 2),
+                borderRadius: BorderRadius.circular(999),
+              ),
+              child: FractionallySizedBox(
+                alignment: Alignment.centerLeft,
+                widthFactor: ratio,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: color,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                ),
+              ),
+            ),
+          ),
           SizedBox(width: 8.w),
           SizedBox(
-            width: textWidth,
-            child: Align(alignment: Alignment.centerRight, child: textBuilder()),
+            width: 50.w,
+            child: Text(text, style: textStyleBold(fontSize: 12.sp, color: AppColors.textPrimary)),
           ),
         ],
       );
     });
   }
 
-  /// EXP bar with a level-up sequence: on level change the old bar first
-  /// animates to 100%, then resets and the new level's bar animates from 0 to
-  /// its actual progress.
-  Widget _buildExpBar() {
+  double _ratioFor(String label) {
+    final char = UserService.to.character.value;
+    if (label == 'HP') {
+      return ((char?.currentHp ?? 100) / GameConstants.maxHp).clamp(0.0, 1.0).toDouble();
+    }
+    final level = char?.level ?? 1;
+    final needed = GameConstants.expForLevel(level).toDouble();
+    return ((char?.currentExp.toInt() ?? 0) / needed).clamp(0.0, 1.0).toDouble();
+  }
+
+  String _xpText() {
     final char = UserService.to.character.value;
     final level = char?.level ?? 1;
-    // final needed = GameConstants.expForLevel(level).toDouble();
-    final ratio = ((char?.currentExp.toInt() ?? 0) / (char?.maxExp.toInt() ?? 0)).clamp(0.0, 1.0);
-    return _AnimatedExpBar(level: level, ratio: ratio, color: AppColors.gold);
+    final needed = GameConstants.expForLevel(level);
+    return '${char?.currentExp ?? 0}/$needed';
   }
 
-  /// HP bar: plain smooth transition between values.
-  Widget _buildHpBar() {
+  String _hpText() {
     final char = UserService.to.character.value;
-    final ratio = ((char?.currentHp ?? 100) / GameConstants.maxHp).clamp(0.0, 1.0);
-    return Container(
-      height: 14.h,
-      decoration: BoxDecoration(
-        color: const Color(0xFFF3E7CE),
-        border: Border.all(color: AppColors.border, width: 2),
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: AnimatedFractionallySizedBox(
-        duration: const Duration(milliseconds: 600),
-        curve: Curves.easeOutCubic,
-        alignment: Alignment.centerLeft,
-        widthFactor: ratio,
-        child: Container(
-          decoration: BoxDecoration(
-            color: AppColors.coral,
-            borderRadius: BorderRadius.circular(999),
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// Animated EXP readout (level-internal progress over the level's need),
-  /// easing to the new value the same way the wallet chip does.
-  Widget _xpTextWidget() {
-    final char = UserService.to.character.value;
-    final exp = char?.currentExp.toInt() ?? 0;
-    final needed = char?.maxExp.toInt() ?? GameConstants.expForLevel(char?.level ?? 1);
-    final style = textStyleBold(fontSize: 12.sp, color: AppColors.textPrimary);
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        AnimatedNumberText(exp, style: style),
-        Text('/$needed', style: style),
-      ],
-    );
+    return '${char?.currentHp ?? 100}/${GameConstants.maxHp}';
   }
 }
 

@@ -102,6 +102,7 @@ class QuestsPage extends GetView<QuestsController> {
           labelColor: AppColors.textPrimary,
           unselectedLabelColor: AppColors.textSecondary,
           labelStyle: textStyleBold(fontSize: 13.sp),
+          overlayColor: WidgetStateProperty.all(Colors.transparent),
           unselectedLabelStyle: textStyleBold(fontSize: 13.sp, color: AppColors.textSecondary),
           tabs: [
             Tab(text: LanKey.all.tr),
