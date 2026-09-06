@@ -1,6 +1,18 @@
-# Copy this file to android/key.properties and fill in your own release keystore.
-# NEVER commit android/key.properties or your .jks/.keystore files.
-storeFile=/path/to/your/keystore.jks
-storePassword=your-store-password
-keyAlias=your-key-alias
-keyPassword=your-key-password
+# Signing setup for the release keystore.
+#
+# Steps:
+#   1. Create a keystore (do this once, keep it safe & backed up):
+#        mkdir -p android/jks
+#        keytool -genkeypair -keystore android/jks/habitforge.jks \
+#                -alias forge -keyalg RSA -keysize 2048 -validity 10950 \
+#                -dname "CN=Your Name, OU=Mobile, O=Your Org, L=City, S=State, C=CN"
+#   2. Copy this file to android/key.properties and replace every value below
+#      with your real keystore credentials.
+#
+# NEVER commit android/key.properties or android/jks/*.jks —
+# both are ignored by android/.gitignore.
+# storeFile is relative to the android/app module.
+storeFile=../jks/habitforge.jks
+storePassword=REPLACE_WITH_STORE_PASSWORD
+keyAlias=forge
+keyPassword=REPLACE_WITH_KEY_PASSWORD

@@ -35,18 +35,37 @@ android {
     defaultConfig {
         applicationId = "com.habitforge.habitforge"
         minSdk = flutter.minSdkVersion
-        targetSdk = 35
+        targetSdk = 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        ndk {
+            abiFilters.clear()
+            abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a"))
+        }
     }
 
     signingConfigs {
+        // Both release and debug share the same keystore (habitforge.jks),
+        // mirroring the reference project. Credentials come from
+        // android/key.properties, which is git-ignored.
         if (keystorePropertiesFile.exists()) {
+            val props = keystoreProperties
             create("release") {
-                storeFile = file(keystoreProperties["storeFile"] as String)
-                storePassword = keystoreProperties["storePassword"] as String
-                keyAlias = keystoreProperties["keyAlias"] as String
-                keyPassword = keystoreProperties["keyPassword"] as String
+                storeFile = file(props["storeFile"] as String)
+                storePassword = props["storePassword"] as String
+                keyAlias = props["keyAlias"] as String
+                keyPassword = props["keyPassword"] as String
+                enableV1Signing = true
+                enableV2Signing = true
+                enableV3Signing = true
+            }
+            // AGP already provides a 'debug' SigningConfig — reconfigure it
+            // instead of creating a duplicate.
+            getByName("debug") {
+                storeFile = file(props["storeFile"] as String)
+                storePassword = props["storePassword"] as String
+                keyAlias = props["keyAlias"] as String
+                keyPassword = props["keyPassword"] as String
                 enableV1Signing = true
                 enableV2Signing = true
                 enableV3Signing = true
@@ -55,16 +74,26 @@ android {
     }
 
     buildTypes {
+        debug {
+            // Sign debug builds with the same keystore (reference behavior).
+            if (keystorePropertiesFile.exists()) {
+                signingConfig = signingConfigs.getByName("debug")
+            }
+        }
         release {
             // If key.properties exists, sign with the release key.
-            // Otherwise fall back to debug signing so the project remains buildable out-of-the-box.
+            // Otherwise fall back to debug signing so the project remains
+            // buildable out-of-the-box.
             signingConfig = if (keystorePropertiesFile.exists()) {
                 signingConfigs.getByName("release")
             } else {
                 signingConfigs.getByName("debug")
             }
+            // Keep the native symbol table (libflutter.so.sym) so Flutter's
+            // release-bundle post-check passes; "none" strips it and the build
+            // fails with "failed to strip debug symbols from native libraries".
             ndk {
-                debugSymbolLevel = "none"
+                debugSymbolLevel = "symbol_table"
             }
         }
     }

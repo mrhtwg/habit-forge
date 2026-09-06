@@ -169,7 +169,7 @@ class CharacterPage extends GetView<CharacterController> {
               ],
             ),
           ),
-          // XP progress
+          // EXP progress
           Padding(
             padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 6.w),
             child: HudBar(label: LanKey.exp.tr, color: AppColors.gold, text: _xpText()),

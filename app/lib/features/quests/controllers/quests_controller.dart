@@ -4,6 +4,7 @@ import 'package:habit_forge_app/core/network/network_registry.dart';
 import 'package:habit_forge_app/core/services/audio_service.dart';
 import 'package:habit_forge_app/core/services/haptic_service.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
+import 'package:habit_forge_app/features/rewards/reward_popup.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';
 
 class QuestsController extends GetxController {
@@ -66,6 +67,7 @@ class QuestsController extends GetxController {
 
   Future<void> toggleComplete(Task task) async {
     if (task.isCompleted) return;
+    final levelBefore = UserService.to.character.value?.level ?? 1;
     final result = await _hive.completeTask(task.id);
     if (result.isFailure) return;
 
@@ -80,15 +82,14 @@ class QuestsController extends GetxController {
     audio.playComplete();
     haptic.success();
 
-    // RewardPopup.show(
-    //   expGained: result.expGained,
-    //   goldGained: result.goldGained,
-    //   newLevel: result.newLevel,
-    // );
-    // if (result.newLevel != null) {
-    //   audio.playLevelUp();
-    //   haptic.heavy();
-    // }
+    // Congratulate the player: task rewards, or the level-up card on level-up.
+    final reply = result.data!;
+    final leveledUp = reply.character.level > levelBefore;
+    RewardPopup.showTaskReward(reply, levelBefore);
+    if (leveledUp) {
+      audio.playLevelUp();
+      haptic.heavy();
+    }
   }
 
   Future<void> toggleSkip(Task task) async {

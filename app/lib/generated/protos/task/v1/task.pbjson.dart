@@ -349,6 +349,8 @@ const CompleteTaskReply$json = {
       '6': '.api.character.v1.Character',
       '10': 'character'
     },
+    {'1': 'exp_reward', '3': 4, '4': 1, '5': 5, '10': 'expReward'},
+    {'1': 'gold_reward', '3': 5, '4': 1, '5': 5, '10': 'goldReward'},
   ],
 };
 
@@ -356,7 +358,9 @@ const CompleteTaskReply$json = {
 final $typed_data.Uint8List completeTaskReplyDescriptor = $convert.base64Decode(
     'ChFDb21wbGV0ZVRhc2tSZXBseRIlCgR0YXNrGAEgASgLMhEuYXBpLnRhc2sudjEuVGFza1IEdG'
     'FzaxIsCgVwcmVmcxgCIAEoCzIWLmFwaS51c2VyLnYxLlVzZXJQcmVmc1IFcHJlZnMSOQoJY2hh'
-    'cmFjdGVyGAMgASgLMhsuYXBpLmNoYXJhY3Rlci52MS5DaGFyYWN0ZXJSCWNoYXJhY3Rlcg==');
+    'cmFjdGVyGAMgASgLMhsuYXBpLmNoYXJhY3Rlci52MS5DaGFyYWN0ZXJSCWNoYXJhY3RlchIdCg'
+    'pleHBfcmV3YXJkGAQgASgFUglleHBSZXdhcmQSHwoLZ29sZF9yZXdhcmQYBSABKAVSCmdvbGRS'
+    'ZXdhcmQ=');
 
 @$core.Deprecated('Use skipTaskRequestDescriptor instead')
 const SkipTaskRequest$json = {

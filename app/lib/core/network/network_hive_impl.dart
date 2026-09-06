@@ -140,6 +140,8 @@ class NetworkHiveImpl implements NetworkInterface {
         task: newTask,
         prefs: _newUserPrefs,
         character: newCharacter,
+        expReward: _gainExp,
+        goldReward: _gainGold,
       ),
     );
   }

@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:habit_forge_app/core/common/animation/frame_sequence_player.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
+import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
+import 'package:habit_forge_app/generated/assets.dart';
+import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';
 
 class RewardPopup {
   static void show({
@@ -22,7 +26,9 @@ class RewardPopup {
           builder: (context, t, child) {
             return Transform.scale(
               scale: 0.5 + t * 0.5,
-              child: Opacity(opacity: t, child: child),
+              // elasticOut overshoots above 1.0 during the settling wobble;
+              // Opacity must stay within [0, 1], so clamp it.
+              child: Opacity(opacity: t.clamp(0.0, 1.0), child: child),
             );
           },
           child: type == 'levelUp'
@@ -34,95 +40,129 @@ class RewardPopup {
       transitionDuration: const Duration(milliseconds: 200),
     );
 
-    Future.delayed(const Duration(seconds: 2), () {
-      if (Get.isDialogOpen ?? false) Get.back();
-    });
+    // Future.delayed(const Duration(seconds: 2), () {
+    //   if (Get.isDialogOpen ?? false) Get.back();
+    // });
+  }
+
+  /// Shows the reward popup after completing a task: the task card with
+  /// EXP/gold, or the level-up card when the character leveled up.
+  static void showTaskReward(CompleteTaskReply reply, int levelBefore) {
+    final leveledUp = reply.character.level > levelBefore;
+    if (leveledUp) {
+      show(
+        expGained: reply.expReward.toInt(),
+        goldGained: reply.goldReward.toInt(),
+        newLevel: reply.character.level,
+        type: 'levelUp',
+      );
+    } else {
+      show(
+        expGained: reply.expReward.toInt(),
+        goldGained: reply.goldReward.toInt(),
+        type: 'task',
+      );
+    }
   }
 
   // ─────────── Task/achievement reward card ───────────
   static Widget _buildCard(int expGained, int goldGained, String? achievementName, String type) {
     final isAchievement = type == 'achievement';
-    return Container(
-      width: 300.w,
-      padding: EdgeInsets.fromLTRB(22.w, 28.h, 22.w, 20.h),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: AppColors.border, width: 3),
-        boxShadow: const [
-          BoxShadow(color: Color(0x663A2A4E), blurRadius: 24, offset: Offset(0, 10)),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Top gold badge
-          Container(
-            margin: EdgeInsets.only(top: -52.h),
-            width: 80.w,
-            height: 80.w,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: isAchievement ? AppColors.gold : AppColors.green,
-              border: Border.all(color: AppColors.border, width: 3),
-              boxShadow: const [BoxShadow(color: Color(0xFFE7B93F), offset: Offset(0, 4))],
-            ),
-            child: Icon(
-              isAchievement ? Icons.emoji_events_rounded : Icons.check_rounded,
-              color: Colors.white,
-              size: 44.w,
-            ),
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Container(
+          width: 300.w,
+          // Top padding leaves room under the badge that straddles the edge.
+          padding: EdgeInsets.fromLTRB(22.w, 56.h, 22.w, 20.h),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(color: AppColors.border, width: 3),
+            boxShadow: const [
+              BoxShadow(color: Color(0x663A2A4E), blurRadius: 24, offset: Offset(0, 10)),
+            ],
           ),
-          SizedBox(height: 12.h),
-          Text(
-            isAchievement ? LanKey.achievementUnlocked.tr : LanKey.questComplete.tr,
-            style: textStyleBold(fontSize: 14.sp, color: AppColors.primaryDark),
-          ),
-          SizedBox(height: 4.h),
-          Text(
-            isAchievement ? (achievementName ?? LanKey.newAchievement.tr) : LanKey.niceWork.tr,
-            style: textStyleHand(fontSize: 30.sp, color: AppColors.textPrimary),
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: 14.h),
-          // Reward chips
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              _rewardChip(
-                icon: Icons.bolt_rounded,
-                text: LanKey.xpGained.trParams({'n': '$expGained'}),
-                bg: AppColors.goldLight,
+              Text(
+                isAchievement ? LanKey.achievementUnlocked.tr : LanKey.questComplete.tr,
+                style: textStyleBold(fontSize: 14.sp, color: AppColors.primaryDark)
+                    .copyWith(decoration: TextDecoration.none),
               ),
-              SizedBox(width: 10.w),
-              _rewardChip(
-                icon: Icons.star_rounded,
-                text: isAchievement
-                    ? LanKey.gemsGained.trParams({'n': '$goldGained'})
-                    : LanKey.goldGained.trParams({'n': '$goldGained'}),
-                bg: AppColors.goldLight,
+              SizedBox(height: 4.h),
+              Text(
+                isAchievement ? (achievementName ?? LanKey.newAchievement.tr) : LanKey.niceWork.tr,
+                style: textStyleHand(fontSize: 30.sp, color: AppColors.textPrimary)
+                    .copyWith(decoration: TextDecoration.none),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 14.h),
+              // Reward chips
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _rewardChip(
+                    icon: Assets.imagesSharedIcExp,
+                    text: LanKey.xpGained.trParams({'n': '$expGained'}),
+                    bg: AppColors.goldLight,
+                  ),
+                  SizedBox(width: 10.w),
+                  _rewardChip(
+                    icon: Assets.imagesSharedIcGold,
+                    text: isAchievement
+                        ? LanKey.gemsGained.trParams({'n': '$goldGained'})
+                        : LanKey.goldGained.trParams({'n': '$goldGained'}),
+                    bg: AppColors.goldLight,
+                  ),
+                ],
+              ),
+              SizedBox(height: 16.h),
+              // Continue button
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(vertical: 12.h),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(colors: [AppColors.gold, AppColors.goldDark]),
+                  border: Border.all(color: AppColors.border, width: 2.5),
+                  borderRadius: BorderRadius.circular(999),
+                  boxShadow: const [BoxShadow(color: AppColors.goldDark, offset: Offset(0, 4))],
+                ),
+                child: Text(
+                  LanKey.continueLabel.tr,
+                  textAlign: TextAlign.center,
+                  style: textStyleBold(fontSize: 15.sp, color: AppColors.textPrimary)
+                      .copyWith(decoration: TextDecoration.none),
+                ),
               ),
             ],
           ),
-          SizedBox(height: 16.h),
-          // Continue button
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.symmetric(vertical: 12.h),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(colors: [AppColors.gold, AppColors.goldDark]),
-              border: Border.all(color: AppColors.border, width: 2.5),
-              borderRadius: BorderRadius.circular(999),
-              boxShadow: const [BoxShadow(color: AppColors.goldDark, offset: Offset(0, 4))],
-            ),
-            child: Text(
-              LanKey.continueLabel.tr,
-              textAlign: TextAlign.center,
-              style: textStyleBold(fontSize: 15.sp, color: AppColors.textPrimary),
+        ),
+        // Badge riding the top edge of the card.
+        Positioned(
+          top: -40.h,
+          left: 0,
+          right: 0,
+          child: Center(
+            child: Container(
+              width: 80.w,
+              height: 80.w,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: isAchievement ? AppColors.gold : AppColors.green,
+                border: Border.all(color: AppColors.border, width: 3),
+                boxShadow: const [BoxShadow(color: Color(0xFFE7B93F), offset: Offset(0, 4))],
+              ),
+              child: Icon(
+                isAchievement ? Icons.emoji_events_rounded : Icons.check_rounded,
+                color: Colors.white,
+                size: 44.w,
+              ),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -144,24 +184,36 @@ class RewardPopup {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(LanKey.yourHeroReached.tr, style: textStyleBold(fontSize: 16.sp, color: const Color(0xFF7A4A00))),
+          // TODO(levelup): play a Victory animation once it's ready — the hero
+          // stays on its idle frames for now.
+          FrameSequencePlayer(
+            frames: UserService.to.getCharacterFrame(),
+            preferredSize: const Size(84, 92),
+          ),
+          SizedBox(height: 8.h),
+          Text(
+            LanKey.yourHeroReached.tr,
+            style: textStyleBold(fontSize: 16.sp, color: const Color(0xFF7A4A00))
+                .copyWith(decoration: TextDecoration.none),
+          ),
           SizedBox(height: 6.h),
           Text(
             LanKey.levelValue.trParams({'n': '${newLevel ?? ''}'}),
-            style: textStyleBlack(fontSize: 44.sp, color: const Color(0xFF7A4A00)),
+            style: textStyleBlack(fontSize: 44.sp, color: const Color(0xFF7A4A00))
+                .copyWith(decoration: TextDecoration.none),
           ),
           SizedBox(height: 14.h),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               _rewardChip(
-                icon: Icons.bolt_rounded,
+                icon: Assets.imagesSharedIcExp,
                 text: LanKey.xpGained.trParams({'n': '$expGained'}),
                 bg: Colors.white,
               ),
               SizedBox(width: 10.w),
               _rewardChip(
-                icon: Icons.star_rounded,
+                icon: Assets.imagesSharedIcGold,
                 text: LanKey.goldGained.trParams({'n': '$goldGained'}),
                 bg: Colors.white,
               ),
@@ -180,7 +232,8 @@ class RewardPopup {
             child: Text(
               LanKey.awesome.tr,
               textAlign: TextAlign.center,
-              style: textStyleBold(fontSize: 15.sp, color: AppColors.textPrimary),
+              style: textStyleBold(fontSize: 15.sp, color: AppColors.textPrimary)
+                  .copyWith(decoration: TextDecoration.none),
             ),
           ),
         ],
@@ -188,7 +241,7 @@ class RewardPopup {
     );
   }
 
-  static Widget _rewardChip({required IconData icon, required String text, required Color bg}) {
+  static Widget _rewardChip({required String icon, required String text, required Color bg}) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
       decoration: BoxDecoration(
@@ -200,9 +253,17 @@ class RewardPopup {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 20.w, color: AppColors.goldDark),
+          Image.asset(
+            icon,
+            width: 20.w,
+            height: 20.w,
+          ),
           SizedBox(width: 5.w),
-          Text(text, style: textStyleBold(fontSize: 16.sp, color: AppColors.textPrimary)),
+          Text(
+            text,
+            style:
+                textStyleBold(fontSize: 16.sp, color: AppColors.textPrimary).copyWith(decoration: TextDecoration.none),
+          ),
         ],
       ),
     );

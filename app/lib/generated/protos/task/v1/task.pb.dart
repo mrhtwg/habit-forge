@@ -984,11 +984,15 @@ class CompleteTaskReply extends $pb.GeneratedMessage {
     Task? task,
     $1.UserPrefs? prefs,
     $2.Character? character,
+    $core.int? expReward,
+    $core.int? goldReward,
   }) {
     final result = create();
     if (task != null) result.task = task;
     if (prefs != null) result.prefs = prefs;
     if (character != null) result.character = character;
+    if (expReward != null) result.expReward = expReward;
+    if (goldReward != null) result.goldReward = goldReward;
     return result;
   }
 
@@ -1010,6 +1014,8 @@ class CompleteTaskReply extends $pb.GeneratedMessage {
         subBuilder: $1.UserPrefs.create)
     ..aOM<$2.Character>(3, _omitFieldNames ? '' : 'character',
         subBuilder: $2.Character.create)
+    ..aI(4, _omitFieldNames ? '' : 'expReward')
+    ..aI(5, _omitFieldNames ? '' : 'goldReward')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1066,6 +1072,26 @@ class CompleteTaskReply extends $pb.GeneratedMessage {
   void clearCharacter() => $_clearField(3);
   @$pb.TagNumber(3)
   $2.Character ensureCharacter() => $_ensure(2);
+
+  /// EXP granted for completing this task (includes streak multiplier).
+  @$pb.TagNumber(4)
+  $core.int get expReward => $_getIZ(3);
+  @$pb.TagNumber(4)
+  set expReward($core.int value) => $_setSignedInt32(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasExpReward() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearExpReward() => $_clearField(4);
+
+  /// Gold granted for completing this task.
+  @$pb.TagNumber(5)
+  $core.int get goldReward => $_getIZ(4);
+  @$pb.TagNumber(5)
+  set goldReward($core.int value) => $_setSignedInt32(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasGoldReward() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearGoldReward() => $_clearField(5);
 }
 
 /// SkipTaskRequest — id of the task to mark completed.
