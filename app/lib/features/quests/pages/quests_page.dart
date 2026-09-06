@@ -9,6 +9,7 @@ import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/quests/controllers/quests_controller.dart';
 import 'package:habit_forge_app/features/quests/pages/task_form_sheet.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';
+import 'package:habit_forge_app/widgets/confirm_dialog.dart';
 import 'package:habit_forge_app/widgets/pressable_button.dart';
 import 'package:habit_forge_app/widgets/task_ticket.dart';
 
@@ -212,11 +213,26 @@ class QuestsPage extends GetView<QuestsController> {
           return TaskTicket(
             task: task,
             onComplete: () => controller.toggleComplete(task),
-            onLongPress: () => _showTaskMenu(context, task),
+            onSkip: () => controller.toggleSkip(task),
+            onDelete: () => _confirmDelete(context, task),
+            // Completed tasks can't be deleted or skipped, so hide the
+            // long-press menu (which offers skip/delete) for them too.
+            onLongPress: task.isCompleted ? null : () => _showTaskMenu(context, task),
           );
         },
       );
     });
+  }
+
+  Future<void> _confirmDelete(BuildContext context, Task task) async {
+    final confirmed = await ConfirmDialog.show(
+      context,
+      title: LanKey.deleteTask.tr,
+      message: LanKey.deleteConfirm.trParams({'title': task.title}),
+      confirmLabel: LanKey.delete.tr,
+      isDestructive: true,
+    );
+    if (confirmed == true) controller.deleteTask(task.id);
   }
 
   Widget _menuItem({

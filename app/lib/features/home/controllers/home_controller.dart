@@ -41,16 +41,19 @@ class HomeController extends GetxController {
     );
   }
 
-  void onTaskDelete(String id) {
-    NetworkRegistry.ins.deleteTask(id);
+  Future<void> onTaskDelete(String id) async {
+    await NetworkRegistry.ins.deleteTask(id);
+    loadTodayTasks();
   }
 
   /// Skips the task (marked skipped; todos get due date pushed to tomorrow).
-  void onTaskPostpone(Task task) {
-    NetworkRegistry.ins.skipTask(task.id);
+  Future<void> onTaskPostpone(Task task) async {
+    await NetworkRegistry.ins.skipTask(task.id);
+    loadTodayTasks();
   }
 
-  void onTaskSkip(Task task) {
-    NetworkRegistry.ins.skipTask(task.id);
+  Future<void> onTaskSkip(Task task) async {
+    await NetworkRegistry.ins.skipTask(task.id);
+    loadTodayTasks();
   }
 }

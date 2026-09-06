@@ -10,6 +10,8 @@ import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/home/controllers/home_controller.dart';
 import 'package:habit_forge_app/features/quests/pages/task_form_sheet.dart';
 import 'package:habit_forge_app/generated/protos/shared/v1/shared.pbenum.dart';
+import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';
+import 'package:habit_forge_app/widgets/confirm_dialog.dart';
 import 'package:habit_forge_app/widgets/hud_bar.dart';
 import 'package:habit_forge_app/widgets/pressable_button.dart';
 import 'package:habit_forge_app/widgets/task_ticket.dart';
@@ -67,6 +69,8 @@ class HomePage extends GetView<HomeController> {
                 itemBuilder: (context, index) => TaskTicket(
                   task: tasks[index],
                   onComplete: () => controller.onTaskComplete(tasks[index]),
+                  onSkip: () => controller.onTaskSkip(tasks[index]),
+                  onDelete: () => _confirmDelete(context, tasks[index]),
                 ),
               ),
             ),
@@ -174,15 +178,18 @@ class HomePage extends GetView<HomeController> {
               ),
             );
           }),
-          // EXP / HP
+          // EXP / HP (Obx so the bars refresh once the character updates
+          // after a task is completed).
           Padding(
             padding: EdgeInsets.fromLTRB(24.w, 18.h, 24.w, 18.h),
-            child: Column(
-              children: [
-                HudBar(label: LanKey.exp.tr, color: AppColors.gold, text: _xpText()),
-                SizedBox(height: 8.h),
-                HudBar(label: LanKey.hp.tr, color: AppColors.coral, text: _hpText()),
-              ],
+            child: Obx(
+              () => Column(
+                children: [
+                  HudBar(label: LanKey.exp.tr, color: AppColors.gold, text: _xpText()),
+                  SizedBox(height: 8.h),
+                  HudBar(label: LanKey.hp.tr, color: AppColors.coral, text: _hpText()),
+                ],
+              ),
             ),
           ),
         ],
@@ -232,6 +239,17 @@ class HomePage extends GetView<HomeController> {
         ],
       ),
     );
+  }
+
+  Future<void> _confirmDelete(BuildContext context, Task task) async {
+    final confirmed = await ConfirmDialog.show(
+      context,
+      title: LanKey.deleteTask.tr,
+      message: LanKey.deleteConfirm.trParams({'title': task.title}),
+      confirmLabel: LanKey.delete.tr,
+      isDestructive: true,
+    );
+    if (confirmed == true) controller.onTaskDelete(task.id);
   }
 
   String _xpText() {

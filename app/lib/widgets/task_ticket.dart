@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/network/hive/game_constants.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
@@ -8,15 +9,22 @@ import 'package:habit_forge_app/generated/assets.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.dart';
 
 /// Bright cartoon "task ticket" card (shared by the home / tasks pages).
+///
+/// Swipe **right** to skip and swipe **left** to delete when the matching
+/// callbacks are provided; otherwise the card has no slide actions.
 class TaskTicket extends StatelessWidget {
   final Task task;
   final VoidCallback onComplete;
+  final VoidCallback? onSkip;
+  final VoidCallback? onDelete;
   final VoidCallback? onLongPress;
 
   const TaskTicket({
     super.key,
     required this.task,
     required this.onComplete,
+    this.onSkip,
+    this.onDelete,
     this.onLongPress,
   });
 
@@ -27,81 +35,119 @@ class TaskTicket extends StatelessWidget {
     final exp = task.customExpReward > 0 ? task.customExpReward : GameConstants.baseExpReward(task.difficulty);
     final gold = task.customGoldReward > 0 ? task.customGoldReward : GameConstants.baseGoldReward(task.difficulty);
 
-    return GestureDetector(
-      onLongPress: onLongPress,
-      child: Container(
-        padding: EdgeInsets.all(12.w),
-        decoration: BoxDecoration(
-          color: done ? const Color(0xFFEAF8EF) : Colors.white,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: AppColors.border, width: 2),
-          boxShadow: const [BoxShadow(color: Color(0xFFEFDFC4), offset: Offset(0, 4))],
-        ),
-        child: Row(
-          children: [
-            // Complete check button
-            GestureDetector(
-              onTap: done ? null : onComplete,
-              child: Container(
-                width: 40.w,
-                height: 40.w,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: done ? AppColors.green : Colors.white,
-                  border: Border.all(color: AppColors.border, width: 2.5),
-                  boxShadow: const [BoxShadow(color: Color(0xFFE9D9BE), offset: Offset(0, 3))],
-                ),
-                child: done ? const Icon(Icons.check_rounded, color: Colors.white, size: 24) : null,
-              ),
-            ),
-            SizedBox(width: 12.w),
-            // Title + metadata
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(18),
+      child: Slidable(
+        key: ValueKey('task-ticket-${task.id}'),
+        startActionPane: (onSkip == null || done)
+            ? null
+            : ActionPane(
+                motion: const BehindMotion(),
+                extentRatio: 0.3,
                 children: [
-                  Text(
-                    task.title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: textStyleBold(
-                      fontSize: 14.sp,
-                      color: done ? AppColors.textMuted : AppColors.textPrimary,
-                    ),
-                  ),
-                  SizedBox(height: 5.h),
-                  Row(
-                    children: [
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
-                        decoration: BoxDecoration(
-                          color: tagColor.$1,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(_typeLabel(), style: textStyleBold(fontSize: 10.sp, color: tagColor.$2)),
-                      ),
-                      if (task.streak > 0) ...[
-                        SizedBox(width: 8.w),
-                        Text(
-                          '🔥 ${task.streak}',
-                          style: textStyleBold(fontSize: 11.sp, color: const Color(0xFFE9852C)),
-                        ),
-                      ],
-                    ],
+                  SlidableAction(
+                    onPressed: (_) => onSkip?.call(),
+                    backgroundColor: AppColors.warning,
+                    foregroundColor: Colors.white,
+                    icon: Icons.skip_next_rounded,
+                    label: LanKey.skip.tr,
+                    borderRadius: BorderRadius.circular(18.r),
                   ),
                 ],
               ),
+        endActionPane: (onDelete == null || done)
+            ? null
+            : ActionPane(
+                motion: const BehindMotion(),
+                extentRatio: 0.34,
+                children: [
+                  SlidableAction(
+                    onPressed: (_) => onDelete?.call(),
+                    backgroundColor: AppColors.error,
+                    foregroundColor: Colors.white,
+                    icon: Icons.delete_rounded,
+                    label: LanKey.delete.tr,
+                    borderRadius: BorderRadius.circular(18.r),
+                  ),
+                ],
+              ),
+        child: GestureDetector(
+          onLongPress: onLongPress,
+          child: Container(
+            padding: EdgeInsets.all(12.w),
+            decoration: BoxDecoration(
+              color: done ? const Color(0xFFEAF8EF) : Colors.white,
+              borderRadius: BorderRadius.circular(18.r),
+              border: Border.all(color: AppColors.border, width: 2.w),
+              boxShadow: const [BoxShadow(color: Color(0xFFEFDFC4), offset: Offset(0, 4))],
             ),
-            // Rewards
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
+            child: Row(
               children: [
-                _rewardChip(icon: Assets.imagesSharedIcExp, text: '+$exp', color: AppColors.goldLight),
-                SizedBox(height: 5.h),
-                _rewardChip(icon: Assets.imagesSharedIcGold, text: '+$gold', color: AppColors.goldLight),
+                // Complete check button
+                GestureDetector(
+                  onTap: done ? null : onComplete,
+                  child: Container(
+                    width: 40.w,
+                    height: 40.w,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: done ? AppColors.green : Colors.white,
+                      border: Border.all(color: AppColors.border, width: 2.5),
+                      boxShadow: const [BoxShadow(color: Color(0xFFE9D9BE), offset: Offset(0, 3))],
+                    ),
+                    child: done ? const Icon(Icons.check_rounded, color: Colors.white, size: 24) : null,
+                  ),
+                ),
+                SizedBox(width: 12.w),
+                // Title + metadata
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        task.title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: textStyleBold(
+                          fontSize: 14.sp,
+                          color: done ? AppColors.textMuted : AppColors.textPrimary,
+                        ),
+                      ),
+                      SizedBox(height: 5.h),
+                      Row(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
+                            decoration: BoxDecoration(
+                              color: tagColor.$1,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(_typeLabel(), style: textStyleBold(fontSize: 10.sp, color: tagColor.$2)),
+                          ),
+                          if (task.streak > 0) ...[
+                            SizedBox(width: 8.w),
+                            Text(
+                              '🔥 ${task.streak}',
+                              style: textStyleBold(fontSize: 11.sp, color: const Color(0xFFE9852C)),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                // Rewards
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    _rewardChip(icon: Assets.imagesSharedIcExp, text: '+$exp', color: AppColors.goldLight),
+                    SizedBox(height: 5.h),
+                    _rewardChip(icon: Assets.imagesSharedIcGold, text: '+$gold', color: AppColors.goldLight),
+                  ],
+                ),
               ],
             ),
-          ],
+          ),
         ),
       ),
     );

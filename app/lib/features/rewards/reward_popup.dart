@@ -8,6 +8,7 @@ import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/generated/assets.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';
+import 'package:habit_forge_app/widgets/gain_exp_sheet.dart';
 
 class RewardPopup {
   static void show({
@@ -17,36 +18,40 @@ class RewardPopup {
     int? newLevel,
     String type = 'task', // 'task' | 'levelUp' | 'achievement'
   }) {
-    Get.dialog(
-      Center(
-        child: TweenAnimationBuilder<double>(
-          tween: Tween(begin: 0.0, end: 1.0),
-          duration: const Duration(milliseconds: 500),
-          curve: Curves.elasticOut,
-          builder: (context, t, child) {
-            return Transform.scale(
-              scale: 0.5 + t * 0.5,
-              // elasticOut overshoots above 1.0 during the settling wobble;
-              // Opacity must stay within [0, 1], so clamp it.
-              child: Opacity(opacity: t.clamp(0.0, 1.0), child: child),
-            );
-          },
-          child: type == 'levelUp'
-              ? _buildLevelUpCard(expGained, goldGained, newLevel)
-              : _buildCard(expGained, goldGained, achievementName, type),
-        ),
-      ),
-      barrierColor: Colors.black.withValues(alpha: 0.55),
-      transitionDuration: const Duration(milliseconds: 200),
-    );
-
-    // Future.delayed(const Duration(seconds: 2), () {
-    //   if (Get.isDialogOpen ?? false) Get.back();
-    // });
+    if (type == 'levelUp') {
+      // Level-ups keep the celebratory centered dialog.
+      final content = TweenAnimationBuilder<double>(
+        tween: Tween(begin: 0.0, end: 1.0),
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.elasticOut,
+        builder: (context, t, child) {
+          return Transform.scale(
+            scale: 0.5 + t * 0.5,
+            // elasticOut overshoots above 1.0 during the settling wobble;
+            // Opacity must stay within [0, 1], so clamp it.
+            child: Opacity(opacity: t.clamp(0.0, 1.0), child: child),
+          );
+        },
+        child: _buildLevelUpCard(expGained, goldGained, newLevel),
+      );
+      Get.dialog(
+        Center(child: content),
+        barrierColor: Colors.black.withValues(alpha: 0.55),
+        transitionDuration: const Duration(milliseconds: 200),
+      );
+    } else {
+      // Task/achievement rewards slide up as a full-width bottom sheet.
+      Get.bottomSheet(
+        GainExpSheet(expGained: expGained, goldGained: goldGained),
+        backgroundColor: Colors.transparent,
+        barrierColor: Colors.black.withValues(alpha: 0.45),
+        isScrollControlled: true,
+      );
+    }
   }
 
-  /// Shows the reward popup after completing a task: the task card with
-  /// EXP/gold, or the level-up card when the character leveled up.
+  /// Shows the reward after completing a task: task rewards slide up as a
+  /// bottom sheet, level-ups keep the centered celebratory dialog.
   static void showTaskReward(CompleteTaskReply reply, int levelBefore) {
     final leveledUp = reply.character.level > levelBefore;
     if (leveledUp) {
@@ -65,108 +70,7 @@ class RewardPopup {
     }
   }
 
-  // ─────────── Task/achievement reward card ───────────
-  static Widget _buildCard(int expGained, int goldGained, String? achievementName, String type) {
-    final isAchievement = type == 'achievement';
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        Container(
-          width: 300.w,
-          // Top padding leaves room under the badge that straddles the edge.
-          padding: EdgeInsets.fromLTRB(22.w, 56.h, 22.w, 20.h),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(28),
-            border: Border.all(color: AppColors.border, width: 3),
-            boxShadow: const [
-              BoxShadow(color: Color(0x663A2A4E), blurRadius: 24, offset: Offset(0, 10)),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                isAchievement ? LanKey.achievementUnlocked.tr : LanKey.questComplete.tr,
-                style: textStyleBold(fontSize: 14.sp, color: AppColors.primaryDark)
-                    .copyWith(decoration: TextDecoration.none),
-              ),
-              SizedBox(height: 4.h),
-              Text(
-                isAchievement ? (achievementName ?? LanKey.newAchievement.tr) : LanKey.niceWork.tr,
-                style: textStyleHand(fontSize: 30.sp, color: AppColors.textPrimary)
-                    .copyWith(decoration: TextDecoration.none),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 14.h),
-              // Reward chips
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _rewardChip(
-                    icon: Assets.imagesSharedIcExp,
-                    text: LanKey.xpGained.trParams({'n': '$expGained'}),
-                    bg: AppColors.goldLight,
-                  ),
-                  SizedBox(width: 10.w),
-                  _rewardChip(
-                    icon: Assets.imagesSharedIcGold,
-                    text: isAchievement
-                        ? LanKey.gemsGained.trParams({'n': '$goldGained'})
-                        : LanKey.goldGained.trParams({'n': '$goldGained'}),
-                    bg: AppColors.goldLight,
-                  ),
-                ],
-              ),
-              SizedBox(height: 16.h),
-              // Continue button
-              Container(
-                width: double.infinity,
-                padding: EdgeInsets.symmetric(vertical: 12.h),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(colors: [AppColors.gold, AppColors.goldDark]),
-                  border: Border.all(color: AppColors.border, width: 2.5),
-                  borderRadius: BorderRadius.circular(999),
-                  boxShadow: const [BoxShadow(color: AppColors.goldDark, offset: Offset(0, 4))],
-                ),
-                child: Text(
-                  LanKey.continueLabel.tr,
-                  textAlign: TextAlign.center,
-                  style: textStyleBold(fontSize: 15.sp, color: AppColors.textPrimary)
-                      .copyWith(decoration: TextDecoration.none),
-                ),
-              ),
-            ],
-          ),
-        ),
-        // Badge riding the top edge of the card.
-        Positioned(
-          top: -40.h,
-          left: 0,
-          right: 0,
-          child: Center(
-            child: Container(
-              width: 80.w,
-              height: 80.w,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: isAchievement ? AppColors.gold : AppColors.green,
-                border: Border.all(color: AppColors.border, width: 3),
-                boxShadow: const [BoxShadow(color: Color(0xFFE7B93F), offset: Offset(0, 4))],
-              ),
-              child: Icon(
-                isAchievement ? Icons.emoji_events_rounded : Icons.check_rounded,
-                color: Colors.white,
-                size: 44.w,
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  // ─────────── Level-up card ───────────
+// ─────────── Level-up card ───────────
   static Widget _buildLevelUpCard(int expGained, int goldGained, int? newLevel) {
     return Container(
       width: 300.w,
