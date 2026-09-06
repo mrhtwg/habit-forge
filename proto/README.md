@@ -38,7 +38,7 @@ proto/
 
   ```bash
   cd app
-  ./generate_proto.sh              # messages only (REST mode); --grpc for gRPC client
+  ./generate_proto.sh --grpc       # Dart messages + gRPC client stubs (default flow)
   ```
 
   (`protoc` + `protoc-gen-dart` + barrel files). Full guide: `docs/proto-guide.md`.

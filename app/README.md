@@ -65,13 +65,13 @@ The runtime mode is selected by the `env/` config file passed via `--dart-define
 |---|---|---|---|
 | Hive (default) | `env/hive.json` | Local on-device (Hive) | Guest / local mock |
 | Firebase | `env/firebase.json` | Firebase (cloud data + auth) | Google Sign-In (only) |
-| Server | `env/server.json` | Self-hosted backend (`apiUrl`) | Email/password + registration (no verification) |
+| Server | `env/server.json` | Self-hosted backend — **gRPC** game data (`grpcUrl`) + **HTTP** auth (`apiUrl`) | Email/password + registration (no verification) |
 
 - **Hive** — local-first mode, no backend required; the login page is skipped and the app enters directly (guest/local auth), Firebase is never initialized.
 - **Firebase** — initializes Firebase for cloud-backed auth and data; offers **Google Sign-In only** for now (email/Apple to be added later); requires [Firebase setup](docs/firebase-setup.md) and valid platform config in `lib/firebase_options.dart`.
-- **Server** — targets the self-hosted Go backend; offers **email/password login** with a **registration** entry (`POST /api/v1/auth/login` / `/api/v1/auth/register`); registration requires **no email verification**. The base URL comes from `apiUrl` in `env/server.json` (defaults to `http://localhost:8080`).
+- **Server** — targets the self-hosted Go backend over **two transports**: email **auth** goes over HTTP REST (`POST {apiUrl}/api/v1/auth/login` / `/api/v1/auth/register`, JWT, no email verification), while **game data** (tasks, character, shop, achievements, stats) uses **gRPC** stubs generated from `proto/`. Both endpoints are read from `env/server.json`: `apiUrl` defaults to `http://localhost:8080`, `grpcUrl` to `localhost:9000`. Backend service implementations are pending (`501 Not Implemented`).
 
-The active mode is exposed through `EnvConstants` (`lib/core/constants/env_constants.dart`) — `storageMode`, `authMode`, `apiBaseUrl`, and helpers `isHive()` / `isFirebase()` / `isServer()`.
+The active mode is exposed through `EnvConstants` (`lib/core/constants/env_constants.dart`) — `storageMode`, `authMode`, `apiBaseUrl`, `grpcUrl`, and helpers `isHive()` / `isFirebase()` / `isServer()`.
 
 ## Project Layout
 

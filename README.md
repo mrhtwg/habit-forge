@@ -11,7 +11,7 @@ This repository is a **full-stack monorepo**:
 - `proto/` — shared API contracts (protobuf source of truth for app + server)
 - `docs/` — product, design, and development docs
 
-> **Status:** MVP. The Flutter app is local-first and playable; the Go backend is a go-kratos skeleton with all route interfaces defined (auth, user, character, task, shop, achievement, stats) — implementations are pending. See [Roadmap](docs/roadmap.md).
+> **Status:** MVP. The Flutter app is local-first and playable; the Go backend is a go-kratos skeleton exposing **HTTP (REST) and gRPC** endpoints for all services (auth, user, character, task, shop, achievement, stats) — implementations are pending. See [Roadmap](docs/roadmap.md).
 
 ## Why this project exists
 
@@ -27,7 +27,7 @@ HabitForge is not trying to clone Habitica. The goal is a modern, native, and **
 | Layer | Technology |
 |---|---|
 | Mobile | Flutter, GetX, Hive, Firebase Auth |
-| Backend | Go, go-kratos, GORM, PostgreSQL, Wire |
+| Backend | Go, go-kratos (HTTP + gRPC), GORM, PostgreSQL, Wire |
 | Shared contract | proto (protobuf, app + server) |
 | Infra | Docker Compose |
 
@@ -69,7 +69,7 @@ go mod download
 go run ./cmd/server/
 ```
 
-The server listens on `http://localhost:8080`.
+The server exposes HTTP (REST) on `http://localhost:8080` and gRPC on `localhost:9000`.
 
 ### 3. Run the Flutter app
 
@@ -85,6 +85,11 @@ For Firebase mode, see [Firebase setup](app/docs/firebase-setup.md); for the sel
 
 ## Backend API
 
+The Flutter app talks to the backend over two transports (configured in `app/env/server.json`):
+
+- **gRPC — `localhost:9000`**: game data APIs (auth sessions, character, task, shop, achievement, stats, user prefs). The contracts in `proto/` are the single source of truth and generate both the Dart clients (`app/lib/generated/protos`) and the Go services.
+- **HTTP (REST) — `http://localhost:8080`**: health check and email auth (`register` / `login` / `oauth`); kratos mirrors the same service routes on this transport.
+
 | Method | Path | Auth | Description |
 |---|---|---|---|
 | GET | `/health` | No | Health check |
@@ -92,6 +97,8 @@ For Firebase mode, see [Firebase setup](app/docs/firebase-setup.md); for the sel
 | POST | `/api/v1/auth/login` | No | Email login |
 | POST | `/api/v1/auth/oauth` | No | Google/Apple login |
 | GET | `/api/v1/me` | Yes | Current user |
+
+> Service implementations are pending — the Go handlers currently return `501 Not Implemented`.
 
 ## Development
 

@@ -223,7 +223,7 @@ protoc \
 dependencies:
   protobuf: ^5.0.0        # must match protoc_plugin 24.x + grpc (see §0.2)
   fixnum: ^1.0.0
-  # grpc: ^4.0.0          # only when using --grpc
+  grpc: ^4.0.0            # required — the app talks to the backend over gRPC
 ```
 
 **analysis_options.yaml** (already configured — excludes generated code from linting):
@@ -246,16 +246,17 @@ final task = Task()
   ..title = 'Morning exercise'
   ..difficulty = TaskDifficulty.taskDifficultyMedium;
 
-// REST mode: serialize with pbjson to talk to ServerAuthService / the backend
-import 'package:habit_forge_app/generated/protos/task/v1/task.pbjson.dart';
-final json = taskToJson(task);            // → Map<String, dynamic>
-final task2 = Task.fromJson(json);
+// Game data (server mode): generated gRPC stubs, wrapped in
+// app/lib/core/network/grpc/ (GrpcClientChannel → NetworkServerImpl).
+import 'package:habit_forge_app/generated/protos/task/v1/task.pbgrpc.dart';
+final client = TaskServiceClient(GrpcClientChannel.instance().channel);
+final reply = await client.listTasks(ListTasksRequest());
 ```
 
-> The app currently talks to the backend over **REST + JSON**
-> (`ServerAuthService` posts JSON directly), so generating messages only is
-> enough. When switching to gRPC, regenerate with `--grpc` and add the `grpc`
-> dependency; client code swaps in structurally.
+> Game data travels over **gRPC**: always regenerate with `./generate_proto.sh
+> --grpc` so the `.pbgrpc.dart` clients stay in sync (the `grpc` dependency is
+> active in pubspec). Only the email/register auth path uses REST + JSON
+> (`ServerAuthService`); serialize messages with pbjson there when needed.
 
 ### 3.3 Alternative: generate Go + Dart in one `buf generate`
 
@@ -279,7 +280,7 @@ plugins:
 ```
 1. Edit proto/api/<service>/v1/<service>.proto      # add fields / RPCs / route annotations
 2. make proto                                        # regenerate the server Go code
-3. cd app && ./generate_proto.sh                     # regenerate the frontend Dart code
+3. cd app && ./generate_proto.sh --grpc             # regenerate Dart incl. gRPC stubs
 4. Fill in server/internal/biz/*.go business logic   # for new interfaces
 5. Wire the new interface on the frontend with the generated pb messages / JSON
 ```
