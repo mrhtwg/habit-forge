@@ -13,8 +13,8 @@ class FrameSequencePlayer extends StatefulWidget {
 
   static const String _mageIdleDir = 'assets/animations/mage_idle';
 
-  /// Ranger idle sequence frames (72 frames, 720×960, transparent PNG)
-  static const int rangerIdleCount = 72;
+  /// Ranger idle sequence frames
+  static const int rangerIdleCount = 50;
 
   static const String _rangerIdleDir = 'assets/animations/ranger_idle';
 
@@ -58,7 +58,7 @@ class FrameSequencePlayer extends StatefulWidget {
 
   static List<String> rangerIdleFrames() => List.generate(
         rangerIdleCount,
-        (i) => '$_rangerIdleDir/ranger_idle_${i.toString().padLeft(2, '0')}.png',
+        (i) => '$_rangerIdleDir/ranger_idle_${i.toString().padLeft(2, '0')}.webp',
       );
 }
 
