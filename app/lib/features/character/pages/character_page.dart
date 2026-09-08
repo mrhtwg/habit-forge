@@ -137,7 +137,21 @@ class CharacterPage extends GetView<CharacterController> {
                   style: textStyleBold(fontSize: 16.sp, color: AppColors.textSecondary),
                 ),
                 const Spacer(),
-                SizedBox(width: 38.w),
+                // Attribute help (right side mirrors the back button).
+                GestureDetector(
+                  onTap: _showAttributesHelp,
+                  child: Container(
+                    width: 38.w,
+                    height: 38.w,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white,
+                      border: Border.all(color: AppColors.border, width: 2.5),
+                      boxShadow: const [BoxShadow(color: Color(0xFFD6C3A4), offset: Offset(0, 3))],
+                    ),
+                    child: const Icon(Icons.help_outline_rounded, size: 20, color: AppColors.textPrimary),
+                  ),
+                ),
               ],
             ),
           ),
@@ -255,6 +269,115 @@ class CharacterPage extends GetView<CharacterController> {
           }).toList(),
         ),
       ],
+    );
+  }
+
+  /// Bottom-sheet explaining what each attribute does.
+  void _showAttributesHelp() {
+    Get.bottomSheet(
+      Container(
+        padding: EdgeInsets.all(AppSpacing.md),
+        decoration: const BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.textMuted,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(LanKey.attributes.tr, style: textStyleBold(fontSize: 18.sp, color: AppColors.textPrimary)),
+            SizedBox(height: 4.h),
+            Text(
+              LanKey.statHelpHint.tr,
+              style: textStyleMedium(fontSize: 12.5.sp, color: AppColors.textSecondary),
+            ),
+            SizedBox(height: 14.h),
+            _statHelpRow(
+              icon: Icons.fitness_center_rounded,
+              color: const Color(0xFFE0644A),
+              name: LanKey.statStr.tr,
+              effect: LanKey.statEffectStr.tr,
+            ),
+            _statHelpRow(
+              icon: Icons.psychology_rounded,
+              color: const Color(0xFF5B8DEF),
+              name: LanKey.statInt.tr,
+              effect: LanKey.statEffectInt.tr,
+            ),
+            _statHelpRow(
+              icon: Icons.bolt_rounded,
+              color: const Color(0xFFE9B44C),
+              name: LanKey.statAgi.tr,
+              effect: LanKey.statEffectAgi.tr,
+            ),
+            _statHelpRow(
+              icon: Icons.shield_rounded,
+              color: const Color(0xFF4CA6A8),
+              name: LanKey.statDef.tr,
+              effect: LanKey.statEffectDef.tr,
+            ),
+            _statHelpRow(
+              icon: Icons.favorite_rounded,
+              color: const Color(0xFFE0527A),
+              name: LanKey.statVit.tr,
+              effect: LanKey.statEffectVit.tr,
+            ),
+            _statHelpRow(
+              icon: Icons.auto_awesome_rounded,
+              color: const Color(0xFF9B6BFF),
+              name: LanKey.statLuk.tr,
+              effect: LanKey.statEffectLuk.tr,
+            ),
+            SizedBox(height: 8.h),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _statHelpRow({required IconData icon, required Color color, required String name, required String effect}) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 7.h),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 40.w,
+            height: 40.w,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: color.withValues(alpha: 0.14),
+              border: Border.all(color: color.withValues(alpha: 0.5), width: 1.5),
+            ),
+            child: Icon(icon, size: 20.w, color: color),
+          ),
+          SizedBox(width: 12.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(name, style: textStyleBold(fontSize: 15.sp, color: AppColors.textPrimary)),
+                SizedBox(height: 2.h),
+                Text(
+                  effect,
+                  style: textStyleMedium(fontSize: 12.5.sp, color: AppColors.textSecondary),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 

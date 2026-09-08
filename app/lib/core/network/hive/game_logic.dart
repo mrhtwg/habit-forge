@@ -86,10 +86,13 @@ class GameLogic {
     });
   }
 
-  /// Base EXP reward for a task, including the streak multiplier.
-  static int expReward(Task task) {
+  /// Base EXP reward for a task, including the streak multiplier and the
+  /// character's INT bonus (+1% per point). Custom rewards are respected
+  /// verbatim and never scaled by stats.
+  static int expReward(Task task, Character character) {
     if (task.customExpReward > 0) return task.customExpReward;
-    return (GameConstants.baseExpReward(task.difficulty) * GameConstants.streakMultiplier(task.streak)).round();
+    final base = GameConstants.baseExpReward(task.difficulty) * GameConstants.streakMultiplier(task.streak);
+    return (base * (1 + character.baseStats.intelligence * 0.01)).round();
   }
 
   /// Applies exp and returns (character, newLevel or -1).
@@ -113,6 +116,9 @@ class GameLogic {
     final gained = (level - frozen.level) * GameConstants.statPointsPerLevel;
     final maxForLevel = GameConstants.expForLevel(level);
     final cappedExp = level >= GameConstants.maxLevel ? remaining.clamp(0, maxForLevel) : remaining;
+    // VIT raises the HP cap (base 100 + 2 per point); the level-up heal
+    // clamps to the character's own cap.
+    final maxHp = GameConstants.maxHpFor(frozen.baseStats.vitality);
     return (
       frozen.rebuild(
         (x) => x
@@ -120,16 +126,18 @@ class GameLogic {
           ..level = level
           ..maxExp = Int64(maxForLevel)
           ..availableStatPoints = x.availableStatPoints + gained
-          ..currentHp = (x.currentHp + GameConstants.completeTaskAddHp).clamp(0, GameConstants.maxHp),
+          ..currentHp = (x.currentHp + GameConstants.completeTaskAddHp).clamp(0, maxHp),
       ),
       level,
     );
   }
 
-  /// Base gold reward for a task.
-  static int goldReward(Task task) {
+  /// Base gold reward for a task, scaled by the character's STR bonus
+  /// (+1% per point). Custom rewards are respected verbatim and never scaled.
+  static int goldReward(Task task, Character character) {
     if (task.customGoldReward > 0) return task.customGoldReward;
-    return GameConstants.baseGoldReward(task.difficulty);
+    final base = GameConstants.baseGoldReward(task.difficulty);
+    return (base * (1 + character.baseStats.strength * 0.01)).round();
   }
 
   static int levelForExp(int totalExp) {
@@ -163,11 +171,14 @@ class GameLogic {
   /// Toggles the skipped flag.
   static Task skip(Task task) => (task.deepCopy()..freeze()).rebuild((t) => t..isSkipped = !t.isSkipped);
 
-  /// Applies damage; the character dies at 0 HP and schedules recovery.
+  /// Applies damage; DEF absorbs one HP per point (minimum 1 damage) and VIT
+  /// raises the HP cap. The character dies at 0 HP and schedules recovery.
   static Character takeDamage(Character c, int amount) {
     if (c.isDead) return c;
     final frozen = c.deepCopy()..freeze();
-    final newHp = (frozen.currentHp - amount).clamp(0, GameConstants.maxHp);
+    final reduced = amount - frozen.baseStats.defense;
+    final dealt = reduced < 1 ? 1 : reduced;
+    final newHp = (frozen.currentHp - dealt).clamp(0, GameConstants.maxHpFor(frozen.baseStats.vitality));
     final dead = newHp <= 0;
     return frozen.rebuild(
       (x) => x

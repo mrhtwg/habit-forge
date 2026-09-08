@@ -261,7 +261,8 @@ class HomePage extends GetView<HomeController> {
 
   String _hpText() {
     final char = UserService.to.character.value;
-    return '${char?.currentHp ?? 100}/${GameConstants.maxHp}';
+    final max = GameConstants.maxHpFor(char?.baseStats.vitality ?? 0);
+    return '${char?.currentHp ?? max}/$max';
   }
 }
 

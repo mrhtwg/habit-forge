@@ -17,7 +17,7 @@ The app is **local-first**: all game data lives in Hive on-device. Firebase Auth
 ### RPG character loop
 - Pick a class — **Warrior**, **Mage**, or **Ranger** — each rendered with a PNG frame-sequence idle animation (62 / 62 / 50 frames; the Ranger export duplicated its first 21 frames at the tail, which were trimmed for a seamless loop)
 - Earn EXP and gold from completed tasks; base rewards scale with difficulty and streaks apply a multiplier (up to ×2.0)
-- Level up to **max level 50** with a progressive EXP curve; spend stat points on six attributes (STR / INT / AGI / DEF / VIT / LUK)
+- Level up to **max level 50** with a progressive EXP curve; spend stat points on six attributes — **INT** +1% EXP/point, **STR** +1% gold/point, **VIT** +2 HP cap/point, **DEF** −1 HP damage/point (AGI / LUK effects pending)
 - HP system: skipped or overdue tasks cost HP; at 0 HP the character dies and recovers after **30 minutes** with partial HP
 
 ### Forge & economy

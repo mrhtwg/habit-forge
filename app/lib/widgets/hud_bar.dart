@@ -58,7 +58,8 @@ class HudBar extends StatelessWidget {
     // Match against the localized label both call sites pass (LanKey.hp),
     // not the literal 'HP', so the HP branch also works in Chinese.
     if (label == LanKey.hp.tr) {
-      return ((char?.currentHp ?? 100) / GameConstants.maxHp).clamp(0.0, 1.0).toDouble();
+      final max = GameConstants.maxHpFor(char?.baseStats.vitality ?? 0);
+      return ((char?.currentHp ?? max) / max).clamp(0.0, 1.0).toDouble();
     }
     final level = char?.level ?? 1;
     final needed = GameConstants.expForLevel(level).toDouble();

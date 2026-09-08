@@ -103,9 +103,9 @@ class NetworkHiveImpl implements NetworkInterface {
       );
     }
 
-    // Rewards (streak-aware EXP + gold).
-    final _gainExp = GameLogic.expReward(task);
-    final _gainGold = GameLogic.goldReward(task);
+    // Rewards (streak-aware EXP + gold, scaled by INT / STR stat bonuses).
+    final _gainExp = GameLogic.expReward(task, character);
+    final _gainGold = GameLogic.goldReward(task, character);
 
     // Wallet + lifetime completed-task counter.
     final _userFreezon = UserBox.ins.getUserPrefs()..freeze();

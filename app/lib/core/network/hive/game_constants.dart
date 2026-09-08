@@ -5,6 +5,10 @@ import 'package:habit_forge_app/generated/protos/task/v1/task.pbenum.dart';
 class GameConstants {
   static const int maxLevel = 50;
   static const int maxHp = 100;
+
+  /// HP cap of a character with the given VIT: base 100 + 2 per point.
+  static int maxHpFor(int vitality) => maxHp + vitality * 2;
+
   static const int initialHp = 100;
   static const int deathRecoveryMinutes = 30;
   static const int deathRecoveryHp = 50;
