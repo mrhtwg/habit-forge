@@ -3,6 +3,8 @@
 class Assets {
   Assets._();
 
+  static const String configConfig = "assets/config/config.yml";
+
   static const String fontsBaloo2Bold = "assets/fonts/Baloo2-Bold.ttf";
 
   static const String fontsBaloo2ExtraBold = "assets/fonts/Baloo2-ExtraBold.ttf";
@@ -15,11 +17,11 @@ class Assets {
 
   static const String fontsNunitoRegular = "assets/fonts/Nunito-Regular.ttf";
 
-  static const String imagesSharedIcExp = "assets/images/shared/ic_exp.png";
+  static const String imagesSharedIcExp = "assets/images/shared/ic_exp.webp";
 
-  static const String imagesSharedIcGem = "assets/images/shared/ic_gem.png";
+  static const String imagesSharedIcGem = "assets/images/shared/ic_gem.webp";
 
-  static const String imagesSharedIcGold = "assets/images/shared/ic_gold.png";
+  static const String imagesSharedIcGold = "assets/images/shared/ic_gold.webp";
 }
 
 class FontFamily {

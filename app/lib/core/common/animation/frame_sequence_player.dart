@@ -49,11 +49,11 @@ class FrameSequencePlayer extends StatefulWidget {
 
   static List<String> knightIdleFrames() => List.generate(
         knightIdleCount,
-        (i) => '$_knightIdleDir/knight_idle_${i.toString().padLeft(2, '0')}.png',
+        (i) => '$_knightIdleDir/knight_idle_${i.toString().padLeft(2, '0')}.webp',
       );
   static List<String> mageIdleFrames() => List.generate(
         mageIdleCount,
-        (i) => '$_mageIdleDir/mage_idle_${i.toString().padLeft(2, '0')}.png',
+        (i) => '$_mageIdleDir/mage_idle_${i.toString().padLeft(2, '0')}.webp',
       );
 
   static List<String> rangerIdleFrames() => List.generate(
