@@ -26,12 +26,14 @@ class ForgePage extends GetView<ForgeController> {
           children: [
             _buildSkyHeader(),
             _buildDealBanner(context),
-            _buildCategoryTabs(),
+            _buildShopTabs(),
             Expanded(
               child: TabBarView(
                 children: [
-                  _buildItemGridFor('appearance'),
-                  _buildItemGridFor('equipment'),
+                  // Town Shop rack: every piece of equipment, always buyable.
+                  _buildPermanentPage(),
+                  // Field Shop rack: 6 random picks that refresh every 2 hours.
+                  _buildRotatingPage(),
                 ],
               ),
             ),
@@ -94,16 +96,16 @@ class ForgePage extends GetView<ForgeController> {
                   ),
                   child: Row(
                     children: [
-                      // Item icon
+                      // Item icon (rarity-tinted gradient + rarity border)
                       Container(
                         width: 68.w,
                         height: 68.w,
                         decoration: BoxDecoration(
-                          color: Colors.white,
-                          border: Border.all(color: AppColors.border, width: 2.5),
+                          gradient: ShopItemIcon.rarityGradient(item.rarity),
+                          border: Border.all(color: ShopItemIcon.rarityColor(item.rarity), width: 2.5),
                           borderRadius: BorderRadius.circular(18),
                         ),
-                        child: ShopItemIcon(itemId: item.id, size: 40.w),
+                        child: ShopItemIcon(itemId: item.id, iconFile: ShopConfig.iconOf(item.id), size: 40.w),
                       ),
                       SizedBox(width: 12.w),
                       Expanded(
@@ -176,101 +178,24 @@ class ForgePage extends GetView<ForgeController> {
     });
   }
 
-  // ─────────── Swipeable category pager (appearance / equipment) ───────────
-  Widget _buildItemGridFor(String category) {
+  // ─────────── Shop racks ───────────
+  Widget _buildPermanentPage() {
     return Obx(() {
-      final items = controller.shopItems.where((i) => ShopConfig.categoryOf(i.id) == category).toList();
-      return GridView.builder(
-        padding: EdgeInsets.fromLTRB(20.w, 14.h, 20.w, 24.h),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 12.w,
-          mainAxisSpacing: 12.h,
-          childAspectRatio: 0.78,
-        ),
-        itemCount: items.length,
-        itemBuilder: (context, index) {
-          final item = items[index];
-          final owned = controller.isOwned(item.id);
-          return GestureDetector(
-            onTap: () => ItemDetailSheet.show(context, item),
-            child: Container(
-              padding: EdgeInsets.all(12.w),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(color: AppColors.border, width: 2),
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: const [BoxShadow(color: Color(0xFFEFDFC4), offset: Offset(0, 4))],
-              ),
-              child: Column(
-                children: [
-                  // Icon frame
-                  Container(
-                    width: 64.w,
-                    height: 64.w,
-                    decoration: BoxDecoration(
-                      color: ShopItemIcon.bg(item.id),
-                      border: Border.all(color: AppColors.border, width: 2),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: ShopItemIcon(itemId: item.id, size: 36.w),
-                  ),
-                  SizedBox(height: 8.h),
-                  Text(
-                    item.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: textStyleBold(fontSize: 13.sp, color: AppColors.textPrimary),
-                  ),
-                  SizedBox(height: 6.h),
-                  if (owned)
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFEAF8EF),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: AppColors.green, width: 1.2),
-                      ),
-                      child: Text(
-                        LanKey.owned.tr,
-                        style: textStyleBold(fontSize: 10.sp, color: AppColors.greenDark),
-                      ),
-                    )
-                  else
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Image.asset(
-                          ShopConfig.currencyOf(item.id) == ShopCurrency.SHOP_CURRENCY_GEMS
-                              ? Assets.imagesSharedIcGem
-                              : Assets.imagesSharedIcGold,
-                          width: 15.w,
-                          height: 15.w,
-                        ),
-                        SizedBox(width: 4.w),
-                        Text(
-                          '${item.price}',
-                          style: textStyleBold(
-                            fontSize: 14.sp,
-                            color: ShopConfig.currencyOf(item.id) == ShopCurrency.SHOP_CURRENCY_GEMS
-                                ? AppColors.info
-                                : const Color(0xFFC97700),
-                          ),
-                        ),
-                      ],
-                    ),
-                ],
-              ),
-            ),
-          );
-        },
-      );
+      final items = controller.shopItems.where((i) => ShopConfig.categoryOf(i.id) == 'equipment').toList();
+      return _buildGrid(items);
     });
   }
 
-  // ─────────── Category segment ───────────
-  // ─────────── Category tabs: Appearance / Equipment ───────────
-  Widget _buildCategoryTabs() {
+  Widget _buildRotatingPage() {
+    return Obx(() {
+      // Each Field Shop tile carries its own supermarket-style countdown
+      // sticker; the whole rack refreshes together every 2 hours.
+      return _buildGrid(controller.rotating.toList(), showSaleTag: true);
+    });
+  }
+
+  // ─────────── Category pill tabs (Town Shop / Field Shop) ───────────
+  Widget _buildShopTabs() {
     return Padding(
       padding: EdgeInsets.fromLTRB(20.w, 14.h, 20.w, 0),
       child: Container(
@@ -294,11 +219,144 @@ class ForgePage extends GetView<ForgeController> {
           labelStyle: textStyleBold(fontSize: 13.sp),
           unselectedLabelStyle: textStyleBold(fontSize: 13.sp, color: AppColors.textSecondary),
           tabs: [
-            Tab(text: LanKey.appearance.tr),
-            Tab(text: LanKey.equipment.tr),
+            Tab(text: LanKey.shopPermanent.tr),
+            Tab(text: LanKey.shopRandom.tr),
           ],
         ),
       ),
+    );
+  }
+
+  // ─────────── Item grid ───────────
+  Widget _buildGrid(List<ShopItem> items, {bool showSaleTag = false}) {
+    return GridView.builder(
+      padding: EdgeInsets.fromLTRB(20.w, 14.h, 20.w, 24.h),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 12.w,
+        mainAxisSpacing: 12.h,
+        childAspectRatio: 1,
+      ),
+      itemCount: items.length,
+      itemBuilder: (context, index) {
+        final item = items[index];
+        final owned = controller.isOwned(item.id);
+        final Widget tile = GestureDetector(
+          onTap: () => ItemDetailSheet.show(context, item),
+          child: Container(
+            width: double.infinity,
+            padding: EdgeInsets.all(12.w),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(color: AppColors.border, width: 2),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: const [BoxShadow(color: Color(0xFFEFDFC4), offset: Offset(0, 4))],
+            ),
+            child: Column(
+              children: [
+                // Icon frame (rarity-tinted gradient + rarity border)
+                Container(
+                  width: 64.w,
+                  height: 64.w,
+                  padding: EdgeInsets.all(8.w),
+                  decoration: BoxDecoration(
+                    gradient: ShopItemIcon.rarityGradient(item.rarity),
+                    border: Border.all(color: ShopItemIcon.rarityColor(item.rarity), width: 2),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: ShopItemIcon(itemId: item.id, iconFile: ShopConfig.iconOf(item.id), size: 36.w),
+                ),
+                SizedBox(height: 8.h),
+                Text(
+                  item.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: textStyleBold(fontSize: 13.sp, color: AppColors.textPrimary),
+                ),
+                SizedBox(height: 6.h),
+                if (owned)
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEAF8EF),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: AppColors.green, width: 1.2),
+                    ),
+                    child: Text(
+                      LanKey.owned.tr,
+                      style: textStyleBold(fontSize: 10.sp, color: AppColors.greenDark),
+                    ),
+                  )
+                else
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Image.asset(
+                        ShopConfig.currencyOf(item.id) == ShopCurrency.SHOP_CURRENCY_GEMS
+                            ? Assets.imagesSharedIcGem
+                            : Assets.imagesSharedIcGold,
+                        width: 15.w,
+                        height: 15.w,
+                      ),
+                      SizedBox(width: 4.w),
+                      Text(
+                        '${item.price}',
+                        style: textStyleBold(
+                          fontSize: 14.sp,
+                          color: ShopConfig.currencyOf(item.id) == ShopCurrency.SHOP_CURRENCY_GEMS
+                              ? AppColors.info
+                              : const Color(0xFFC97700),
+                        ),
+                      ),
+                    ],
+                  ),
+              ],
+            ),
+          ),
+        );
+
+        final Widget gridCard = showSaleTag
+            ? Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  tile,
+                  // Supermarket limited-offer sticker: ticking countdown.
+                  Positioned(
+                    top: 8.h,
+                    right: 0,
+                    child: Obx(
+                      () => Transform.rotate(
+                        angle: -0.06,
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 3.h),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(colors: [AppColors.coral, AppColors.coralDark]),
+                            border: Border.all(color: Colors.white, width: 1.2),
+                            borderRadius: BorderRadius.circular(7),
+                            boxShadow: const [
+                              BoxShadow(color: Color(0x55222222), blurRadius: 3, offset: Offset(0, 1)),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.timer_outlined, size: 14, color: Colors.white),
+                              SizedBox(width: 3.w),
+                              Text(
+                                controller.rotationCountdown.value,
+                                style: textStyleBold(fontSize: 14.sp, color: Colors.white),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            : tile;
+        return gridCard;
+      },
     );
   }
 
@@ -320,6 +378,8 @@ class ForgePage extends GetView<ForgeController> {
           Text(LanKey.forge.tr, style: textStyleBlack(fontSize: 26.sp, color: AppColors.textPrimary)),
           const Spacer(),
           WalletChip(sysMaterial: SysMaterial.SYSMATERIAL_GOLD),
+          SizedBox(width: 8.w),
+          WalletChip(sysMaterial: SysMaterial.SYSMATERIAL_GEM),
         ],
       ),
     );

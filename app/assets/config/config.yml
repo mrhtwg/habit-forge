@@ -69,7 +69,7 @@ equipment:
     description: A dependable training blade for starting adventurers
     price: 60
     rarity: "common"
-    icon: "sword_iron.png"
+    icon: "sword_iron.webp"
     stats:
       str: 1
 
@@ -79,7 +79,7 @@ equipment:
     description: Tempered steel that holds a keen edge
     price: 90
     rarity: "common"
-    icon: "sword_steel.png"
+    icon: "sword_steel.webp"
     stats:
       str: 2
 
@@ -89,7 +89,7 @@ equipment:
     description: Blessed silver, sharp against the dark
     price: 130
     rarity: "common"
-    icon: "sword_silver.png"
+    icon: "sword_silver.webp"
     stats:
       str: 3
 
@@ -99,7 +99,7 @@ equipment:
     description: A light staff humming with gentle magic
     price: 170
     rarity: "rare"
-    icon: "staff_willow.png"
+    icon: "staff_willow.webp"
     stats:
       int: 3
       vit: 1
@@ -110,7 +110,7 @@ equipment:
     description: Heavy axe that bites deep with every swing
     price: 220
     rarity: "rare"
-    icon: "axe_war.png"
+    icon: "axe_war.webp"
     stats:
       str: 3
       def: 1
@@ -122,7 +122,7 @@ equipment:
     description: A staff crackling with arcane energy
     price: 350
     rarity: "epic"
-    icon: "staff_arcane.png"
+    icon: "staff_arcane.webp"
     stats:
       int: 4
       agi: 1
@@ -136,7 +136,7 @@ equipment:
     description: A sword wreathed in eternal flame
     price: 500
     rarity: "epic"
-    icon: "sword_flame.png"
+    icon: "sword_flame.webp"
     stats:
       str: 4
       int: 1
@@ -151,7 +151,7 @@ equipment:
     description: Obsidian edge that drinks the twilight
     price: 900
     rarity: "epic"
-    icon: "blade_dusk.png"
+    icon: "blade_dusk.webp"
     stats:
       str: 10
       int: 1
@@ -166,7 +166,7 @@ equipment:
     description: Focuses raw mana into brilliant shards
     price: 1400
     rarity: "epic"
-    icon: "staff_crystal.png"
+    icon: "staff_crystal.webp"
     stats:
       str: 2
       int: 15
@@ -179,9 +179,10 @@ equipment:
     slot: "weapon"
     name: Dragon Fang
     description: Legendary blade carved from a dragon fang
-    price: 2200
+    price: 80
     rarity: "legendary"
-    icon: "sword_dragon.png"
+    currency: "gems"
+    icon: "sword_dragon.webp"
     stats:
       str: 20
       int: 2
@@ -196,7 +197,7 @@ equipment:
     description: Sturdy cloth for the road ahead
     price: 70
     rarity: "common"
-    icon: "armor_tunic.png"
+    icon: "armor_tunic.webp"
     stats:
       def: 1
       vit: 1
@@ -207,7 +208,7 @@ equipment:
     description: Cured hide that turns aside weak blows
     price: 110
     rarity: "common"
-    icon: "armor_leather.png"
+    icon: "armor_leather.webp"
     stats:
       def: 1
       vit: 1
@@ -218,7 +219,7 @@ equipment:
     description: Interlocked rings that flex with every move
     price: 160
     rarity: "common"
-    icon: "armor_chain.png"
+    icon: "armor_chain.webp"
     stats:
       def: 3
       vit: 1
@@ -229,7 +230,7 @@ equipment:
     description: Overlapping scales, strong yet light
     price: 240
     rarity: "rare"
-    icon: "armor_scale.png"
+    icon: "armor_scale.webp"
     stats:
       def: 3
       vit: 2
@@ -240,7 +241,7 @@ equipment:
     description: Shining golden plate armor
     price: 300
     rarity: "rare"
-    icon: "armor_golden.png"
+    icon: "armor_golden.webp"
     stats:
       str: 1
       def: 3
@@ -253,7 +254,7 @@ equipment:
     description: Full plate worn by proud knights
     price: 450
     rarity: "rare"
-    icon: "armor_plate.png"
+    icon: "armor_plate.webp"
     stats:
       str: 1
       def: 4
@@ -266,7 +267,7 @@ equipment:
     description: Silvery metal lighter than steel
     price: 700
     rarity: "epic"
-    icon: "armor_mithril.png"
+    icon: "armor_mithril.webp"
     stats:
       str: 2
       int: 1
@@ -281,7 +282,7 @@ equipment:
     description: Plate etched with protective runes
     price: 1050
     rarity: "epic"
-    icon: "armor_rune.png"
+    icon: "armor_rune.webp"
     stats:
       str: 2
       int: 1
@@ -294,9 +295,10 @@ equipment:
     slot: "armor"
     name: Guardian Aegis
     description: Blessed bulwark of an ancient order
-    price: 1600
+    price: 60
     rarity: "epic"
-    icon: "armor_guardian.png"
+    currency: "gems"
+    icon: "armor_guardian.webp"
     stats:
       str: 4
       int: 2
@@ -309,9 +311,10 @@ equipment:
     slot: "armor"
     name: Voidcarapace
     description: Shell of hardened void-stone
-    price: 2400
+    price: 100
     rarity: "legendary"
-    icon: "armor_void.png"
+    currency: "gems"
+    icon: "armor_void.webp"
     stats:
       str: 4
       int: 2
@@ -326,7 +329,7 @@ equipment:
     description: Simple cap for keeping the sun off
     price: 55
     rarity: "common"
-    icon: "helm_leather.png"
+    icon: "helm_leather.webp"
     stats:
       def: 1
 
@@ -336,7 +339,7 @@ equipment:
     description: Plain iron protection for the head
     price: 100
     rarity: "common"
-    icon: "helm_iron.png"
+    icon: "helm_iron.webp"
     stats:
       def: 2
 
@@ -346,7 +349,7 @@ equipment:
     description: Hood with a leather half-mask
     price: 150
     rarity: "common"
-    icon: "helm_archer.png"
+    icon: "helm_archer.webp"
     stats:
       def: 2
       vit: 1
@@ -357,7 +360,7 @@ equipment:
     description: Helm worn by city watchmen
     price: 220
     rarity: "rare"
-    icon: "helm_guard.png"
+    icon: "helm_guard.webp"
     stats:
       int: 1
       agi: 1
@@ -370,7 +373,7 @@ equipment:
     description: Helm forged from dragon scales
     price: 250
     rarity: "rare"
-    icon: "helm_dragon.png"
+    icon: "helm_dragon.webp"
     stats:
       str: 1
       int: 1
@@ -384,7 +387,7 @@ equipment:
     description: Visored helm of a sworn knight
     price: 320
     rarity: "rare"
-    icon: "helm_knight.png"
+    icon: "helm_knight.webp"
     stats:
       str: 1
       int: 1
@@ -399,7 +402,7 @@ equipment:
     description: Circlet that sharpens the mind
     price: 480
     rarity: "epic"
-    icon: "helm_sage.png"
+    icon: "helm_sage.webp"
     stats:
       str: 1
       int: 5
@@ -414,7 +417,7 @@ equipment:
     description: Gilded crown warm as morning light
     price: 760
     rarity: "epic"
-    icon: "helm_crown.png"
+    icon: "helm_crown.webp"
     stats:
       str: 2
       int: 3
@@ -429,7 +432,7 @@ equipment:
     description: Helm crested for the deep woods
     price: 1250
     rarity: "epic"
-    icon: "helm_warden.png"
+    icon: "helm_warden.webp"
     stats:
       str: 3
       int: 4
@@ -442,9 +445,10 @@ equipment:
     slot: "helmet"
     name: Skycrown
     description: Crown said to be cut from a cloud
-    price: 1900
+    price: 70
     rarity: "legendary"
-    icon: "helm_sky.png"
+    currency: "gems"
+    icon: "helm_sky.webp"
     stats:
       str: 4
       int: 6
@@ -459,7 +463,7 @@ equipment:
     description: Plain ring, dependable and true
     price: 65
     rarity: "common"
-    icon: "ring_iron.png"
+    icon: "ring_iron.webp"
     stats:
       luk: 1
 
@@ -469,7 +473,7 @@ equipment:
     description: Ring of cool silver light
     price: 105
     rarity: "common"
-    icon: "ring_silver.png"
+    icon: "ring_silver.webp"
     stats:
       luk: 2
 
@@ -479,7 +483,7 @@ equipment:
     description: Bright band engraved with small suns
     price: 150
     rarity: "common"
-    icon: "band_brass.png"
+    icon: "band_brass.webp"
     stats:
       agi: 1
       luk: 2
@@ -490,7 +494,7 @@ equipment:
     description: Pendant glowing with pale moonlight
     price: 230
     rarity: "rare"
-    icon: "pendant_moon.png"
+    icon: "pendant_moon.webp"
     stats:
       int: 1
       agi: 1
@@ -503,7 +507,7 @@ equipment:
     description: Ring set with a burning ruby
     price: 330
     rarity: "rare"
-    icon: "ring_ruby.png"
+    icon: "ring_ruby.webp"
     stats:
       str: 1
       int: 1
@@ -518,7 +522,7 @@ equipment:
     description: Talisman that hums with moving air
     price: 470
     rarity: "rare"
-    icon: "talisman_wind.png"
+    icon: "talisman_wind.webp"
     stats:
       str: 1
       int: 2
@@ -533,7 +537,7 @@ equipment:
     description: Amulet radiating quiet warmth
     price: 680
     rarity: "epic"
-    icon: "amulet_sun.png"
+    icon: "amulet_sun.webp"
     stats:
       str: 2
       int: 2
@@ -548,7 +552,7 @@ equipment:
     description: Black ring with a hidden gleam
     price: 1000
     rarity: "epic"
-    icon: "ring_onyx.png"
+    icon: "ring_onyx.webp"
     stats:
       str: 2
       int: 3
@@ -561,9 +565,10 @@ equipment:
     slot: "accessory"
     name: Void Relic
     description: Fragment of a star that fell silent
-    price: 1500
+    price: 55
     rarity: "epic"
-    icon: "relic_void.png"
+    currency: "gems"
+    icon: "relic_void.webp"
     stats:
       str: 3
       int: 5
@@ -576,9 +581,10 @@ equipment:
     slot: "accessory"
     name: Eternal Chain
     description: Chain looped outside of time
-    price: 2300
+    price: 120
     rarity: "legendary"
-    icon: "chain_eternal.png"
+    currency: "gems"
+    icon: "chain_eternal.webp"
     stats:
       str: 4
       int: 6
@@ -586,79 +592,104 @@ equipment:
       def: 4
       vit: 6
       luk: 12
-appearance:
-  - id: cloak_shadow
-    slot: "accessory"
-    name: Shadow Cloak
-    description: Cloak woven from shadow
-    price: 150
-    rarity: "common"
-    icon: "cloak_shadow.png"
-
-  - id: amulet_star
-    slot: "accessory"
-    name: Star Amulet
-    description: Amulet that glows like starlight
-    price: 200
-    rarity: "common"
-    icon: "amulet_star.png"
-
-  - id: charm_paw
-    slot: "accessory"
-    name: Lucky Paw Charm
-    description: A charm shaped like a hero's paw
+  - id: bow_yew
+    slot: "weapon"
+    name: Yew Bow
+    description: A springy yew bow, quiet and true
     price: 120
     rarity: "common"
-    icon: "charm_paw.png"
+    icon: "bow_yew.webp"
+    stats:
+      str: 1
+      agi: 2
 
-  - id: banner_hero
-    slot: "accessory"
-    name: Hero Banner
-    description: Colorful banner to flaunt in the Forge
+  - id: bow_hunter
+    slot: "weapon"
+    name: Hunter Bow
+    description: A seasoned bow that never misses prey
     price: 260
     rarity: "rare"
-    icon: "banner_hero.png"
+    icon: "bow_hunter.webp"
+    stats:
+      str: 1
+      agi: 2
+      def: 1
+      vit: 1
+      luk: 1
 
-  - id: hourglass_gold
-    slot: "accessory"
-    name: Golden Hourglass
-    description: A keepsake of time well spent
-    price: 340
-    rarity: "rare"
-    icon: "hourglass_gold.png"
-
-  - id: trophy_days
-    slot: "accessory"
-    name: Trophy of Days
-    description: Polished trophy for a streak well kept
-    price: 500
+  - id: bow_gale
+    slot: "weapon"
+    name: Gale Longbow
+    description: Draws the wind itself into each arrow
+    price: 560
     rarity: "epic"
-    icon: "trophy_days.png"
-skins:
-  - id: skin_shadow
-    name: Shadow Rogue
-    description: A sleek shadow-tinted recolor of your hero
-    price: 20
-    rarity: "common"
-    icon: "skin_shadow.png"
+    icon: "bow_gale.webp"
+    stats:
+      str: 2
+      int: 1
+      agi: 6
+      def: 1
+      vit: 1
+      luk: 1
 
-  - id: skin_golden
-    name: Golden Knight
-    description: Shining golden recolor, fit for a champion
-    price: 30
+  - id: bow_phoenix
+    slot: "weapon"
+    name: Phoenix Bow
+    description: Wreathed in embers that never die
+    price: 90
+    rarity: "legendary"
+    currency: "gems"
+    icon: "bow_phoenix.webp"
+    stats:
+      str: 7
+      int: 2
+      agi: 15
+      def: 4
+      vit: 4
+      luk: 4
+
+  - id: quiver_swift
+    slot: "accessory"
+    name: Swift Quiver
+    description: Endless arrows, always within reach
+    price: 300
     rarity: "rare"
-    icon: "skin_golden.png"
+    icon: "quiver_swift.webp"
+    stats:
+      str: 1
+      int: 1
+      agi: 1
+      def: 1
+      vit: 1
+      luk: 2
 
-  - id: skin_forest
-    name: Forest Ranger
-    description: Earthy green recolor blending into the wilds
-    price: 30
-    rarity: "rare"
-    icon: "skin_forest.png"
-
-  - id: skin_dragon
-    name: Dragonheart
-    description: Fiery ember recolor, touched by dragon blood
-    price: 50
+  - id: helm_hawkeye
+    slot: "helmet"
+    name: Hawkeye Hood
+    description: Hood sharpening sight across the field
+    price: 430
     rarity: "epic"
-    icon: "skin_dragon.png"
+    icon: "helm_hawkeye.webp"
+    stats:
+      str: 1
+      int: 2
+      agi: 2
+      def: 2
+      vit: 2
+      luk: 1
+
+  - id: armor_wind
+    slot: "armor"
+    name: Windwalker Leather
+    description: Light leather that moves like the breeze
+    price: 850
+    rarity: "epic"
+    icon: "armor_wind.webp"
+    stats:
+      str: 2
+      int: 1
+      agi: 1
+      def: 6
+      vit: 7
+      luk: 2
+

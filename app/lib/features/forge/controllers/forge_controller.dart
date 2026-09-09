@@ -11,12 +11,16 @@ import 'package:habit_forge_app/widgets/toast_widget.dart';
 class ForgeController extends GetxController {
   final shopItems = <ShopItem>[].obs;
   final ownedIds = <String>[].obs;
-  final activeCategory = 'appearance'.obs;
+  final activeCategory = 'equipment'.obs;
   // Daily deal
   final dailyDeal = DailyDeal().obs;
   final countdown = ''.obs;
+  // 2-hour rotating picks
+  final rotating = <ShopItem>[].obs;
+  final rotationCountdown = ''.obs;
 
   Timer? _countdownTimer;
+  int _rotationWindow = -1;
 
   ShopItem? get dailyDealItem {
     final deal = dailyDeal.value;
@@ -79,7 +83,15 @@ class ForgeController extends GetxController {
     final result = await NetworkRegistry.ins.listShopItems();
     if (result.isSuccess) {
       shopItems.value = result.data!.items;
+      _refreshRotation();
     }
+  }
+
+  /// (Re)computes the rotating batch for the current 2-hour window.
+  void _refreshRotation() {
+    final now = DateTime.now();
+    _rotationWindow = ShopConfig.rotationWindowOf(now);
+    rotating.value = ShopConfig.rotatingBatch(shopItems, now, size: 6);
   }
 
   Future<void> loadOwned() async {
@@ -107,15 +119,23 @@ class ForgeController extends GetxController {
   }
 
   void _updateCountdown() {
+    final now = DateTime.now();
+
+    // Daily deal remaining time.
     final deal = dailyDeal.value;
-    final remaining = DateTime.fromMillisecondsSinceEpoch(deal.expiresAt.toInt()).difference(DateTime.now());
-    if (remaining.isNegative) {
-      countdown.value = '00:00:00';
-      return;
-    }
-    final hours = remaining.inHours.toString().padLeft(2, '0');
-    final minutes = (remaining.inMinutes % 60).toString().padLeft(2, '0');
-    final seconds = (remaining.inSeconds % 60).toString().padLeft(2, '0');
-    countdown.value = '$hours:$minutes:$seconds';
+    final remaining = DateTime.fromMillisecondsSinceEpoch(deal.expiresAt.toInt()).difference(now);
+    countdown.value = remaining.isNegative ? '00:00:00' : _fmt(remaining);
+
+    // 2-hour rotation: swap the batch the moment a new window starts.
+    final window = ShopConfig.rotationWindowOf(now);
+    if (window != _rotationWindow) _refreshRotation();
+    rotationCountdown.value = _fmt(ShopConfig.nextRotationAt(now).difference(now));
+  }
+
+  static String _fmt(Duration d) {
+    final hours = d.inHours.toString().padLeft(2, '0');
+    final minutes = (d.inMinutes % 60).toString().padLeft(2, '0');
+    final seconds = (d.inSeconds % 60).toString().padLeft(2, '0');
+    return '$hours:$minutes:$seconds';
   }
 }

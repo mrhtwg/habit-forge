@@ -35,6 +35,7 @@ const _excludeAssetDirs = [
   'assets/animations/knight_idle',
   'assets/animations/mage_idle',
   'assets/animations/ranger_idle',
+  'assets/images/equipments',
 ];
 
 /// Returns true if the relative path matches one of the configured exclude directories

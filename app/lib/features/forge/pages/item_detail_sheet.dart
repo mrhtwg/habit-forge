@@ -23,7 +23,7 @@ class ItemDetailSheet extends StatelessWidget {
     final affordable = controller.canAfford(item);
     final shortfall = controller.shortfall(item);
     final isSkin = controller.isSkin(item);
-    final rarityColor = _rarityColor(item.rarity);
+    final rarityColor = ShopItemIcon.rarityColor(item.rarity);
 
     return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
@@ -43,17 +43,17 @@ class ItemDetailSheet extends StatelessWidget {
             ),
           ),
           SizedBox(height: 20.h),
-          // Icon frame
+          // Icon frame (rarity-tinted gradient + rarity border)
           Container(
             width: 88.w,
             height: 88.w,
             decoration: BoxDecoration(
-              color: ShopItemIcon.bg(item.id),
-              border: Border.all(color: AppColors.border, width: 3),
+              gradient: ShopItemIcon.rarityGradient(item.rarity),
+              border: Border.all(color: rarityColor, width: 3),
               borderRadius: BorderRadius.circular(24),
               boxShadow: const [BoxShadow(color: Color(0xFFEFDFC4), offset: Offset(0, 5))],
             ),
-            child: ShopItemIcon(itemId: item.id, size: 48.w),
+            child: ShopItemIcon(itemId: item.id, iconFile: ShopConfig.iconOf(item.id), size: 48.w),
           ),
           SizedBox(height: 14.h),
           Text(item.name, style: textStyleBold(fontSize: 20.sp, color: AppColors.textPrimary)),
@@ -225,19 +225,6 @@ class ItemDetailSheet extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Color _rarityColor(EquipmentRarity rarity) {
-    switch (rarity) {
-      case EquipmentRarity.EQUIPMENT_RARITY_COMMON:
-        return AppColors.textSecondary;
-      case EquipmentRarity.EQUIPMENT_RARITY_RARE:
-        return AppColors.info;
-      case EquipmentRarity.EQUIPMENT_RARITY_EPIC:
-        return AppColors.primaryDark;
-      default:
-        return AppColors.textSecondary;
-    }
   }
 
   static void show(BuildContext context, ShopItem item) {

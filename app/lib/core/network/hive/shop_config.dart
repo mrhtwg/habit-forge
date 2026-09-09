@@ -28,19 +28,88 @@ class ShopConfig {
   /// appearance items (cosmetics / skins) grant no stats.
   static final Map<String, CharacterStats> _bonus = <String, CharacterStats>{};
 
+  /// itemId -> icon asset filename (from the `icon` field in config).
+  static final Map<String, String> _icons = <String, String>{};
+
+  /// itemIds of equipment sold for gems (config `currency: "gems"`).
+  static final Set<String> _gemItemIds = <String>{};
+
+  /// Whether the item is bought with gems (skins and gem-priced equipment).
+  static bool isGemItem(String itemId) => _skinIds.contains(itemId) || _gemItemIds.contains(itemId);
+
   /// The stat bonus an item grants while equipped (all zeros for appearance).
   static CharacterStats bonusStatsOf(String itemId) => _bonus[itemId] ?? CharacterStats();
 
-  /// The UI category of an item. Skins count as appearance (they are cosmetic
-  /// unlocks) and are listed under the Appearance tab.
-  static String categoryOf(String itemId) => _categories[itemId] ?? 'appearance';
+  /// Asset filename of the item's icon (e.g. `sword_flame.webp`), or '' when
+  /// the item has no icon file configured.
+  static String iconOf(String itemId) => _icons[itemId] ?? '';
+
+  /// The UI category of an item. Appearance/skin items were deferred until the
+  /// skeletal-animation character system lands, so everything is equipment now.
+  static String categoryOf(String itemId) => _categories[itemId] ?? 'equipment';
 
   /// Whether [itemId] is a character skin (bought with gems).
   static bool isSkin(String itemId) => _skinIds.contains(itemId);
 
-  /// The currency a shop item is bought with (skins -> gems, else gold).
+  /// The currency a shop item is bought with (skins & gem-priced equipment ->
+  /// gems, everything else gold).
   static ShopCurrency currencyOf(String itemId) =>
-      _skinIds.contains(itemId) ? ShopCurrency.SHOP_CURRENCY_GEMS : ShopCurrency.SHOP_CURRENCY_GOLD;
+      isGemItem(itemId) ? ShopCurrency.SHOP_CURRENCY_GEMS : ShopCurrency.SHOP_CURRENCY_GOLD;
+
+  // ── Rotating picks (refreshes every 2 hours) ──
+
+  /// Index of the current 2-hour rotation window (minutes since local
+  /// midnight divided by 120): windows start at local 00:00 / 02:00 / 04:00…
+  static int rotationWindowOf(DateTime now) => (now.hour * 60 + now.minute) ~/ 120;
+
+  /// The next rotation boundary after [now].
+  static DateTime nextRotationAt(DateTime now) {
+    final midnight = DateTime(now.year, now.month, now.day);
+    return midnight.add(Duration(minutes: (rotationWindowOf(now) + 1) * 120));
+  }
+
+  /// Deterministic rotating batch for the current 2-hour window: up to [size]
+  /// picks from [catalog], with at least one epic/legendary when the catalog
+  /// has any. The same window always yields the same picks, so the shop stays
+  /// stable across restarts and only changes at the boundary.
+  static List<ShopItem> rotatingBatch(List<ShopItem> catalog, DateTime now, {int size = 6}) {
+    if (catalog.isEmpty || size <= 0) return const [];
+    var seed = (rotationWindowOf(now) + 1) * 0x9E3779B9 ^ 0x85EBCA6B;
+    int nextRand(int n) {
+      seed = (seed * 1103515245 + 12345) & 0x7FFFFFFF;
+      return seed % n;
+    }
+
+    final pool = List<ShopItem>.of(catalog);
+    final take = size < pool.length ? size : pool.length;
+    // Partial Fisher–Yates with the deterministic PRNG.
+    for (var i = 0; i < take; i++) {
+      final j = i + nextRand(pool.length - i);
+      final tmp = pool[i];
+      pool[i] = pool[j];
+      pool[j] = tmp;
+    }
+    final picks = pool.sublist(0, take);
+    final hasHigh = picks.any(
+      (p) =>
+          p.rarity == EquipmentRarity.EQUIPMENT_RARITY_EPIC || p.rarity == EquipmentRarity.EQUIPMENT_RARITY_LEGENDARY,
+    );
+    if (!hasHigh) {
+      final highs = catalog
+          .where(
+            (p) =>
+                p.rarity == EquipmentRarity.EQUIPMENT_RARITY_EPIC ||
+                p.rarity == EquipmentRarity.EQUIPMENT_RARITY_LEGENDARY,
+          )
+          .where((p) => !picks.contains(p))
+          .toList();
+      if (highs.isNotEmpty) {
+        final last = picks.length - 1;
+        picks[last] = highs[nextRand(highs.length)];
+      }
+    }
+    return picks;
+  }
 
   /// Parses the YAML config into [achievementDefs] and [shopItems].
   static Future<void> load() async {
@@ -51,6 +120,8 @@ class ShopConfig {
       _skinIds.clear();
       _categories.clear();
       _bonus.clear();
+      _icons.clear();
+      _gemItemIds.clear();
       for (final entry in (doc['skins'] as List? ?? const [])) {
         final m = (entry as Map).cast<String, dynamic>();
         final id = m['id'] as String?;
@@ -66,6 +137,9 @@ class ShopConfig {
           _categories[id] = 'equipment';
           final stats = _statsFrom(m['stats']);
           if (stats != null) _bonus[id] = stats;
+          final icon = m['icon'] as String?;
+          if (icon != null && icon.isNotEmpty) _icons[id] = icon;
+          if (m['currency'] == 'gems') _gemItemIds.add(id);
         }
       }
       for (final entry in (doc['appearance'] as List? ?? const [])) {
@@ -263,22 +337,6 @@ class ShopConfig {
         price: Int64(350),
         slot: EquipmentSlot.EQUIPMENT_SLOT_WEAPON,
         rarity: EquipmentRarity.EQUIPMENT_RARITY_EPIC,
-      ),
-      ShopItem(
-        id: 'amulet_star',
-        name: 'Star Amulet',
-        description: 'Amulet that glows like starlight',
-        price: Int64(200),
-        slot: EquipmentSlot.EQUIPMENT_SLOT_ACCESSORY,
-        rarity: EquipmentRarity.EQUIPMENT_RARITY_COMMON,
-      ),
-      ShopItem(
-        id: 'cloak_shadow',
-        name: 'Shadow Cloak',
-        description: 'Cloak woven from shadow',
-        price: Int64(150),
-        slot: EquipmentSlot.EQUIPMENT_SLOT_ACCESSORY,
-        rarity: EquipmentRarity.EQUIPMENT_RARITY_COMMON,
       ),
     ];
   }
