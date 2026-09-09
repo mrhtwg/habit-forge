@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
+import 'package:habit_forge_app/core/network/hive/shop_config.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/forge/controllers/forge_controller.dart';
@@ -76,6 +77,30 @@ class ItemDetailSheet extends StatelessWidget {
               style: textStyleBold(fontSize: 11.sp, color: rarityColor).copyWith(letterSpacing: 0.5),
             ),
           ),
+          // Attribute bonus chips (equipment only; appearance grants none).
+          Builder(
+            builder: (context) {
+              final bonus = ShopConfig.bonusStatsOf(item.id);
+              final chips = <Widget>[
+                if (bonus.strength > 0) _bonusChip('+${bonus.strength} ${LanKey.statStr.tr}'),
+                if (bonus.intelligence > 0) _bonusChip('+${bonus.intelligence} ${LanKey.statInt.tr}'),
+                if (bonus.agility > 0) _bonusChip('+${bonus.agility} ${LanKey.statAgi.tr}'),
+                if (bonus.defense > 0) _bonusChip('+${bonus.defense} ${LanKey.statDef.tr}'),
+                if (bonus.vitality > 0) _bonusChip('+${bonus.vitality} ${LanKey.statVit.tr}'),
+                if (bonus.luck > 0) _bonusChip('+${bonus.luck} ${LanKey.statLuk.tr}'),
+              ];
+              if (chips.isEmpty) return const SizedBox.shrink();
+              return Padding(
+                padding: EdgeInsets.only(top: 10.h),
+                child: Wrap(
+                  spacing: 6.w,
+                  runSpacing: 6.h,
+                  alignment: WrapAlignment.center,
+                  children: chips,
+                ),
+              );
+            },
+          ),
           SizedBox(height: 14.h),
           // Description
           Padding(
@@ -99,6 +124,18 @@ class ItemDetailSheet extends StatelessWidget {
           SizedBox(height: 28.h),
         ],
       ),
+    );
+  }
+
+  Widget _bonusChip(String text) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF3D6),
+        border: Border.all(color: AppColors.goldDark.withValues(alpha: 0.6), width: 1.2),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(text, style: textStyleBold(fontSize: 12.sp, color: AppColors.goldDark)),
     );
   }
 

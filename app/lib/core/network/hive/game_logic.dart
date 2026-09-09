@@ -1,6 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:habit_forge_app/core/extensions/date_extensions.dart';
 import 'package:habit_forge_app/core/network/hive/game_constants.dart';
+import 'package:habit_forge_app/core/network/hive/shop_config.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';
 import 'package:habit_forge_app/generated/protos/user/v1/user.pb.dart';
@@ -86,13 +87,43 @@ class GameLogic {
     });
   }
 
+  /// The character's effective attributes: base stats plus the bonuses of all
+  /// equipped items. Appearance items grant no stats, so only equipment
+  /// contributes. Unknown ids resolve to zero bonus.
+  static CharacterStats effectiveStats(Character c) {
+    final s = c.baseStats;
+    var str = s.strength, intel = s.intelligence, agi = s.agility;
+    var def = s.defense, vit = s.vitality, luk = s.luck;
+    for (final itemId in c.equipment.values) {
+      final b = ShopConfig.bonusStatsOf(itemId);
+      str += b.strength;
+      intel += b.intelligence;
+      agi += b.agility;
+      def += b.defense;
+      vit += b.vitality;
+      luk += b.luck;
+    }
+    return CharacterStats(
+      strength: str,
+      intelligence: intel,
+      agility: agi,
+      defense: def,
+      vitality: vit,
+      luck: luk,
+    );
+  }
+
+  /// HP cap of [c] taking equipped VIT bonuses into account (100 when null).
+  static int maxHpOf(Character? c) =>
+      c == null ? GameConstants.maxHp : GameConstants.maxHpFor(effectiveStats(c).vitality);
+
   /// Base EXP reward for a task, including the streak multiplier and the
-  /// character's INT bonus (+1% per point). Custom rewards are respected
-  /// verbatim and never scaled by stats.
+  /// character's effective INT bonus (+1% per point). Custom rewards are
+  /// respected verbatim and never scaled by stats.
   static int expReward(Task task, Character character) {
     if (task.customExpReward > 0) return task.customExpReward;
     final base = GameConstants.baseExpReward(task.difficulty) * GameConstants.streakMultiplier(task.streak);
-    return (base * (1 + character.baseStats.intelligence * 0.01)).round();
+    return (base * (1 + effectiveStats(character).intelligence * 0.01)).round();
   }
 
   /// Applies exp and returns (character, newLevel or -1).
@@ -116,9 +147,9 @@ class GameLogic {
     final gained = (level - frozen.level) * GameConstants.statPointsPerLevel;
     final maxForLevel = GameConstants.expForLevel(level);
     final cappedExp = level >= GameConstants.maxLevel ? remaining.clamp(0, maxForLevel) : remaining;
-    // VIT raises the HP cap (base 100 + 2 per point); the level-up heal
-    // clamps to the character's own cap.
-    final maxHp = GameConstants.maxHpFor(frozen.baseStats.vitality);
+    // VIT (base + equipment) raises the HP cap; the level-up heal clamps to
+    // the character's own cap.
+    final maxHp = GameConstants.maxHpFor(effectiveStats(frozen).vitality);
     return (
       frozen.rebuild(
         (x) => x
@@ -132,12 +163,13 @@ class GameLogic {
     );
   }
 
-  /// Base gold reward for a task, scaled by the character's STR bonus
-  /// (+1% per point). Custom rewards are respected verbatim and never scaled.
+  /// Base gold reward for a task, scaled by the character's effective STR
+  /// bonus (+1% per point). Custom rewards are respected verbatim and never
+  /// scaled.
   static int goldReward(Task task, Character character) {
     if (task.customGoldReward > 0) return task.customGoldReward;
     final base = GameConstants.baseGoldReward(task.difficulty);
-    return (base * (1 + character.baseStats.strength * 0.01)).round();
+    return (base * (1 + effectiveStats(character).strength * 0.01)).round();
   }
 
   static int levelForExp(int totalExp) {
@@ -171,14 +203,16 @@ class GameLogic {
   /// Toggles the skipped flag.
   static Task skip(Task task) => (task.deepCopy()..freeze()).rebuild((t) => t..isSkipped = !t.isSkipped);
 
-  /// Applies damage; DEF absorbs one HP per point (minimum 1 damage) and VIT
-  /// raises the HP cap. The character dies at 0 HP and schedules recovery.
+  /// Applies damage; effective DEF absorbs one HP per point (minimum 1
+  /// damage) and effective VIT raises the HP cap. The character dies at
+  /// 0 HP and schedules recovery.
   static Character takeDamage(Character c, int amount) {
     if (c.isDead) return c;
     final frozen = c.deepCopy()..freeze();
-    final reduced = amount - frozen.baseStats.defense;
+    final effective = effectiveStats(frozen);
+    final reduced = amount - effective.defense;
     final dealt = reduced < 1 ? 1 : reduced;
-    final newHp = (frozen.currentHp - dealt).clamp(0, GameConstants.maxHpFor(frozen.baseStats.vitality));
+    final newHp = (frozen.currentHp - dealt).clamp(0, GameConstants.maxHpFor(effective.vitality));
     final dead = newHp <= 0;
     return frozen.rebuild(
       (x) => x

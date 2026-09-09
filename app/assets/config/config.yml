@@ -63,29 +63,58 @@ achievement_defs:
     gem_reward: 5
 
 equipment:
-  - id: sword_flame
+  - id: sword_iron
     slot: "weapon"
-    name: Flame Sword
-    description: A sword wreathed in eternal flame
-    price: 500
-    rarity: "epic"
-    icon: "sword_flame.png"
+    name: Iron Sword
+    description: A dependable training blade for starting adventurers
+    price: 60
+    rarity: "common"
+    icon: "sword_iron.png"
+    stats:
+      str: 1
 
-  - id: armor_golden
-    slot: "armor"
-    name: Golden Armor
-    description: Shining golden plate armor
-    price: 300
-    rarity: "rare"
-    icon: "armor_golden.png"
+  - id: sword_steel
+    slot: "weapon"
+    name: Steel Sword
+    description: Tempered steel that holds a keen edge
+    price: 90
+    rarity: "common"
+    icon: "sword_steel.png"
+    stats:
+      str: 2
 
-  - id: helm_dragon
-    slot: "helmet"
-    name: Dragon Helm
-    description: Helm forged from dragon scales
-    price: 250
+  - id: sword_silver
+    slot: "weapon"
+    name: Silver Sword
+    description: Blessed silver, sharp against the dark
+    price: 130
+    rarity: "common"
+    icon: "sword_silver.png"
+    stats:
+      str: 3
+
+  - id: staff_willow
+    slot: "weapon"
+    name: Willow Staff
+    description: A light staff humming with gentle magic
+    price: 170
     rarity: "rare"
-    icon: "helm_dragon.png"
+    icon: "staff_willow.png"
+    stats:
+      int: 3
+      vit: 1
+
+  - id: axe_war
+    slot: "weapon"
+    name: War Axe
+    description: Heavy axe that bites deep with every swing
+    price: 220
+    rarity: "rare"
+    icon: "axe_war.png"
+    stats:
+      str: 3
+      def: 1
+      vit: 1
 
   - id: staff_arcane
     slot: "weapon"
@@ -94,7 +123,469 @@ equipment:
     price: 350
     rarity: "epic"
     icon: "staff_arcane.png"
+    stats:
+      int: 4
+      agi: 1
+      def: 1
+      vit: 1
+      luk: 1
 
+  - id: sword_flame
+    slot: "weapon"
+    name: Flame Sword
+    description: A sword wreathed in eternal flame
+    price: 500
+    rarity: "epic"
+    icon: "sword_flame.png"
+    stats:
+      str: 4
+      int: 1
+      agi: 1
+      def: 2
+      vit: 2
+      luk: 1
+
+  - id: blade_dusk
+    slot: "weapon"
+    name: Dusk Blade
+    description: Obsidian edge that drinks the twilight
+    price: 900
+    rarity: "epic"
+    icon: "blade_dusk.png"
+    stats:
+      str: 10
+      int: 1
+      agi: 2
+      def: 3
+      vit: 3
+      luk: 1
+
+  - id: staff_crystal
+    slot: "weapon"
+    name: Crystal Staff
+    description: Focuses raw mana into brilliant shards
+    price: 1400
+    rarity: "epic"
+    icon: "staff_crystal.png"
+    stats:
+      str: 2
+      int: 15
+      agi: 3
+      def: 3
+      vit: 5
+      luk: 3
+
+  - id: sword_dragon
+    slot: "weapon"
+    name: Dragon Fang
+    description: Legendary blade carved from a dragon fang
+    price: 2200
+    rarity: "legendary"
+    icon: "sword_dragon.png"
+    stats:
+      str: 20
+      int: 2
+      agi: 4
+      def: 6
+      vit: 6
+      luk: 2
+
+  - id: armor_tunic
+    slot: "armor"
+    name: Adventurer Tunic
+    description: Sturdy cloth for the road ahead
+    price: 70
+    rarity: "common"
+    icon: "armor_tunic.png"
+    stats:
+      def: 1
+      vit: 1
+
+  - id: armor_leather
+    slot: "armor"
+    name: Leather Armor
+    description: Cured hide that turns aside weak blows
+    price: 110
+    rarity: "common"
+    icon: "armor_leather.png"
+    stats:
+      def: 1
+      vit: 1
+
+  - id: armor_chain
+    slot: "armor"
+    name: Chainmail
+    description: Interlocked rings that flex with every move
+    price: 160
+    rarity: "common"
+    icon: "armor_chain.png"
+    stats:
+      def: 3
+      vit: 1
+
+  - id: armor_scale
+    slot: "armor"
+    name: Scale Armor
+    description: Overlapping scales, strong yet light
+    price: 240
+    rarity: "rare"
+    icon: "armor_scale.png"
+    stats:
+      def: 3
+      vit: 2
+
+  - id: armor_golden
+    slot: "armor"
+    name: Golden Armor
+    description: Shining golden plate armor
+    price: 300
+    rarity: "rare"
+    icon: "armor_golden.png"
+    stats:
+      str: 1
+      def: 3
+      vit: 2
+      luk: 1
+
+  - id: armor_plate
+    slot: "armor"
+    name: Knight Plate
+    description: Full plate worn by proud knights
+    price: 450
+    rarity: "rare"
+    icon: "armor_plate.png"
+    stats:
+      str: 1
+      def: 4
+      vit: 4
+      luk: 1
+
+  - id: armor_mithril
+    slot: "armor"
+    name: Mithril Coat
+    description: Silvery metal lighter than steel
+    price: 700
+    rarity: "epic"
+    icon: "armor_mithril.png"
+    stats:
+      str: 2
+      int: 1
+      agi: 1
+      def: 4
+      vit: 6
+      luk: 2
+
+  - id: armor_rune
+    slot: "armor"
+    name: Rune Plate
+    description: Plate etched with protective runes
+    price: 1050
+    rarity: "epic"
+    icon: "armor_rune.png"
+    stats:
+      str: 2
+      int: 1
+      agi: 1
+      def: 9
+      vit: 8
+      luk: 2
+
+  - id: armor_guardian
+    slot: "armor"
+    name: Guardian Aegis
+    description: Blessed bulwark of an ancient order
+    price: 1600
+    rarity: "epic"
+    icon: "armor_guardian.png"
+    stats:
+      str: 4
+      int: 2
+      agi: 2
+      def: 11
+      vit: 13
+      luk: 4
+
+  - id: armor_void
+    slot: "armor"
+    name: Voidcarapace
+    description: Shell of hardened void-stone
+    price: 2400
+    rarity: "legendary"
+    icon: "armor_void.png"
+    stats:
+      str: 4
+      int: 2
+      agi: 2
+      def: 14
+      vit: 14
+      luk: 4
+
+  - id: helm_leather
+    slot: "helmet"
+    name: Leather Cap
+    description: Simple cap for keeping the sun off
+    price: 55
+    rarity: "common"
+    icon: "helm_leather.png"
+    stats:
+      def: 1
+
+  - id: helm_iron
+    slot: "helmet"
+    name: Iron Helm
+    description: Plain iron protection for the head
+    price: 100
+    rarity: "common"
+    icon: "helm_iron.png"
+    stats:
+      def: 2
+
+  - id: helm_archer
+    slot: "helmet"
+    name: Archer Hood
+    description: Hood with a leather half-mask
+    price: 150
+    rarity: "common"
+    icon: "helm_archer.png"
+    stats:
+      def: 2
+      vit: 1
+
+  - id: helm_guard
+    slot: "helmet"
+    name: Guard Helm
+    description: Helm worn by city watchmen
+    price: 220
+    rarity: "rare"
+    icon: "helm_guard.png"
+    stats:
+      int: 1
+      agi: 1
+      def: 2
+      vit: 1
+
+  - id: helm_dragon
+    slot: "helmet"
+    name: Dragon Helm
+    description: Helm forged from dragon scales
+    price: 250
+    rarity: "rare"
+    icon: "helm_dragon.png"
+    stats:
+      str: 1
+      int: 1
+      agi: 1
+      vit: 2
+      luk: 1
+
+  - id: helm_knight
+    slot: "helmet"
+    name: Knight Helm
+    description: Visored helm of a sworn knight
+    price: 320
+    rarity: "rare"
+    icon: "helm_knight.png"
+    stats:
+      str: 1
+      int: 1
+      agi: 1
+      def: 1
+      vit: 2
+      luk: 1
+
+  - id: helm_sage
+    slot: "helmet"
+    name: Sage Circlet
+    description: Circlet that sharpens the mind
+    price: 480
+    rarity: "epic"
+    icon: "helm_sage.png"
+    stats:
+      str: 1
+      int: 5
+      agi: 1
+      def: 1
+      vit: 2
+      luk: 1
+
+  - id: helm_crown
+    slot: "helmet"
+    name: Crown of Dawn
+    description: Gilded crown warm as morning light
+    price: 760
+    rarity: "epic"
+    icon: "helm_crown.png"
+    stats:
+      str: 2
+      int: 3
+      agi: 3
+      def: 3
+      vit: 4
+      luk: 2
+
+  - id: helm_warden
+    slot: "helmet"
+    name: Warden Crest
+    description: Helm crested for the deep woods
+    price: 1250
+    rarity: "epic"
+    icon: "helm_warden.png"
+    stats:
+      str: 3
+      int: 4
+      agi: 4
+      def: 7
+      vit: 7
+      luk: 3
+
+  - id: helm_sky
+    slot: "helmet"
+    name: Skycrown
+    description: Crown said to be cut from a cloud
+    price: 1900
+    rarity: "legendary"
+    icon: "helm_sky.png"
+    stats:
+      str: 4
+      int: 6
+      agi: 6
+      def: 10
+      vit: 10
+      luk: 4
+
+  - id: ring_iron
+    slot: "accessory"
+    name: Iron Ring
+    description: Plain ring, dependable and true
+    price: 65
+    rarity: "common"
+    icon: "ring_iron.png"
+    stats:
+      luk: 1
+
+  - id: ring_silver
+    slot: "accessory"
+    name: Silver Ring
+    description: Ring of cool silver light
+    price: 105
+    rarity: "common"
+    icon: "ring_silver.png"
+    stats:
+      luk: 2
+
+  - id: band_brass
+    slot: "accessory"
+    name: Brass Band
+    description: Bright band engraved with small suns
+    price: 150
+    rarity: "common"
+    icon: "band_brass.png"
+    stats:
+      agi: 1
+      luk: 2
+
+  - id: pendant_moon
+    slot: "accessory"
+    name: Moon Pendant
+    description: Pendant glowing with pale moonlight
+    price: 230
+    rarity: "rare"
+    icon: "pendant_moon.png"
+    stats:
+      int: 1
+      agi: 1
+      vit: 1
+      luk: 2
+
+  - id: ring_ruby
+    slot: "accessory"
+    name: Ruby Ring
+    description: Ring set with a burning ruby
+    price: 330
+    rarity: "rare"
+    icon: "ring_ruby.png"
+    stats:
+      str: 1
+      int: 1
+      agi: 1
+      def: 1
+      vit: 1
+      luk: 2
+
+  - id: talisman_wind
+    slot: "accessory"
+    name: Wind Talisman
+    description: Talisman that hums with moving air
+    price: 470
+    rarity: "rare"
+    icon: "talisman_wind.png"
+    stats:
+      str: 1
+      int: 2
+      agi: 2
+      def: 1
+      vit: 2
+      luk: 2
+
+  - id: amulet_sun
+    slot: "accessory"
+    name: Sun Amulet
+    description: Amulet radiating quiet warmth
+    price: 680
+    rarity: "epic"
+    icon: "amulet_sun.png"
+    stats:
+      str: 2
+      int: 2
+      agi: 3
+      def: 2
+      vit: 2
+      luk: 4
+
+  - id: ring_onyx
+    slot: "accessory"
+    name: Onyx Ring
+    description: Black ring with a hidden gleam
+    price: 1000
+    rarity: "epic"
+    icon: "ring_onyx.png"
+    stats:
+      str: 2
+      int: 3
+      agi: 4
+      def: 2
+      vit: 3
+      luk: 8
+
+  - id: relic_void
+    slot: "accessory"
+    name: Void Relic
+    description: Fragment of a star that fell silent
+    price: 1500
+    rarity: "epic"
+    icon: "relic_void.png"
+    stats:
+      str: 3
+      int: 5
+      agi: 7
+      def: 3
+      vit: 5
+      luk: 10
+
+  - id: chain_eternal
+    slot: "accessory"
+    name: Eternal Chain
+    description: Chain looped outside of time
+    price: 2300
+    rarity: "legendary"
+    icon: "chain_eternal.png"
+    stats:
+      str: 4
+      int: 6
+      agi: 8
+      def: 4
+      vit: 6
+      luk: 12
 appearance:
   - id: cloak_shadow
     slot: "accessory"
@@ -112,6 +603,37 @@ appearance:
     rarity: "common"
     icon: "amulet_star.png"
 
+  - id: charm_paw
+    slot: "accessory"
+    name: Lucky Paw Charm
+    description: A charm shaped like a hero's paw
+    price: 120
+    rarity: "common"
+    icon: "charm_paw.png"
+
+  - id: banner_hero
+    slot: "accessory"
+    name: Hero Banner
+    description: Colorful banner to flaunt in the Forge
+    price: 260
+    rarity: "rare"
+    icon: "banner_hero.png"
+
+  - id: hourglass_gold
+    slot: "accessory"
+    name: Golden Hourglass
+    description: A keepsake of time well spent
+    price: 340
+    rarity: "rare"
+    icon: "hourglass_gold.png"
+
+  - id: trophy_days
+    slot: "accessory"
+    name: Trophy of Days
+    description: Polished trophy for a streak well kept
+    price: 500
+    rarity: "epic"
+    icon: "trophy_days.png"
 skins:
   - id: skin_shadow
     name: Shadow Rogue

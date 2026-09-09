@@ -2,6 +2,7 @@ import 'package:fixnum/fixnum.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:habit_forge_app/core/common/utils/log.dart';
 import 'package:habit_forge_app/generated/protos/achievement/v1/achievement.pb.dart';
+import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart';
 import 'package:habit_forge_app/generated/protos/shared/v1/shared.pbenum.dart';
 import 'package:habit_forge_app/generated/protos/shop/v1/shop.pb.dart';
 import 'package:yaml/yaml.dart';
@@ -23,6 +24,13 @@ class ShopConfig {
   /// itemId -> UI category: 'equipment' | 'appearance'.
   static final Map<String, String> _categories = <String, String>{};
 
+  /// itemId -> attribute bonus granted while equipped. Equipment only;
+  /// appearance items (cosmetics / skins) grant no stats.
+  static final Map<String, CharacterStats> _bonus = <String, CharacterStats>{};
+
+  /// The stat bonus an item grants while equipped (all zeros for appearance).
+  static CharacterStats bonusStatsOf(String itemId) => _bonus[itemId] ?? CharacterStats();
+
   /// The UI category of an item. Skins count as appearance (they are cosmetic
   /// unlocks) and are listed under the Appearance tab.
   static String categoryOf(String itemId) => _categories[itemId] ?? 'appearance';
@@ -42,6 +50,7 @@ class ShopConfig {
 
       _skinIds.clear();
       _categories.clear();
+      _bonus.clear();
       for (final entry in (doc['skins'] as List? ?? const [])) {
         final m = (entry as Map).cast<String, dynamic>();
         final id = m['id'] as String?;
@@ -53,7 +62,11 @@ class ShopConfig {
       for (final entry in (doc['equipment'] as List? ?? const [])) {
         final m = (entry as Map).cast<String, dynamic>();
         final id = m['id'] as String?;
-        if (id != null && id.isNotEmpty) _categories[id] = 'equipment';
+        if (id != null && id.isNotEmpty) {
+          _categories[id] = 'equipment';
+          final stats = _statsFrom(m['stats']);
+          if (stats != null) _bonus[id] = stats;
+        }
       }
       for (final entry in (doc['appearance'] as List? ?? const [])) {
         final m = (entry as Map).cast<String, dynamic>();
@@ -106,6 +119,22 @@ class ShopConfig {
       );
     }
     return items;
+  }
+
+  /// Parses an optional `stats` map (keys: str/int/agi/def/vit/luk) into a
+  /// [CharacterStats]; returns null when the item has no stats block.
+  static CharacterStats? _statsFrom(dynamic raw) {
+    if (raw is! Map) return null;
+    final m = raw.cast<String, dynamic>();
+    int stat(String k) => m[k] as int? ?? 0;
+    return CharacterStats(
+      strength: stat('str'),
+      intelligence: stat('int'),
+      agility: stat('agi'),
+      defense: stat('def'),
+      vitality: stat('vit'),
+      luck: stat('luk'),
+    );
   }
 
   static EquipmentSlot _slotFor(String? slot) => switch (slot) {

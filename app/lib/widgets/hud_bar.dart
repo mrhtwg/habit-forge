@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/network/hive/game_constants.dart';
+import 'package:habit_forge_app/core/network/hive/game_logic.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
@@ -58,7 +59,7 @@ class HudBar extends StatelessWidget {
     // Match against the localized label both call sites pass (LanKey.hp),
     // not the literal 'HP', so the HP branch also works in Chinese.
     if (label == LanKey.hp.tr) {
-      final max = GameConstants.maxHpFor(char?.baseStats.vitality ?? 0);
+      final max = GameLogic.maxHpOf(char);
       return ((char?.currentHp ?? max) / max).clamp(0.0, 1.0).toDouble();
     }
     final level = char?.level ?? 1;

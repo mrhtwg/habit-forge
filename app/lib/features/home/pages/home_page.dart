@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:habit_forge_app/core/common/animation/frame_sequence_player.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/network/hive/game_constants.dart';
+import 'package:habit_forge_app/core/network/hive/game_logic.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
@@ -261,7 +262,7 @@ class HomePage extends GetView<HomeController> {
 
   String _hpText() {
     final char = UserService.to.character.value;
-    final max = GameConstants.maxHpFor(char?.baseStats.vitality ?? 0);
+    final max = GameLogic.maxHpOf(char);
     return '${char?.currentHp ?? max}/$max';
   }
 }
