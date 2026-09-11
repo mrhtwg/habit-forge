@@ -26,8 +26,9 @@ const (
 type TaskErrorReason int32
 
 const (
-	TaskErrorReason_TASK_ALREADY_EXISTS TaskErrorReason = 0
-	TaskErrorReason_TASK_NOT_FOUND      TaskErrorReason = 1
+	TaskErrorReason_TASK_ALREADY_EXISTS    TaskErrorReason = 0
+	TaskErrorReason_TASK_NOT_FOUND         TaskErrorReason = 1
+	TaskErrorReason_TASK_ALREADY_COMPLETED TaskErrorReason = 2
 )
 
 // Enum value maps for TaskErrorReason.
@@ -35,10 +36,12 @@ var (
 	TaskErrorReason_name = map[int32]string{
 		0: "TASK_ALREADY_EXISTS",
 		1: "TASK_NOT_FOUND",
+		2: "TASK_ALREADY_COMPLETED",
 	}
 	TaskErrorReason_value = map[string]int32{
-		"TASK_ALREADY_EXISTS": 0,
-		"TASK_NOT_FOUND":      1,
+		"TASK_ALREADY_EXISTS":    0,
+		"TASK_NOT_FOUND":         1,
+		"TASK_ALREADY_COMPLETED": 2,
 	}
 )
 
@@ -73,10 +76,11 @@ var File_api_task_v1_task_error_proto protoreflect.FileDescriptor
 
 const file_api_task_v1_task_error_proto_rawDesc = "" +
 	"\n" +
-	"\x1capi/task/v1/task_error.proto\x12\vapi.task.v1\x1a\x13errors/errors.proto*P\n" +
+	"\x1capi/task/v1/task_error.proto\x12\vapi.task.v1\x1a\x13errors/errors.proto*r\n" +
 	"\x0fTaskErrorReason\x12\x1d\n" +
 	"\x13TASK_ALREADY_EXISTS\x10\x00\x1a\x04\xa8E\x99\x03\x12\x18\n" +
-	"\x0eTASK_NOT_FOUND\x10\x01\x1a\x04\xa8E\x94\x03\x1a\x04\xa0E\xf4\x03B.Z,github.com/habitforge/backend/api/task/v1;v1b\x06proto3"
+	"\x0eTASK_NOT_FOUND\x10\x01\x1a\x04\xa8E\x94\x03\x12 \n" +
+	"\x16TASK_ALREADY_COMPLETED\x10\x02\x1a\x04\xa8E\x90\x03\x1a\x04\xa0E\xf4\x03B.Z,github.com/habitforge/backend/api/task/v1;v1b\x06proto3"
 
 var (
 	file_api_task_v1_task_error_proto_rawDescOnce sync.Once

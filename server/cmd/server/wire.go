@@ -10,6 +10,7 @@ import (
 
 	"github.com/habitforge/backend/internal/biz"
 	"github.com/habitforge/backend/internal/conf"
+	"github.com/habitforge/backend/internal/data"
 	"github.com/habitforge/backend/internal/server"
 	"github.com/habitforge/backend/internal/service"
 )
@@ -18,6 +19,7 @@ import (
 func wireApp(cfg *conf.Config, logger log.Logger) (*kratos.App, func(), error) {
 	panic(wire.Build(
 		conf.ProviderSet,
+		data.ProviderSet,
 		biz.ProviderSet,
 		service.ProviderSet,
 		server.ProviderSet,

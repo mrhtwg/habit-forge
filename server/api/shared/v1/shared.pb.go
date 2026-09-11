@@ -135,6 +135,58 @@ func (EquipmentSlot) EnumDescriptor() ([]byte, []int) {
 	return file_api_shared_v1_shared_proto_rawDescGZIP(), []int{1}
 }
 
+type EquipmentRarity int32
+
+const (
+	EquipmentRarity_EQUIPMENT_RARITY_COMMON    EquipmentRarity = 0
+	EquipmentRarity_EQUIPMENT_RARITY_RARE      EquipmentRarity = 1
+	EquipmentRarity_EQUIPMENT_RARITY_EPIC      EquipmentRarity = 2
+	EquipmentRarity_EQUIPMENT_RARITY_LEGENDARY EquipmentRarity = 3
+)
+
+// Enum value maps for EquipmentRarity.
+var (
+	EquipmentRarity_name = map[int32]string{
+		0: "EQUIPMENT_RARITY_COMMON",
+		1: "EQUIPMENT_RARITY_RARE",
+		2: "EQUIPMENT_RARITY_EPIC",
+		3: "EQUIPMENT_RARITY_LEGENDARY",
+	}
+	EquipmentRarity_value = map[string]int32{
+		"EQUIPMENT_RARITY_COMMON":    0,
+		"EQUIPMENT_RARITY_RARE":      1,
+		"EQUIPMENT_RARITY_EPIC":      2,
+		"EQUIPMENT_RARITY_LEGENDARY": 3,
+	}
+)
+
+func (x EquipmentRarity) Enum() *EquipmentRarity {
+	p := new(EquipmentRarity)
+	*p = x
+	return p
+}
+
+func (x EquipmentRarity) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (EquipmentRarity) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_shared_v1_shared_proto_enumTypes[2].Descriptor()
+}
+
+func (EquipmentRarity) Type() protoreflect.EnumType {
+	return &file_api_shared_v1_shared_proto_enumTypes[2]
+}
+
+func (x EquipmentRarity) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use EquipmentRarity.Descriptor instead.
+func (EquipmentRarity) EnumDescriptor() ([]byte, []int) {
+	return file_api_shared_v1_shared_proto_rawDescGZIP(), []int{2}
+}
+
 var File_api_shared_v1_shared_proto protoreflect.FileDescriptor
 
 const file_api_shared_v1_shared_proto_rawDesc = "" +
@@ -149,7 +201,12 @@ const file_api_shared_v1_shared_proto_rawDesc = "" +
 	"\x15EQUIPMENT_SLOT_WEAPON\x10\x01\x12\x19\n" +
 	"\x15EQUIPMENT_SLOT_HELMET\x10\x02\x12\x18\n" +
 	"\x14EQUIPMENT_SLOT_ARMOR\x10\x03\x12\x1c\n" +
-	"\x18EQUIPMENT_SLOT_ACCESSORY\x10\x04B0Z.github.com/habitforge/backend/api/shared/v1;v1b\x06proto3"
+	"\x18EQUIPMENT_SLOT_ACCESSORY\x10\x04*\x84\x01\n" +
+	"\x0fEquipmentRarity\x12\x1b\n" +
+	"\x17EQUIPMENT_RARITY_COMMON\x10\x00\x12\x19\n" +
+	"\x15EQUIPMENT_RARITY_RARE\x10\x01\x12\x19\n" +
+	"\x15EQUIPMENT_RARITY_EPIC\x10\x02\x12\x1e\n" +
+	"\x1aEQUIPMENT_RARITY_LEGENDARY\x10\x03B0Z.github.com/habitforge/backend/api/shared/v1;v1b\x06proto3"
 
 var (
 	file_api_shared_v1_shared_proto_rawDescOnce sync.Once
@@ -163,10 +220,11 @@ func file_api_shared_v1_shared_proto_rawDescGZIP() []byte {
 	return file_api_shared_v1_shared_proto_rawDescData
 }
 
-var file_api_shared_v1_shared_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_api_shared_v1_shared_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
 var file_api_shared_v1_shared_proto_goTypes = []any{
-	(SysMaterial)(0),   // 0: api.shared.v1.SysMaterial
-	(EquipmentSlot)(0), // 1: api.shared.v1.EquipmentSlot
+	(SysMaterial)(0),     // 0: api.shared.v1.SysMaterial
+	(EquipmentSlot)(0),   // 1: api.shared.v1.EquipmentSlot
+	(EquipmentRarity)(0), // 2: api.shared.v1.EquipmentRarity
 }
 var file_api_shared_v1_shared_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
@@ -186,7 +244,7 @@ func file_api_shared_v1_shared_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_shared_v1_shared_proto_rawDesc), len(file_api_shared_v1_shared_proto_rawDesc)),
-			NumEnums:      2,
+			NumEnums:      3,
 			NumMessages:   0,
 			NumExtensions: 0,
 			NumServices:   0,

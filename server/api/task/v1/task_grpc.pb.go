@@ -46,7 +46,7 @@ type TaskServiceClient interface {
 	DeleteTask(ctx context.Context, in *DeleteTaskRequest, opts ...grpc.CallOption) (*DeleteTaskReply, error)
 	// CompleteTask marks a task completed and grants EXP/gold rewards.
 	CompleteTask(ctx context.Context, in *CompleteTaskRequest, opts ...grpc.CallOption) (*CompleteTaskReply, error)
-	// SkipTask marks a task completed and grants EXP/gold rewards.
+	// SkipTask skips a task (todos are postponed to tomorrow).
 	SkipTask(ctx context.Context, in *SkipTaskRequest, opts ...grpc.CallOption) (*SkipTaskReply, error)
 }
 
@@ -146,7 +146,7 @@ type TaskServiceServer interface {
 	DeleteTask(context.Context, *DeleteTaskRequest) (*DeleteTaskReply, error)
 	// CompleteTask marks a task completed and grants EXP/gold rewards.
 	CompleteTask(context.Context, *CompleteTaskRequest) (*CompleteTaskReply, error)
-	// SkipTask marks a task completed and grants EXP/gold rewards.
+	// SkipTask skips a task (todos are postponed to tomorrow).
 	SkipTask(context.Context, *SkipTaskRequest) (*SkipTaskReply, error)
 	mustEmbedUnimplementedTaskServiceServer()
 }

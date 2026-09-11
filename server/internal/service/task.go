@@ -19,37 +19,108 @@ func NewTaskService(uc *biz.TaskUseCase) *TaskService {
 }
 
 // ListTasks lists tasks with optional filters.
-// TODO(implementation): delegate to s.uc.List.
 func (s *TaskService) ListTasks(ctx context.Context, req *taskv1.ListTasksRequest) (*taskv1.ListTasksReply, error) {
-	return nil, errNotImplemented()
+	uid, err := requireUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	list, err := s.uc.List(ctx, uid, biz.TaskListFilter{
+		Type:             taskTypeName(req.GetType()),
+		Difficulty:       difficultyName(req.GetDifficulty()),
+		Tags:             req.GetTags(),
+		OnlyDueToday:     req.GetOnlyDueToday(),
+		IncludeCompleted: req.GetIncludeCompleted(),
+	})
+	if err != nil {
+		return nil, err
+	}
+	out := make([]*taskv1.Task, 0, len(list))
+	for _, t := range list {
+		out = append(out, toProtoTask(t))
+	}
+	return &taskv1.ListTasksReply{Tasks: out}, nil
 }
 
 // GetTask returns one task.
-// TODO(implementation): delegate to s.uc.Get.
 func (s *TaskService) GetTask(ctx context.Context, req *taskv1.GetTaskRequest) (*taskv1.GetTaskReply, error) {
-	return nil, errNotImplemented()
+	uid, err := requireUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	t, err := s.uc.Get(ctx, uid, req.GetId())
+	if err != nil {
+		return nil, err
+	}
+	return &taskv1.GetTaskReply{Task: toProtoTask(t)}, nil
 }
 
 // CreateTask creates a new task.
-// TODO(implementation): delegate to s.uc.Create.
 func (s *TaskService) CreateTask(ctx context.Context, req *taskv1.CreateTaskRequest) (*taskv1.CreateTaskReply, error) {
-	return nil, errNotImplemented()
+	uid, err := requireUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	t, err := s.uc.Create(ctx, uid, fromProtoTask(req.GetTask()))
+	if err != nil {
+		return nil, err
+	}
+	return &taskv1.CreateTaskReply{Task: toProtoTask(t)}, nil
 }
 
 // UpdateTask updates an existing task.
-// TODO(implementation): delegate to s.uc.Update.
 func (s *TaskService) UpdateTask(ctx context.Context, req *taskv1.UpdateTaskRequest) (*taskv1.UpdateTaskReply, error) {
-	return nil, errNotImplemented()
+	uid, err := requireUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	t := fromProtoTask(req.GetTask())
+	if t != nil {
+		t.ID = req.GetId()
+	}
+	updated, err := s.uc.Update(ctx, uid, t)
+	if err != nil {
+		return nil, err
+	}
+	return &taskv1.UpdateTaskReply{Task: toProtoTask(updated)}, nil
 }
 
 // DeleteTask removes a task.
-// TODO(implementation): delegate to s.uc.Delete.
 func (s *TaskService) DeleteTask(ctx context.Context, req *taskv1.DeleteTaskRequest) (*taskv1.DeleteTaskReply, error) {
-	return nil, errNotImplemented()
+	uid, err := requireUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if err := s.uc.Delete(ctx, uid, req.GetId()); err != nil {
+		return nil, err
+	}
+	return &taskv1.DeleteTaskReply{}, nil
 }
 
 // CompleteTask marks a task completed and grants rewards.
-// TODO(implementation): delegate to s.uc.Complete.
 func (s *TaskService) CompleteTask(ctx context.Context, req *taskv1.CompleteTaskRequest) (*taskv1.CompleteTaskReply, error) {
-	return nil, errNotImplemented()
+	uid, err := requireUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	res, err := s.uc.Complete(ctx, uid, req.GetId())
+	if err != nil {
+		return nil, err
+	}
+	return &taskv1.CompleteTaskReply{
+		Task: toProtoTask(res.Task), Prefs: toProtoPrefs(res.Prefs), Character: toProtoCharacter(res.Character),
+		ExpReward: res.Exp, GoldReward: res.Gold,
+	}, nil
+}
+
+// SkipTask skips / postpones a task.
+func (s *TaskService) SkipTask(ctx context.Context, req *taskv1.SkipTaskRequest) (*taskv1.SkipTaskReply, error) {
+	uid, err := requireUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	t, err := s.uc.Skip(ctx, uid, req.GetId())
+	if err != nil {
+		return nil, err
+	}
+	return &taskv1.SkipTaskReply{Task: toProtoTask(t)}, nil
 }

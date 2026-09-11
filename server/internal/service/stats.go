@@ -19,7 +19,14 @@ func NewStatsService(uc *biz.StatsUseCase) *StatsService {
 }
 
 // GetStats returns task statistics over a time range.
-// TODO(implementation): delegate to s.uc.Get.
 func (s *StatsService) GetStats(ctx context.Context, req *statsv1.GetStatsRequest) (*statsv1.GetStatsReply, error) {
-	return nil, errNotImplemented()
+	uid, err := requireUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	st, err := s.uc.Get(ctx, uid, biz.StatsRange(req.GetRange()))
+	if err != nil {
+		return nil, err
+	}
+	return &statsv1.GetStatsReply{Stats: toProtoStats(st)}, nil
 }

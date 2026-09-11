@@ -22,8 +22,6 @@ import (
 )
 
 // NewHTTPServer builds the kratos HTTP server with all services registered.
-// The JWT middleware protects every route except the public prefixes
-// (/health and the auth entry points).
 func NewHTTPServer(cfg *conf.Server, jwtCfg *conf.JWT, logger log.Logger,
 	auth *service.AuthService,
 	user *service.UserService,
@@ -33,27 +31,21 @@ func NewHTTPServer(cfg *conf.Server, jwtCfg *conf.JWT, logger log.Logger,
 	achievement *service.AchievementService,
 	stats *service.StatsService,
 ) *khttp.Server {
+	_ = logger
 	var opts = []khttp.ServerOption{
 		khttp.Middleware(
 			recovery.Recovery(),
-			middleware.JWT(jwtCfg,
-				"/health",
-				"/api/v1/auth/register",
-				"/api/v1/auth/login",
-				"/api/v1/auth/oauth",
-			),
+			middleware.JWT(jwtCfg),
 		),
 		khttp.Address(cfg.HTTPAddr),
 	}
 	srv := khttp.NewServer(opts...)
 
-	// Health check (public).
 	srv.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		_, _ = w.Write([]byte(`{"status":"ok"}`))
 	})
 
-	// Register all service routes.
 	authv1.RegisterAuthServiceHTTPServer(srv, auth)
 	userv1.RegisterUserServiceHTTPServer(srv, user)
 	characterv1.RegisterCharacterServiceHTTPServer(srv, character)
@@ -65,10 +57,8 @@ func NewHTTPServer(cfg *conf.Server, jwtCfg *conf.JWT, logger log.Logger,
 	return srv
 }
 
-// NewGRPCServer builds the kratos gRPC server with all services registered.
-// NOTE: the JWT middleware is applied to the HTTP transport only for now;
-// gRPC auth will be added together with the implementations.
-func NewGRPCServer(cfg *conf.Server, logger log.Logger,
+// NewGRPCServer builds the kratos gRPC server with JWT middleware.
+func NewGRPCServer(cfg *conf.Server, jwtCfg *conf.JWT, logger log.Logger,
 	auth *service.AuthService,
 	user *service.UserService,
 	character *service.CharacterService,
@@ -77,8 +67,16 @@ func NewGRPCServer(cfg *conf.Server, logger log.Logger,
 	achievement *service.AchievementService,
 	stats *service.StatsService,
 ) *grpc.Server {
+	_ = logger
 	var opts = []grpc.ServerOption{
-		grpc.Middleware(recovery.Recovery()),
+		grpc.Middleware(
+			recovery.Recovery(),
+			middleware.JWT(jwtCfg,
+				"/api.auth.v1.AuthService/Register",
+				"/api.auth.v1.AuthService/Login",
+				"/api.auth.v1.AuthService/OAuthLogin",
+			),
+		),
 		grpc.Address(cfg.GRPCAddr),
 	}
 	srv := grpc.NewServer(opts...)

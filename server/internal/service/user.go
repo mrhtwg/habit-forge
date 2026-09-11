@@ -19,13 +19,27 @@ func NewUserService(uc *biz.UserUseCase) *UserService {
 }
 
 // GetPrefs returns the current user's preferences and wallet.
-// TODO(implementation): delegate to s.uc.GetPrefs.
 func (s *UserService) GetPrefs(ctx context.Context, req *userv1.GetPrefsRequest) (*userv1.GetPrefsReply, error) {
-	return nil, errNotImplemented()
+	uid, err := requireUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	prefs, err := s.uc.GetPrefs(ctx, uid)
+	if err != nil {
+		return nil, err
+	}
+	return &userv1.GetPrefsReply{Prefs: toProtoPrefs(prefs)}, nil
 }
 
 // UpdatePrefs saves the current user's preferences and wallet.
-// TODO(implementation): delegate to s.uc.UpdatePrefs.
 func (s *UserService) UpdatePrefs(ctx context.Context, req *userv1.UpdatePrefsRequest) (*userv1.UpdatePrefsReply, error) {
-	return nil, errNotImplemented()
+	uid, err := requireUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	prefs, err := s.uc.UpdatePrefs(ctx, uid, fromProtoPrefs(req.GetPrefs()))
+	if err != nil {
+		return nil, err
+	}
+	return &userv1.UpdatePrefsReply{Prefs: toProtoPrefs(prefs)}, nil
 }

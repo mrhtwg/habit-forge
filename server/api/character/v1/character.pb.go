@@ -7,6 +7,7 @@
 package v1
 
 import (
+	v1 "github.com/habitforge/backend/api/shared/v1"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -250,18 +251,20 @@ type Character struct {
 	Level int32 `protobuf:"varint,3,opt,name=level,proto3" json:"level,omitempty"`
 	// EXP accumulated toward the next level.
 	CurrentExp int64 `protobuf:"varint,4,opt,name=current_exp,json=currentExp,proto3" json:"current_exp,omitempty"`
+	// max EXP for this level.
+	MaxExp int64 `protobuf:"varint,5,opt,name=max_exp,json=maxExp,proto3" json:"max_exp,omitempty"`
 	// Current HP (max 100); reaches 0 when dead.
-	CurrentHp int32 `protobuf:"varint,5,opt,name=current_hp,json=currentHp,proto3" json:"current_hp,omitempty"`
+	CurrentHp int32 `protobuf:"varint,6,opt,name=current_hp,json=currentHp,proto3" json:"current_hp,omitempty"`
 	// Base attribute values.
-	BaseStats *CharacterStats `protobuf:"bytes,6,opt,name=base_stats,json=baseStats,proto3" json:"base_stats,omitempty"`
+	BaseStats *CharacterStats `protobuf:"bytes,7,opt,name=base_stats,json=baseStats,proto3" json:"base_stats,omitempty"`
 	// Unspent stat points available for allocation (1 per level).
-	AvailableStatPoints int32 `protobuf:"varint,7,opt,name=available_stat_points,json=availableStatPoints,proto3" json:"available_stat_points,omitempty"`
+	AvailableStatPoints int32 `protobuf:"varint,8,opt,name=available_stat_points,json=availableStatPoints,proto3" json:"available_stat_points,omitempty"`
 	// Equipped items: equipment slot -> shop item id (weapon/helmet/armor/accessory).
-	Equipment map[string]string `protobuf:"bytes,8,rep,name=equipment,proto3" json:"equipment,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	Equipment map[string]string `protobuf:"bytes,9,rep,name=equipment,proto3" json:"equipment,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	// Whether the character is dead (unusable until revived).
-	IsDead bool `protobuf:"varint,9,opt,name=is_dead,json=isDead,proto3" json:"is_dead,omitempty"`
+	IsDead bool `protobuf:"varint,10,opt,name=is_dead,json=isDead,proto3" json:"is_dead,omitempty"`
 	// Time when the death recovery finishes, unix millis.
-	DeathRecoveryUntil int64 `protobuf:"varint,10,opt,name=death_recovery_until,json=deathRecoveryUntil,proto3" json:"death_recovery_until,omitempty"`
+	DeathRecoveryUntil int64 `protobuf:"varint,11,opt,name=death_recovery_until,json=deathRecoveryUntil,proto3" json:"death_recovery_until,omitempty"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
@@ -320,6 +323,13 @@ func (x *Character) GetLevel() int32 {
 func (x *Character) GetCurrentExp() int64 {
 	if x != nil {
 		return x.CurrentExp
+	}
+	return 0
+}
+
+func (x *Character) GetMaxExp() int64 {
+	if x != nil {
+		return x.MaxExp
 	}
 	return 0
 }
@@ -805,33 +815,124 @@ func (x *ReviveReply) GetCharacter() *Character {
 	return nil
 }
 
+// EquipItemRequest — no parameters; equips the current user's character.
+type EquipItemRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ItemId        string                 `protobuf:"bytes,1,opt,name=itemId,proto3" json:"itemId,omitempty"`
+	Slot          v1.EquipmentSlot       `protobuf:"varint,2,opt,name=slot,proto3,enum=api.shared.v1.EquipmentSlot" json:"slot,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EquipItemRequest) Reset() {
+	*x = EquipItemRequest{}
+	mi := &file_api_character_v1_character_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EquipItemRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EquipItemRequest) ProtoMessage() {}
+
+func (x *EquipItemRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_character_v1_character_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EquipItemRequest.ProtoReflect.Descriptor instead.
+func (*EquipItemRequest) Descriptor() ([]byte, []int) {
+	return file_api_character_v1_character_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *EquipItemRequest) GetItemId() string {
+	if x != nil {
+		return x.ItemId
+	}
+	return ""
+}
+
+func (x *EquipItemRequest) GetSlot() v1.EquipmentSlot {
+	if x != nil {
+		return x.Slot
+	}
+	return v1.EquipmentSlot(0)
+}
+
+// EquipItemReply — the equipped character state.
+type EquipItemReply struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EquipItemReply) Reset() {
+	*x = EquipItemReply{}
+	mi := &file_api_character_v1_character_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EquipItemReply) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EquipItemReply) ProtoMessage() {}
+
+func (x *EquipItemReply) ProtoReflect() protoreflect.Message {
+	mi := &file_api_character_v1_character_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EquipItemReply.ProtoReflect.Descriptor instead.
+func (*EquipItemReply) Descriptor() ([]byte, []int) {
+	return file_api_character_v1_character_proto_rawDescGZIP(), []int{13}
+}
+
 var File_api_character_v1_character_proto protoreflect.FileDescriptor
 
 const file_api_character_v1_character_proto_rawDesc = "" +
 	"\n" +
-	" api/character/v1/character.proto\x12\x10api.character.v1\x1a\x1cgoogle/api/annotations.proto\"\xb4\x01\n" +
+	" api/character/v1/character.proto\x12\x10api.character.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1aapi/shared/v1/shared.proto\"\xb4\x01\n" +
 	"\x0eCharacterStats\x12\x1a\n" +
 	"\bstrength\x18\x01 \x01(\x05R\bstrength\x12\"\n" +
 	"\fintelligence\x18\x02 \x01(\x05R\fintelligence\x12\x18\n" +
 	"\aagility\x18\x03 \x01(\x05R\aagility\x12\x18\n" +
 	"\adefense\x18\x04 \x01(\x05R\adefense\x12\x1a\n" +
 	"\bvitality\x18\x05 \x01(\x05R\bvitality\x12\x12\n" +
-	"\x04luck\x18\x06 \x01(\x05R\x04luck\"\x84\x04\n" +
+	"\x04luck\x18\x06 \x01(\x05R\x04luck\"\x9d\x04\n" +
 	"\tCharacter\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12I\n" +
 	"\x0fcharacter_Class\x18\x02 \x01(\x0e2 .api.character.v1.CharacterClassR\x0echaracterClass\x12\x14\n" +
 	"\x05level\x18\x03 \x01(\x05R\x05level\x12\x1f\n" +
 	"\vcurrent_exp\x18\x04 \x01(\x03R\n" +
-	"currentExp\x12\x1d\n" +
+	"currentExp\x12\x17\n" +
+	"\amax_exp\x18\x05 \x01(\x03R\x06maxExp\x12\x1d\n" +
 	"\n" +
-	"current_hp\x18\x05 \x01(\x05R\tcurrentHp\x12?\n" +
+	"current_hp\x18\x06 \x01(\x05R\tcurrentHp\x12?\n" +
 	"\n" +
-	"base_stats\x18\x06 \x01(\v2 .api.character.v1.CharacterStatsR\tbaseStats\x122\n" +
-	"\x15available_stat_points\x18\a \x01(\x05R\x13availableStatPoints\x12H\n" +
-	"\tequipment\x18\b \x03(\v2*.api.character.v1.Character.EquipmentEntryR\tequipment\x12\x17\n" +
-	"\ais_dead\x18\t \x01(\bR\x06isDead\x120\n" +
-	"\x14death_recovery_until\x18\n" +
-	" \x01(\x03R\x12deathRecoveryUntil\x1a<\n" +
+	"base_stats\x18\a \x01(\v2 .api.character.v1.CharacterStatsR\tbaseStats\x122\n" +
+	"\x15available_stat_points\x18\b \x01(\x05R\x13availableStatPoints\x12H\n" +
+	"\tequipment\x18\t \x03(\v2*.api.character.v1.Character.EquipmentEntryR\tequipment\x12\x17\n" +
+	"\ais_dead\x18\n" +
+	" \x01(\bR\x06isDead\x120\n" +
+	"\x14death_recovery_until\x18\v \x01(\x03R\x12deathRecoveryUntil\x1a<\n" +
 	"\x0eEquipmentEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"b\n" +
@@ -852,7 +953,11 @@ const file_api_character_v1_character_proto_rawDesc = "" +
 	"\tcharacter\x18\x01 \x01(\v2\x1b.api.character.v1.CharacterR\tcharacter\"\x0f\n" +
 	"\rReviveRequest\"H\n" +
 	"\vReviveReply\x129\n" +
-	"\tcharacter\x18\x01 \x01(\v2\x1b.api.character.v1.CharacterR\tcharacter*\x84\x01\n" +
+	"\tcharacter\x18\x01 \x01(\v2\x1b.api.character.v1.CharacterR\tcharacter\"\\\n" +
+	"\x10EquipItemRequest\x12\x16\n" +
+	"\x06itemId\x18\x01 \x01(\tR\x06itemId\x120\n" +
+	"\x04slot\x18\x02 \x01(\x0e2\x1c.api.shared.v1.EquipmentSlotR\x04slot\"\x10\n" +
+	"\x0eEquipItemReply*\x84\x01\n" +
 	"\x0eCharacterClass\x12\x1f\n" +
 	"\x1bCHARACTER_CLASS_UNSPECIFIED\x10\x00\x12\x1b\n" +
 	"\x17CHARACTER_CLASS_WARRIOR\x10\x01\x12\x18\n" +
@@ -865,13 +970,14 @@ const file_api_character_v1_character_proto_rawDesc = "" +
 	"\x11STAT_TYPE_AGILITY\x10\x03\x12\x15\n" +
 	"\x11STAT_TYPE_DEFENSE\x10\x04\x12\x16\n" +
 	"\x12STAT_TYPE_VITALITY\x10\x05\x12\x12\n" +
-	"\x0eSTAT_TYPE_LUCK\x10\x062\x99\x05\n" +
+	"\x0eSTAT_TYPE_LUCK\x10\x062\x90\x06\n" +
 	"\x10CharacterService\x12\x81\x01\n" +
 	"\x0fCreateCharacter\x12(.api.character.v1.CreateCharacterRequest\x1a&.api.character.v1.CreateCharacterReply\"\x1c\x82\xd3\xe4\x93\x02\x16:\x01*\"\x11/api/v1/character\x12u\n" +
 	"\fGetCharacter\x12%.api.character.v1.GetCharacterRequest\x1a#.api.character.v1.GetCharacterReply\"\x19\x82\xd3\xe4\x93\x02\x13\x12\x11/api/v1/character\x12\x81\x01\n" +
 	"\x0fUpdateCharacter\x12(.api.character.v1.UpdateCharacterRequest\x1a&.api.character.v1.UpdateCharacterReply\"\x1c\x82\xd3\xe4\x93\x02\x16:\x01*\x1a\x11/api/v1/character\x12\x96\x01\n" +
 	"\x11AllocateStatPoint\x12*.api.character.v1.AllocateStatPointRequest\x1a(.api.character.v1.AllocateStatPointReply\"+\x82\xd3\xe4\x93\x02%:\x01*\" /api/v1/character/stats/allocate\x12m\n" +
-	"\x06Revive\x12\x1f.api.character.v1.ReviveRequest\x1a\x1d.api.character.v1.ReviveReply\"#\x82\xd3\xe4\x93\x02\x1d:\x01*\"\x18/api/v1/character/reviveB3Z1github.com/habitforge/backend/api/character/v1;v1b\x06proto3"
+	"\x06Revive\x12\x1f.api.character.v1.ReviveRequest\x1a\x1d.api.character.v1.ReviveReply\"#\x82\xd3\xe4\x93\x02\x1d:\x01*\"\x18/api/v1/character/revive\x12u\n" +
+	"\tEquipItem\x12\".api.character.v1.EquipItemRequest\x1a .api.character.v1.EquipItemReply\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/api/v1/character/equipB3Z1github.com/habitforge/backend/api/character/v1;v1b\x06proto3"
 
 var (
 	file_api_character_v1_character_proto_rawDescOnce sync.Once
@@ -886,7 +992,7 @@ func file_api_character_v1_character_proto_rawDescGZIP() []byte {
 }
 
 var file_api_character_v1_character_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_api_character_v1_character_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
+var file_api_character_v1_character_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
 var file_api_character_v1_character_proto_goTypes = []any{
 	(CharacterClass)(0),              // 0: api.character.v1.CharacterClass
 	(StatType)(0),                    // 1: api.character.v1.StatType
@@ -902,12 +1008,15 @@ var file_api_character_v1_character_proto_goTypes = []any{
 	(*AllocateStatPointReply)(nil),   // 11: api.character.v1.AllocateStatPointReply
 	(*ReviveRequest)(nil),            // 12: api.character.v1.ReviveRequest
 	(*ReviveReply)(nil),              // 13: api.character.v1.ReviveReply
-	nil,                              // 14: api.character.v1.Character.EquipmentEntry
+	(*EquipItemRequest)(nil),         // 14: api.character.v1.EquipItemRequest
+	(*EquipItemReply)(nil),           // 15: api.character.v1.EquipItemReply
+	nil,                              // 16: api.character.v1.Character.EquipmentEntry
+	(v1.EquipmentSlot)(0),            // 17: api.shared.v1.EquipmentSlot
 }
 var file_api_character_v1_character_proto_depIdxs = []int32{
 	0,  // 0: api.character.v1.Character.character_Class:type_name -> api.character.v1.CharacterClass
 	2,  // 1: api.character.v1.Character.base_stats:type_name -> api.character.v1.CharacterStats
-	14, // 2: api.character.v1.Character.equipment:type_name -> api.character.v1.Character.EquipmentEntry
+	16, // 2: api.character.v1.Character.equipment:type_name -> api.character.v1.Character.EquipmentEntry
 	0,  // 3: api.character.v1.CreateCharacterRequest.characterClass:type_name -> api.character.v1.CharacterClass
 	3,  // 4: api.character.v1.CreateCharacterReply.character:type_name -> api.character.v1.Character
 	3,  // 5: api.character.v1.GetCharacterReply.character:type_name -> api.character.v1.Character
@@ -916,21 +1025,24 @@ var file_api_character_v1_character_proto_depIdxs = []int32{
 	1,  // 8: api.character.v1.AllocateStatPointRequest.stat:type_name -> api.character.v1.StatType
 	3,  // 9: api.character.v1.AllocateStatPointReply.character:type_name -> api.character.v1.Character
 	3,  // 10: api.character.v1.ReviveReply.character:type_name -> api.character.v1.Character
-	4,  // 11: api.character.v1.CharacterService.CreateCharacter:input_type -> api.character.v1.CreateCharacterRequest
-	6,  // 12: api.character.v1.CharacterService.GetCharacter:input_type -> api.character.v1.GetCharacterRequest
-	8,  // 13: api.character.v1.CharacterService.UpdateCharacter:input_type -> api.character.v1.UpdateCharacterRequest
-	10, // 14: api.character.v1.CharacterService.AllocateStatPoint:input_type -> api.character.v1.AllocateStatPointRequest
-	12, // 15: api.character.v1.CharacterService.Revive:input_type -> api.character.v1.ReviveRequest
-	5,  // 16: api.character.v1.CharacterService.CreateCharacter:output_type -> api.character.v1.CreateCharacterReply
-	7,  // 17: api.character.v1.CharacterService.GetCharacter:output_type -> api.character.v1.GetCharacterReply
-	9,  // 18: api.character.v1.CharacterService.UpdateCharacter:output_type -> api.character.v1.UpdateCharacterReply
-	11, // 19: api.character.v1.CharacterService.AllocateStatPoint:output_type -> api.character.v1.AllocateStatPointReply
-	13, // 20: api.character.v1.CharacterService.Revive:output_type -> api.character.v1.ReviveReply
-	16, // [16:21] is the sub-list for method output_type
-	11, // [11:16] is the sub-list for method input_type
-	11, // [11:11] is the sub-list for extension type_name
-	11, // [11:11] is the sub-list for extension extendee
-	0,  // [0:11] is the sub-list for field type_name
+	17, // 11: api.character.v1.EquipItemRequest.slot:type_name -> api.shared.v1.EquipmentSlot
+	4,  // 12: api.character.v1.CharacterService.CreateCharacter:input_type -> api.character.v1.CreateCharacterRequest
+	6,  // 13: api.character.v1.CharacterService.GetCharacter:input_type -> api.character.v1.GetCharacterRequest
+	8,  // 14: api.character.v1.CharacterService.UpdateCharacter:input_type -> api.character.v1.UpdateCharacterRequest
+	10, // 15: api.character.v1.CharacterService.AllocateStatPoint:input_type -> api.character.v1.AllocateStatPointRequest
+	12, // 16: api.character.v1.CharacterService.Revive:input_type -> api.character.v1.ReviveRequest
+	14, // 17: api.character.v1.CharacterService.EquipItem:input_type -> api.character.v1.EquipItemRequest
+	5,  // 18: api.character.v1.CharacterService.CreateCharacter:output_type -> api.character.v1.CreateCharacterReply
+	7,  // 19: api.character.v1.CharacterService.GetCharacter:output_type -> api.character.v1.GetCharacterReply
+	9,  // 20: api.character.v1.CharacterService.UpdateCharacter:output_type -> api.character.v1.UpdateCharacterReply
+	11, // 21: api.character.v1.CharacterService.AllocateStatPoint:output_type -> api.character.v1.AllocateStatPointReply
+	13, // 22: api.character.v1.CharacterService.Revive:output_type -> api.character.v1.ReviveReply
+	15, // 23: api.character.v1.CharacterService.EquipItem:output_type -> api.character.v1.EquipItemReply
+	18, // [18:24] is the sub-list for method output_type
+	12, // [12:18] is the sub-list for method input_type
+	12, // [12:12] is the sub-list for extension type_name
+	12, // [12:12] is the sub-list for extension extendee
+	0,  // [0:12] is the sub-list for field type_name
 }
 
 func init() { file_api_character_v1_character_proto_init() }
@@ -944,7 +1056,7 @@ func file_api_character_v1_character_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_character_v1_character_proto_rawDesc), len(file_api_character_v1_character_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   13,
+			NumMessages:   15,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

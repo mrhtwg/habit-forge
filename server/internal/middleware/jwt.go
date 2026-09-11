@@ -20,14 +20,26 @@ const userIDKey ctxKey = "user_id"
 // ErrUnauthorized is returned when the Bearer token is missing or invalid.
 var ErrUnauthorized = kerrors.New(401, "UNAUTHORIZED", "unauthorized")
 
+// Public auth operations (HTTP paths and gRPC full method names).
+var defaultPublic = []string{
+	"/health",
+	"/api/v1/auth/register",
+	"/api/v1/auth/login",
+	"/api/v1/auth/oauth",
+	"/api.auth.v1.AuthService/Register",
+	"/api.auth.v1.AuthService/Login",
+	"/api.auth.v1.AuthService/OAuthLogin",
+}
+
 // JWT validates the Authorization Bearer token on protected routes.
-// Requests to publicPrefixes (e.g. /health, /api/v1/auth/register|login|oauth)
+// Requests matching publicPrefixes (HTTP paths or gRPC operation names)
 // are passed through without a token.
 func JWT(cfg *conf.JWT, publicPrefixes ...string) middleware.Middleware {
+	if len(publicPrefixes) == 0 {
+		publicPrefixes = defaultPublic
+	}
 	return func(handler middleware.Handler) middleware.Handler {
 		return func(ctx context.Context, req interface{}) (interface{}, error) {
-			// Match the real HTTP path when available (the kratos operation
-			// name is gRPC-style, e.g. /api.auth.v1.AuthService/Register).
 			path := operationPath(ctx)
 			for _, p := range publicPrefixes {
 				if path == p || strings.HasPrefix(path, p) {

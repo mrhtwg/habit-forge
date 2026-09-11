@@ -24,6 +24,7 @@ const (
 	CharacterService_UpdateCharacter_FullMethodName   = "/api.character.v1.CharacterService/UpdateCharacter"
 	CharacterService_AllocateStatPoint_FullMethodName = "/api.character.v1.CharacterService/AllocateStatPoint"
 	CharacterService_Revive_FullMethodName            = "/api.character.v1.CharacterService/Revive"
+	CharacterService_EquipItem_FullMethodName         = "/api.character.v1.CharacterService/EquipItem"
 )
 
 // CharacterServiceClient is the client API for CharacterService service.
@@ -42,6 +43,7 @@ type CharacterServiceClient interface {
 	AllocateStatPoint(ctx context.Context, in *AllocateStatPointRequest, opts ...grpc.CallOption) (*AllocateStatPointReply, error)
 	// Revive revives a dead character (e.g. after the recovery timer).
 	Revive(ctx context.Context, in *ReviveRequest, opts ...grpc.CallOption) (*ReviveReply, error)
+	EquipItem(ctx context.Context, in *EquipItemRequest, opts ...grpc.CallOption) (*EquipItemReply, error)
 }
 
 type characterServiceClient struct {
@@ -102,6 +104,16 @@ func (c *characterServiceClient) Revive(ctx context.Context, in *ReviveRequest, 
 	return out, nil
 }
 
+func (c *characterServiceClient) EquipItem(ctx context.Context, in *EquipItemRequest, opts ...grpc.CallOption) (*EquipItemReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(EquipItemReply)
+	err := c.cc.Invoke(ctx, CharacterService_EquipItem_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CharacterServiceServer is the server API for CharacterService service.
 // All implementations must embed UnimplementedCharacterServiceServer
 // for forward compatibility.
@@ -118,6 +130,7 @@ type CharacterServiceServer interface {
 	AllocateStatPoint(context.Context, *AllocateStatPointRequest) (*AllocateStatPointReply, error)
 	// Revive revives a dead character (e.g. after the recovery timer).
 	Revive(context.Context, *ReviveRequest) (*ReviveReply, error)
+	EquipItem(context.Context, *EquipItemRequest) (*EquipItemReply, error)
 	mustEmbedUnimplementedCharacterServiceServer()
 }
 
@@ -142,6 +155,9 @@ func (UnimplementedCharacterServiceServer) AllocateStatPoint(context.Context, *A
 }
 func (UnimplementedCharacterServiceServer) Revive(context.Context, *ReviveRequest) (*ReviveReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method Revive not implemented")
+}
+func (UnimplementedCharacterServiceServer) EquipItem(context.Context, *EquipItemRequest) (*EquipItemReply, error) {
+	return nil, status.Error(codes.Unimplemented, "method EquipItem not implemented")
 }
 func (UnimplementedCharacterServiceServer) mustEmbedUnimplementedCharacterServiceServer() {}
 func (UnimplementedCharacterServiceServer) testEmbeddedByValue()                          {}
@@ -254,6 +270,24 @@ func _CharacterService_Revive_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CharacterService_EquipItem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EquipItemRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CharacterServiceServer).EquipItem(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CharacterService_EquipItem_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CharacterServiceServer).EquipItem(ctx, req.(*EquipItemRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CharacterService_ServiceDesc is the grpc.ServiceDesc for CharacterService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -280,6 +314,10 @@ var CharacterService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Revive",
 			Handler:    _CharacterService_Revive_Handler,
+		},
+		{
+			MethodName: "EquipItem",
+			Handler:    _CharacterService_EquipItem_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

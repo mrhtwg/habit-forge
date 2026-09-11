@@ -8,6 +8,7 @@ package v1
 
 import (
 	v1 "github.com/habitforge/backend/api/character/v1"
+	v11 "github.com/habitforge/backend/api/shop/v1"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -23,7 +24,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// UserPrefs — per-user preferences, wallet balances and onboarding state.
+// UserPrefs
 type UserPrefs struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Chosen character class.
@@ -36,8 +37,16 @@ type UserPrefs struct {
 	NotificationsEnabled bool `protobuf:"varint,4,opt,name=notifications_enabled,json=notificationsEnabled,proto3" json:"notifications_enabled,omitempty"`
 	// Lifetime count of completed tasks.
 	TotalTasksCompleted int64 `protobuf:"varint,5,opt,name=total_tasks_completed,json=totalTasksCompleted,proto3" json:"total_tasks_completed,omitempty"`
+	// Total number of tasks.
+	TotalTasks int64 `protobuf:"varint,6,opt,name=total_tasks,json=totalTasks,proto3" json:"total_tasks,omitempty"`
+	// Today's count of completed tasks.
+	TodayTasksCompleted int64 `protobuf:"varint,7,opt,name=today_tasks_completed,json=todayTasksCompleted,proto3" json:"today_tasks_completed,omitempty"`
+	// Today's number of tasks.
+	TodayTasks int64 `protobuf:"varint,8,opt,name=today_tasks,json=todayTasks,proto3" json:"today_tasks,omitempty"`
 	// Date of the first completed task, unix millis.
-	FirstTaskDate int64 `protobuf:"varint,6,opt,name=first_task_date,json=firstTaskDate,proto3" json:"first_task_date,omitempty"`
+	FirstTaskDate int64 `protobuf:"varint,9,opt,name=first_task_date,json=firstTaskDate,proto3" json:"first_task_date,omitempty"`
+	// List of item IDs owned by the user.
+	Items         []*v11.ShopItem `protobuf:"bytes,10,rep,name=items,proto3" json:"items,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -107,11 +116,39 @@ func (x *UserPrefs) GetTotalTasksCompleted() int64 {
 	return 0
 }
 
+func (x *UserPrefs) GetTotalTasks() int64 {
+	if x != nil {
+		return x.TotalTasks
+	}
+	return 0
+}
+
+func (x *UserPrefs) GetTodayTasksCompleted() int64 {
+	if x != nil {
+		return x.TodayTasksCompleted
+	}
+	return 0
+}
+
+func (x *UserPrefs) GetTodayTasks() int64 {
+	if x != nil {
+		return x.TodayTasks
+	}
+	return 0
+}
+
 func (x *UserPrefs) GetFirstTaskDate() int64 {
 	if x != nil {
 		return x.FirstTaskDate
 	}
 	return 0
+}
+
+func (x *UserPrefs) GetItems() []*v11.ShopItem {
+	if x != nil {
+		return x.Items
+	}
+	return nil
 }
 
 // GetPrefsRequest — no parameters.
@@ -293,14 +330,21 @@ var File_api_user_v1_user_proto protoreflect.FileDescriptor
 
 const file_api_user_v1_user_proto_rawDesc = "" +
 	"\n" +
-	"\x16api/user/v1/user.proto\x12\vapi.user.v1\x1a\x1cgoogle/api/annotations.proto\x1a api/character/v1/character.proto\"\xad\x02\n" +
+	"\x16api/user/v1/user.proto\x12\vapi.user.v1\x1a\x1cgoogle/api/annotations.proto\x1a api/character/v1/character.proto\x1a\x16api/shop/v1/shop.proto\"\xd0\x03\n" +
 	"\tUserPrefs\x12I\n" +
 	"\x0fcharactor_class\x18\x01 \x01(\x0e2 .api.character.v1.CharacterClassR\x0echaractorClass\x12!\n" +
 	"\fcurrent_gold\x18\x02 \x01(\x03R\vcurrentGold\x12!\n" +
 	"\fcurrent_gems\x18\x03 \x01(\x03R\vcurrentGems\x123\n" +
 	"\x15notifications_enabled\x18\x04 \x01(\bR\x14notificationsEnabled\x122\n" +
-	"\x15total_tasks_completed\x18\x05 \x01(\x03R\x13totalTasksCompleted\x12&\n" +
-	"\x0ffirst_task_date\x18\x06 \x01(\x03R\rfirstTaskDate\"\x11\n" +
+	"\x15total_tasks_completed\x18\x05 \x01(\x03R\x13totalTasksCompleted\x12\x1f\n" +
+	"\vtotal_tasks\x18\x06 \x01(\x03R\n" +
+	"totalTasks\x122\n" +
+	"\x15today_tasks_completed\x18\a \x01(\x03R\x13todayTasksCompleted\x12\x1f\n" +
+	"\vtoday_tasks\x18\b \x01(\x03R\n" +
+	"todayTasks\x12&\n" +
+	"\x0ffirst_task_date\x18\t \x01(\x03R\rfirstTaskDate\x12+\n" +
+	"\x05items\x18\n" +
+	" \x03(\v2\x15.api.shop.v1.ShopItemR\x05items\"\x11\n" +
 	"\x0fGetPrefsRequest\"=\n" +
 	"\rGetPrefsReply\x12,\n" +
 	"\x05prefs\x18\x01 \x01(\v2\x16.api.user.v1.UserPrefsR\x05prefs\"B\n" +
@@ -332,21 +376,23 @@ var file_api_user_v1_user_proto_goTypes = []any{
 	(*UpdatePrefsRequest)(nil), // 3: api.user.v1.UpdatePrefsRequest
 	(*UpdatePrefsReply)(nil),   // 4: api.user.v1.UpdatePrefsReply
 	(v1.CharacterClass)(0),     // 5: api.character.v1.CharacterClass
+	(*v11.ShopItem)(nil),       // 6: api.shop.v1.ShopItem
 }
 var file_api_user_v1_user_proto_depIdxs = []int32{
 	5, // 0: api.user.v1.UserPrefs.charactor_class:type_name -> api.character.v1.CharacterClass
-	0, // 1: api.user.v1.GetPrefsReply.prefs:type_name -> api.user.v1.UserPrefs
-	0, // 2: api.user.v1.UpdatePrefsRequest.prefs:type_name -> api.user.v1.UserPrefs
-	0, // 3: api.user.v1.UpdatePrefsReply.prefs:type_name -> api.user.v1.UserPrefs
-	1, // 4: api.user.v1.UserService.GetPrefs:input_type -> api.user.v1.GetPrefsRequest
-	3, // 5: api.user.v1.UserService.UpdatePrefs:input_type -> api.user.v1.UpdatePrefsRequest
-	2, // 6: api.user.v1.UserService.GetPrefs:output_type -> api.user.v1.GetPrefsReply
-	4, // 7: api.user.v1.UserService.UpdatePrefs:output_type -> api.user.v1.UpdatePrefsReply
-	6, // [6:8] is the sub-list for method output_type
-	4, // [4:6] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	6, // 1: api.user.v1.UserPrefs.items:type_name -> api.shop.v1.ShopItem
+	0, // 2: api.user.v1.GetPrefsReply.prefs:type_name -> api.user.v1.UserPrefs
+	0, // 3: api.user.v1.UpdatePrefsRequest.prefs:type_name -> api.user.v1.UserPrefs
+	0, // 4: api.user.v1.UpdatePrefsReply.prefs:type_name -> api.user.v1.UserPrefs
+	1, // 5: api.user.v1.UserService.GetPrefs:input_type -> api.user.v1.GetPrefsRequest
+	3, // 6: api.user.v1.UserService.UpdatePrefs:input_type -> api.user.v1.UpdatePrefsRequest
+	2, // 7: api.user.v1.UserService.GetPrefs:output_type -> api.user.v1.GetPrefsReply
+	4, // 8: api.user.v1.UserService.UpdatePrefs:output_type -> api.user.v1.UpdatePrefsReply
+	7, // [7:9] is the sub-list for method output_type
+	5, // [5:7] is the sub-list for method input_type
+	5, // [5:5] is the sub-list for extension type_name
+	5, // [5:5] is the sub-list for extension extendee
+	0, // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_api_user_v1_user_proto_init() }

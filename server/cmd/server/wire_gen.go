@@ -12,19 +12,32 @@ import (
 
 	"github.com/habitforge/backend/internal/biz"
 	"github.com/habitforge/backend/internal/conf"
+	"github.com/habitforge/backend/internal/data"
 	"github.com/habitforge/backend/internal/server"
 	"github.com/habitforge/backend/internal/service"
 )
 
 // wireApp wires the whole application.
 func wireApp(cfg *conf.Config, logger log.Logger) (*kratos.App, func(), error) {
-	authUseCase := biz.NewAuthUseCase()
-	userUseCase := biz.NewUserUseCase()
-	characterUseCase := biz.NewCharacterUseCase()
-	taskUseCase := biz.NewTaskUseCase()
-	shopUseCase := biz.NewShopUseCase()
-	achievementUseCase := biz.NewAchievementUseCase()
-	statsUseCase := biz.NewStatsUseCase()
+	dataLayer, cleanup, err := data.NewData(cfg.Data)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	userRepo := data.NewUserRepo(dataLayer)
+	characterRepo := data.NewCharacterRepo(dataLayer)
+	taskRepo := data.NewTaskRepo(dataLayer)
+	shopRepo := data.NewShopRepo(dataLayer)
+	achievementRepo := data.NewAchievementRepo(dataLayer)
+	prefsRepo := data.NewPrefsRepo(dataLayer)
+
+	authUseCase := biz.NewAuthUseCase(userRepo, cfg.JWT)
+	userUseCase := biz.NewUserUseCase(prefsRepo, taskRepo)
+	characterUseCase := biz.NewCharacterUseCase(characterRepo, prefsRepo, taskRepo, achievementRepo, shopRepo, dataLayer)
+	taskUseCase := biz.NewTaskUseCase(taskRepo, characterRepo, prefsRepo, achievementRepo, dataLayer)
+	shopUseCase := biz.NewShopUseCase(shopRepo, prefsRepo, characterRepo, achievementRepo, dataLayer)
+	achievementUseCase := biz.NewAchievementUseCase(achievementRepo, prefsRepo, characterRepo, shopRepo, dataLayer)
+	statsUseCase := biz.NewStatsUseCase(taskRepo, prefsRepo, characterRepo, dataLayer)
 
 	authService := service.NewAuthService(authUseCase)
 	userService := service.NewUserService(userUseCase)
@@ -36,9 +49,9 @@ func wireApp(cfg *conf.Config, logger log.Logger) (*kratos.App, func(), error) {
 
 	httpServer := server.NewHTTPServer(cfg.Server, cfg.JWT, logger,
 		authService, userService, characterService, taskService, shopService, achievementService, statsService)
-	grpcServer := server.NewGRPCServer(cfg.Server, logger,
+	grpcServer := server.NewGRPCServer(cfg.Server, cfg.JWT, logger,
 		authService, userService, characterService, taskService, shopService, achievementService, statsService)
 
 	app := newApp(logger, httpServer, grpcServer)
-	return app, func() {}, nil
+	return app, cleanup, nil
 }

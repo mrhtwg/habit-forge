@@ -19,13 +19,31 @@ func NewAchievementService(uc *biz.AchievementUseCase) *AchievementService {
 }
 
 // ListAchievements lists all achievements with unlock state.
-// TODO(implementation): delegate to s.uc.List.
 func (s *AchievementService) ListAchievements(ctx context.Context, req *achievementv1.ListAchievementsRequest) (*achievementv1.ListAchievementsReply, error) {
-	return nil, errNotImplemented()
+	uid, err := requireUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	list, err := s.uc.List(ctx, uid)
+	if err != nil {
+		return nil, err
+	}
+	out := make([]*achievementv1.Achievement, 0, len(list))
+	for _, a := range list {
+		out = append(out, toProtoAchievement(a))
+	}
+	return &achievementv1.ListAchievementsReply{Achievements: out}, nil
 }
 
 // Unlock claims an achievement and grants its gem reward.
-// TODO(implementation): delegate to s.uc.Unlock.
 func (s *AchievementService) Unlock(ctx context.Context, req *achievementv1.UnlockRequest) (*achievementv1.UnlockReply, error) {
-	return nil, errNotImplemented()
+	uid, err := requireUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	a, gems, err := s.uc.Unlock(ctx, uid, req.GetId())
+	if err != nil {
+		return nil, err
+	}
+	return &achievementv1.UnlockReply{Achievement: toProtoAchievement(a), GemReward: gems}, nil
 }

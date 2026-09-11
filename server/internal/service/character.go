@@ -18,26 +18,79 @@ func NewCharacterService(uc *biz.CharacterUseCase) *CharacterService {
 	return &CharacterService{uc: uc}
 }
 
+// CreateCharacter creates the current user's character.
+func (s *CharacterService) CreateCharacter(ctx context.Context, req *characterv1.CreateCharacterRequest) (*characterv1.CreateCharacterReply, error) {
+	uid, err := requireUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	c, err := s.uc.Create(ctx, uid, characterClassName(req.GetCharacterClass()))
+	if err != nil {
+		return nil, err
+	}
+	return &characterv1.CreateCharacterReply{Character: toProtoCharacter(c)}, nil
+}
+
 // GetCharacter returns the current user's character.
-// TODO(implementation): delegate to s.uc.Get.
 func (s *CharacterService) GetCharacter(ctx context.Context, req *characterv1.GetCharacterRequest) (*characterv1.GetCharacterReply, error) {
-	return nil, errNotImplemented()
+	uid, err := requireUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	c, err := s.uc.Get(ctx, uid)
+	if err != nil {
+		return nil, err
+	}
+	return &characterv1.GetCharacterReply{Character: toProtoCharacter(c)}, nil
 }
 
 // UpdateCharacter replaces the character state.
-// TODO(implementation): delegate to s.uc.Update.
 func (s *CharacterService) UpdateCharacter(ctx context.Context, req *characterv1.UpdateCharacterRequest) (*characterv1.UpdateCharacterReply, error) {
-	return nil, errNotImplemented()
+	uid, err := requireUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	c, err := s.uc.Update(ctx, uid, fromProtoCharacter(req.GetCharacter()))
+	if err != nil {
+		return nil, err
+	}
+	return &characterv1.UpdateCharacterReply{Character: toProtoCharacter(c)}, nil
 }
 
 // AllocateStatPoint spends one available stat point.
-// TODO(implementation): delegate to s.uc.AllocateStatPoint.
 func (s *CharacterService) AllocateStatPoint(ctx context.Context, req *characterv1.AllocateStatPointRequest) (*characterv1.AllocateStatPointReply, error) {
-	return nil, errNotImplemented()
+	uid, err := requireUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	c, err := s.uc.AllocateStatPoint(ctx, uid, toBizStat(req.GetStat()))
+	if err != nil {
+		return nil, err
+	}
+	return &characterv1.AllocateStatPointReply{Character: toProtoCharacter(c)}, nil
 }
 
 // Revive revives a dead character.
-// TODO(implementation): delegate to s.uc.Revive.
 func (s *CharacterService) Revive(ctx context.Context, req *characterv1.ReviveRequest) (*characterv1.ReviveReply, error) {
-	return nil, errNotImplemented()
+	uid, err := requireUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	c, err := s.uc.Revive(ctx, uid)
+	if err != nil {
+		return nil, err
+	}
+	return &characterv1.ReviveReply{Character: toProtoCharacter(c)}, nil
+}
+
+// EquipItem equips or unequips an item.
+func (s *CharacterService) EquipItem(ctx context.Context, req *characterv1.EquipItemRequest) (*characterv1.EquipItemReply, error) {
+	uid, err := requireUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if _, err := s.uc.Equip(ctx, uid, req.GetItemId(), int32(req.GetSlot())); err != nil {
+		return nil, err
+	}
+	return &characterv1.EquipItemReply{}, nil
 }

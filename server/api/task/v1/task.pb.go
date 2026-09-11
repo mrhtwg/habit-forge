@@ -7,6 +7,8 @@
 package v1
 
 import (
+	v11 "github.com/habitforge/backend/api/character/v1"
+	v1 "github.com/habitforge/backend/api/user/v1"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -431,6 +433,7 @@ type ListTasksReply struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The matching tasks.
 	Tasks         []*Task `protobuf:"bytes,1,rep,name=tasks,proto3" json:"tasks,omitempty"`
+	LastId        string  `protobuf:"bytes,2,opt,name=lastId,proto3" json:"lastId,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -470,6 +473,13 @@ func (x *ListTasksReply) GetTasks() []*Task {
 		return x.Tasks
 	}
 	return nil
+}
+
+func (x *ListTasksReply) GetLastId() string {
+	if x != nil {
+		return x.LastId
+	}
+	return ""
 }
 
 // GetTaskRequest — id of the task to fetch.
@@ -892,11 +902,13 @@ type CompleteTaskReply struct {
 	// The task with updated completion state.
 	Task *Task `protobuf:"bytes,1,opt,name=task,proto3" json:"task,omitempty"`
 	// EXP granted for completing this task (includes streak multiplier).
-	ExpReward int32 `protobuf:"varint,2,opt,name=exp_reward,json=expReward,proto3" json:"exp_reward,omitempty"`
+	Prefs *v1.UserPrefs `protobuf:"bytes,2,opt,name=prefs,proto3" json:"prefs,omitempty"`
+	// Character state after completing this task.
+	Character *v11.Character `protobuf:"bytes,3,opt,name=character,proto3" json:"character,omitempty"`
+	// EXP granted for completing this task (includes streak multiplier).
+	ExpReward int32 `protobuf:"varint,4,opt,name=exp_reward,json=expReward,proto3" json:"exp_reward,omitempty"`
 	// Gold granted for completing this task.
-	GoldReward int32 `protobuf:"varint,3,opt,name=gold_reward,json=goldReward,proto3" json:"gold_reward,omitempty"`
-	// HP change applied on completion (positive heals, negative damages).
-	HpChange      int32 `protobuf:"varint,4,opt,name=hp_change,json=hpChange,proto3" json:"hp_change,omitempty"`
+	GoldReward    int32 `protobuf:"varint,5,opt,name=gold_reward,json=goldReward,proto3" json:"gold_reward,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -938,6 +950,20 @@ func (x *CompleteTaskReply) GetTask() *Task {
 	return nil
 }
 
+func (x *CompleteTaskReply) GetPrefs() *v1.UserPrefs {
+	if x != nil {
+		return x.Prefs
+	}
+	return nil
+}
+
+func (x *CompleteTaskReply) GetCharacter() *v11.Character {
+	if x != nil {
+		return x.Character
+	}
+	return nil
+}
+
 func (x *CompleteTaskReply) GetExpReward() int32 {
 	if x != nil {
 		return x.ExpReward
@@ -948,13 +974,6 @@ func (x *CompleteTaskReply) GetExpReward() int32 {
 func (x *CompleteTaskReply) GetGoldReward() int32 {
 	if x != nil {
 		return x.GoldReward
-	}
-	return 0
-}
-
-func (x *CompleteTaskReply) GetHpChange() int32 {
-	if x != nil {
-		return x.HpChange
 	}
 	return 0
 }
@@ -1082,7 +1101,7 @@ var File_api_task_v1_task_proto protoreflect.FileDescriptor
 
 const file_api_task_v1_task_proto_rawDesc = "" +
 	"\n" +
-	"\x16api/task/v1/task.proto\x12\vapi.task.v1\x1a\x1cgoogle/api/annotations.proto\"\x80\x05\n" +
+	"\x16api/task/v1/task.proto\x12\vapi.task.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x16api/user/v1/user.proto\x1a api/character/v1/character.proto\"\x80\x05\n" +
 	"\x04Task\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12 \n" +
@@ -1118,9 +1137,10 @@ const file_api_task_v1_task_proto_rawDesc = "" +
 	"difficulty\x12\x12\n" +
 	"\x04tags\x18\x03 \x03(\tR\x04tags\x12$\n" +
 	"\x0eonly_due_today\x18\x04 \x01(\bR\fonlyDueToday\x12+\n" +
-	"\x11include_completed\x18\x05 \x01(\bR\x10includeCompleted\"9\n" +
+	"\x11include_completed\x18\x05 \x01(\bR\x10includeCompleted\"Q\n" +
 	"\x0eListTasksReply\x12'\n" +
-	"\x05tasks\x18\x01 \x03(\v2\x11.api.task.v1.TaskR\x05tasks\" \n" +
+	"\x05tasks\x18\x01 \x03(\v2\x11.api.task.v1.TaskR\x05tasks\x12\x16\n" +
+	"\x06lastId\x18\x02 \x01(\tR\x06lastId\" \n" +
 	"\x0eGetTaskRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"5\n" +
 	"\fGetTaskReply\x12%\n" +
@@ -1138,14 +1158,15 @@ const file_api_task_v1_task_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"\x11\n" +
 	"\x0fDeleteTaskReply\"%\n" +
 	"\x13CompleteTaskRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\"\x97\x01\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"\xe3\x01\n" +
 	"\x11CompleteTaskReply\x12%\n" +
-	"\x04task\x18\x01 \x01(\v2\x11.api.task.v1.TaskR\x04task\x12\x1d\n" +
+	"\x04task\x18\x01 \x01(\v2\x11.api.task.v1.TaskR\x04task\x12,\n" +
+	"\x05prefs\x18\x02 \x01(\v2\x16.api.user.v1.UserPrefsR\x05prefs\x129\n" +
+	"\tcharacter\x18\x03 \x01(\v2\x1b.api.character.v1.CharacterR\tcharacter\x12\x1d\n" +
 	"\n" +
-	"exp_reward\x18\x02 \x01(\x05R\texpReward\x12\x1f\n" +
-	"\vgold_reward\x18\x03 \x01(\x05R\n" +
-	"goldReward\x12\x1b\n" +
-	"\thp_change\x18\x04 \x01(\x05R\bhpChange\"!\n" +
+	"exp_reward\x18\x04 \x01(\x05R\texpReward\x12\x1f\n" +
+	"\vgold_reward\x18\x05 \x01(\x05R\n" +
+	"goldReward\"!\n" +
 	"\x0fSkipTaskRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"\x93\x01\n" +
 	"\rSkipTaskReply\x12%\n" +
@@ -1164,7 +1185,7 @@ const file_api_task_v1_task_proto_rawDesc = "" +
 	"\x1bTASK_DIFFICULTY_UNSPECIFIED\x10\x00\x12\x18\n" +
 	"\x14TASK_DIFFICULTY_EASY\x10\x01\x12\x1a\n" +
 	"\x16TASK_DIFFICULTY_MEDIUM\x10\x02\x12\x18\n" +
-	"\x14TASK_DIFFICULTY_HARD\x10\x032\xed\x05\n" +
+	"\x14TASK_DIFFICULTY_HARD\x10\x032\xe9\x05\n" +
 	"\vTaskService\x12^\n" +
 	"\tListTasks\x12\x1d.api.task.v1.ListTasksRequest\x1a\x1b.api.task.v1.ListTasksReply\"\x15\x82\xd3\xe4\x93\x02\x0f\x12\r/api/v1/tasks\x12]\n" +
 	"\aGetTask\x12\x1b.api.task.v1.GetTaskRequest\x1a\x19.api.task.v1.GetTaskReply\"\x1a\x82\xd3\xe4\x93\x02\x14\x12\x12/api/v1/tasks/{id}\x12d\n" +
@@ -1174,8 +1195,8 @@ const file_api_task_v1_task_proto_rawDesc = "" +
 	"UpdateTask\x12\x1e.api.task.v1.UpdateTaskRequest\x1a\x1c.api.task.v1.UpdateTaskReply\"\x1d\x82\xd3\xe4\x93\x02\x17:\x01*\x1a\x12/api/v1/tasks/{id}\x12f\n" +
 	"\n" +
 	"DeleteTask\x12\x1e.api.task.v1.DeleteTaskRequest\x1a\x1c.api.task.v1.DeleteTaskReply\"\x1a\x82\xd3\xe4\x93\x02\x14*\x12/api/v1/tasks/{id}\x12x\n" +
-	"\fCompleteTask\x12 .api.task.v1.CompleteTaskRequest\x1a\x1e.api.task.v1.CompleteTaskReply\"&\x82\xd3\xe4\x93\x02 :\x01*\"\x1b/api/v1/tasks/{id}/complete\x12l\n" +
-	"\bSkipTask\x12\x1c.api.task.v1.SkipTaskRequest\x1a\x1a.api.task.v1.SkipTaskReply\"&\x82\xd3\xe4\x93\x02 :\x01*\"\x1b/api/v1/tasks/{id}/completeB.Z,github.com/habitforge/backend/api/task/v1;v1b\x06proto3"
+	"\fCompleteTask\x12 .api.task.v1.CompleteTaskRequest\x1a\x1e.api.task.v1.CompleteTaskReply\"&\x82\xd3\xe4\x93\x02 :\x01*\"\x1b/api/v1/tasks/{id}/complete\x12h\n" +
+	"\bSkipTask\x12\x1c.api.task.v1.SkipTaskRequest\x1a\x1a.api.task.v1.SkipTaskReply\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/api/v1/tasks/{id}/skipB.Z,github.com/habitforge/backend/api/task/v1;v1b\x06proto3"
 
 var (
 	file_api_task_v1_task_proto_rawDescOnce sync.Once
@@ -1209,6 +1230,8 @@ var file_api_task_v1_task_proto_goTypes = []any{
 	(*CompleteTaskReply)(nil),   // 14: api.task.v1.CompleteTaskReply
 	(*SkipTaskRequest)(nil),     // 15: api.task.v1.SkipTaskRequest
 	(*SkipTaskReply)(nil),       // 16: api.task.v1.SkipTaskReply
+	(*v1.UserPrefs)(nil),        // 17: api.user.v1.UserPrefs
+	(*v11.Character)(nil),       // 18: api.character.v1.Character
 }
 var file_api_task_v1_task_proto_depIdxs = []int32{
 	0,  // 0: api.task.v1.Task.type:type_name -> api.task.v1.TaskType
@@ -1222,26 +1245,28 @@ var file_api_task_v1_task_proto_depIdxs = []int32{
 	2,  // 8: api.task.v1.UpdateTaskRequest.task:type_name -> api.task.v1.Task
 	2,  // 9: api.task.v1.UpdateTaskReply.task:type_name -> api.task.v1.Task
 	2,  // 10: api.task.v1.CompleteTaskReply.task:type_name -> api.task.v1.Task
-	2,  // 11: api.task.v1.SkipTaskReply.task:type_name -> api.task.v1.Task
-	3,  // 12: api.task.v1.TaskService.ListTasks:input_type -> api.task.v1.ListTasksRequest
-	5,  // 13: api.task.v1.TaskService.GetTask:input_type -> api.task.v1.GetTaskRequest
-	7,  // 14: api.task.v1.TaskService.CreateTask:input_type -> api.task.v1.CreateTaskRequest
-	9,  // 15: api.task.v1.TaskService.UpdateTask:input_type -> api.task.v1.UpdateTaskRequest
-	11, // 16: api.task.v1.TaskService.DeleteTask:input_type -> api.task.v1.DeleteTaskRequest
-	13, // 17: api.task.v1.TaskService.CompleteTask:input_type -> api.task.v1.CompleteTaskRequest
-	15, // 18: api.task.v1.TaskService.SkipTask:input_type -> api.task.v1.SkipTaskRequest
-	4,  // 19: api.task.v1.TaskService.ListTasks:output_type -> api.task.v1.ListTasksReply
-	6,  // 20: api.task.v1.TaskService.GetTask:output_type -> api.task.v1.GetTaskReply
-	8,  // 21: api.task.v1.TaskService.CreateTask:output_type -> api.task.v1.CreateTaskReply
-	10, // 22: api.task.v1.TaskService.UpdateTask:output_type -> api.task.v1.UpdateTaskReply
-	12, // 23: api.task.v1.TaskService.DeleteTask:output_type -> api.task.v1.DeleteTaskReply
-	14, // 24: api.task.v1.TaskService.CompleteTask:output_type -> api.task.v1.CompleteTaskReply
-	16, // 25: api.task.v1.TaskService.SkipTask:output_type -> api.task.v1.SkipTaskReply
-	19, // [19:26] is the sub-list for method output_type
-	12, // [12:19] is the sub-list for method input_type
-	12, // [12:12] is the sub-list for extension type_name
-	12, // [12:12] is the sub-list for extension extendee
-	0,  // [0:12] is the sub-list for field type_name
+	17, // 11: api.task.v1.CompleteTaskReply.prefs:type_name -> api.user.v1.UserPrefs
+	18, // 12: api.task.v1.CompleteTaskReply.character:type_name -> api.character.v1.Character
+	2,  // 13: api.task.v1.SkipTaskReply.task:type_name -> api.task.v1.Task
+	3,  // 14: api.task.v1.TaskService.ListTasks:input_type -> api.task.v1.ListTasksRequest
+	5,  // 15: api.task.v1.TaskService.GetTask:input_type -> api.task.v1.GetTaskRequest
+	7,  // 16: api.task.v1.TaskService.CreateTask:input_type -> api.task.v1.CreateTaskRequest
+	9,  // 17: api.task.v1.TaskService.UpdateTask:input_type -> api.task.v1.UpdateTaskRequest
+	11, // 18: api.task.v1.TaskService.DeleteTask:input_type -> api.task.v1.DeleteTaskRequest
+	13, // 19: api.task.v1.TaskService.CompleteTask:input_type -> api.task.v1.CompleteTaskRequest
+	15, // 20: api.task.v1.TaskService.SkipTask:input_type -> api.task.v1.SkipTaskRequest
+	4,  // 21: api.task.v1.TaskService.ListTasks:output_type -> api.task.v1.ListTasksReply
+	6,  // 22: api.task.v1.TaskService.GetTask:output_type -> api.task.v1.GetTaskReply
+	8,  // 23: api.task.v1.TaskService.CreateTask:output_type -> api.task.v1.CreateTaskReply
+	10, // 24: api.task.v1.TaskService.UpdateTask:output_type -> api.task.v1.UpdateTaskReply
+	12, // 25: api.task.v1.TaskService.DeleteTask:output_type -> api.task.v1.DeleteTaskReply
+	14, // 26: api.task.v1.TaskService.CompleteTask:output_type -> api.task.v1.CompleteTaskReply
+	16, // 27: api.task.v1.TaskService.SkipTask:output_type -> api.task.v1.SkipTaskReply
+	21, // [21:28] is the sub-list for method output_type
+	14, // [14:21] is the sub-list for method input_type
+	14, // [14:14] is the sub-list for extension type_name
+	14, // [14:14] is the sub-list for extension extendee
+	0,  // [0:14] is the sub-list for field type_name
 }
 
 func init() { file_api_task_v1_task_proto_init() }
