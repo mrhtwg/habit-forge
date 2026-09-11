@@ -49,10 +49,10 @@ service TaskService {
       body: "*"
     };
   }
-  // SkipTask marks a task completed and grants EXP/gold rewards.
+  // SkipTask skips a task (todos are postponed to tomorrow).
   rpc SkipTask(SkipTaskRequest) returns (SkipTaskReply) {
     option (google.api.http) = {
-      post: "/api/v1/tasks/{id}/complete"
+      post: "/api/v1/tasks/{id}/skip"
       body: "*"
     };
   }

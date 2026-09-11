@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package api.shared.v1;
 
-// option go_package = "github.com/habitforge/backend/api/shared/v1;v1";
+option go_package = "github.com/habitforge/backend/api/shared/v1;v1";
 
 // SysMaterial — in-game currency types shown in the wallet.
 enum SysMaterial {
