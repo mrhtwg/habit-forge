@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>HabitForge — Docs</title>
+<style>
+  :root {
+    --ink: #3a2a4e; --ink-soft: #6b5b7f; --cream: #fff8ec; --card: #fff;
+    --gold-dark: #b56a00; --violet: #6c5ce7; --border: #e3c9a0;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--cream); color: var(--ink);
+    font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+  }
+  header {
+    background: linear-gradient(180deg, #8fd4ff 0%, #c8ecff 60%, #e4f6ff 100%);
+    border-bottom-left-radius: 28px; border-bottom-right-radius: 28px;
+    padding: 44px 20px 34px; text-align: center;
+  }
+  header h1 { margin: 0 0 6px; font-size: 30px; }
+  header p { margin: 0; color: var(--ink-soft); font-size: 14px; }
+  main { max-width: 720px; margin: 0 auto; padding: 28px 20px 64px; }
+  section {
+    background: var(--card); border: 2px solid var(--border); border-radius: 20px;
+    padding: 20px 22px; margin-bottom: 18px; box-shadow: 0 4px 0 #efdfc4;
+  }
+  h2 { font-size: 18px; margin: 0 0 12px; }
+  a.card {
+    display: block; text-decoration: none; color: inherit;
+    border: 2px solid var(--border); border-radius: 14px;
+    padding: 14px 16px; margin-bottom: 10px; background: #fffdf8;
+  }
+  a.card:hover { border-color: var(--violet); }
+  a.card strong { display: block; font-size: 16px; }
+  a.card span { color: var(--ink-soft); font-size: 13.5px; }
+  ul { margin: 0; padding-left: 20px; }
+  li { margin-bottom: 6px; }
+  a { color: var(--violet); }
+  footer { max-width: 720px; margin: 0 auto; padding: 0 20px 48px; text-align: center; color: var(--ink-soft); font-size: 13px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>HabitForge Docs</h1>
+  <p>Legal pages published with GitHub Pages</p>
+</header>
+
+<main>
+  <section>
+    <h2>Legal</h2>
+    <a class="card" href="./privacy-policy.html">
+      <strong>Privacy Policy</strong>
+      <span>What the app processes, where your data is stored, and how to delete it.</span>
+    </a>
+    <a class="card" href="./terms-of-service.html">
+      <strong>Terms of Service</strong>
+      <span>Rules for using HabitForge, virtual items, and the shops.</span>
+    </a>
+  </section>
+
+  <section>
+    <h2>Developer docs</h2>
+    <ul>
+      <li><a href="https://github.com/mrhtwg/habit-forge/blob/main/docs/v1.0-features.md">V1.0 feature scope</a></li>
+      <li><a href="https://github.com/mrhtwg/habit-forge/blob/main/docs/proto-guide.md">Proto &amp; codegen guide</a></li>
+      <li><a href="https://github.com/mrhtwg/habit-forge/blob/main/docs/art-style-guide.md">Art style guide</a></li>
+      <li><a href="https://github.com/mrhtwg/habit-forge/blob/main/README.md">Repository README</a></li>
+    </ul>
+    <p style="color:var(--ink-soft);font-size:13.5px;margin:12px 0 0">
+      Markdown sources live in the repository under <code>docs/</code>.
+    </p>
+  </section>
+</main>
+
+<footer>
+  <p>HabitForge — RPG-style habit tracker</p>
+</footer>
+
+</body>
+</html>
