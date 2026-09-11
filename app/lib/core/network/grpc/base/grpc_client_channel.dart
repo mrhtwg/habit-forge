@@ -2,6 +2,7 @@ import 'package:grpc/grpc.dart';
 import 'package:habit_forge_app/core/common/utils/log.dart';
 import 'package:habit_forge_app/core/constants/env_constants.dart';
 import 'package:habit_forge_app/core/di/injection_container.dart';
+import 'package:habit_forge_app/core/network/grpc/base/auth_grpc_interceptor.dart';
 import 'package:injectable/injectable.dart';
 
 /// A singleton managing the gRPC ClientChannel with automatic reconnection on
@@ -30,7 +31,9 @@ class GrpcClientChannel {
   ClientChannel get channel => _channel;
 
   /// Interceptors applied to every gRPC stub (token metadata, timing...).
-  List<ClientInterceptor> get interceptors => [];
+  List<ClientInterceptor> get interceptors => [_authInterceptor];
+
+  final AuthGrpcInterceptor _authInterceptor = AuthGrpcInterceptor();
 
   /// Public method to manually trigger a shutdown of the channel.
   Future<void> shutdown() async {

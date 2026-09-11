@@ -28,7 +28,8 @@ abstract class NetworkInterface {
   ///  - hive: mints a local session token immediately (guest auto-login);
   ///  - server: will exchange a Google credential via OAuthLogin
   ///    (**not implemented yet**);
-  ///  - firebase: auth is owned by FirebaseAuthService, so this is unused.
+  ///  - firebase: persists the Firebase ID token and ensures the Firestore
+  ///    user document exists (call after FirebaseAuth sign-in).
   Future<ApiResponse<LoginReply>> login(String provider);
 
   // ── Character ──

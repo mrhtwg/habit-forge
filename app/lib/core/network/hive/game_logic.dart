@@ -2,7 +2,9 @@ import 'package:fixnum/fixnum.dart';
 import 'package:habit_forge_app/core/extensions/date_extensions.dart';
 import 'package:habit_forge_app/core/network/hive/game_constants.dart';
 import 'package:habit_forge_app/core/network/hive/shop_config.dart';
+import 'package:habit_forge_app/generated/protos/achievement/v1/achievement.pb.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart';
+import 'package:habit_forge_app/generated/protos/shared/v1/shared.pbenum.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';
 import 'package:habit_forge_app/generated/protos/user/v1/user.pb.dart';
 
@@ -26,6 +28,118 @@ class GameLogic {
       (p.deepCopy()..freeze()).rebuild((x) => x..currentGems = x.currentGems + amount);
 
   // ── Task ──
+
+  /// Task-shape rules shared by create/update (hive / firebase / server).
+  /// Dailies need at least one repeat day, todos need a due date.
+  static String? invalidTaskShape(Task t) {
+    if (t.title.trim().isEmpty ||
+        t.type.value == TaskType.TASK_TYPE_UNSPECIFIED ||
+        t.difficulty == TaskDifficulty.TASK_DIFFICULTY_UNSPECIFIED) {
+      return 'Title, type and difficulty are required';
+    }
+    if (t.type == TaskType.TASK_TYPE_DAILY && t.repeatDays.isEmpty) {
+      return 'Daily tasks require at least one repeat day';
+    }
+    if (t.type == TaskType.TASK_TYPE_TODO && t.dueDate.toInt() <= 0) {
+      return 'Todo tasks require a due date';
+    }
+    return null;
+  }
+
+  /// 0=Mon .. 6=Sun — matches the task form and proto comment.
+  static int weekdayIndex(DateTime d) => d.weekday - 1;
+
+  /// Whether [task] is scheduled on [day] (calendar date, local).
+  static bool isDueOn(Task task, DateTime day) {
+    switch (task.type) {
+      case TaskType.TASK_TYPE_HABIT:
+        return true;
+      case TaskType.TASK_TYPE_DAILY:
+        return task.repeatDays.contains(weekdayIndex(day));
+      case TaskType.TASK_TYPE_TODO:
+        if (task.dueDate.toInt() <= 0) return false;
+        final due = DateTime.fromMillisecondsSinceEpoch(task.dueDate.toInt()).dateOnly;
+        return due.year == day.year && due.month == day.month && due.day == day.day;
+      default:
+        return false;
+    }
+  }
+
+  /// Re-arms a repeatable task completed on a previous day. Returns the reset
+  /// task, or null when no change is needed.
+  static Task? rolloverIfNeeded(Task task, DateTime now) {
+    if (!task.isCompleted) return null;
+    if (DateTime.fromMillisecondsSinceEpoch(task.completedAt.toInt()).isToday) return null;
+    final repeatable =
+        task.type == TaskType.TASK_TYPE_HABIT || (task.type == TaskType.TASK_TYPE_DAILY && isDueOn(task, now));
+    if (!repeatable) return null;
+    return (task.deepCopy()..freeze()).rebuild((t) => t..isCompleted = false);
+  }
+
+  /// HP damage from tasks that were due and left uncompleted yesterday.
+  /// Skipped tasks and tasks completed yesterday are exempt. Missed days
+  /// before yesterday are forgiven.
+  static int overduePenalty(Iterable<Task> tasks, DateTime yesterday) {
+    final y = yesterday.dateOnly;
+    var damage = 0;
+    for (final task in tasks) {
+      if (task.isSkipped) continue;
+      final completedAt = DateTime.fromMillisecondsSinceEpoch(task.completedAt.toInt()).dateOnly;
+      if (task.isCompleted && completedAt.isSameDay(y)) continue;
+      if (task.type == TaskType.TASK_TYPE_TODO) {
+        if (task.isCompleted) continue;
+        if (task.dueDate.toInt() <= 0) continue;
+        final dueDay = DateTime.fromMillisecondsSinceEpoch(task.dueDate.toInt()).dateOnly;
+        if (dueDay.isAfter(y)) continue;
+      } else if (!isDueOn(task, y)) {
+        continue;
+      }
+      damage += task.hpPenalty;
+    }
+    return damage;
+  }
+
+  /// Maps an [EquipmentSlot] to the equipment-map key used on the character.
+  static String slotKey(EquipmentSlot slot) => switch (slot) {
+        EquipmentSlot.EQUIPMENT_SLOT_WEAPON => 'weapon',
+        EquipmentSlot.EQUIPMENT_SLOT_HELMET => 'helmet',
+        EquipmentSlot.EQUIPMENT_SLOT_ARMOR => 'armor',
+        EquipmentSlot.EQUIPMENT_SLOT_ACCESSORY => 'accessory',
+        EquipmentSlot.EQUIPMENT_SLOT_UNSPECIFIED => 'unspecified',
+        _ => 'unspecified',
+      };
+
+  /// Achievements whose condition is newly met. Does not mutate [defs].
+  static List<Achievement> newlyUnlocked({
+    required Iterable<Achievement> defs,
+    required Set<String> unlockedIds,
+    required int totalTasks,
+    required int streak,
+    required int level,
+    int purchases = 0,
+    int deaths = 0,
+  }) {
+    final now = Int64(DateTime.now().millisecondsSinceEpoch);
+    final out = <Achievement>[];
+    for (final def in defs) {
+      if (unlockedIds.contains(def.id)) continue;
+      final met = switch (def.conditionType) {
+        'total_tasks' => totalTasks >= def.threshold,
+        'streak' => streak >= def.threshold,
+        'level' => level >= def.threshold,
+        'purchases' => purchases >= def.threshold,
+        'deaths' => deaths >= def.threshold,
+        _ => false,
+      };
+      if (!met) continue;
+      out.add(
+        def.deepCopy()
+          ..isUnlocked = true
+          ..unlockedAt = now,
+      );
+    }
+    return out;
+  }
 
   // ── Economy ──
 
@@ -142,7 +256,8 @@ class GameLogic {
       level++;
     }
     if (level <= frozen.level) {
-      return (frozen.rebuild((x) => x..currentExp = Int64(remaining)), -1);
+      final capped = level >= GameConstants.maxLevel ? remaining.clamp(0, GameConstants.expForLevel(level)) : remaining;
+      return (frozen.rebuild((x) => x..currentExp = Int64(capped)), -1);
     }
     final gained = (level - frozen.level) * GameConstants.statPointsPerLevel;
     final maxForLevel = GameConstants.expForLevel(level);

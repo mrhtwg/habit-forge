@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -6,10 +7,14 @@ import 'package:habit_forge_app/core/common/utils/log.dart';
 import 'package:habit_forge_app/core/common/utils/sp_utils.dart';
 import 'package:habit_forge_app/core/constants/env_constants.dart';
 import 'package:habit_forge_app/core/di/injection_container.dart';
+import 'package:habit_forge_app/core/network/hive/shop_config.dart';
 import 'package:habit_forge_app/core/network/network_bootstrap.dart';
 import 'package:habit_forge_app/core/services/audio_service.dart';
+import 'package:habit_forge_app/core/services/firebase_auth_service.dart';
 import 'package:habit_forge_app/core/services/haptic_service.dart';
+import 'package:habit_forge_app/core/services/server_auth_service.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
+import 'package:habit_forge_app/firebase_options.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 void main() async {
@@ -38,28 +43,25 @@ void main() async {
 
   Get.put(AudioService());
   Get.put(HapticService());
-  // Get.put(ServerAuthService());
   Get.put(UserService(), permanent: true);
   await UserService.to.init();
+  await ShopConfig.load();
 
-  // Always register FirebaseAuthService so AuthController can find it.
-  // Firebase initialization only happens in firebase storage/auth mode.
-  // final firebaseAuth = FirebaseAuthService();
-
-  // if (EnvConstants.isFirebase()) {
-  //   try {
-  //     await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  //     firebaseAuth.markAvailable();
-  //     await firebaseAuth.initGoogleSignIn();
-  //     debugPrint('Firebase initialized successfully');
-  //   } catch (e) {
-  //     debugPrint('Firebase not configured ($e). Auth will use local mock.');
-  //   }
-  // } else {
-  //   debugPrint('Non-Firebase mode: Firebase auth skipped (local or backend auth).');
-  // }
-
-  // Get.put(firebaseAuth);
+  final firebaseAuth = FirebaseAuthService();
+  if (EnvConstants.isFirebase() || EnvConstants.isAuthFirebase()) {
+    try {
+      await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+      firebaseAuth.markAvailable();
+      await firebaseAuth.initGoogleSignIn();
+      debugPrint('Firebase initialized successfully');
+    } catch (e) {
+      debugPrint('Firebase not configured ($e). Auth will use local mock.');
+    }
+  }
+  Get.put(firebaseAuth);
+  if (EnvConstants.isAuthServer()) {
+    Get.put(ServerAuthService());
+  }
 
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(

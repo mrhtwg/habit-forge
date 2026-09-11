@@ -41,3 +41,26 @@ For Google Sign-In to work on Android:
 1. Register iOS app in Firebase Console
 2. Copy values into `firebase_options.dart`
 3. Run `flutter pub get` + `cd ios && pod install --repo-update`
+
+### Step 5: Firestore
+
+1. Firebase Console → Build → Firestore Database → Create database
+2. Start in production mode, then deploy the rules in `app/firebase/firestore.rules`:
+
+```bash
+cd app
+firebase deploy --only firestore:rules
+```
+
+3. Enable Authentication → Sign-in method → Google (required for Google Play builds)
+
+> Firebase mode runs game logic on the client (same as Hive). Firestore rules only
+> isolate per-user data. For server-authoritative economy / IAP verification, use
+> the Go backend (or Cloud Functions) later.
+
+### Step 6: Run the app in firebase mode
+
+```bash
+cd app
+flutter run --dart-define-from-file=env/firebase.json
+```

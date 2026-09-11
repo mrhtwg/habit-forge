@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/constants/env_constants.dart';
 import 'package:habit_forge_app/core/network/network_registry.dart';
@@ -13,6 +14,16 @@ class SplashController extends GetxController {
     // facade (mints the local session token).
     if (EnvConstants.isHive() && !UserService.to.isLoggedIn()) {
       await NetworkRegistry.ins.login('guest');
+    }
+
+    // Firebase mode: restore the session from Firebase Auth when the Google
+    // account is still signed in, otherwise drop a stale local token.
+    if (EnvConstants.isFirebase()) {
+      if (FirebaseAuth.instance.currentUser != null) {
+        await NetworkRegistry.ins.login('google');
+      } else {
+        await UserService.to.setSessionToken(null);
+      }
     }
 
     await Future.delayed(const Duration(milliseconds: 1000));

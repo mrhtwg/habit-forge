@@ -1,0 +1,20 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Each signed-in user can only read/write their own game document tree.
+    // Game rules (EXP/gold/HP) run on the client in firebase mode — these
+    // rules enforce ownership, not economy integrity. Use Cloud Functions /
+    // the Go backend when you need server-authoritative economy.
+    match /users/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+
+      match /tasks/{taskId} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+      }
+
+      match /achievements/{achievementId} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+      }
+    }
+  }
+}

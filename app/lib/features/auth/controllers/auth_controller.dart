@@ -24,7 +24,14 @@ class AuthController extends GetxController {
         return false;
       }
       isLoggedIn.value = true;
-      _checkOnboardingAndRoute();
+      if (EnvConstants.isFirebase()) {
+        final result = await NetworkRegistry.ins.login('apple');
+        if (result.isFailure) {
+          Toast.error('${LanKey.appleLoginFailed.tr}: ${result.message}');
+          return false;
+        }
+      }
+      await _routeAfterAuth();
       return true;
     } finally {
       isLoading.value = false;
@@ -47,7 +54,14 @@ class AuthController extends GetxController {
         return false;
       }
       isLoggedIn.value = true;
-      _checkOnboardingAndRoute();
+      if (EnvConstants.isFirebase()) {
+        final result = await NetworkRegistry.ins.login('email');
+        if (result.isFailure) {
+          Toast.error('${LanKey.loginFailed.tr}: ${result.message}');
+          return false;
+        }
+      }
+      await _routeAfterAuth();
       return true;
     } finally {
       isLoading.value = false;
@@ -63,8 +77,13 @@ class AuthController extends GetxController {
         Toast.error('${LanKey.googleLoginFailed.tr}: $error');
         return false;
       }
+      final result = await NetworkRegistry.ins.login('google');
+      if (result.isFailure) {
+        Toast.error('${LanKey.googleLoginFailed.tr}: ${result.message}');
+        return false;
+      }
       isLoggedIn.value = true;
-      _checkOnboardingAndRoute();
+      await _routeAfterAuth();
       return true;
     } finally {
       isLoading.value = false;
@@ -130,12 +149,13 @@ class AuthController extends GetxController {
     }
   }
 
-  void _checkOnboardingAndRoute() {
-    // final prefs = NetworkRegistry.ins.userPrefs.value;
-    // if (prefs == null) {
-    //   Get.offAllNamed(Routers.boarding);
-    // } else {
-    //   Get.offAllNamed(Routers.main);
-    // }
+  Future<void> _routeAfterAuth() async {
+    await UserService.to.loadUserPrefs();
+    await UserService.to.loadCharacter();
+    if (UserService.to.character.value == null) {
+      Get.offAllNamed(Routers.boarding);
+    } else {
+      Get.offAllNamed(Routers.main);
+    }
   }
 }

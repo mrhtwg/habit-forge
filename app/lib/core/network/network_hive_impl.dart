@@ -57,29 +57,12 @@ class NetworkHiveImpl implements NetworkInterface {
 
   @override
   Future<ApiResponse<CreateTaskReply>> createTask(Task task) async {
-    final reason = _invalidTaskShape(task);
+    final reason = GameLogic.invalidTaskShape(task);
     if (reason != null) {
       return ApiResponse.failure(code: StatusCode.invalidArgument, message: reason);
     }
     final t = await TaskBox.ins.createTask(task);
     return ApiResponse.success(CreateTaskReply(task: t));
-  }
-
-  /// Task-shape rules shared by create/update (both ends must enforce them):
-  /// dailies need at least one repeat day, todos need a due date.
-  static String? _invalidTaskShape(Task t) {
-    if (t.title.trim().isEmpty ||
-        t.type.value == TaskType.TASK_TYPE_UNSPECIFIED ||
-        t.difficulty == TaskDifficulty.TASK_DIFFICULTY_UNSPECIFIED) {
-      return 'Title, type and difficulty are required';
-    }
-    if (t.type == TaskType.TASK_TYPE_DAILY && t.repeatDays.isEmpty) {
-      return 'Daily tasks require at least one repeat day';
-    }
-    if (t.type == TaskType.TASK_TYPE_TODO && t.dueDate.toInt() <= 0) {
-      return 'Todo tasks require a due date';
-    }
-    return null;
   }
 
   @override
@@ -154,19 +137,14 @@ class NetworkHiveImpl implements NetworkInterface {
     required int level,
   }) async {
     final unlockedIds = UserBox.ins.getAchievements().map((a) => a.id).toSet();
-    for (final def in ShopConfig.achievementDefs) {
-      if (unlockedIds.contains(def.id)) continue;
-      final met = switch (def.conditionType) {
-        'total_tasks' => totalTasks >= def.threshold,
-        'streak' => streak >= def.threshold,
-        'level' => level >= def.threshold,
-        _ => false,
-      };
-      if (!met) continue;
-
-      final unlocked = def.deepCopy()
-        ..isUnlocked = true
-        ..unlockedAt = Int64(DateTime.now().millisecondsSinceEpoch);
+    final fresh = GameLogic.newlyUnlocked(
+      defs: ShopConfig.achievementDefs,
+      unlockedIds: unlockedIds,
+      totalTasks: totalTasks,
+      streak: streak,
+      level: level,
+    );
+    for (final unlocked in fresh) {
       UserBox.ins.updateAchievement(unlocked);
       if (unlocked.gemReward > 0) {
         final prefs = UserBox.ins.getUserPrefs();
@@ -192,20 +170,9 @@ class NetworkHiveImpl implements NetworkInterface {
     if (itemId.isNotEmpty && !owned.contains(itemId)) {
       return ApiResponse.failure(code: StatusCode.failedPrecondition, message: 'Item not owned');
     }
-    final slotKey = _slotKey(slot);
-    CharacterBox.ins.updateCharacter(GameLogic.equip(char, slotKey, itemId));
+    CharacterBox.ins.updateCharacter(GameLogic.equip(char, GameLogic.slotKey(slot), itemId));
     return ApiResponse.success(EquipItemReply(), 'Equipped');
   }
-
-  /// Maps an [EquipmentSlot] to the equipment-map key used on the character.
-  static String _slotKey(EquipmentSlot slot) => switch (slot) {
-        EquipmentSlot.EQUIPMENT_SLOT_WEAPON => 'weapon',
-        EquipmentSlot.EQUIPMENT_SLOT_HELMET => 'helmet',
-        EquipmentSlot.EQUIPMENT_SLOT_ARMOR => 'armor',
-        EquipmentSlot.EQUIPMENT_SLOT_ACCESSORY => 'accessory',
-        EquipmentSlot.EQUIPMENT_SLOT_UNSPECIFIED => 'unspecified',
-        _ => 'unspecified',
-      };
 
   @override
   Future<ApiResponse<GetCharacterReply>> getCharacter() async {
@@ -328,7 +295,7 @@ class NetworkHiveImpl implements NetworkInterface {
     if (current == null) {
       return ApiResponse.failure(code: StatusCode.notFound, message: 'Task not found');
     }
-    final reason = _invalidTaskShape(task);
+    final reason = GameLogic.invalidTaskShape(task);
     if (reason != null) {
       return ApiResponse.failure(code: StatusCode.invalidArgument, message: reason);
     }

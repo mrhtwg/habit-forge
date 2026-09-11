@@ -53,20 +53,9 @@ class TaskBox {
       if (tags != null && !tags.every(task.tags.contains)) {
         return false;
       }
-      if (onlyDueToday != null && onlyDueToday == true) {
-        switch (task.type) {
-          case TaskType.TASK_TYPE_HABIT:
-            return true;
-          case TaskType.TASK_TYPE_DAILY:
-            return task.repeatDays.contains(DateTime.now().weekday);
-          case TaskType.TASK_TYPE_TODO:
-            return DateTime.fromMillisecondsSinceEpoch(task.dueDate.toInt()) == DateTime.now().day &&
-                DateTime.fromMillisecondsSinceEpoch(task.dueDate.toInt()).month == DateTime.now().month &&
-                DateTime.fromMillisecondsSinceEpoch(task.dueDate.toInt()).year == DateTime.now().year;
-        }
-
-        return false;
-      }
+          if (onlyDueToday != null && onlyDueToday == true) {
+            return GameLogic.isDueOn(task, DateTime.now());
+          }
       return true;
     }).toList();
     _tasks.sort((a, b) => a.createdAt.compareTo(b.createdAt));
@@ -141,23 +130,11 @@ class TaskBox {
 
     final yesterday = today.subtract(const Duration(days: 1));
     var damage = 0;
+    final tasks = <Task>[];
     for (final value in _taskBox.values) {
-      final task = Task()..mergeFromBuffer(value);
-      if (task.isSkipped) continue; // explicitly handled → exempt
-      final completedAt = DateTime.fromMillisecondsSinceEpoch(task.completedAt.toInt()).dateOnly;
-      if (task.isCompleted && completedAt.isSameDay(yesterday)) continue; // done yesterday
-      if (task.type == TaskType.TASK_TYPE_TODO) {
-        if (task.isCompleted) continue; // one-off, already done
-        final dueDay = DateTime.fromMillisecondsSinceEpoch(task.dueDate.toInt()).dateOnly;
-        final overdue = dueDay.isBefore(yesterday) || dueDay.isSameDay(yesterday);
-        if (!overdue) continue;
-      } else {
-        final due = task.type == TaskType.TASK_TYPE_HABIT ||
-            (task.type == TaskType.TASK_TYPE_DAILY && task.repeatDays.contains(yesterday.weekday));
-        if (!due) continue;
-      }
-      damage += task.hpPenalty;
+      tasks.add(Task()..mergeFromBuffer(value));
     }
+    damage = GameLogic.overduePenalty(tasks, yesterday);
     return damage;
   }
 
@@ -169,12 +146,8 @@ class TaskBox {
     final now = DateTime.now();
     for (final key in _taskBox.keys) {
       final task = Task()..mergeFromBuffer(_taskBox.get(key));
-      if (!task.isCompleted) continue;
-      if (DateTime.fromMillisecondsSinceEpoch(task.completedAt.toInt()).isToday) continue;
-      final repeatable = task.type == TaskType.TASK_TYPE_HABIT ||
-          (task.type == TaskType.TASK_TYPE_DAILY && task.repeatDays.contains(now.weekday));
-      if (!repeatable) continue;
-      final reset = (task.deepCopy()..freeze()).rebuild((t) => t..isCompleted = false);
+      final reset = GameLogic.rolloverIfNeeded(task, now);
+      if (reset == null) continue;
       _taskBox.put(key, reset.writeToBuffer());
     }
   }

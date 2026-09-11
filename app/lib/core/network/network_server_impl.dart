@@ -1,8 +1,11 @@
 import 'package:habit_forge_app/core/network/api_response.dart';
+import 'package:habit_forge_app/core/network/grpc/achievement_api.dart';
 import 'package:habit_forge_app/core/network/grpc/character_api.dart';
 import 'package:habit_forge_app/core/network/grpc/shop_api.dart';
 import 'package:habit_forge_app/core/network/grpc/task_api.dart';
+import 'package:habit_forge_app/core/network/grpc/user_api.dart';
 import 'package:habit_forge_app/core/network/network_interface.dart';
+import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/generated/protos/achievement/v1/achievement.pb.dart';
 import 'package:habit_forge_app/generated/protos/auth/v1/auth.pb.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart';
@@ -13,60 +16,60 @@ import 'package:habit_forge_app/generated/protos/user/v1/user.pb.dart';
 
 /// gRPC-backed storage (server mode). Talks to the self-hosted Go backend,
 /// which owns all game logic (rewards, level-ups, purchases, penalties).
-///
-/// The grpc API stubs are still being filled in (see `core/network/grpc/`);
-/// unimplemented methods throw until then.
 class NetworkServerImpl implements NetworkInterface {
+  final _character = CharacterApi();
+  final _task = TaskApi();
+  final _shop = ShopApi();
+  final _user = UserApi();
+  final _achievement = AchievementApi();
+
   // ── Auth ──
 
   @override
-  Future<ApiResponse<LoginReply>> login(String provider) {
-    // TODO: Google OAuth — exchange the Google credential for a JWT via the
-    // backend's OAuthLogin RPC. Not implemented yet.
-    throw UnimplementedError();
+  Future<ApiResponse<LoginReply>> login(String provider) async {
+    // Email sessions are established by ServerAuthService (HTTP). Google OAuth
+    // via gRPC is not wired yet — keep the existing local JWT if present.
+    final token = UserService.to.token.value;
+    if (token.isEmpty) {
+      return ApiResponse.failure(code: 16, message: 'Not signed in — use email login');
+    }
+    return ApiResponse.success(LoginReply(token: token), 'Signed in');
   }
 
   // ── Character ──
 
   @override
   Future<ApiResponse<CreateCharacterReply>> createCharacter(CharacterClass characterClass) async =>
-      await CharacterApi().createCharacter(characterClass);
+      _character.createCharacter(characterClass);
 
   @override
-  Future<ApiResponse<GetCharacterReply>> getCharacter() async => await CharacterApi().getCharacter();
+  Future<ApiResponse<GetCharacterReply>> getCharacter() async => _character.getCharacter();
 
   @override
-  Future<bool> allocateStatPoint(StatType stat) {
-    // TODO: implement allocateStatPoint (gRPC)
-    throw UnimplementedError();
+  Future<bool> allocateStatPoint(StatType stat) async {
+    final reply = await _character.allocateStatPoint(stat);
+    return reply.isSuccess;
   }
 
   @override
-  Future<void> reviveCharacter() {
-    // TODO: implement reviveCharacter (gRPC)
-    throw UnimplementedError();
+  Future<void> reviveCharacter() async {
+    await _character.revive();
   }
 
   @override
   Future<ApiResponse<EquipItemReply>> equipItem(String itemId, EquipmentSlot slot) async =>
-      await CharacterApi().equipItem(itemId, slot);
+      _character.equipItem(itemId, slot);
 
   // ── Tasks ──
 
   @override
-  Future<ApiResponse<CreateTaskReply>> createTask(Task task) async => await TaskApi().createTask(task);
+  Future<ApiResponse<CreateTaskReply>> createTask(Task task) async => _task.createTask(task);
 
   @override
-  Future<ApiResponse<UpdateTaskReply>> updateTask(String id, Task task) {
-    // TODO: implement updateTask (gRPC)
-    throw UnimplementedError();
-  }
+  Future<ApiResponse<UpdateTaskReply>> updateTask(String id, Task task) async => _task.updateTask(id, task);
 
   @override
-  Future<ApiResponse<DeleteTaskReply>> deleteTask(String id) {
-    // TODO: implement deleteTask (gRPC)
-    throw UnimplementedError();
-  }
+  Future<ApiResponse<DeleteTaskReply>> deleteTask(String id) async => _task.deleteTask(id);
 
   @override
   Future<ApiResponse<ListTasksReply>> listTasks({
@@ -74,65 +77,48 @@ class NetworkServerImpl implements NetworkInterface {
     TaskDifficulty? difficulty,
     List<String>? tags,
     bool? onlyDueToday,
-  }) {
-    // TODO: implement listTasks (gRPC)
-    throw UnimplementedError();
-  }
+  }) async =>
+      _task.listTasks(type: type, difficulty: difficulty, tags: tags, onlyDueToday: onlyDueToday);
 
   @override
-  Future<ApiResponse<CompleteTaskReply>> completeTask(String id) {
-    // TODO: implement completeTask (gRPC)
-    throw UnimplementedError();
-  }
+  Future<ApiResponse<CompleteTaskReply>> completeTask(String id) async => _task.completeTask(id);
 
   @override
-  Future<ApiResponse<SkipTaskReply>> skipTask(String id) async => await TaskApi().skipTask(id);
+  Future<ApiResponse<SkipTaskReply>> skipTask(String id) async => _task.skipTask(id);
 
   // ── User profile ──
 
   @override
-  Future<ApiResponse<GetPrefsReply>> getPrefs() {
-    // TODO: implement getPrefs (gRPC)
-    throw UnimplementedError();
-  }
+  Future<ApiResponse<GetPrefsReply>> getPrefs() async => _user.getPrefs();
 
   // ── Shop ──
 
   @override
-  Future<ApiResponse<ListShopItemsReply>> listShopItems() {
-    // TODO: implement listShopItems (gRPC)
-    throw UnimplementedError();
-  }
+  Future<ApiResponse<ListShopItemsReply>> listShopItems() async => _shop.listShopItems();
 
   @override
-  Future<ApiResponse<ListOwnedItemsReply>> listOwnedItems() {
-    // TODO: implement listOwnedItems (gRPC)
-    throw UnimplementedError();
-  }
+  Future<ApiResponse<ListOwnedItemsReply>> listOwnedItems() async => _shop.listOwnedItems();
 
   @override
   Future<ApiResponse<BuyItemReply>> purchaseItem(String itemId, ShopCurrency currency) async =>
-      await ShopApi().buyItem(itemId, currency);
+      _shop.buyItem(itemId, currency);
 
   @override
-  Future<ApiResponse<DailyDeal>> getDailyDeal() {
-    // TODO: implement getDailyDeal (gRPC)
-    throw UnimplementedError();
+  Future<ApiResponse<DailyDeal>> getDailyDeal() async {
+    final reply = await _shop.getDailyDeal();
+    if (reply.isFailure || reply.data?.deal == null) {
+      return ApiResponse.failure(code: reply.code, message: reply.message);
+    }
+    return ApiResponse.success(reply.data!.deal);
   }
 
   // ── Achievements ──
 
   @override
-  Future<ApiResponse<ListAchievementsReply>> listAchievements() {
-    // TODO: implement listAchievements (gRPC)
-    throw UnimplementedError();
-  }
+  Future<ApiResponse<ListAchievementsReply>> listAchievements() async => _achievement.listAchievements();
 
   // ── Lifecycle ──
 
   @override
-  Future<NetworkInterface> init() {
-    // Session token persistence is handled by UserService.setSessionToken.
-    return Future.value(this);
-  }
+  Future<NetworkInterface> init() async => this;
 }

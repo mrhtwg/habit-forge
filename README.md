@@ -11,7 +11,7 @@ This repository is a **full-stack monorepo**:
 - `proto/` — shared API contracts (protobuf source of truth for app + server)
 - `docs/` — product, design, and development docs
 
-> **Status:** MVP. The Flutter app is local-first and playable; the Go backend is a go-kratos skeleton exposing **HTTP (REST) and gRPC** endpoints for all services (auth, user, character, task, shop, achievement, stats) — implementations are pending. See [Roadmap](docs/roadmap.md).
+> **Status:** MVP. Flutter is playable in **hive** (local) and **firebase** (Auth + Firestore) modes. The Go backend implements auth + game-data services over HTTP/gRPC; apply `server/migrations/*.sql` (or let AutoMigrate+seed run on boot) before using **server** mode. See [Roadmap](docs/roadmap.md).
 
 ## Why this project exists
 
