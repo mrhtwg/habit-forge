@@ -1,0 +1,7 @@
+{
+  "env": "server",
+  "network": "server",
+  "auth": "server",
+  "apiUrl": "http://localhost:8080",
+  "grpcUrl": "localhost:9000"
+}

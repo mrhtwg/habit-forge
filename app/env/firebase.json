@@ -1,0 +1,10 @@
+{
+  "env": "firebase",
+  "network": "firebase",
+  "auth": "firebase",
+  "apiKey": "XXXXX",
+  "appId": "XXXXXX",
+  "messagingSenderId": "XXXXXXX",
+  "projectId": "XXXXXXXXXXX",
+  "storageBucket": "XXXXXXXXXXX.firebasestorage.app"
+}
