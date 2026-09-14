@@ -57,18 +57,47 @@ For Google Sign-In to work on Android:
 ### Step 5: Firestore
 
 1. Firebase Console → Build → Firestore Database → Create database
-2. Start in production mode, then deploy the rules in `app/firebase/firestore.rules`:
+2. Start in **production** mode (or test mode briefly), then **deploy** the rules in `app/firebase/firestore.rules`.
+
+Rules are **not** applied automatically from the repo. Until you deploy them, every read/write returns `PERMISSION_DENIED` (even for signed-in / anonymous users).
+
+**Option A — Console paste**
+
+1. Firebase Console → Firestore → Rules
+2. Paste the contents of `app/firebase/firestore.rules`
+3. Publish
+
+**Option B — CLI**
 
 ```bash
 cd app
+# npm i -g firebase-tools && firebase login && firebase use <your-project-id>
 firebase deploy --only firestore:rules
 ```
 
-3. Enable Authentication → Sign-in method → Google (and Anonymous if you use guest upgrade)
+3. Authentication → Sign-in method → enable **Google** (Anonymous is **not** required; the app plays on local Hive until Settings sign-in)
 
 > Firebase mode runs game logic on the client (same as Hive). Firestore rules only
 > isolate per-user data. For server-authoritative economy / IAP verification, use
 > the Go backend (or Cloud Functions) later.
+
+### Step 5b: Fix `DEVELOPER_ERROR` / Google Sign-In on device
+
+`ConnectionResult{statusCode=DEVELOPER_ERROR}` almost always means the **debug SHA-1** of the keystore that signed your APK is missing from Firebase.
+
+```bash
+# Debug keystore (Flutter default):
+keytool -list -v -alias androiddebugkey \
+  -keystore ~/.android/debug.keystore \
+  -storepass android -keypass android | grep SHA1
+```
+
+1. Copy the `SHA1` value
+2. Firebase Console → Project Settings → Your Android app → Add fingerprint
+3. Download a fresh `google-services.json` into `android/app/`
+4. Rebuild the app (`flutter clean && flutter run --dart-define-from-file=env/firebase.json`)
+
+Also ensure `env/firebase.json` `projectId` / `appId` / `apiKey` match the same project as `google-services.json`.
 
 ### Step 6: Run the app in firebase mode
 
@@ -79,3 +108,11 @@ flutter run --dart-define-from-file=env/firebase.json
 ```
 
 If placeholders are left as `YOUR_*`, startup logs `Firebase not configured` and cloud auth stays unavailable.
+
+### Log noise you can ignore
+
+| Log                                           | Meaning                                                             |
+| --------------------------------------------- | ------------------------------------------------------------------- |
+| `BillingClient ... Response code: 3`          | Play Billing unavailable on sideload/debug — OK until IAP is set up |
+| `gRPC Channel initialized for localhost:9000` | Was GetIt eager-init (fixed to lazy); only needed in server mode    |
+| `ProviderInstaller` / Phenotype warnings      | Common GMS noise on some devices; not fatal if Auth/Firestore work  |

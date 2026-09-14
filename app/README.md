@@ -9,50 +9,56 @@ The app is **local-first**: all game data lives in Hive on-device. Firebase Auth
 ## Features
 
 ### Task management
+
 - Three task types — **Habit**, **Daily**, **ToDo** — with weekday repeat for dailies and due dates for todos
 - Difficulty levels (`easy` / `medium` / `hard`) that drive EXP & gold rewards
 - Tags, priority, streak tracking, HP penalty, and postpone / skip actions
 - Swipeable task list (complete / postpone / skip / delete) via `flutter_slidable`
 
 ### RPG character loop
+
 - Pick a class — **Warrior**, **Mage**, or **Ranger** — each rendered with a PNG frame-sequence idle animation (62 / 62 / 50 frames; the Ranger export duplicated its first 21 frames at the tail, which were trimmed for a seamless loop)
 - Earn EXP and gold from completed tasks; base rewards scale with difficulty and streaks apply a multiplier (up to ×2.0)
 - Level up to **max level 50** with a progressive EXP curve; spend stat points on six attributes — **INT** +1% EXP/point, **STR** +1% gold/point, **VIT** +2 HP cap/point, **DEF** −1 HP damage/point (AGI / LUK effects pending)
 - HP system: skipped or overdue tasks cost HP; at 0 HP the character dies and recovers after **30 minutes** with partial HP
 
 ### Forge & economy
+
 - Shop with items categorized by rarity, priced in **gold** (plus a **gems** currency)
 - **Daily deal**: a rotating discounted item with an expiry timestamp
 - Owned items persist and show up on the character page (weapon / helmet / armor / accessory slots)
 
 ### Progress & profile
+
 - **Achievements** with unlock thresholds and gem rewards
 - **Statistics** page with time-segment bar charts and streak leaderboards
 - Profile page with quick links; settings for sound, haptics, and notifications
 
 ### Onboarding & auth
+
 - 4-step onboarding: Welcome → Class → Habit → Ready
 - Hive (local) mode is **local-first**: splash auto-mints a guest session and never forces login; optional Sign In lives in Settings when Firebase/server auth is configured
 - Firebase mode offers **Google Sign-In only** (email/Apple to be added later)
 - Server mode offers **email/password** login with a **registration** entry (no email verification)
 
 ### Freemium & subscription
+
 - Free: 3 habit slots, Warrior only, week stats, ads allowed, no legendary gear
 - Premium monthly / yearly / lifetime unlock unlimited habits, all classes, advanced stats, exclusive gear, no ads (see `docs/subscription.md`)
 - Play Billing via `in_app_purchase`; debug builds can unlock tiers from Settings → Premium when store products are missing
 
 ## Tech Stack
 
-| Area | Choice |
-|---|---|
-| Framework | Flutter (`.fvmrc` pins 3.41.6) |
-| State / DI / Routing | GetX |
-| Local storage | Hive + hive_flutter |
-| Auth (prod) | firebase_auth, google_sign_in, sign_in_with_apple |
-| UI | flutter_screenutil (393×852 design size), phosphor_flutter icons, custom fonts (Baloo2 / Nunito / Caveat) |
-| i18n | GetX translations + flutter_localizations (English / 中文) |
-| Effects | Lottie, audioplayers, haptics service, frame-sequence PNG animation player |
-| Other | uuid, intl, flutter_slidable, carousel_slider |
+| Area                 | Choice                                                                                                    |
+| -------------------- | --------------------------------------------------------------------------------------------------------- |
+| Framework            | Flutter (`.fvmrc` pins 3.41.6)                                                                            |
+| State / DI / Routing | GetX                                                                                                      |
+| Local storage        | Hive + hive_flutter                                                                                       |
+| Auth (prod)          | firebase_auth, google_sign_in, sign_in_with_apple                                                         |
+| UI                   | flutter_screenutil (393×852 design size), phosphor_flutter icons, custom fonts (Baloo2 / Nunito / Caveat) |
+| i18n                 | GetX translations + flutter_localizations (English / 中文)                                                |
+| Effects              | Lottie, audioplayers, haptics service, frame-sequence PNG animation player                                |
+| Other                | uuid, intl, flutter_slidable, carousel_slider                                                             |
 
 ## Getting Started
 
@@ -66,14 +72,14 @@ flutter run --dart-define-from-file=env/hive.json
 
 The runtime mode is selected by the `env/` config file passed via `--dart-define-from-file`. Three modes are supported:
 
-| Mode | File | Data storage | Auth |
-|---|---|---|---|
-| Hive (default) | `env/hive.json` | Local on-device (Hive) | Guest / local mock |
-| Firebase | `env/firebase.json` | Firebase (cloud data + auth) | Google Sign-In (Settings) + anonymous guest |
-| Server | `env/server.json` | Self-hosted backend — **gRPC** game data (`grpcUrl`) + **HTTP** auth (`apiUrl`) | Email/password + registration (no verification) |
+| Mode           | File                | Data storage                                                                    | Auth                                            |
+| -------------- | ------------------- | ------------------------------------------------------------------------------- | ----------------------------------------------- |
+| Hive (default) | `env/hive.json`     | Local on-device (Hive)                                                          | Guest / local mock                              |
+| Firebase       | `env/firebase.json` | Firebase (cloud data + auth)                                                    | Google Sign-In (Settings) + anonymous guest     |
+| Server         | `env/server.json`   | Self-hosted backend — **gRPC** game data (`grpcUrl`) + **HTTP** auth (`apiUrl`) | Email/password + registration (no verification) |
 
 - **Hive** — local-first mode, no backend required; the login page is skipped and the app enters directly (guest/local auth), Firebase is never initialized.
-- **Firebase** — initializes Firebase for cloud-backed auth and data. **Do not hardcode** project keys in Dart: put them in `env/firebase.json` (`apiKey`, `appId`, `messagingSenderId`, `projectId`, `storageBucket`). See [Firebase setup](docs/firebase-setup.md). Also keep `android/app/google-services.json` from the Console.
+- **Firebase** — SDK may initialize at startup, but **no anonymous Auth / Firestore** until the user signs in from Settings. Before that, gameplay uses on-device Hive (same as local-first). Weak networks cannot block entering the app (cloud restore is timed out and falls back to Hive).
 - **Server** — targets the self-hosted Go backend over **two transports**: email **auth** goes over HTTP REST (`POST {apiUrl}/api/v1/auth/login` / `/api/v1/auth/register`, JWT, no email verification), while **game data** (tasks, character, shop, achievements, stats) uses **gRPC** stubs generated from `proto/`. Both endpoints are read from `env/server.json`: `apiUrl` defaults to `http://localhost:8080`, `grpcUrl` to `localhost:9000`.
 
 #### `env/firebase.json` (required keys)

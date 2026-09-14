@@ -56,20 +56,23 @@ void main() async {
   Get.put(AuthController(), permanent: true);
 
   final firebaseAuth = FirebaseAuthService();
+  // Firebase mode: initialize the SDK only (needed later for Settings sign-in).
+  // Do NOT create anonymous sessions or hit Firestore here — that happens after
+  // explicit Settings login (see FirebaseSession / SplashController).
   if (EnvConstants.isFirebase() || EnvConstants.isAuthFirebase()) {
     try {
       if (!DefaultFirebaseOptions.isConfigured) {
         throw StateError(
           'Firebase options missing. Fill apiKey/appId/messagingSenderId/'
-          'projectId/storageBucket in .env/firebase.json',
+          'projectId/storageBucket in env/firebase.json',
         );
       }
-      await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+      await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform).timeout(const Duration(seconds: 8));
       firebaseAuth.markAvailable();
       await firebaseAuth.initGoogleSignIn();
-      debugPrint('Firebase initialized successfully');
+      debugPrint('Firebase SDK initialized (auth deferred to Settings)');
     } catch (e) {
-      debugPrint('Firebase not configured ($e). Auth will use local mock.');
+      debugPrint('Firebase not configured ($e). Local Hive will be used until sign-in.');
     }
   }
   Get.put(firebaseAuth);

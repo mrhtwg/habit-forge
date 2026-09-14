@@ -5,52 +5,55 @@ import 'package:habit_forge_app/core/di/injection_container.dart';
 import 'package:habit_forge_app/core/network/grpc/base/auth_grpc_interceptor.dart';
 import 'package:injectable/injectable.dart';
 
-/// A singleton managing the gRPC ClientChannel with automatic reconnection on
-/// specific failures.
+/// Singleton gRPC channel — only used in **server** mode.
+///
+/// Construction is lazy so hive/firebase startups do not open a useless
+/// `localhost:9000` connection.
 @singleton
 class GrpcClientChannel {
-  late ClientChannel _channel;
+  ClientChannel? _channel;
 
   final List<int> retryableErrors = [
     StatusCode.unavailable,
-    StatusCode.deadlineExceeded, // Resource exhausted; may be temporary.
-    StatusCode.aborted, // Operation aborted; may be retryable.
-    StatusCode.internal, // Internal error; may be temporary.
-    StatusCode.unknown, // Unknown error; depends on the situation.
+    StatusCode.deadlineExceeded,
+    StatusCode.aborted,
+    StatusCode.internal,
+    StatusCode.unknown,
   ];
 
-  /// Initializes the channel upon creation.
-  GrpcClientChannel() {
-    _initializeChannel();
-  }
+  GrpcClientChannel();
 
-  /// Factory constructor returning the singleton instance.
   factory GrpcClientChannel.instance() => getIt<GrpcClientChannel>();
 
-  /// Gets the underlying gRPC ClientChannel.
-  ClientChannel get channel => _channel;
+  ClientChannel get channel {
+    _channel ??= _createChannel();
+    return _channel!;
+  }
 
-  /// Interceptors applied to every gRPC stub (token metadata, timing...).
   List<ClientInterceptor> get interceptors => [_authInterceptor];
 
   final AuthGrpcInterceptor _authInterceptor = AuthGrpcInterceptor();
 
-  /// Public method to manually trigger a shutdown of the channel.
   Future<void> shutdown() async {
+    final ch = _channel;
+    if (ch == null) return;
     Log.d('Shutting down gRPC ClientChannel...');
     try {
-      await _channel.shutdown().timeout(const Duration(seconds: 5));
+      await ch.shutdown().timeout(const Duration(seconds: 5));
       Log.d('gRPC ClientChannel shut down successfully.');
     } catch (e) {
       Log.e('Error shutting down gRPC ClientChannel: $e');
+    } finally {
+      _channel = null;
     }
   }
 
-  /// Internal method to create and set up the ClientChannel from
-  /// [EnvConstants.grpcUrl] (format "host:port").
-  void _initializeChannel() {
+  ClientChannel _createChannel() {
+    if (!EnvConstants.isServer()) {
+      Log.w('gRPC channel requested outside server mode — using ${EnvConstants.grpcUrl}');
+    }
     final (host, port) = _parseEndpoint(EnvConstants.grpcUrl);
-    _channel = ClientChannel(
+    final ch = ClientChannel(
       host,
       port: port,
       options: const ChannelOptions(
@@ -64,9 +67,9 @@ class GrpcClientChannel {
       channelShutdownHandler: () => {Log.d('ClientChannel shutdown')},
     );
     Log.d('gRPC Channel initialized for $host:$port');
+    return ch;
   }
 
-  /// Parses "host:port" (or "http://host:port") into a (host, port) record.
   (String, int) _parseEndpoint(String url) {
     final cleaned = url.replaceAll(RegExp(r'^https?://'), '');
     final parts = cleaned.split(':');

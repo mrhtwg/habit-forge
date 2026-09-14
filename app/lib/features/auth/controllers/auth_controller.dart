@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/common/utils/sp_keys.dart';
 import 'package:habit_forge_app/core/common/utils/sp_utils.dart';
@@ -7,27 +8,24 @@ import 'package:habit_forge_app/core/network/network_registry.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
 import 'package:habit_forge_app/core/services/cloud_login_policy.dart';
 import 'package:habit_forge_app/core/services/firebase_auth_service.dart';
+import 'package:habit_forge_app/core/services/firebase_session.dart';
 import 'package:habit_forge_app/core/services/server_auth_service.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/widgets/confirm_dialog.dart';
 import 'package:habit_forge_app/widgets/toast_widget.dart';
-import 'package:flutter/material.dart';
 
 class AuthController extends GetxController {
   static AuthController get to => Get.find();
 
   final isLoading = false.obs;
   final isLoggedIn = false.obs;
-  /// Bumped after sign-in / sign-out so Settings Obx rebuilds.
   final accountRevision = 0.obs;
 
-  /// True when the player has a non-guest cloud identity (for Settings UI).
   bool get hasCloudIdentity {
-    accountRevision.value; // Obx dependency
+    accountRevision.value;
     if (EnvConstants.isHive()) return false;
     if (EnvConstants.isAuthFirebase()) {
-      final u = FirebaseAuthService.to.currentUser;
-      return u != null && !u.isAnonymous;
+      return FirebaseSession.hasLinkedCloudUser;
     }
     if (EnvConstants.isAuthServer()) {
       return UserService.to.isLoggedIn();
@@ -45,10 +43,10 @@ class AuthController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    if (UserService.to.isLoggedIn()) isLoggedIn.value = true;
+    if (hasCloudIdentity) isLoggedIn.value = true;
   }
 
-  /// Settings → Firebase: open Google account picker directly (no AuthPage).
+  /// Settings → Firebase: Google picker only (no AuthPage, no startup anonymous).
   Future<bool> signInWithGoogleFromSettings(BuildContext context) async {
     if (!EnvConstants.isAuthFirebase()) return false;
     isLoading.value = true;
@@ -61,23 +59,24 @@ class AuthController extends GetxController {
         return false;
       }
 
-      if (link.usedExistingAccount) {
-        if (CloudLoginPolicy.shouldConfirmOverwrite(
-          hasLocalProgress: hasLocal,
-          isExistingCloudAccount: true,
-        )) {
-          final confirmed = await _showOverwriteDialog(context);
-          if (confirmed != true) {
-            await FirebaseAuthService.to.restoreAnonymousSession();
-            await NetworkRegistry.ins.login('guest');
-            return false;
-          }
+      if (link.usedExistingAccount &&
+          CloudLoginPolicy.shouldConfirmOverwrite(
+            hasLocalProgress: hasLocal,
+            isExistingCloudAccount: true,
+          )) {
+        final confirmed = await _showOverwriteDialog(context);
+        if (confirmed != true) {
+          await FirebaseAuthService.to.signOut();
+          await FirebaseSession.useLocalBackend();
+          return false;
         }
       }
 
-      final result = await NetworkRegistry.ins.login('google');
+      final result = await FirebaseSession.useCloudBackend(provider: 'google').timeout(FirebaseSession.networkTimeout);
       if (result.isFailure) {
         Toast.error('${LanKey.googleLoginFailed.tr}: ${result.message}');
+        await FirebaseAuthService.to.signOut();
+        await FirebaseSession.useLocalBackend();
         return false;
       }
       await _persistLinkedEmail();
@@ -86,12 +85,16 @@ class AuthController extends GetxController {
       await _reloadAfterCloudLogin();
       Toast.success(LanKey.signInSuccess.tr);
       return true;
+    } catch (e) {
+      Toast.error('${LanKey.googleLoginFailed.tr}: $e');
+      await FirebaseAuthService.to.signOut();
+      await FirebaseSession.useLocalBackend();
+      return false;
     } finally {
       isLoading.value = false;
     }
   }
 
-  /// Email login (server or firebase). Used from Settings bottom sheet.
   Future<bool> loginWithEmail(String email, String password) async {
     isLoading.value = true;
     try {
@@ -105,14 +108,13 @@ class AuthController extends GetxController {
       } else if (EnvConstants.isAuthFirebase()) {
         error = await FirebaseAuthService.to.loginWithEmail(email, password);
       } else {
-        return false; // hive: no cloud email login
+        return false;
       }
       if (error != null) {
         Toast.error('${LanKey.loginFailed.tr}: $error');
         return false;
       }
 
-      // Email login always targets an existing account. Confirm before syncing.
       if (ctx != null &&
           CloudLoginPolicy.shouldConfirmOverwrite(
             hasLocalProgress: hasLocal,
@@ -125,7 +127,14 @@ class AuthController extends GetxController {
         }
       }
 
-      if (EnvConstants.isFirebase() || EnvConstants.isServer()) {
+      if (EnvConstants.isFirebase()) {
+        final result = await FirebaseSession.useCloudBackend(provider: 'email').timeout(FirebaseSession.networkTimeout);
+        if (result.isFailure) {
+          Toast.error('${LanKey.loginFailed.tr}: ${result.message}');
+          await _rollbackEmailLogin(previousToken);
+          return false;
+        }
+      } else if (EnvConstants.isServer()) {
         final result = await NetworkRegistry.ins.login('email');
         if (result.isFailure) {
           Toast.error('${LanKey.loginFailed.tr}: ${result.message}');
@@ -145,7 +154,6 @@ class AuthController extends GetxController {
     }
   }
 
-  /// Register (new account) — never an "existing" cloud save, no overwrite dialog.
   Future<bool> registerWithEmail(String email, String password) async {
     isLoading.value = true;
     try {
@@ -162,7 +170,13 @@ class AuthController extends GetxController {
         return false;
       }
 
-      if (EnvConstants.isFirebase() || EnvConstants.isServer()) {
+      if (EnvConstants.isFirebase()) {
+        final result = await FirebaseSession.useCloudBackend(provider: 'email').timeout(FirebaseSession.networkTimeout);
+        if (result.isFailure) {
+          Toast.error('${LanKey.registrationFailed.tr}: ${result.message}');
+          return false;
+        }
+      } else if (EnvConstants.isServer()) {
         final result = await NetworkRegistry.ins.login('email');
         if (result.isFailure) {
           Toast.error('${LanKey.registrationFailed.tr}: ${result.message}');
@@ -186,24 +200,19 @@ class AuthController extends GetxController {
 
     if (EnvConstants.isAuthServer()) {
       await ServerAuthService.to.signOut();
+      await UserService.to.setSessionToken(null);
+      isLoggedIn.value = false;
     } else if (Get.isRegistered<FirebaseAuthService>()) {
       await FirebaseAuthService.to.signOut();
-      if (EnvConstants.isFirebase()) {
-        await FirebaseAuthService.to.ensureAnonymousSession();
-        await NetworkRegistry.ins.login('guest');
-      }
+      await SpUtils.ins.remove(SpKeys.linkedEmail);
+      // Back to local-first Hive — do not create anonymous Firebase users.
+      await FirebaseSession.useLocalBackend();
+      await UserService.to.loadUserPrefs();
+      await UserService.to.loadCharacter();
+      isLoggedIn.value = false;
     }
-    await SpUtils.ins.remove(SpKeys.linkedEmail);
-    // Keep in-memory character/tasks as "local progress" for a subsequent
-    // cloud login conflict check within this session.
-    if (!EnvConstants.isFirebase()) {
-      await UserService.to.setSessionToken(null);
-    }
-    isLoggedIn.value = EnvConstants.isFirebase() && UserService.to.isLoggedIn();
     accountRevision.value++;
   }
-
-  // ── Internals ──
 
   bool _snapshotLocalProgress() {
     return CloudLoginPolicy.hasLocalProgress(
@@ -226,8 +235,7 @@ class AuthController extends GetxController {
   Future<void> _rollbackEmailLogin(String previousToken) async {
     if (EnvConstants.isAuthFirebase()) {
       await FirebaseAuthService.to.signOut();
-      await FirebaseAuthService.to.ensureAnonymousSession();
-      await NetworkRegistry.ins.login('guest');
+      await FirebaseSession.useLocalBackend();
       return;
     }
     if (previousToken.isEmpty) {
@@ -251,7 +259,6 @@ class AuthController extends GetxController {
     if (tasks.isSuccess) {
       UserService.to.tasks.assignAll(tasks.data?.tasks ?? []);
     }
-    // Refresh route if we just gained/lost a character.
     if (UserService.to.character.value == null) {
       if (Get.currentRoute != Routers.boarding) {
         Get.offAllNamed(Routers.boarding);

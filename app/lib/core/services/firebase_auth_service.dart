@@ -48,6 +48,10 @@ class FirebaseAuthService extends GetxService {
 
   /// Ensures a Firebase session exists so Firestore game data can be written
   /// without showing a login page (anonymous guest).
+  ///
+  /// Prefer [FirebaseSession.useLocalBackend] for cold start / Settings-cancel
+  /// paths — anonymous Auth is no longer used at splash.
+  @Deprecated('Use FirebaseSession.useLocalBackend instead of anonymous Auth')
   Future<String?> ensureAnonymousSession() async {
     if (!_available) return 'Firebase not configured';
     if (_auth.currentUser != null) return null;
@@ -61,14 +65,9 @@ class FirebaseAuthService extends GetxService {
     }
   }
 
-  /// After canceling an existing-account login, return to a guest session.
+  /// Clears Firebase + Google sessions. Caller should switch to local Hive.
   Future<void> restoreAnonymousSession() async {
-    if (!_available) return;
-    try {
-      await _auth.signOut();
-      await _googleSignIn.signOut();
-    } catch (_) {}
-    await ensureAnonymousSession();
+    await signOut();
   }
 
   /// Settings Google entry: link anonymous → Google when possible; otherwise
