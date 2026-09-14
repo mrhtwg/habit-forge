@@ -3,6 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/network/hive/shop_config.dart';
+import 'package:habit_forge_app/core/routes/app_routes.dart';
+import 'package:habit_forge_app/core/services/subscription_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/forge/controllers/forge_controller.dart';
@@ -152,8 +154,15 @@ class ItemDetailSheet extends StatelessWidget {
     final String label;
     final bool showPrice;
     final bool payWithGems = controller.currencyOf(item) == ShopCurrency.SHOP_CURRENCY_GEMS;
+    final premiumLocked = !SubscriptionService.to.canAccessShopItem(item);
 
-    if (owned) {
+    if (premiumLocked && !owned) {
+      onTap = () => Get.toNamed(Routers.subscription);
+      bg = AppColors.gold;
+      fg = AppColors.textPrimary;
+      label = LanKey.premiumGearLocked.tr;
+      showPrice = false;
+    } else if (owned) {
       if (isSkin) {
         // Skins are cosmetic unlocks; equipping them belongs to the future
         // Rive character system. For now just show "Owned".
@@ -217,9 +226,12 @@ class ItemDetailSheet extends StatelessWidget {
               ),
               SizedBox(width: 6.w),
             ],
-            Text(
-              showPrice ? '$label · ${item.price}' : label,
-              style: textStyleBold(fontSize: 15.sp, color: fg),
+            Flexible(
+              child: Text(
+                showPrice ? '$label · ${item.price}' : label,
+                textAlign: TextAlign.center,
+                style: textStyleBold(fontSize: 15.sp, color: fg),
+              ),
             ),
           ],
         ),

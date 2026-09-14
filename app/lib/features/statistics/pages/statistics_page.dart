@@ -3,6 +3,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/network/hive/game_constants.dart';
+import 'package:habit_forge_app/core/routes/app_routes.dart';
+import 'package:habit_forge_app/core/services/subscription_service.dart';
+import 'package:habit_forge_app/core/services/subscription_tier.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
@@ -42,6 +45,50 @@ class StatisticsPage extends GetView<StatisticsController> {
 
   /// Stats content for one time period (swipeable tab).
   Widget _buildStatsPage(TimePeriod period) {
+    return Obx(() {
+      // Observe entitlement so unlocking Premium refreshes locked tabs.
+      final premium = SubscriptionService.to.tier.value != SubscriptionTier.free;
+      if (period != TimePeriod.week && !premium) {
+        return _buildPremiumLock();
+      }
+      return _buildStatsContent(period);
+    });
+  }
+
+  Widget _buildPremiumLock() {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 32.w),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.lock_rounded, size: 48.w, color: AppColors.goldDark),
+            SizedBox(height: 12.h),
+            Text(
+              LanKey.premiumStatsLocked.tr,
+              textAlign: TextAlign.center,
+              style: textStyleBold(fontSize: 16.sp, color: AppColors.textPrimary),
+            ),
+            SizedBox(height: 16.h),
+            GestureDetector(
+              onTap: () => Get.toNamed(Routers.subscription),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(color: AppColors.border, width: 2),
+                ),
+                child: Text(LanKey.premium.tr, style: textStyleBold(fontSize: 14.sp, color: Colors.white)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatsContent(TimePeriod period) {
     return Obx(() {
       final now = DateTime.now();
 

@@ -5,10 +5,12 @@ import 'package:habit_forge_app/core/common/animation/frame_sequence_player.dart
 import 'package:habit_forge_app/core/constants/env_constants.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
+import 'package:habit_forge_app/core/services/subscription_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/boarding/controllers/boarding_controller.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pbenum.dart';
+import 'package:habit_forge_app/widgets/terms_privacy_footer.dart';
 
 class BoardingPage extends GetView<BoardingController> {
   static const _totalSteps = 4;
@@ -30,6 +32,11 @@ class BoardingPage extends GetView<BoardingController> {
                 SizedBox(height: 6.h),
                 Expanded(child: _buildStepContent(step)),
                 SizedBox(height: 10.h),
+                // Welcome step = first screen after splash (no login page in hive).
+                if (step == 0) ...[
+                  const TermsPrivacyFooter(),
+                  SizedBox(height: 12.h),
+                ],
                 _buildBottomButton(step),
                 SizedBox(height: 30.h),
               ],
@@ -136,9 +143,10 @@ class BoardingPage extends GetView<BoardingController> {
                 child: const Icon(Icons.arrow_back_rounded, size: 18, color: AppColors.textPrimary),
               ),
             )
-          else if (!EnvConstants.isHive()) ...[
+          else if (!EnvConstants.isHive() && !EnvConstants.isFirebase() && !EnvConstants.isServer()) ...[
+            // Legacy only — cloud modes sign in from Settings, not AuthPage.
             GestureDetector(
-              onTap: () => Get.offAllNamed(EnvConstants.isHive() ? Routers.main : Routers.login),
+              onTap: () => Get.offAllNamed(Routers.login),
               child: Container(
                 width: 34.w,
                 height: 34.w,
@@ -235,6 +243,7 @@ class BoardingPage extends GetView<BoardingController> {
               final cls = classes[i];
               return Obx(() {
                 final selected = controller.selectedClass.value == cls.$1;
+                final locked = !SubscriptionService.to.canUseClass(cls.$1);
                 return GestureDetector(
                   onTap: () => controller.selectClass(cls.$1),
                   child: Container(
@@ -284,9 +293,17 @@ class BoardingPage extends GetView<BoardingController> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                cls.$2.tr,
-                                style: textStyleBlack(fontSize: 17.sp, color: AppColors.textPrimary),
+                              Row(
+                                children: [
+                                  Text(
+                                    cls.$2.tr,
+                                    style: textStyleBlack(fontSize: 17.sp, color: AppColors.textPrimary),
+                                  ),
+                                  if (locked) ...[
+                                    SizedBox(width: 6.w),
+                                    Icon(Icons.lock_rounded, size: 16.w, color: AppColors.goldDark),
+                                  ],
+                                ],
                               ),
                               SizedBox(height: 2.h),
                               Text(

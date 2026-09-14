@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/network/hive/shop_config.dart';
+import 'package:habit_forge_app/core/services/subscription_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/forge/controllers/forge_controller.dart';
@@ -181,6 +182,7 @@ class ForgePage extends GetView<ForgeController> {
   // ─────────── Shop racks ───────────
   Widget _buildPermanentPage() {
     return Obx(() {
+      SubscriptionService.to.tier.value; // rebuild locks when entitlement changes
       final items = controller.shopItems.where((i) => ShopConfig.categoryOf(i.id) == 'equipment').toList();
       return _buildGrid(items);
     });
@@ -188,6 +190,7 @@ class ForgePage extends GetView<ForgeController> {
 
   Widget _buildRotatingPage() {
     return Obx(() {
+      SubscriptionService.to.tier.value;
       // Each Field Shop tile carries its own supermarket-style countdown
       // sticker; the whole rack refreshes together every 2 hours.
       return _buildGrid(controller.rotating.toList(), showSaleTag: true);
@@ -264,7 +267,19 @@ class ForgePage extends GetView<ForgeController> {
                     border: Border.all(color: ShopItemIcon.rarityColor(item.rarity), width: 2),
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: ShopItemIcon(itemId: item.id, iconFile: ShopConfig.iconOf(item.id), size: 36.w),
+                  child: Stack(
+                    children: [
+                      Center(
+                        child: ShopItemIcon(itemId: item.id, iconFile: ShopConfig.iconOf(item.id), size: 36.w),
+                      ),
+                      if (!SubscriptionService.to.canAccessShopItem(item))
+                        Positioned(
+                          right: 0,
+                          top: 0,
+                          child: Icon(Icons.lock_rounded, size: 14.w, color: AppColors.goldDark),
+                        ),
+                    ],
+                  ),
                 ),
                 SizedBox(height: 8.h),
                 Text(

@@ -1,7 +1,9 @@
 import 'package:carousel_slider/carousel_controller.dart';
 import 'package:get/get.dart';
+import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/network/network_registry.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
+import 'package:habit_forge_app/core/services/subscription_service.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';
@@ -55,7 +57,14 @@ class BoardingController extends GetxController {
     }
   }
 
-  void selectClass(CharacterClass c) => selectedClass.value = c;
+  void selectClass(CharacterClass c) {
+    if (!SubscriptionService.to.canUseClass(c)) {
+      Toast.warning(LanKey.premiumClassLocked.tr);
+      Get.toNamed(Routers.subscription);
+      return;
+    }
+    selectedClass.value = c;
+  }
 
   void selectHabit(String title) => firstHabitTitle.value = title;
 

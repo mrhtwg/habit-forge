@@ -17,6 +17,11 @@ import 'package:habit_forge_app/features/splash/bindings/splash_binding.dart';
 import 'package:habit_forge_app/features/splash/pages/splash_page.dart';
 import 'package:habit_forge_app/features/statistics/bindings/statistics_binding.dart';
 import 'package:habit_forge_app/features/statistics/pages/statistics_page.dart';
+import 'package:habit_forge_app/features/subscription/bindings/subscription_binding.dart';
+import 'package:habit_forge_app/features/subscription/pages/subscription_page.dart';
+import 'package:habit_forge_app/features/legal/bindings/legal_binding.dart';
+import 'package:habit_forge_app/features/legal/pages/legal_doc_page.dart';
+import 'package:habit_forge_app/core/constants/legal_urls.dart';
 
 class AppPages {
   static final List<GetPage> pages = [
@@ -29,6 +34,17 @@ class AppPages {
     cupertinoPage(name: Routers.achievements, binding: AchievementsBinding(), page: () => AchievementsPage()),
     cupertinoPage(name: Routers.statistics, binding: StatisticsBinding(), page: () => StatisticsPage()),
     cupertinoPage(name: Routers.settings, binding: SettingsBinding(), page: () => SettingsPage()),
+    cupertinoPage(name: Routers.subscription, binding: SubscriptionBinding(), page: () => const SubscriptionPage()),
+    cupertinoPage(
+      name: Routers.terms,
+      binding: LegalBinding(),
+      page: () => const LegalDocPage(type: LegalDocType.terms),
+    ),
+    cupertinoPage(
+      name: Routers.privacy,
+      binding: LegalBinding(),
+      page: () => const LegalDocPage(type: LegalDocType.privacy),
+    ),
   ];
 
   // Common transition route (right to left)
@@ -70,4 +86,7 @@ class Routers {
   static final String achievements = "/achievements";
   static final String statistics = "/statistics";
   static final String settings = "/settings";
+  static final String subscription = "/subscription";
+  static final String terms = "/legal/terms";
+  static final String privacy = "/legal/privacy";
 }

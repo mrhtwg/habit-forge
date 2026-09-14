@@ -1,9 +1,12 @@
 import 'dart:async';
 
 import 'package:get/get.dart';
+import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/network/api_response.dart';
 import 'package:habit_forge_app/core/network/hive/shop_config.dart';
 import 'package:habit_forge_app/core/network/network_registry.dart';
+import 'package:habit_forge_app/core/routes/app_routes.dart';
+import 'package:habit_forge_app/core/services/subscription_service.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/generated/protos/shop/v1/shop.pb.dart';
 import 'package:habit_forge_app/widgets/toast_widget.dart';
@@ -104,6 +107,11 @@ class ForgeController extends GetxController {
   /// Delegates the purchase to the storage layer (the item's own currency
   /// decides gold vs gems), then refreshes wallet + owned + catalog.
   Future<ApiResponse<BuyItemReply>> purchase(ShopItem item) async {
+    if (!SubscriptionService.to.canAccessShopItem(item)) {
+      Toast.warning(LanKey.premiumGearLocked.tr);
+      Get.toNamed(Routers.subscription);
+      return ApiResponse.failure(code: -1, message: LanKey.premiumRequired.tr);
+    }
     final result = await NetworkRegistry.ins.purchaseItem(item.id, currencyOf(item));
     if (result.isSuccess) {
       await UserService.to.loadUserPrefs();

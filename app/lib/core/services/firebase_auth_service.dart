@@ -3,9 +3,28 @@ import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
+/// Result of a Google sign-in / link attempt from Settings.
+class GoogleLinkResult {
+  final String? error;
+  final bool canceled;
+
+  /// True when the Google credential belonged to an account that already
+  /// existed (anonymous upgrade failed with credential-already-in-use).
+  final bool usedExistingAccount;
+
+  const GoogleLinkResult({
+    this.error,
+    this.canceled = false,
+    this.usedExistingAccount = false,
+  });
+
+  const GoogleLinkResult.canceled() : this(canceled: true);
+  const GoogleLinkResult.linked() : this();
+  const GoogleLinkResult.existing() : this(usedExistingAccount: true);
+  GoogleLinkResult.failed(String message) : this(error: message);
+}
+
 /// Firebase Auth wrapper.
-/// If Firebase not configured (google-services.json missing/invalid),
-/// all methods fall back gracefully and return an error string.
 class FirebaseAuthService extends GetxService {
   static FirebaseAuthService get to => Get.find();
 
@@ -13,39 +32,97 @@ class FirebaseAuthService extends GetxService {
 
   User? get currentUser => _auth.currentUser;
   bool get isAvailable => _available;
+  bool get isAnonymous => _auth.currentUser?.isAnonymous ?? false;
 
-  // Lazily resolve Firebase/Google instances so constructor doesn't
-  // throw before Firebase.initializeApp() completes.
   FirebaseAuth get _auth => FirebaseAuth.instance;
   GoogleSignIn get _googleSignIn => GoogleSignIn.instance;
 
-  /// Init Google Sign-In (call after Firebase is ready).
   Future<void> initGoogleSignIn() async {
     if (!_available) return;
     try {
       await _googleSignIn.initialize();
-    } catch (_) {
-      // Google sign-in won't work — that's OK
+    } catch (_) {}
+  }
+
+  void markAvailable() => _available = true;
+
+  /// Ensures a Firebase session exists so Firestore game data can be written
+  /// without showing a login page (anonymous guest).
+  Future<String?> ensureAnonymousSession() async {
+    if (!_available) return 'Firebase not configured';
+    if (_auth.currentUser != null) return null;
+    try {
+      await _auth.signInAnonymously();
+      return null;
+    } on FirebaseAuthException catch (e) {
+      return _mapError(e);
+    } catch (e) {
+      return e.toString();
     }
   }
 
-  // ── Apple ──
+  /// After canceling an existing-account login, return to a guest session.
+  Future<void> restoreAnonymousSession() async {
+    if (!_available) return;
+    try {
+      await _auth.signOut();
+      await _googleSignIn.signOut();
+    } catch (_) {}
+    await ensureAnonymousSession();
+  }
+
+  /// Settings Google entry: link anonymous → Google when possible; otherwise
+  /// sign into the existing Google account (caller handles overwrite confirm).
+  Future<GoogleLinkResult> linkOrSignInWithGoogle() async {
+    if (!_available) return GoogleLinkResult.failed('Firebase not configured');
+    try {
+      final account = await _googleSignIn.authenticate();
+      final idToken = account.authentication.idToken;
+      if (idToken == null) return GoogleLinkResult.failed('No ID token received from Google');
+
+      final credential = GoogleAuthProvider.credential(idToken: idToken);
+      final user = _auth.currentUser;
+
+      if (user != null && user.isAnonymous) {
+        try {
+          await user.linkWithCredential(credential);
+          return const GoogleLinkResult.linked();
+        } on FirebaseAuthException catch (e) {
+          if (e.code == 'credential-already-in-use' || e.code == 'email-already-in-use') {
+            await _auth.signInWithCredential(credential);
+            return const GoogleLinkResult.existing();
+          }
+          return GoogleLinkResult.failed(_mapError(e));
+        }
+      }
+
+      final signedIn = await _auth.signInWithCredential(credential);
+      if (signedIn.additionalUserInfo?.isNewUser == true) {
+        return const GoogleLinkResult.linked();
+      }
+      return const GoogleLinkResult.existing();
+    } on GoogleSignInException catch (e) {
+      if (e.code == GoogleSignInExceptionCode.canceled) {
+        return const GoogleLinkResult.canceled();
+      }
+      return GoogleLinkResult.failed('Google sign-in failed: ${e.code.name}');
+    } on FirebaseAuthException catch (e) {
+      return GoogleLinkResult.failed(_mapError(e));
+    } catch (e) {
+      return GoogleLinkResult.failed(e.toString());
+    }
+  }
 
   Future<String?> loginWithApple() async {
     if (!_available) return 'Firebase not configured';
     try {
       final appleCredential = await SignInWithApple.getAppleIDCredential(
-        scopes: [
-          AppleIDAuthorizationScopes.email,
-          AppleIDAuthorizationScopes.fullName,
-        ],
+        scopes: [AppleIDAuthorizationScopes.email, AppleIDAuthorizationScopes.fullName],
       );
-
       final credential = OAuthProvider('apple.com').credential(
         idToken: appleCredential.identityToken,
         accessToken: appleCredential.authorizationCode,
       );
-
       await _auth.signInWithCredential(credential);
       return null;
     } on FirebaseAuthException catch (e) {
@@ -67,36 +144,15 @@ class FirebaseAuthService extends GetxService {
     }
   }
 
-  // ── Google ──
-
-  Future<String?> loginWithGoogle() async {
-    if (!_available) return 'Firebase not configured';
-    try {
-      final account = await _googleSignIn.authenticate();
-      final idToken = account.authentication.idToken;
-      if (idToken == null) return 'No ID token received from Google';
-
-      final credential = GoogleAuthProvider.credential(idToken: idToken);
-      await _auth.signInWithCredential(credential);
-      return null;
-    } on GoogleSignInException catch (e) {
-      if (e.code == GoogleSignInExceptionCode.canceled) return null;
-      return 'Google sign-in failed: ${e.code.name}';
-    } on FirebaseAuthException catch (e) {
-      return _mapError(e);
-    } catch (e) {
-      return e.toString();
-    }
-  }
-
-  /// Call after Firebase.initializeApp() succeeds.
-  void markAvailable() => _available = true;
-
-  // ── Email/Password ──
-
   Future<String?> registerWithEmail(String email, String password) async {
     if (!_available) return 'Firebase not configured';
     try {
+      final user = _auth.currentUser;
+      if (user != null && user.isAnonymous) {
+        final cred = EmailAuthProvider.credential(email: email, password: password);
+        await user.linkWithCredential(cred);
+        return null;
+      }
       await _auth.createUserWithEmailAndPassword(email: email, password: password);
       return null;
     } on FirebaseAuthException catch (e) {
@@ -106,15 +162,13 @@ class FirebaseAuthService extends GetxService {
     }
   }
 
-  // ── Logout ──
-
   Future<void> signOut() async {
     if (!_available) return;
     await _auth.signOut();
-    await _googleSignIn.signOut();
+    try {
+      await _googleSignIn.signOut();
+    } catch (_) {}
   }
-
-  // ── Error mapping ──
 
   String _mapError(FirebaseAuthException e) {
     switch (e.code) {

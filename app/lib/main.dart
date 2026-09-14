@@ -13,7 +13,9 @@ import 'package:habit_forge_app/core/services/audio_service.dart';
 import 'package:habit_forge_app/core/services/firebase_auth_service.dart';
 import 'package:habit_forge_app/core/services/haptic_service.dart';
 import 'package:habit_forge_app/core/services/server_auth_service.dart';
+import 'package:habit_forge_app/core/services/subscription_service.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
+import 'package:habit_forge_app/features/auth/controllers/auth_controller.dart';
 import 'package:habit_forge_app/firebase_options.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
@@ -47,9 +49,21 @@ void main() async {
   await UserService.to.init();
   await ShopConfig.load();
 
+  final subscription = SubscriptionService();
+  Get.put(subscription, permanent: true);
+  await subscription.init();
+
+  Get.put(AuthController(), permanent: true);
+
   final firebaseAuth = FirebaseAuthService();
   if (EnvConstants.isFirebase() || EnvConstants.isAuthFirebase()) {
     try {
+      if (!DefaultFirebaseOptions.isConfigured) {
+        throw StateError(
+          'Firebase options missing. Fill apiKey/appId/messagingSenderId/'
+          'projectId/storageBucket in .env/firebase.json',
+        );
+      }
       await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
       firebaseAuth.markAvailable();
       await firebaseAuth.initGoogleSignIn();

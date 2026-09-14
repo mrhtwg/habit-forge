@@ -4,11 +4,15 @@ import 'package:get/get.dart';
 import 'package:habit_forge_app/core/constants/env_constants.dart';
 import 'package:habit_forge_app/core/i18n/app_locale.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
+import 'package:habit_forge_app/core/routes/app_routes.dart';
 import 'package:habit_forge_app/core/services/audio_service.dart';
 import 'package:habit_forge_app/core/services/haptic_service.dart';
+import 'package:habit_forge_app/core/services/subscription_service.dart';
+import 'package:habit_forge_app/core/services/subscription_tier.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/auth/controllers/auth_controller.dart';
+import 'package:habit_forge_app/features/auth/pages/email_login_sheet.dart';
 import 'package:habit_forge_app/features/settings/controllers/settings_controller.dart';
 import 'package:habit_forge_app/widgets/confirm_dialog.dart';
 
@@ -62,56 +66,41 @@ class SettingsPage extends GetView<SettingsController> {
         child: Column(
           children: [
             _buildHeader(),
-            Padding(
-              padding: EdgeInsets.all(16.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.all(16.w),
                 children: [
-                  // Account section
-                  ...[
-                    _SectionHeader(LanKey.account.tr),
-                    _SettingsCard(
-                      child: Column(
-                        children: [
-                          ListTile(
-                            dense: true,
-                            leading: const Icon(Icons.person_outline, color: AppColors.textSecondary),
-                            title: Text(
-                              LanKey.guest.tr,
-                              style: textStyleRegular(color: AppColors.textPrimary),
-                            ),
-                            subtitle: Text(
-                              LanKey.signedIn.tr,
-                              style: textStyleRegular(color: AppColors.textMuted, fontSize: 12),
-                            ),
-                          ),
-                          const Divider(color: AppColors.elevated, height: 1, thickness: 1),
-                          ListTile(
-                            dense: true,
-                            leading: const Icon(Icons.logout, color: AppColors.red),
-                            title: Text(
-                              LanKey.signOut.tr,
-                              style: textStyleRegular(color: AppColors.red),
-                            ),
-                            onTap: () async {
-                              final confirmed = await ConfirmDialog.show(
-                                context,
-                                title: LanKey.signOut.tr,
-                                message: LanKey.signOutConfirm.tr,
-                                confirmLabel: LanKey.signOut.tr,
-                                isDestructive: true,
-                              );
-                              if (confirmed == true) {
-                                await AuthController.to.logout();
-                              }
-                            },
-                          ),
-                        ],
+                  _SectionHeader(LanKey.account.tr),
+                  _SettingsCard(child: _buildAccountSection(context)),
+                  const SizedBox(height: 20),
+
+                  _SectionHeader(LanKey.premium.tr),
+                  Obx(() {
+                    final tier = SubscriptionService.to.tier.value;
+                    final label = switch (tier) {
+                      SubscriptionTier.monthly => LanKey.planMonthly.tr,
+                      SubscriptionTier.yearly => LanKey.planYearly.tr,
+                      SubscriptionTier.lifetime => LanKey.planLifetime.tr,
+                      _ => LanKey.planFree.tr,
+                    };
+                    return _SettingsCard(
+                      child: ListTile(
+                        leading: const Icon(Icons.workspace_premium_rounded, color: AppColors.goldDark),
+                        title: Text(
+                          tier.isPremium ? label : LanKey.premium.tr,
+                          style: textStyleRegular(color: AppColors.textPrimary),
+                        ),
+                        subtitle: Text(
+                          tier.isPremium ? LanKey.currentPlan.tr : LanKey.premiumSubtitle.tr,
+                          style: textStyleRegular(color: AppColors.textMuted, fontSize: 12),
+                        ),
+                        trailing: const Icon(Icons.chevron_right_rounded, color: AppColors.textMuted),
+                        onTap: () => Get.toNamed(Routers.subscription),
                       ),
-                    ),
-                    const SizedBox(height: 20),
-                  ],
-                  // Preferences section
+                    );
+                  }),
+                  const SizedBox(height: 20),
+
                   _SectionHeader(LanKey.preferences.tr),
                   _SettingsCard(
                     child: Column(
@@ -132,7 +121,6 @@ class SettingsPage extends GetView<SettingsController> {
                   ),
                   const SizedBox(height: 20),
 
-                  // Language section
                   _SectionHeader(LanKey.language.tr),
                   _SettingsCard(
                     child: Column(
@@ -145,17 +133,36 @@ class SettingsPage extends GetView<SettingsController> {
                   ),
                   const SizedBox(height: 20),
 
-                  // Data section — wiping local data only makes sense in hive
-                  // mode (server/firebase sessions live on the backend).
+                  _SectionHeader(LanKey.legal.tr),
+                  _SettingsCard(
+                    child: Column(
+                      children: [
+                        ListTile(
+                          dense: true,
+                          leading: const Icon(Icons.description_outlined, color: AppColors.textSecondary),
+                          title: Text(LanKey.termsOfService.tr, style: textStyleRegular(color: AppColors.textPrimary)),
+                          trailing: const Icon(Icons.chevron_right_rounded, color: AppColors.textMuted),
+                          onTap: () => Get.toNamed(Routers.terms),
+                        ),
+                        const Divider(color: AppColors.elevated, height: 1, thickness: 1),
+                        ListTile(
+                          dense: true,
+                          leading: const Icon(Icons.privacy_tip_outlined, color: AppColors.textSecondary),
+                          title: Text(LanKey.privacyPolicy.tr, style: textStyleRegular(color: AppColors.textPrimary)),
+                          trailing: const Icon(Icons.chevron_right_rounded, color: AppColors.textMuted),
+                          onTap: () => Get.toNamed(Routers.privacy),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
                   if (EnvConstants.isHive()) ...[
                     _SectionHeader(LanKey.data.tr),
                     _SettingsCard(
                       child: ListTile(
                         leading: Icon(Icons.recycling_outlined, color: AppColors.textPrimary.withValues(alpha: 0.5)),
-                        title: Text(
-                          LanKey.resetAllData.tr,
-                          style: textStyleRegular(color: AppColors.red),
-                        ),
+                        title: Text(LanKey.resetAllData.tr, style: textStyleRegular(color: AppColors.red)),
                         onTap: () async {
                           final confirmed = await ConfirmDialog.show(
                             context,
@@ -179,8 +186,92 @@ class SettingsPage extends GetView<SettingsController> {
       ),
     );
   }
+
+  Widget _buildAccountSection(BuildContext context) {
+    // Hive: local-only identity, no cloud auth entry.
+    if (EnvConstants.isHive()) {
+      return ListTile(
+        dense: true,
+        leading: const Icon(Icons.person_outline, color: AppColors.textSecondary),
+        title: Text(LanKey.guest.tr, style: textStyleRegular(color: AppColors.textPrimary)),
+        subtitle: Text(
+          LanKey.playingLocally.tr,
+          style: textStyleRegular(color: AppColors.textMuted, fontSize: 12),
+        ),
+      );
+    }
+
+    return Obx(() {
+      final auth = AuthController.to;
+      // Touch loading so the row rebuilds while Google sheet is open.
+      final loading = auth.isLoading.value;
+      final linked = auth.hasCloudIdentity;
+      final email = auth.cloudEmail;
+      final title = (email != null && email.isNotEmpty) ? email : LanKey.guest.tr;
+      final subtitle = linked ? LanKey.signedIn.tr : LanKey.tapToSignIn.tr;
+
+      return Column(
+        children: [
+          ListTile(
+            dense: true,
+            leading: const Icon(Icons.person_outline, color: AppColors.textSecondary),
+            title: Text(title, style: textStyleRegular(color: AppColors.textPrimary)),
+            subtitle: Text(subtitle, style: textStyleRegular(color: AppColors.textMuted, fontSize: 12)),
+          ),
+          if (!linked) ...[
+            const Divider(color: AppColors.elevated, height: 1, thickness: 1),
+            if (EnvConstants.isAuthFirebase())
+              ListTile(
+                dense: true,
+                leading: loading
+                    ? SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primaryDark),
+                      )
+                    : const Icon(Icons.g_mobiledata_rounded, color: AppColors.primaryDark),
+                title: Text(
+                  LanKey.continueWithGoogle.tr,
+                  style: textStyleRegular(color: AppColors.primaryDark),
+                ),
+                onTap: loading ? null : () => auth.signInWithGoogleFromSettings(context),
+              ),
+            if (EnvConstants.isAuthServer())
+              ListTile(
+                dense: true,
+                leading: const Icon(Icons.email_rounded, color: AppColors.primaryDark),
+                title: Text(
+                  LanKey.continueWithEmail.tr,
+                  style: textStyleRegular(color: AppColors.primaryDark),
+                ),
+                onTap: loading ? null : () => EmailLoginSheet.show(context),
+              ),
+          ],
+          if (linked) ...[
+            const Divider(color: AppColors.elevated, height: 1, thickness: 1),
+            ListTile(
+              dense: true,
+              leading: const Icon(Icons.logout, color: AppColors.red),
+              title: Text(LanKey.signOut.tr, style: textStyleRegular(color: AppColors.red)),
+              onTap: () async {
+                final confirmed = await ConfirmDialog.show(
+                  context,
+                  title: LanKey.signOut.tr,
+                  message: LanKey.signOutConfirm.tr,
+                  confirmLabel: LanKey.signOut.tr,
+                  isDestructive: true,
+                );
+                if (confirmed == true) {
+                  await auth.logout();
+                }
+              },
+            ),
+          ],
+        ],
+      );
+    });
+  }
 }
-// ── Custom Toggle (44x24 pill, purple on / gray off, white circle thumb) ──
 
 class _CustomToggle extends StatelessWidget {
   final bool value;
@@ -226,8 +317,6 @@ class _CustomToggle extends StatelessWidget {
   }
 }
 
-// ── Language Option (label + check when active) ──
-
 class _LanguageOption extends StatelessWidget {
   final String label;
   final String value;
@@ -238,18 +327,13 @@ class _LanguageOption extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       dense: true,
-      title: Text(
-        label,
-        style: textStyleRegular(color: AppColors.textPrimary),
-      ),
+      title: Text(label, style: textStyleRegular(color: AppColors.textPrimary)),
       trailing:
           AppLocale.current() == value ? const Icon(Icons.check_rounded, color: AppColors.primary, size: 20) : null,
       onTap: () => AppLocale.set(value),
     );
   }
 }
-
-// ── Preference Row (label + custom toggle) ──
 
 class _PreferenceRow extends StatelessWidget {
   final String label;
@@ -269,21 +353,13 @@ class _PreferenceRow extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: textStyleRegular(
-              color: AppColors.textPrimary,
-              fontSize: 15,
-            ),
-          ),
+          Text(label, style: textStyleRegular(color: AppColors.textPrimary, fontSize: 15)),
           _CustomToggle(value: value, onChanged: onChanged),
         ],
       ),
     );
   }
 }
-
-// ── Section Header (uppercase 12px label) ──
 
 class _SectionHeader extends StatelessWidget {
   final String title;
@@ -295,16 +371,11 @@ class _SectionHeader extends StatelessWidget {
       padding: const EdgeInsets.only(left: 4, bottom: 8),
       child: Text(
         title.toUpperCase(),
-        style: textStyleBold(
-          color: AppColors.textMuted,
-          fontSize: 12,
-        ).copyWith(letterSpacing: 0.5),
+        style: textStyleBold(color: AppColors.textMuted, fontSize: 12).copyWith(letterSpacing: 0.5),
       ),
     );
   }
 }
-
-// ── Settings Card (surface bg, 12px radius, 1px elevated border) ──
 
 class _SettingsCard extends StatelessWidget {
   final Widget child;

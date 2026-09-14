@@ -32,9 +32,14 @@ The app is **local-first**: all game data lives in Hive on-device. Firebase Auth
 
 ### Onboarding & auth
 - 4-step onboarding: Welcome → Class → Habit → Ready
-- Hive (local) mode runs with **guest/local mock auth** and no backend
+- Hive (local) mode is **local-first**: splash auto-mints a guest session and never forces login; optional Sign In lives in Settings when Firebase/server auth is configured
 - Firebase mode offers **Google Sign-In only** (email/Apple to be added later)
 - Server mode offers **email/password** login with a **registration** entry (no email verification)
+
+### Freemium & subscription
+- Free: 3 habit slots, Warrior only, week stats, ads allowed, no legendary gear
+- Premium monthly / yearly / lifetime unlock unlimited habits, all classes, advanced stats, exclusive gear, no ads (see `docs/subscription.md`)
+- Play Billing via `in_app_purchase`; debug builds can unlock tiers from Settings → Premium when store products are missing
 
 ## Tech Stack
 
@@ -64,14 +69,31 @@ The runtime mode is selected by the `env/` config file passed via `--dart-define
 | Mode | File | Data storage | Auth |
 |---|---|---|---|
 | Hive (default) | `env/hive.json` | Local on-device (Hive) | Guest / local mock |
-| Firebase | `env/firebase.json` | Firebase (cloud data + auth) | Google Sign-In (only) |
+| Firebase | `env/firebase.json` | Firebase (cloud data + auth) | Google Sign-In (Settings) + anonymous guest |
 | Server | `env/server.json` | Self-hosted backend — **gRPC** game data (`grpcUrl`) + **HTTP** auth (`apiUrl`) | Email/password + registration (no verification) |
 
 - **Hive** — local-first mode, no backend required; the login page is skipped and the app enters directly (guest/local auth), Firebase is never initialized.
-- **Firebase** — initializes Firebase for cloud-backed auth and data; offers **Google Sign-In only** for now (email/Apple to be added later); requires [Firebase setup](docs/firebase-setup.md) and valid platform config in `lib/firebase_options.dart`.
-- **Server** — targets the self-hosted Go backend over **two transports**: email **auth** goes over HTTP REST (`POST {apiUrl}/api/v1/auth/login` / `/api/v1/auth/register`, JWT, no email verification), while **game data** (tasks, character, shop, achievements, stats) uses **gRPC** stubs generated from `proto/`. Both endpoints are read from `env/server.json`: `apiUrl` defaults to `http://localhost:8080`, `grpcUrl` to `localhost:9000`. Backend service implementations are pending (`501 Not Implemented`).
+- **Firebase** — initializes Firebase for cloud-backed auth and data. **Do not hardcode** project keys in Dart: put them in `env/firebase.json` (`apiKey`, `appId`, `messagingSenderId`, `projectId`, `storageBucket`). See [Firebase setup](docs/firebase-setup.md). Also keep `android/app/google-services.json` from the Console.
+- **Server** — targets the self-hosted Go backend over **two transports**: email **auth** goes over HTTP REST (`POST {apiUrl}/api/v1/auth/login` / `/api/v1/auth/register`, JWT, no email verification), while **game data** (tasks, character, shop, achievements, stats) uses **gRPC** stubs generated from `proto/`. Both endpoints are read from `env/server.json`: `apiUrl` defaults to `http://localhost:8080`, `grpcUrl` to `localhost:9000`.
 
-The active mode is exposed through `EnvConstants` (`lib/core/constants/env_constants.dart`) — `storageMode`, `authMode`, `apiBaseUrl`, `grpcUrl`, and helpers `isHive()` / `isFirebase()` / `isServer()`.
+#### `env/firebase.json` (required keys)
+
+```json
+{
+  "env": "firebase",
+  "network": "firebase",
+  "auth": "firebase",
+  "apiKey": "YOUR_ANDROID_API_KEY",
+  "appId": "YOUR_ANDROID_APP_ID",
+  "messagingSenderId": "YOUR_PROJECT_NUMBER",
+  "projectId": "YOUR_PROJECT_ID",
+  "storageBucket": "YOUR_PROJECT_ID.appspot.com"
+}
+```
+
+Replace every `YOUR_*` value from Firebase Console (or `google-services.json`). `lib/firebase_options.dart` reads these via `--dart-define-from-file`.
+
+The active mode is exposed through `EnvConstants` (`lib/core/constants/env_constants.dart`) — `networkMode`, `authMode`, `apiBaseUrl`, `grpcUrl`, Firebase option fields, and helpers `isHive()` / `isFirebase()` / `isServer()`.
 
 ## Project Layout
 

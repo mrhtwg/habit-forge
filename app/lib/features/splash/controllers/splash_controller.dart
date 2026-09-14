@@ -3,37 +3,43 @@ import 'package:get/get.dart';
 import 'package:habit_forge_app/core/constants/env_constants.dart';
 import 'package:habit_forge_app/core/network/network_registry.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
+import 'package:habit_forge_app/core/services/firebase_auth_service.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
 
 class SplashController extends GetxController {
   void loadAndRouteEntry() async {
-    // Initialize network
     await NetworkRegistry.ins.init();
 
-    // Hive mode has no real login: auto sign-in as guest through the auth
-    // facade (mints the local session token).
-    if (EnvConstants.isHive() && !UserService.to.isLoggedIn()) {
-      await NetworkRegistry.ins.login('guest');
-    }
-
-    // Firebase mode: restore the session from Firebase Auth when the Google
-    // account is still signed in, otherwise drop a stale local token.
-    if (EnvConstants.isFirebase()) {
-      if (FirebaseAuth.instance.currentUser != null) {
-        await NetworkRegistry.ins.login('google');
-      } else {
-        await UserService.to.setSessionToken(null);
+    if (EnvConstants.isHive()) {
+      // Local-only: guest session, never Firebase/server login.
+      if (!UserService.to.isLoggedIn()) {
+        await NetworkRegistry.ins.login('guest');
+      }
+    } else if (EnvConstants.isFirebase()) {
+      // Restore Google/email session, otherwise anonymous guest (no login page).
+      if (Get.isRegistered<FirebaseAuthService>() && FirebaseAuthService.to.isAvailable) {
+        if (FirebaseAuth.instance.currentUser == null) {
+          await FirebaseAuthService.to.ensureAnonymousSession();
+        }
+        final current = FirebaseAuth.instance.currentUser;
+        await NetworkRegistry.ins.login(
+          current != null && !current.isAnonymous ? 'google' : 'guest',
+        );
+      }
+    } else if (EnvConstants.isServer()) {
+      // Keep JWT if present; otherwise continue without forcing AuthPage.
+      if (UserService.to.isLoggedIn()) {
+        await NetworkRegistry.ins.login('email');
       }
     }
 
     await Future.delayed(const Duration(milliseconds: 1000));
 
-    if (!(await UserService.to.isLoggedIn())) {
-      Get.offAllNamed(Routers.login);
-      return;
+    // Never route to AuthPage — cloud sign-in lives in Settings.
+    if ((EnvConstants.isHive() || EnvConstants.isFirebase()) && !UserService.to.isLoggedIn()) {
+      await NetworkRegistry.ins.login('guest');
     }
 
-    // Logged in, check character
     await UserService.to.loadUserPrefs();
     await UserService.to.loadCharacter();
     if (UserService.to.character.value == null) {

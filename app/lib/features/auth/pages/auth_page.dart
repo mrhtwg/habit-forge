@@ -4,11 +4,14 @@ import 'package:get/get.dart';
 import 'package:habit_forge_app/core/common/animation/frame_sequence_player.dart';
 import 'package:habit_forge_app/core/constants/env_constants.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
-import 'package:habit_forge_app/core/routes/app_routes.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/auth/controllers/auth_controller.dart';
+import 'package:habit_forge_app/features/auth/pages/email_login_sheet.dart';
+import 'package:habit_forge_app/widgets/terms_privacy_footer.dart';
 
+/// Legacy full-screen auth. Prefer Settings in-place sign-in.
+/// Kept for deep links / older builds; hive mode should never land here.
 class AuthPage extends GetView<AuthController> {
   const AuthPage({super.key});
 
@@ -29,107 +32,60 @@ class AuthPage extends GetView<AuthController> {
             child: Column(
               children: [
                 SizedBox(height: 160.h),
-                // Knight idle animation
                 FrameSequencePlayer(
                   frames: FrameSequencePlayer.knightIdleFrames(),
                   preferredSize: Size(180.h, 200.h),
                 ),
                 SizedBox(height: 10.h),
-                Text(
-                  'HABIT FORGE',
-                  style: textStyleBlack(fontSize: 28.sp, color: AppColors.textPrimary),
-                ),
+                Text('HABIT FORGE', style: textStyleBlack(fontSize: 28.sp, color: AppColors.textPrimary)),
                 SizedBox(height: 8.h),
                 Text(
                   LanKey.yourHabitsYourLegend.tr,
                   style: textStyleHand(fontSize: 18.sp, color: AppColors.textSecondary),
                 ),
                 SizedBox(height: 50.h),
-
-                // Firebase mode: Google Sign-In only (other methods come later)
                 if (EnvConstants.isAuthFirebase())
-                  _SocialButton(
-                    icon: Icons.g_mobiledata_rounded,
-                    label: LanKey.continueWithGoogle.tr,
-                    onTap: () => controller.loginWithGoogle(),
-                    textColor: AppColors.textPrimary,
-                    backgroundColor: Colors.white,
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () => controller.signInWithGoogleFromSettings(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: AppColors.textPrimary,
+                        padding: EdgeInsets.symmetric(vertical: 15.h),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(48.r),
+                          side: BorderSide(color: AppColors.border, width: 2),
+                        ),
+                      ),
+                      child: Text(LanKey.continueWithGoogle.tr, style: textStyleBold(fontSize: 15.sp)),
+                    ),
                   ),
-                if (EnvConstants.isAuthFirebase()) SizedBox(height: 14.h),
-
-                // Server mode: email/password login (registration inside the form)
                 if (EnvConstants.isAuthServer())
-                  _SocialButton(
-                    icon: Icons.email_rounded,
-                    label: LanKey.continueWithEmail.tr,
-                    onTap: () => Get.toNamed(Routers.emailLogin),
-                    textColor: Colors.white,
-                    backgroundColor: AppColors.primary,
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () => EmailLoginSheet.show(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        padding: EdgeInsets.symmetric(vertical: 15.h),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(48.r),
+                          side: BorderSide(color: AppColors.border, width: 2),
+                        ),
+                      ),
+                      child: Text(LanKey.continueWithEmail.tr, style: textStyleBold(fontSize: 15.sp, color: Colors.white)),
+                    ),
                   ),
-
-                // SizedBox(height: 24.h),
                 const Spacer(),
-                Text(
-                  LanKey.termsAndPrivacy.tr,
-                  textAlign: TextAlign.center,
-                  style: textStyleRegular(fontSize: 11.sp, color: AppColors.textSecondary),
-                ),
+                const TermsPrivacyFooter(),
                 SizedBox(height: 24.h),
               ],
             ),
           ),
         ),
       ),
-    );
-  }
-}
-
-class _SocialButton extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-  final Color textColor;
-  final Color backgroundColor;
-
-  const _SocialButton({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-    required this.textColor,
-    required this.backgroundColor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: Obx(() {
-        final loading = AuthController.to.isLoading.value;
-        return ElevatedButton(
-          onPressed: loading ? null : onTap,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: backgroundColor,
-            foregroundColor: textColor,
-            disabledBackgroundColor: AppColors.surface.withValues(alpha: 0.5),
-            padding: EdgeInsets.symmetric(vertical: 15.h),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(48.r),
-              side: BorderSide(color: AppColors.border, width: 2),
-            ),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, size: 20.w, color: textColor),
-              SizedBox(width: 10.w),
-              Text(
-                label,
-                style: textStyleBold(fontSize: 15.sp, color: textColor),
-              ),
-            ],
-          ),
-        );
-      }),
     );
   }
 }

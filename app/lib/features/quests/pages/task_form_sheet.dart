@@ -417,10 +417,12 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
                   );
                   if (isEdit) {
                     ctrl.updateTask(widget.task!.id, params);
+                    Get.back();
                   } else {
-                    ctrl.createTask(params);
+                    ctrl.createTask(params).then((ok) {
+                      if (ok) Get.back();
+                    });
                   }
-                  Get.back();
                 },
                 child: Center(
                   child: Text(

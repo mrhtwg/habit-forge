@@ -52,3 +52,9 @@ dist/
 *.log
 *.tmp
 *.swp
+
+# Firebase CLI
+.firebase/
+firebase-debug.log*
+firebase-debug.*.log*
+.firebaserc

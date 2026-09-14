@@ -1,11 +1,16 @@
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/common/utils/log.dart';
+import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/network/network_registry.dart';
+import 'package:habit_forge_app/core/routes/app_routes.dart';
 import 'package:habit_forge_app/core/services/audio_service.dart';
 import 'package:habit_forge_app/core/services/haptic_service.dart';
+import 'package:habit_forge_app/core/services/subscription_service.dart';
+import 'package:habit_forge_app/core/services/subscription_tier.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/features/rewards/reward_popup.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';
+import 'package:habit_forge_app/widgets/toast_widget.dart';
 
 class QuestsController extends GetxController {
   final _hive = NetworkRegistry.ins;
@@ -16,6 +21,8 @@ class QuestsController extends GetxController {
   final selectedTask = Rxn<Task>();
 
   final tasks = <Task>[].obs;
+
+  int get habitCount => tasks.where((t) => t.type == TaskType.TASK_TYPE_HABIT).length;
 
   @override
   void onInit() {
@@ -39,8 +46,6 @@ class QuestsController extends GetxController {
     return tags.toList()..sort();
   }
 
-  /// Tasks of one category (null = all types), further filtered by the
-  /// active tag chip. Used by the swipeable category pages.
   List<Task> tasksFor(TaskType? type) {
     Iterable<Task> list = type == null ? tasks : tasks.where((t) => t.type == type);
     if (activeTag.value != 'all') {
@@ -49,9 +54,20 @@ class QuestsController extends GetxController {
     return list.toList();
   }
 
-  Future<void> createTask(Task task) async {
+  /// Returns false when freemium habit-slot gate blocks creation.
+  Future<bool> createTask(Task task) async {
+    if (task.type == TaskType.TASK_TYPE_HABIT) {
+      if (!SubscriptionService.to.canCreateHabit(habitCount)) {
+        Toast.warning(
+          LanKey.habitLimitReached.trParams({'n': '${SubscriptionLimits.freeHabitSlots}'}),
+        );
+        Get.toNamed(Routers.subscription);
+        return false;
+      }
+    }
     await NetworkRegistry.ins.createTask(task);
     getTasks();
+    return true;
   }
 
   Future<void> deleteTask(String id) async {
@@ -59,7 +75,6 @@ class QuestsController extends GetxController {
     getTasks();
   }
 
-  /// Skips the task (marked skipped; todos get due date pushed to tomorrow).
   Future<void> onTaskPostpone(Task task) async {
     await _hive.skipTask(task.id);
     getTasks();
@@ -71,18 +86,15 @@ class QuestsController extends GetxController {
     final result = await _hive.completeTask(task.id);
     if (result.isFailure) return;
 
-    // Refresh the shared mirrors (wallet + character EXP/level) and the list.
     UserService.to.loadUserPrefs();
     UserService.to.loadCharacter();
     getTasks();
 
-    // Trigger audio/haptic feedback
     final audio = Get.find<AudioService>();
     final haptic = Get.find<HapticService>();
     audio.playComplete();
     haptic.success();
 
-    // Congratulate the player: task rewards, or the level-up card on level-up.
     final reply = result.data!;
     final leveledUp = reply.character.level > levelBefore;
     RewardPopup.showTaskReward(reply, levelBefore);

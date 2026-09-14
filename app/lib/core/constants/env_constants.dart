@@ -14,6 +14,13 @@ class EnvConstants {
   /// gRPC endpoint of the self-hosted backend (server mode), host:port.
   static const String grpcUrl = String.fromEnvironment('grpcUrl', defaultValue: 'localhost:9000');
 
+  // ── Firebase options (from env/firebase.json via --dart-define-from-file) ──
+  static const String firebaseApiKey = String.fromEnvironment('apiKey', defaultValue: '');
+  static const String firebaseAppId = String.fromEnvironment('appId', defaultValue: '');
+  static const String firebaseMessagingSenderId = String.fromEnvironment('messagingSenderId', defaultValue: '');
+  static const String firebaseProjectId = String.fromEnvironment('projectId', defaultValue: '');
+  static const String firebaseStorageBucket = String.fromEnvironment('storageBucket', defaultValue: '');
+
   static const String hive = 'hive';
 
   static const String firebase = 'firebase';
