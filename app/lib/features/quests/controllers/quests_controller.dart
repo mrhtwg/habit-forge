@@ -4,6 +4,7 @@ import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/network/network_registry.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
 import 'package:habit_forge_app/core/services/audio_service.dart';
+import 'package:habit_forge_app/core/services/achievement_unlock_service.dart';
 import 'package:habit_forge_app/core/services/haptic_service.dart';
 import 'package:habit_forge_app/core/services/subscription_service.dart';
 import 'package:habit_forge_app/core/services/subscription_tier.dart';
@@ -83,6 +84,7 @@ class QuestsController extends GetxController {
   Future<void> toggleComplete(Task task) async {
     if (task.isCompleted) return;
     final levelBefore = UserService.to.character.value?.level ?? 1;
+    final unlockedBefore = await AchievementUnlockService.snapshotUnlockedIds();
     final result = await _hive.completeTask(task.id);
     if (result.isFailure) return;
 
@@ -97,11 +99,16 @@ class QuestsController extends GetxController {
 
     final reply = result.data!;
     final leveledUp = reply.character.level > levelBefore;
-    RewardPopup.showTaskReward(reply, levelBefore);
+    await RewardPopup.showTaskReward(reply, levelBefore);
     if (leveledUp) {
       audio.playLevelUp();
       haptic.heavy();
     }
+
+    final unlocked = await AchievementUnlockService.newlyUnlockedSince(unlockedBefore);
+    // Gem rewards may have been applied — refresh wallet chips.
+    if (unlocked.isNotEmpty) await UserService.to.loadUserPrefs();
+    await AchievementUnlockService.presentUnlocks(unlocked);
   }
 
   Future<void> toggleSkip(Task task) async {

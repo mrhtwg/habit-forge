@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/network/network_registry.dart';
+import 'package:habit_forge_app/core/services/achievement_unlock_service.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart';
 
@@ -21,8 +22,12 @@ class CharacterController extends GetxController {
     final char = UserService.to.character.value;
     if (char == null || !char.isDead) return;
     if (DateTime.now().isAfter(DateTime.fromMillisecondsSinceEpoch(char.deathRecoveryUntil.toInt()))) {
+      final unlockedBefore = await AchievementUnlockService.snapshotUnlockedIds();
       await NetworkRegistry.ins.reviveCharacter();
       await UserService.to.loadCharacter();
+      await UserService.to.loadUserPrefs();
+      final unlocked = await AchievementUnlockService.newlyUnlockedSince(unlockedBefore);
+      await AchievementUnlockService.presentUnlocks(unlocked);
     }
   }
 

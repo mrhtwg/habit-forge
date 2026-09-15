@@ -130,11 +130,13 @@ class NetworkHiveImpl implements NetworkInterface {
   }
 
   /// Unlocks every achievement whose condition is met by the given metrics,
-  /// granting its gem reward. Runs after task completion.
+  /// granting its gem reward. Runs after task completion / purchase / revive.
   Future<void> _unlockEligibleAchievements({
     required int totalTasks,
     required int streak,
     required int level,
+    int purchases = 0,
+    int deaths = 0,
   }) async {
     final unlockedIds = UserBox.ins.getAchievements().map((a) => a.id).toSet();
     final fresh = GameLogic.newlyUnlocked(
@@ -143,6 +145,8 @@ class NetworkHiveImpl implements NetworkInterface {
       totalTasks: totalTasks,
       streak: streak,
       level: level,
+      purchases: purchases,
+      deaths: deaths,
     );
     for (final unlocked in fresh) {
       UserBox.ins.updateAchievement(unlocked);
@@ -258,6 +262,14 @@ class NetworkHiveImpl implements NetworkInterface {
       final updated = GameLogic.addGems(userPrefs, -item.price.toInt());
       UserBox.ins.updateUserPrefs(updated);
       UserBox.ins.updateOwnedItemIds([...owned, itemId]);
+      final char = CharacterBox.ins.getCharacter();
+      final prefs = UserBox.ins.getUserPrefs();
+      await _unlockEligibleAchievements(
+        totalTasks: prefs.totalTasksCompleted.toInt(),
+        streak: 0,
+        level: char?.level ?? 1,
+        purchases: owned.length + 1,
+      );
       return ApiResponse.success(BuyItemReply(item: item, balance: updated.currentGems));
     }
 
@@ -267,6 +279,14 @@ class NetworkHiveImpl implements NetworkInterface {
     final updated = GameLogic.addGold(userPrefs, -item.price.toInt());
     UserBox.ins.updateUserPrefs(updated);
     UserBox.ins.updateOwnedItemIds([...owned, itemId]);
+    final char = CharacterBox.ins.getCharacter();
+    final prefsAfter = UserBox.ins.getUserPrefs();
+    await _unlockEligibleAchievements(
+      totalTasks: prefsAfter.totalTasksCompleted.toInt(),
+      streak: 0,
+      level: char?.level ?? 1,
+      purchases: owned.length + 1,
+    );
     return ApiResponse.success(BuyItemReply(item: item, balance: updated.currentGold));
   }
 
@@ -276,7 +296,15 @@ class NetworkHiveImpl implements NetworkInterface {
     if (char == null || !char.isDead) return;
     final recoveryAt = DateTime.fromMillisecondsSinceEpoch(char.deathRecoveryUntil.toInt());
     if (DateTime.now().isBefore(recoveryAt)) return; // still recovering
-    CharacterBox.ins.updateCharacter(GameLogic.revive(char));
+    final revived = GameLogic.revive(char);
+    CharacterBox.ins.updateCharacter(revived);
+    final prefs = UserBox.ins.getUserPrefs();
+    await _unlockEligibleAchievements(
+      totalTasks: prefs.totalTasksCompleted.toInt(),
+      streak: 0,
+      level: revived.level,
+      deaths: 1,
+    );
   }
 
   @override

@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/network/network_registry.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
+import 'package:habit_forge_app/core/services/achievement_unlock_service.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/features/rewards/reward_popup.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';
@@ -24,21 +25,24 @@ class HomeController extends GetxController {
     loadTodayTasks();
   }
 
-  void onTaskComplete(Task task) async {
+  Future<void> onTaskComplete(Task task) async {
     final levelBefore = UserService.to.character.value?.level ?? 1;
+    final unlockedBefore = await AchievementUnlockService.snapshotUnlockedIds();
     final result = await NetworkRegistry.ins.completeTask(task.id);
-    result.when(
-      onSuccess: (reply) {
-        // Refresh wallet / character / list so the home header (gold chip,
-        // EXP bar) animates to the new values.
-        UserService.to.loadUserPrefs();
-        UserService.to.loadCharacter();
-        loadTodayTasks();
-        // Congratulate the player (task rewards / level-up card).
-        RewardPopup.showTaskReward(reply, levelBefore);
-      },
-      onFailure: (code, msg) => Toast.error(msg),
-    );
+    if (result.isFailure) {
+      Toast.error(result.message);
+      return;
+    }
+
+    final reply = result.data!;
+    UserService.to.loadUserPrefs();
+    UserService.to.loadCharacter();
+    loadTodayTasks();
+    await RewardPopup.showTaskReward(reply, levelBefore);
+
+    final unlocked = await AchievementUnlockService.newlyUnlockedSince(unlockedBefore);
+    if (unlocked.isNotEmpty) await UserService.to.loadUserPrefs();
+    await AchievementUnlockService.presentUnlocks(unlocked);
   }
 
   Future<void> onTaskDelete(String id) async {

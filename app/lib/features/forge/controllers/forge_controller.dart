@@ -6,6 +6,7 @@ import 'package:habit_forge_app/core/network/api_response.dart';
 import 'package:habit_forge_app/core/network/hive/shop_config.dart';
 import 'package:habit_forge_app/core/network/network_registry.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
+import 'package:habit_forge_app/core/services/achievement_unlock_service.dart';
 import 'package:habit_forge_app/core/services/subscription_service.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/generated/protos/shop/v1/shop.pb.dart';
@@ -112,11 +113,15 @@ class ForgeController extends GetxController {
       Get.toNamed(Routers.subscription);
       return ApiResponse.failure(code: -1, message: LanKey.premiumRequired.tr);
     }
+    final unlockedBefore = await AchievementUnlockService.snapshotUnlockedIds();
     final result = await NetworkRegistry.ins.purchaseItem(item.id, currencyOf(item));
     if (result.isSuccess) {
       await UserService.to.loadUserPrefs();
       await loadOwned();
       listItems();
+      final unlocked = await AchievementUnlockService.newlyUnlockedSince(unlockedBefore);
+      if (unlocked.isNotEmpty) await UserService.to.loadUserPrefs();
+      await AchievementUnlockService.presentUnlocks(unlocked);
     }
     return result;
   }
