@@ -21,23 +21,35 @@ debug_symbols/
 # FVM
 .fvm/
 
-# Android
-android/.gradle/
-android/local.properties
-android/key.properties
+# Android signing (never commit)
+**/key.properties
 **/*.jks
 **/*.keystore
+**/*.p12
 
-# Firebase secrets / config
+# Apple signing / push
+**/*.p8
+**/*.mobileprovision
+**/*.cer
+**/*.certSigningRequest
+
+# Firebase / Google client configs (use *.example templates)
 **/google-services.json
 **/GoogleService-Info.plist
+
+# Local dart-defines with project-specific Firebase keys
+# Copy from app/env/firebase.json.example
+app/env/firebase.json
 
 # Environment / secrets
 .env
 .env.*
-.env.example
+!.env.example
+!**/.env.example
 **/secrets/
 **/credentials/
+**/service-account*.json
+**/firebase-adminsdk*.json
 
 # Go
 server/bin/
@@ -53,7 +65,7 @@ dist/
 *.tmp
 *.swp
 
-# Firebase CLI
+# Firebase CLI local state (project binding may be private)
 .firebase/
 firebase-debug.log*
 firebase-debug.*.log*
