@@ -47,8 +47,12 @@ Please include:
 
 ## Security Notes
 
-- **Never commit** Firebase config files, keystores, `key.properties`, or environment secrets.
-- Use placeholder configs or `.example` files for public templates.
+- **Never commit** secrets or project-private configs. Root `.gitignore` already covers:
+  - `android/key.properties`, `*.jks` / `*.keystore`
+  - `android/app/google-services.json`, `ios/Runner/GoogleService-Info.plist`
+  - `app/env/firebase.json` (use `app/env/firebase.json.example`)
+  - `.env*`, service-account JSON, Apple signing certs
+- Commit only `*.example` templates; keep real values local.
 - If you suspect a leaked secret, report it privately before opening an issue.
 
 ## License

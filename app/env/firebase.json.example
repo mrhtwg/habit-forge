@@ -1,0 +1,10 @@
+{
+  "env": "firebase",
+  "network": "firebase",
+  "auth": "firebase",
+  "apiKey": "YOUR_ANDROID_API_KEY",
+  "appId": "YOUR_ANDROID_APP_ID",
+  "messagingSenderId": "YOUR_PROJECT_NUMBER",
+  "projectId": "YOUR_PROJECT_ID",
+  "storageBucket": "YOUR_PROJECT_ID.appspot.com"
+}

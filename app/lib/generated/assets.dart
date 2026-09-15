@@ -22,6 +22,10 @@ class Assets {
   static const String imagesSharedIcGem = "assets/images/shared/ic_gem.webp";
 
   static const String imagesSharedIcGold = "assets/images/shared/ic_gold.webp";
+
+  static const String legalPrivacyPolicy = "assets/legal/privacy-policy.html";
+
+  static const String legalTermsOfService = "assets/legal/terms-of-service.html";
 }
 
 class FontFamily {

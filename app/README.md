@@ -75,14 +75,18 @@ The runtime mode is selected by the `env/` config file passed via `--dart-define
 | Mode           | File                | Data storage                                                                    | Auth                                            |
 | -------------- | ------------------- | ------------------------------------------------------------------------------- | ----------------------------------------------- |
 | Hive (default) | `env/hive.json`     | Local on-device (Hive)                                                          | Guest / local mock                              |
-| Firebase       | `env/firebase.json` | Firebase (cloud data + auth)                                                    | Google Sign-In (Settings) + anonymous guest     |
+| Firebase       | `env/firebase.json` (local; see `.example`) | Firebase (cloud data + auth)                                                    | Google Sign-In (Settings) + anonymous guest     |
 | Server         | `env/server.json`   | Self-hosted backend — **gRPC** game data (`grpcUrl`) + **HTTP** auth (`apiUrl`) | Email/password + registration (no verification) |
 
 - **Hive** — local-first mode, no backend required; the login page is skipped and the app enters directly (guest/local auth), Firebase is never initialized.
 - **Firebase** — SDK may initialize at startup, but **no anonymous Auth / Firestore** until the user signs in from Settings. Before that, gameplay uses on-device Hive (same as local-first). Weak networks cannot block entering the app (cloud restore is timed out and falls back to Hive).
 - **Server** — targets the self-hosted Go backend over **two transports**: email **auth** goes over HTTP REST (`POST {apiUrl}/api/v1/auth/login` / `/api/v1/auth/register`, JWT, no email verification), while **game data** (tasks, character, shop, achievements, stats) uses **gRPC** stubs generated from `proto/`. Both endpoints are read from `env/server.json`: `apiUrl` defaults to `http://localhost:8080`, `grpcUrl` to `localhost:9000`.
 
-#### `env/firebase.json` (required keys)
+#### `env/firebase.json` (required keys, gitignored)
+
+```bash
+cp env/firebase.json.example env/firebase.json
+```
 
 ```json
 {
@@ -97,7 +101,7 @@ The runtime mode is selected by the `env/` config file passed via `--dart-define
 }
 ```
 
-Replace every `YOUR_*` value from Firebase Console (or `google-services.json`). `lib/firebase_options.dart` reads these via `--dart-define-from-file`.
+Replace every `YOUR_*` value from Firebase Console (or `google-services.json`). `lib/firebase_options.dart` reads these via `--dart-define-from-file`. Do **not** commit the filled `env/firebase.json`, `google-services.json`, or Android signing files — see root `.gitignore` and `docs/firebase-setup.md`.
 
 The active mode is exposed through `EnvConstants` (`lib/core/constants/env_constants.dart`) — `networkMode`, `authMode`, `apiBaseUrl`, `grpcUrl`, Firebase option fields, and helpers `isHive()` / `isFirebase()` / `isServer()`.
 
@@ -126,7 +130,7 @@ app/
 │   ├── animations/               # knight_idle / mage_idle / ranger_idle frame sequences
 │   ├── fonts/                    # Baloo2, Nunito, Caveat
 │   └── images/                   # characters, home, shared
-├── env/                          # hive.json / firebase.json / server.json (--dart-define-from-file)
+├── env/                          # hive.json / server.json + firebase.json.example (local firebase.json is gitignored)
 ├── tool/
 │   └── generate_assets.dart      # regenerates lib/generated/assets.dart
 ├── thirdpart/                    # vendored packages (svgaplayer_flutter)

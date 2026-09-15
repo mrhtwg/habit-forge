@@ -2,17 +2,31 @@
 
 ## You need to replace all placeholder values with your real Firebase project values.
 
+**Do not commit** local secrets or project binding files. Git ignores:
+
+- `android/key.properties`, `android/jks/*.jks`
+- `android/app/google-services.json`
+- `ios/Runner/GoogleService-Info.plist`
+- `env/firebase.json` (copy from `env/firebase.json.example`)
+
+Committed templates: `*.example` only.
+
 ### Step 1: Get values from Firebase Console
 
 1. Go to https://console.firebase.google.com
 2. Select your project
 3. Project Settings → General → Your apps → Add app → Android
 4. Package name: `com.habitforge.habitforge`
-5. SHA-1: `D7:E5:F3:3F:A2:16:04:13:AC:8B:EA:0E:8A:58:C9:9F:9D:27:9C:75`
+5. Add **your** signing key SHA-1 (see Step 5b) — never commit the keystore itself
 6. Download `google-services.json`
-7. Replace `android/app/google-services.json` with it
+7. Place it at `android/app/google-services.json` (gitignored; see `google-services.json.example`)
 
 ### Step 2: Fill `env/firebase.json`
+
+```bash
+cp env/firebase.json.example env/firebase.json
+# then edit env/firebase.json with your project values
+```
 
 Flutter reads Firebase options from this file via `--dart-define-from-file` (not from `lib/firebase_options.dart` hardcoding).
 
@@ -43,14 +57,14 @@ Flutter reads Firebase options from this file via `--dart-define-from-file` (not
 
 For Google Sign-In to work on Android:
 
-- Add SHA-1 `D7:E5:F3:3F:A2:16:04:13:AC:8B:EA:0E:8A:58:C9:9F:9D:27:9C:75` in Firebase Console → Authentication → Sign-in method → Google
+- Register the SHA-1 of the keystore that signs your debug/release APK in Firebase Console → Project Settings → Your Android app
 - Keep `android/app/google-services.json` in sync with the same project
 
 ### Step 4: iOS — Add app in Firebase Console
 
 1. Firebase Console → Project Settings → Add app → iOS
 2. Bundle ID: `com.habitforge.habitforge`
-3. Download `GoogleService-Info.plist` → replace `ios/Runner/GoogleService-Info.plist`
+3. Download `GoogleService-Info.plist` → place at `ios/Runner/GoogleService-Info.plist` (gitignored)
 4. For now Android keys in `env/firebase.json` are used as `currentPlatform`; add iOS-specific defines later if needed
 5. Enable Google Sign-In: in plist, find `REVERSED_CLIENT_ID`
 
@@ -83,16 +97,20 @@ firebase deploy --only firestore:rules
 
 ### Step 5b: Fix `DEVELOPER_ERROR` / Google Sign-In on device
 
-`ConnectionResult{statusCode=DEVELOPER_ERROR}` almost always means the **debug SHA-1** of the keystore that signed your APK is missing from Firebase.
+`ConnectionResult{statusCode=DEVELOPER_ERROR}` almost always means the **SHA-1** of the keystore that signed your APK is missing from Firebase.
 
 ```bash
-# Debug keystore (Flutter default):
+# Flutter default debug keystore:
 keytool -list -v -alias androiddebugkey \
   -keystore ~/.android/debug.keystore \
   -storepass android -keypass android | grep SHA1
+
+# Or the release/custom keystore from android/key.properties (gitignored):
+keytool -list -v -alias forge \
+  -keystore android/jks/habitforge.jks
 ```
 
-1. Copy the `SHA1` value
+1. Copy the `SHA1` value for **the same keystore** Gradle uses to sign the APK
 2. Firebase Console → Project Settings → Your Android app → Add fingerprint
 3. Download a fresh `google-services.json` into `android/app/`
 4. Rebuild the app (`flutter clean && flutter run --dart-define-from-file=env/firebase.json`)
@@ -103,7 +121,8 @@ Also ensure `env/firebase.json` `projectId` / `appId` / `apiKey` match the same 
 
 ```bash
 cd app
-# Fill env/firebase.json first, then:
+cp env/firebase.json.example env/firebase.json   # once
+# edit env/firebase.json, then:
 flutter run --dart-define-from-file=env/firebase.json
 ```
 

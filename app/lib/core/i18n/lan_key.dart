@@ -259,10 +259,6 @@ enum LanKey {
   privacyPolicy, // 'Privacy Policy'
   agreeToTermsPrefix, // 'By continuing, you agree to our '
   agreeToTermsAnd, // ' and '
-  legalPlaceholderBody, // placeholder copy
-  legalReservedUrl, // 'Reserved URL'
-  legalCopyHint, // 'Long-press to copy the link'
-  linkCopied, // 'Link copied'
   existingAccountTitle, // 'Existing account'
   existingAccountOverwrite, // overwrite warning
   continueLogin, // 'Continue'

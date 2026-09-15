@@ -257,11 +257,6 @@ const Map<LanKey, String> enUS = {
   LanKey.privacyPolicy: 'Privacy Policy',
   LanKey.agreeToTermsPrefix: 'By continuing, you agree to our ',
   LanKey.agreeToTermsAnd: ' and ',
-  LanKey.legalPlaceholderBody:
-      'This document is a placeholder. The full Terms of Service / Privacy Policy will be published at the reserved URL below before store release.',
-  LanKey.legalReservedUrl: 'Reserved URL',
-  LanKey.legalCopyHint: 'Long-press the link to copy it.',
-  LanKey.linkCopied: 'Link copied',
   LanKey.existingAccountTitle: 'Existing account',
   LanKey.existingAccountOverwrite:
       'This account already has adventure data. Continuing will replace your local progress on this device. Cancel keeps your local data and does not sync.',

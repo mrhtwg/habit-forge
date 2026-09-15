@@ -14,6 +14,8 @@ import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/auth/controllers/auth_controller.dart';
 import 'package:habit_forge_app/features/auth/pages/email_login_sheet.dart';
 import 'package:habit_forge_app/features/settings/controllers/settings_controller.dart';
+import 'package:habit_forge_app/features/webview/models/habit_webview_entity.dart';
+import 'package:habit_forge_app/generated/assets.dart';
 import 'package:habit_forge_app/widgets/confirm_dialog.dart';
 
 Widget _buildHeader() {
@@ -73,7 +75,6 @@ class SettingsPage extends GetView<SettingsController> {
                   _SectionHeader(LanKey.account.tr),
                   _SettingsCard(child: _buildAccountSection(context)),
                   const SizedBox(height: 20),
-
                   _SectionHeader(LanKey.premium.tr),
                   Obx(() {
                     final tier = SubscriptionService.to.tier.value;
@@ -100,7 +101,6 @@ class SettingsPage extends GetView<SettingsController> {
                     );
                   }),
                   const SizedBox(height: 20),
-
                   _SectionHeader(LanKey.preferences.tr),
                   _SettingsCard(
                     child: Column(
@@ -120,7 +120,6 @@ class SettingsPage extends GetView<SettingsController> {
                     ),
                   ),
                   const SizedBox(height: 20),
-
                   _SectionHeader(LanKey.language.tr),
                   _SettingsCard(
                     child: Column(
@@ -132,7 +131,6 @@ class SettingsPage extends GetView<SettingsController> {
                     ),
                   ),
                   const SizedBox(height: 20),
-
                   _SectionHeader(LanKey.legal.tr),
                   _SettingsCard(
                     child: Column(
@@ -142,7 +140,11 @@ class SettingsPage extends GetView<SettingsController> {
                           leading: const Icon(Icons.description_outlined, color: AppColors.textSecondary),
                           title: Text(LanKey.termsOfService.tr, style: textStyleRegular(color: AppColors.textPrimary)),
                           trailing: const Icon(Icons.chevron_right_rounded, color: AppColors.textMuted),
-                          onTap: () => Get.toNamed(Routers.terms),
+                          onTap: () => Get.toNamed(
+                            Routers.webview,
+                            arguments:
+                                WebviewEntity(title: LanKey.termsOfService.tr, assets: Assets.legalTermsOfService),
+                          ),
                         ),
                         const Divider(color: AppColors.elevated, height: 1, thickness: 1),
                         ListTile(
@@ -150,13 +152,15 @@ class SettingsPage extends GetView<SettingsController> {
                           leading: const Icon(Icons.privacy_tip_outlined, color: AppColors.textSecondary),
                           title: Text(LanKey.privacyPolicy.tr, style: textStyleRegular(color: AppColors.textPrimary)),
                           trailing: const Icon(Icons.chevron_right_rounded, color: AppColors.textMuted),
-                          onTap: () => Get.toNamed(Routers.privacy),
+                          onTap: () => Get.toNamed(
+                            Routers.webview,
+                            arguments: WebviewEntity(title: LanKey.privacyPolicy.tr, assets: Assets.legalPrivacyPolicy),
+                          ),
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 20),
-
                   if (EnvConstants.isHive()) ...[
                     _SectionHeader(LanKey.data.tr),
                     _SettingsCard(
