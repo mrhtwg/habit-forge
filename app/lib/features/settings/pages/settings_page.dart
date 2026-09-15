@@ -75,32 +75,34 @@ class SettingsPage extends GetView<SettingsController> {
                   _SectionHeader(LanKey.account.tr),
                   _SettingsCard(child: _buildAccountSection(context)),
                   const SizedBox(height: 20),
-                  _SectionHeader(LanKey.premium.tr),
-                  Obx(() {
-                    final tier = SubscriptionService.to.tier.value;
-                    final label = switch (tier) {
-                      SubscriptionTier.monthly => LanKey.planMonthly.tr,
-                      SubscriptionTier.yearly => LanKey.planYearly.tr,
-                      SubscriptionTier.lifetime => LanKey.planLifetime.tr,
-                      _ => LanKey.planFree.tr,
-                    };
-                    return _SettingsCard(
-                      child: ListTile(
-                        leading: const Icon(Icons.workspace_premium_rounded, color: AppColors.goldDark),
-                        title: Text(
-                          tier.isPremium ? label : LanKey.premium.tr,
-                          style: textStyleRegular(color: AppColors.textPrimary),
+                  if (!EnvConstants.isHive()) ...[
+                    _SectionHeader(LanKey.premium.tr),
+                    Obx(() {
+                      final tier = SubscriptionService.to.tier.value;
+                      final label = switch (tier) {
+                        SubscriptionTier.monthly => LanKey.planMonthly.tr,
+                        SubscriptionTier.yearly => LanKey.planYearly.tr,
+                        SubscriptionTier.lifetime => LanKey.planLifetime.tr,
+                        _ => LanKey.planFree.tr,
+                      };
+                      return _SettingsCard(
+                        child: ListTile(
+                          leading: const Icon(Icons.workspace_premium_rounded, color: AppColors.goldDark),
+                          title: Text(
+                            tier.isPremium ? label : LanKey.premium.tr,
+                            style: textStyleRegular(color: AppColors.textPrimary),
+                          ),
+                          subtitle: Text(
+                            tier.isPremium ? LanKey.currentPlan.tr : LanKey.premiumSubtitle.tr,
+                            style: textStyleRegular(color: AppColors.textMuted, fontSize: 12),
+                          ),
+                          trailing: const Icon(Icons.chevron_right_rounded, color: AppColors.textMuted),
+                          onTap: () => Get.toNamed(Routers.subscription),
                         ),
-                        subtitle: Text(
-                          tier.isPremium ? LanKey.currentPlan.tr : LanKey.premiumSubtitle.tr,
-                          style: textStyleRegular(color: AppColors.textMuted, fontSize: 12),
-                        ),
-                        trailing: const Icon(Icons.chevron_right_rounded, color: AppColors.textMuted),
-                        onTap: () => Get.toNamed(Routers.subscription),
-                      ),
-                    );
-                  }),
-                  const SizedBox(height: 20),
+                      );
+                    }),
+                    const SizedBox(height: 20),
+                  ],
                   _SectionHeader(LanKey.preferences.tr),
                   _SettingsCard(
                     child: Column(

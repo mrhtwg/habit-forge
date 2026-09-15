@@ -149,7 +149,7 @@ class CharacterPage extends GetView<CharacterController> {
                       border: Border.all(color: AppColors.border, width: 2.5),
                       boxShadow: const [BoxShadow(color: Color(0xFFD6C3A4), offset: Offset(0, 3))],
                     ),
-                    child: const Icon(Icons.help_outline_rounded, size: 20, color: AppColors.textPrimary),
+                    child: const Icon(Icons.question_mark_rounded, size: 20, color: AppColors.textPrimary),
                   ),
                 ),
               ],
@@ -186,7 +186,7 @@ class CharacterPage extends GetView<CharacterController> {
           // EXP progress
           Padding(
             padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 6.w),
-            child: HudBar(label: LanKey.exp.tr, color: AppColors.gold, text: _xpText()),
+            child: HudBar(label: 'EXP', color: AppColors.gold, text: _xpText()),
           ),
         ],
       ),

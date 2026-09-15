@@ -186,9 +186,9 @@ class HomePage extends GetView<HomeController> {
             child: Obx(
               () => Column(
                 children: [
-                  HudBar(label: LanKey.exp.tr, color: AppColors.gold, text: _xpText()),
+                  HudBar(label: 'EXP', color: AppColors.gold, text: _xpText()),
                   SizedBox(height: 8.h),
-                  HudBar(label: LanKey.hp.tr, color: AppColors.coral, text: _hpText()),
+                  HudBar(label: 'HP', color: AppColors.coral, text: _hpText()),
                 ],
               ),
             ),

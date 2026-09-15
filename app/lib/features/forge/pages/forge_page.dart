@@ -11,7 +11,7 @@ import 'package:habit_forge_app/features/forge/pages/item_detail_sheet.dart';
 import 'package:habit_forge_app/generated/assets.dart';
 import 'package:habit_forge_app/generated/protos/shared/v1/shared.pbenum.dart';
 import 'package:habit_forge_app/generated/protos/shop/v1/shop.pb.dart';
-import 'package:habit_forge_app/widgets/shop_item_icon.dart';
+import 'package:habit_forge_app/widgets/item_widget.dart';
 import 'package:habit_forge_app/widgets/wallet_chip.dart';
 
 class ForgePage extends GetView<ForgeController> {
@@ -73,11 +73,11 @@ class ForgePage extends GetView<ForgeController> {
                 // 40% OFF badge
                 Positioned(
                   top: 6.h,
-                  right: 12.w,
+                  right: 2.w,
                   child: Transform.rotate(
                     angle: 0.07,
                     child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+                      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 5.h),
                       decoration: BoxDecoration(
                         color: AppColors.coral,
                         border: Border.all(color: AppColors.border, width: 2),
@@ -98,16 +98,7 @@ class ForgePage extends GetView<ForgeController> {
                   child: Row(
                     children: [
                       // Item icon (rarity-tinted gradient + rarity border)
-                      Container(
-                        width: 68.w,
-                        height: 68.w,
-                        decoration: BoxDecoration(
-                          gradient: ShopItemIcon.rarityGradient(item.rarity),
-                          border: Border.all(color: ShopItemIcon.rarityColor(item.rarity), width: 2.5),
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                        child: ShopItemIcon(itemId: item.id, iconFile: ShopConfig.iconOf(item.id), size: 40.w),
-                      ),
+                      ItemWidget(item: item),
                       SizedBox(width: 12.w),
                       Expanded(
                         child: Column(
@@ -191,47 +182,86 @@ class ForgePage extends GetView<ForgeController> {
   Widget _buildRotatingPage() {
     return Obx(() {
       SubscriptionService.to.tier.value;
-      // Each Field Shop tile carries its own supermarket-style countdown
-      // sticker; the whole rack refreshes together every 2 hours.
-      return _buildGrid(controller.rotating.toList(), showSaleTag: true);
+      return _buildGrid(controller.rotating.toList());
     });
   }
 
   // ─────────── Category pill tabs (Town Shop / Field Shop) ───────────
   Widget _buildShopTabs() {
-    return Padding(
-      padding: EdgeInsets.fromLTRB(20.w, 14.h, 20.w, 0),
-      child: Container(
-        padding: EdgeInsets.all(4.w),
-        decoration: BoxDecoration(
-          color: const Color(0xFFF3E7CE),
-          border: Border.all(color: AppColors.border, width: 2),
-          borderRadius: BorderRadius.circular(999),
-        ),
-        child: TabBar(
-          indicatorSize: TabBarIndicatorSize.tab,
-          dividerHeight: 0,
-          indicator: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(999),
-            boxShadow: const [BoxShadow(color: Color(0xFFE4D2B0), offset: Offset(0, 2))],
-          ),
-          labelColor: AppColors.textPrimary,
-          unselectedLabelColor: AppColors.textSecondary,
-          overlayColor: WidgetStateProperty.all(Colors.transparent),
-          labelStyle: textStyleBold(fontSize: 13.sp),
-          unselectedLabelStyle: textStyleBold(fontSize: 13.sp, color: AppColors.textSecondary),
-          tabs: [
-            Tab(text: LanKey.shopPermanent.tr),
-            Tab(text: LanKey.shopRandom.tr),
-          ],
-        ),
-      ),
+    return Builder(
+      builder: (context) {
+        final tabController = DefaultTabController.of(context);
+        return ListenableBuilder(
+          listenable: tabController,
+          builder: (context, _) {
+            final showFieldCountdown = tabController.index == 1;
+            return Padding(
+              padding: EdgeInsets.fromLTRB(20.w, 14.h, 20.w, 0),
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(4.w),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF3E7CE),
+                      border: Border.all(color: AppColors.border, width: 2),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: TabBar(
+                      indicatorSize: TabBarIndicatorSize.tab,
+                      dividerHeight: 0,
+                      indicator: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(999),
+                        boxShadow: const [BoxShadow(color: Color(0xFFE4D2B0), offset: Offset(0, 2))],
+                      ),
+                      labelColor: AppColors.textPrimary,
+                      unselectedLabelColor: AppColors.textSecondary,
+                      overlayColor: WidgetStateProperty.all(Colors.transparent),
+                      labelStyle: textStyleBold(fontSize: 13.sp),
+                      unselectedLabelStyle: textStyleBold(fontSize: 13.sp, color: AppColors.textSecondary),
+                      tabs: [
+                        Tab(text: LanKey.shopPermanent.tr),
+                        Tab(text: LanKey.shopRandom.tr),
+                      ],
+                    ),
+                  ),
+                  if (showFieldCountdown)
+                    Positioned(
+                      top: -8.h,
+                      right: 8.w,
+                      child: Obx(
+                        () => Transform.rotate(
+                          angle: 0.07,
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 2.h),
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(colors: [AppColors.coral, AppColors.coralDark]),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.white, width: 1.2),
+                              boxShadow: const [
+                                BoxShadow(color: Color(0x55222222), blurRadius: 3, offset: Offset(0, 1)),
+                              ],
+                            ),
+                            child: Text(
+                              controller.rotationCountdown.value,
+                              style: textStyleBold(fontSize: 12.sp, color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
   // ─────────── Item grid ───────────
-  Widget _buildGrid(List<ShopItem> items, {bool showSaleTag = false}) {
+  Widget _buildGrid(List<ShopItem> items) {
     return GridView.builder(
       padding: EdgeInsets.fromLTRB(20.w, 14.h, 20.w, 24.h),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -244,7 +274,7 @@ class ForgePage extends GetView<ForgeController> {
       itemBuilder: (context, index) {
         final item = items[index];
         final owned = controller.isOwned(item.id);
-        final Widget tile = GestureDetector(
+        return GestureDetector(
           onTap: () => ItemDetailSheet.show(context, item),
           child: Container(
             width: double.infinity,
@@ -257,30 +287,7 @@ class ForgePage extends GetView<ForgeController> {
             ),
             child: Column(
               children: [
-                // Icon frame (rarity-tinted gradient + rarity border)
-                Container(
-                  width: 64.w,
-                  height: 64.w,
-                  padding: EdgeInsets.all(8.w),
-                  decoration: BoxDecoration(
-                    gradient: ShopItemIcon.rarityGradient(item.rarity),
-                    border: Border.all(color: ShopItemIcon.rarityColor(item.rarity), width: 2),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Stack(
-                    children: [
-                      Center(
-                        child: ShopItemIcon(itemId: item.id, iconFile: ShopConfig.iconOf(item.id), size: 36.w),
-                      ),
-                      if (!SubscriptionService.to.canAccessShopItem(item))
-                        Positioned(
-                          right: 0,
-                          top: 0,
-                          child: Icon(Icons.lock_rounded, size: 14.w, color: AppColors.goldDark),
-                        ),
-                    ],
-                  ),
-                ),
+                ItemWidget(item: item),
                 SizedBox(height: 8.h),
                 Text(
                   item.name,
@@ -329,48 +336,6 @@ class ForgePage extends GetView<ForgeController> {
             ),
           ),
         );
-
-        final Widget gridCard = showSaleTag
-            ? Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  tile,
-                  // Supermarket limited-offer sticker: ticking countdown.
-                  Positioned(
-                    top: 8.h,
-                    right: 0,
-                    child: Obx(
-                      () => Transform.rotate(
-                        angle: -0.06,
-                        child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 3.h),
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(colors: [AppColors.coral, AppColors.coralDark]),
-                            border: Border.all(color: Colors.white, width: 1.2),
-                            borderRadius: BorderRadius.circular(7),
-                            boxShadow: const [
-                              BoxShadow(color: Color(0x55222222), blurRadius: 3, offset: Offset(0, 1)),
-                            ],
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.timer_outlined, size: 14, color: Colors.white),
-                              SizedBox(width: 3.w),
-                              Text(
-                                controller.rotationCountdown.value,
-                                style: textStyleBold(fontSize: 14.sp, color: Colors.white),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              )
-            : tile;
-        return gridCard;
       },
     );
   }

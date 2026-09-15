@@ -25,6 +25,9 @@ class AuthController extends GetxController {
     accountRevision.value;
     if (EnvConstants.isHive()) return false;
     if (EnvConstants.isAuthFirebase()) {
+      if (!Get.isRegistered<FirebaseAuthService>() || !FirebaseAuthService.to.isAvailable) {
+        return false;
+      }
       return FirebaseSession.hasLinkedCloudUser;
     }
     if (EnvConstants.isAuthServer()) {
@@ -35,6 +38,9 @@ class AuthController extends GetxController {
 
   String? get cloudEmail {
     if (EnvConstants.isAuthFirebase()) {
+      if (!Get.isRegistered<FirebaseAuthService>() || !FirebaseAuthService.to.isAvailable) {
+        return null;
+      }
       return FirebaseAuthService.to.currentUser?.email;
     }
     return SpUtils.ins.getString(SpKeys.linkedEmail);

@@ -91,8 +91,6 @@ enum LanKey {
   reward, // 'Reward'
   dueDateAndPriority, // 'Due Date & Priority'
   pickDate, // 'Pick date'
-  exp, // 'EXP'
-  hp, // 'HP'
   attributes, // 'Attributes'
   statStr, // 'STR'
   statInt, // 'INT'

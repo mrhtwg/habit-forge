@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/common/utils/log.dart';
 import 'package:habit_forge_app/core/network/api_response.dart';
@@ -16,8 +17,11 @@ class FirebaseSession {
 
   static const networkTimeout = Duration(seconds: 8);
 
+  static bool get _firebaseReady => Firebase.apps.isNotEmpty;
+
   /// Google / email account (not anonymous guest).
   static bool get hasLinkedCloudUser {
+    if (!_firebaseReady) return false;
     final user = FirebaseAuth.instance.currentUser;
     return user != null && !user.isAnonymous;
   }
@@ -43,7 +47,7 @@ class FirebaseSession {
   /// Network failures fall back to Hive so a bad connection cannot block entry.
   static Future<void> bootstrapAtSplash() async {
     final available = Get.isRegistered<FirebaseAuthService>() && FirebaseAuthService.to.isAvailable;
-    if (!available) {
+    if (!available || !_firebaseReady) {
       await useLocalBackend();
       return;
     }
@@ -66,6 +70,7 @@ class FirebaseSession {
   }
 
   static Future<void> _dropAnonymousIfAny() async {
+    if (!_firebaseReady) return;
     final user = FirebaseAuth.instance.currentUser;
     if (user == null || !user.isAnonymous) return;
     try {

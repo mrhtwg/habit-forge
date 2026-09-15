@@ -30,9 +30,9 @@ class FirebaseAuthService extends GetxService {
 
   bool _available = false;
 
-  User? get currentUser => _auth.currentUser;
+  User? get currentUser => _available ? _auth.currentUser : null;
   bool get isAvailable => _available;
-  bool get isAnonymous => _auth.currentUser?.isAnonymous ?? false;
+  bool get isAnonymous => _available && (_auth.currentUser?.isAnonymous ?? false);
 
   FirebaseAuth get _auth => FirebaseAuth.instance;
   GoogleSignIn get _googleSignIn => GoogleSignIn.instance;

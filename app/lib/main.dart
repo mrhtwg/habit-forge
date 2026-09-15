@@ -53,8 +53,6 @@ void main() async {
   Get.put(subscription, permanent: true);
   await subscription.init();
 
-  Get.put(AuthController(), permanent: true);
-
   final firebaseAuth = FirebaseAuthService();
   // Firebase mode: initialize the SDK only (needed later for Settings sign-in).
   // Do NOT create anonymous sessions or hit Firestore here — that happens after
@@ -76,6 +74,8 @@ void main() async {
     }
   }
   Get.put(firebaseAuth);
+  // After Firebase so AuthController.onInit can safely inspect cloud identity.
+  Get.put(AuthController(), permanent: true);
   if (EnvConstants.isAuthServer()) {
     Get.put(ServerAuthService());
   }

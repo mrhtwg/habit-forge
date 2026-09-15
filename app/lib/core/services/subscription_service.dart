@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:habit_forge_app/core/common/utils/log.dart';
 import 'package:habit_forge_app/core/common/utils/sp_keys.dart';
 import 'package:habit_forge_app/core/common/utils/sp_utils.dart';
+import 'package:habit_forge_app/core/constants/env_constants.dart';
 import 'package:habit_forge_app/core/services/subscription_tier.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart';
 import 'package:habit_forge_app/generated/protos/shared/v1/shared.pbenum.dart';
@@ -13,10 +14,13 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 
 /// Owns Play Billing purchases and local entitlement state.
 ///
-/// Freemium rules (feasibility report §8.1):
+/// Freemium rules (store / cloud builds):
 /// - Free: 3 habits, warrior only, week stats, ads, no legendary gear
 /// - Premium (monthly/yearly/lifetime): unlocks the rest
 /// - Yearly/Lifetime: yearly exclusive shop ids
+///
+/// Hive (local open-source) builds skip IAP and treat every gate as unlocked —
+/// self-compiled clients can change one line anyway; locks only add friction.
 class SubscriptionService extends GetxService {
   static SubscriptionService get to => Get.find();
 
@@ -28,9 +32,17 @@ class SubscriptionService extends GetxService {
   StreamSubscription<List<PurchaseDetails>>? _purchaseSub;
   final _iap = InAppPurchase.instance;
 
+  /// Local-first open builds: no store, full content.
+  bool get isHiveUnlocked => EnvConstants.isHive();
+
   Future<SubscriptionService> init() async {
     final saved = SpUtils.ins.getString(SpKeys.subscriptionTier);
     tier.value = _parseTier(saved);
+
+    if (isHiveUnlocked) {
+      Log.d('Hive mode: premium gates unlocked, IAP skipped');
+      return this;
+    }
 
     try {
       final available = await _iap.isAvailable();
@@ -58,9 +70,9 @@ class SubscriptionService extends GetxService {
     super.onClose();
   }
 
-  bool get isPremium => tier.value.isPremium;
+  bool get isPremium => isHiveUnlocked || tier.value.isPremium;
   bool get showAds => !isPremium;
-  bool get hasYearlyExtras => tier.value.hasYearlyExtras;
+  bool get hasYearlyExtras => isHiveUnlocked || tier.value.hasYearlyExtras;
 
   int get habitSlotLimit => isPremium ? 1 << 20 : SubscriptionLimits.freeHabitSlots;
 
@@ -85,7 +97,7 @@ class SubscriptionService extends GetxService {
   bool get canUseAdvancedStats => isPremium;
 
   Future<void> refreshProducts() async {
-    if (!isStoreAvailable.value) return;
+    if (isHiveUnlocked || !isStoreAvailable.value) return;
     final resp = await _iap.queryProductDetails(SubscriptionProducts.all.toSet());
     if (resp.error != null) {
       Log.w('queryProductDetails: ${resp.error}');
@@ -94,7 +106,7 @@ class SubscriptionService extends GetxService {
   }
 
   Future<bool> buy(SubscriptionTier target) async {
-    if (target == SubscriptionTier.free) return false;
+    if (isHiveUnlocked || target == SubscriptionTier.free) return false;
     final productId = switch (target) {
       SubscriptionTier.monthly => SubscriptionProducts.monthly,
       SubscriptionTier.yearly => SubscriptionProducts.yearly,
@@ -126,7 +138,7 @@ class SubscriptionService extends GetxService {
   }
 
   Future<void> restorePurchases({bool silent = false}) async {
-    if (!isStoreAvailable.value) return;
+    if (isHiveUnlocked || !isStoreAvailable.value) return;
     isBusy.value = true;
     try {
       await _iap.restorePurchases();
