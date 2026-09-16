@@ -147,7 +147,7 @@ if [[ "$BUILD_TYPE" == "aab" ]]; then
     flutter build appbundle --release \
       $VERBOSE \
       --obfuscate --split-debug-info=build/debug-info \
-      --dart-define-from-file=env/$ENV.json \
+      --dart-define-from-file=.env/$ENV.json \
       --build-name="$BUILD_NAME" \
       --build-number="$BUILD_NUMBER" \
       --split-debug-info=debug_symbols \
@@ -157,7 +157,7 @@ else
     flutter build apk --release \
       $VERBOSE \
       --obfuscate --split-debug-info=build/debug-info \
-      --dart-define-from-file=env/$ENV.json \
+      --dart-define-from-file=.env/$ENV.json \
       --build-name="$BUILD_NAME" \
       --build-number="$BUILD_NUMBER" \
       --split-debug-info=debug_symbols \
