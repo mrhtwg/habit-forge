@@ -253,7 +253,7 @@ const Map<LanKey, String> enUS = {
   LanKey.legal: 'Legal',
   LanKey.termsOfService: 'Terms of Service',
   LanKey.privacyPolicy: 'Privacy Policy',
-  LanKey.agreeToTermsPrefix: 'By continuing, you agree to our ',
+  LanKey.agreeToTermsPrefix: 'By continuing, you agree to ',
   LanKey.agreeToTermsAnd: ' and ',
   LanKey.existingAccountTitle: 'Existing account',
   LanKey.existingAccountOverwrite:

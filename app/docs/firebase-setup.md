@@ -92,8 +92,8 @@ firebase deploy --only firestore:rules
 3. Authentication → Sign-in method → enable **Google** (Anonymous is **not** required; the app plays on local Hive until Settings sign-in)
 
 > Firebase mode runs game logic on the client (same as Hive). Firestore rules only
-> isolate per-user data. For server-authoritative economy / IAP verification, use
-> the Go backend (or Cloud Functions) later.
+> isolate per-user data. For a server-authoritative economy / IAP verification, use
+> Cloud Functions (or a self-hosted backend) later — the MVP has no server.
 
 ### Step 5b: Fix `DEVELOPER_ERROR` / Google Sign-In on device
 
@@ -133,5 +133,4 @@ If placeholders are left as `YOUR_*`, startup logs `Firebase not configured` and
 | Log                                           | Meaning                                                             |
 | --------------------------------------------- | ------------------------------------------------------------------- |
 | `BillingClient ... Response code: 3`          | Play Billing unavailable on sideload/debug — OK until IAP is set up |
-| `gRPC Channel initialized for localhost:9000` | Was GetIt eager-init (fixed to lazy); only needed in server mode    |
 | `ProviderInstaller` / Phenotype warnings      | Common GMS noise on some devices; not fatal if Auth/Firestore work  |

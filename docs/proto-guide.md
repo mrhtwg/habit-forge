@@ -1,53 +1,27 @@
-# HabitForge · Proto Contract Authoring & Code Generation Guide
+# HabitForge · Proto Contract Authoring & Dart Code Generation Guide
 
-> `proto/` is the **single source of truth** for app/server contracts: change the
-> `.proto` files and regenerate Go (server) and Dart (app) code.
+> `proto/` is the **single source of truth** for the app's data contracts: edit the
+> `.proto` files and regenerate the Dart models consumed by `app/`.
 > Related: `proto/README.md`, `Makefile` (`make proto`), `app/generate_proto.sh`.
+>
+> **Scope:** the MVP has **no server**. Earlier revisions of this guide also covered
+> a Go + kratos pipeline (`buf` → `server/api/**/*.pb.go`); that module is not part
+> of this repository. The `go_package` options and `google.api.http` annotations are
+> kept in the protos so a backend can be reintroduced later, but nothing in this
+> repository consumes them today.
 
 ---
 
-## 0. Toolchain Installation (hands-on)
+## 0. Toolchain Installation
 
-Two pipelines need the following tools (installed independently):
-
-| Tool | Purpose | Install |
-|---|---|---|
-| `buf` | Server code generation (compiles protos, runs plugins) | `go install` |
-| `protoc-gen-go` | Go message code | `go install` |
-| `protoc-gen-go-grpc` | Go gRPC code | `go install` |
-| `protoc-gen-go-http` | Go kratos HTTP route code | `go install` |
-| `protoc` | Frontend Dart code generation (compiler) | `brew install protobuf` |
-| `protoc-gen-dart` | Dart code plugin | `flutter pub global activate` |
-
-### 0.1 Server side (Go + buf)
-
-```bash
-# 1) Install the 4 Go tools
-go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
-go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
-go install github.com/go-kratos/kratos/cmd/protoc-gen-go-http/v2@latest
-go install github.com/bufbuild/buf/cmd/buf@latest
-
-# 2) Add GOBIN to PATH (otherwise the commands are not found)
-export PATH="$PATH:$(go env GOPATH)/bin"
-
-# 3) Verify
-buf --version
-protoc-gen-go --version
-protoc-gen-go-grpc --version
-```
-
-> If `proxy.golang.org` is unreachable (e.g. in mainland China), prefix the
-> install commands with: `GOPROXY=https://goproxy.cn,direct go install ...`
-
-### 0.2 Frontend side (protoc + Dart plugin)
+### 0.1 Dart side (protoc + Dart plugin)
 
 ```bash
 # 1) Install protoc (Protocol Buffers compiler)
 brew install protobuf
 protoc --version          # verify
 
-# 2) Install the protoc-gen-dart plugin (Dart side, from pub.dev)
+# 2) Install the protoc-gen-dart plugin (from pub.dev)
 flutter pub global activate protoc_plugin
 
 # 3) Add the pub global bin to PATH
@@ -61,7 +35,7 @@ protoc-gen-dart --version
 > `protobuf` **< 6**, so this repo pairs **protoc_plugin 24.x + protobuf ^5.0.0**.
 > Install the plugin pinned: `flutter pub global activate protoc_plugin 24.0.0`.
 > A mismatched pair (e.g. plugin 25 + protobuf ^5) fails with errors like
-> `The method 'aI' isn't defined for the type 'BuilderInfo'` — see §3.2.
+> `The method 'aI' isn't defined for the type 'BuilderInfo'`.
 
 ---
 
@@ -81,7 +55,7 @@ proto/
 | File path | `api/<service>/v1/<service>.proto` (lowercase snake_case) |
 | `syntax` | `syntax = "proto3";` |
 | `package` | `api.<service>.v1` (e.g. `api.auth.v1`) |
-| `go_package` | `github.com/habitforge/backend/api/<service>/v1;v1` (required for Go) |
+| `go_package` | `github.com/habitforge/backend/api/<service>/v1;v1` — retained for a future backend; ignored by the Dart-only pipeline |
 | service/message | `PascalCase` (`AuthService`, `LoginRequest`) |
 | Fields | `snake_case`, numbers start at **1** and **must never change** once released |
 | enums | First value must be 0 (proto3 rule); `SCREAMING_SNAKE_CASE` naming |
@@ -96,6 +70,7 @@ package api.auth.v1;
 
 import "google/api/annotations.proto";   // HTTP route annotations (from third_party)
 
+// Kept so a future backend can generate Go from the same file.
 option go_package = "github.com/habitforge/backend/api/auth/v1;v1";
 
 // AuthService handles authentication.
@@ -121,6 +96,10 @@ message LoginReply {
 ```
 
 ### 1.3 HTTP Route Annotation Rules (`google.api.http`)
+
+> These annotations describe REST routes for a future self-hosted backend. The
+> Dart pipeline compiles `third_party/` but generates nothing from them, so they
+> are inert today — keep them accurate if a backend is reintroduced.
 
 | Rule | Description |
 |---|---|
@@ -150,50 +129,16 @@ message LoginReply {
 
 ---
 
-## 2. Generating Server Code (Go)
+## 2. Generating Dart Code
+
+> This repo's script: **`app/generate_proto.sh`**.
 
 ### 2.1 Generate
 
 ```bash
-# from the repository root (recommended)
-make proto
-
-# or manually (inside proto/)
-cd proto
-buf generate --path api/auth/v1 --path api/user/v1 --path api/character/v1 \
-  --path api/task/v1 --path api/shop/v1 --path api/achievement/v1 --path api/stats/v1
-```
-
-Configuration: `proto/buf.yaml` (modules) and `proto/buf.gen.yaml` (plugins, `out: ../server`).
-
-### 2.2 Output & Wiring
-
-```
-server/api/<service>/v1/
-├── xxx.pb.go          # messages/enums (protobuf runtime)
-├── xxx_http.pb.go     # kratos HTTP route registration (from google.api.http)
-└── xxx_grpc.pb.go     # gRPC service registration
-```
-
-The empty methods to implement live in `server/internal/service/*.go` (currently
-return `501 NOT_IMPLEMENTED`); business logic goes in `server/internal/biz/*.go`.
-Services are already registered in `server/internal/server/server.go` — **no
-hand-written routes**: edit the proto → regenerate → fill in the biz logic.
-
-Verify: `cd server && go build ./... && go vet ./...`
-
----
-
-## 3. Generating Frontend (Dart) Code
-
-> This repo's script: **`app/generate_proto.sh`** (simplified for this layout).
-
-### 3.1 Generate
-
-```bash
 cd app
 ./generate_proto.sh              # generate all modules → lib/generated/protos/
-./generate_proto.sh --grpc       # also generate the gRPC client (.pbgrpc.dart, add grpc dep)
+./generate_proto.sh --grpc       # also generate the gRPC client (.pbgrpc.dart, needs the grpc dep)
 ./generate_proto.sh --clean      # remove the generated directory
 ```
 
@@ -201,7 +146,7 @@ Core protoc invocation:
 
 ```
 protoc \
-  --proto_path=../proto \                # module root (matches buf) so api/... imports resolve
+  --proto_path=../proto \                # module root so api/... imports resolve
   --proto_path=../proto/third_party \    # google.api annotations compiled only, not generated
   --dart_out[=grpc]:lib/generated/protos \
   ../proto/api/*/v1/*.proto
@@ -215,15 +160,15 @@ protoc \
 - A **barrel file** `lib/generated/protos/<svc>/v1/<svc>.dart` is generated per
   module for simpler imports.
 
-### 3.2 Wiring into the app
+### 2.2 Wiring into the app
 
-**pubspec.yaml dependencies** (add before first generation):
+**pubspec.yaml dependencies** (needed by the generated code):
 
 ```yaml
 dependencies:
-  protobuf: ^5.0.0        # must match protoc_plugin 24.x + grpc (see §0.2)
+  protobuf: ^5.0.0        # must match protoc_plugin 24.x (see §0.1)
   fixnum: ^1.0.0
-  grpc: ^4.0.0            # required — the app talks to the backend over gRPC
+  grpc: ^4.0.0            # only required when generating --grpc stubs
 ```
 
 **analysis_options.yaml** (already configured — excludes generated code from linting):
@@ -240,47 +185,23 @@ analyzer:
 // Import via the barrel file
 import 'package:habit_forge_app/generated/protos/task/v1/task.dart';
 
-// Build / read messages
+// Build / read messages — these types are the app's data model in every mode
 final task = Task()
   ..id = 'abc'
   ..title = 'Morning exercise'
   ..difficulty = TaskDifficulty.taskDifficultyMedium;
-
-// Game data (server mode): generated gRPC stubs, wrapped in
-// app/lib/core/network/grpc/ (GrpcClientChannel → NetworkServerImpl).
-import 'package:habit_forge_app/generated/protos/task/v1/task.pbgrpc.dart';
-final client = TaskServiceClient(GrpcClientChannel.instance().channel);
-final reply = await client.listTasks(ListTasksRequest());
 ```
 
-> Game data travels over **gRPC**: always regenerate with `./generate_proto.sh
-> --grpc` so the `.pbgrpc.dart` clients stay in sync (the `grpc` dependency is
-> active in pubspec). Only the email/register auth path uses REST + JSON
-> (`ServerAuthService`); serialize messages with pbjson there when needed.
-
-### 3.3 Alternative: generate Go + Dart in one `buf generate`
-
-Append a Dart plugin to `proto/buf.gen.yaml` and `buf generate` produces both
-sides at once:
-
-```yaml
-plugins:
-  - local: protoc-gen-go
-    out: ../server
-    opt: [paths=source_relative]
-  # ...(go-http / go-grpc)
-  - local: protoc-gen-dart
-    out: ../app/lib/generated/protos
-```
+The generated messages are used by the Hive and Firebase storage implementations
+alike (`app/lib/core/network/`); they are not tied to any transport.
 
 ---
 
-## 4. Changing an Interface (full workflow)
+## 3. Changing a Contract (full workflow)
 
 ```
-1. Edit proto/api/<service>/v1/<service>.proto      # add fields / RPCs / route annotations
-2. make proto                                        # regenerate the server Go code
-3. cd app && ./generate_proto.sh --grpc             # regenerate Dart incl. gRPC stubs
-4. Fill in server/internal/biz/*.go business logic   # for new interfaces
-5. Wire the new interface on the frontend with the generated pb messages / JSON
+1. Edit proto/api/<service>/v1/<service>.proto      # add fields / RPCs
+2. cd app && ./generate_proto.sh                    # regenerate the Dart models
+3. Update app/lib/core/network/**                   # Hive + Firebase storage / mapping
+4. Run `make analyze` and `make test`
 ```

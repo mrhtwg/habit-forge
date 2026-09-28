@@ -52,6 +52,7 @@ app/env/firebase.json
 **/firebase-adminsdk*.json
 
 # Go
+server
 server/bin/
 server/coverage.out
 *.test

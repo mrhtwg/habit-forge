@@ -252,7 +252,7 @@ const Map<LanKey, String> zhCN = {
   LanKey.legal: '法律信息',
   LanKey.termsOfService: '《用户协议》',
   LanKey.privacyPolicy: '《隐私政策》',
-  LanKey.agreeToTermsPrefix: '继续即表示你同意我们的',
+  LanKey.agreeToTermsPrefix: '继续即表示你同意',
   LanKey.agreeToTermsAnd: '和',
   LanKey.existingAccountTitle: '已有账号',
   LanKey.existingAccountOverwrite: '该账号已有冒险数据。继续登录将覆盖本机当前进度。取消则不登录、不同步。',

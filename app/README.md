@@ -1,10 +1,10 @@
 # HabitForge App (Flutter)
 
-> RPG-style habit tracker — the Flutter client of the HabitForge monorepo (`app/`).
+> RPG-style habit tracker — the Flutter client of the HabitForge repository (`app/`).
 
 HabitForge turns real-life tasks into an RPG character growth loop: complete tasks to earn **EXP** and **gold**, level up your character, spend gold on cosmetics in the **Forge**, and keep your streaks alive.
 
-The app is **local-first**: all game data lives in Hive on-device. Firebase Auth is optional and enabled in `firebase` mode. See the repository [root README](../README.md) for the full monorepo (Go backend, proto contracts, product & design docs).
+The app is **local-first**: all game data lives in Hive on-device. Firebase Auth + Firestore are optional and enabled in `firebase` mode. There is no server component in the MVP. See the repository [root README](../README.md) for the proto contracts and the product & design docs.
 
 ## Features
 
@@ -37,9 +37,8 @@ The app is **local-first**: all game data lives in Hive on-device. Firebase Auth
 ### Onboarding & auth
 
 - 4-step onboarding: Welcome → Class → Habit → Ready
-- Hive (local) mode is **local-first**: splash auto-mints a guest session and never forces login; optional Sign In lives in Settings when Firebase/server auth is configured
+- Hive (local) mode is **local-first**: splash auto-mints a guest session and never forces login; optional Sign In lives in Settings once Firebase auth is configured
 - Firebase mode offers **Google Sign-In only** (email/Apple to be added later)
-- Server mode offers **email/password** login with a **registration** entry (no email verification)
 
 ### Freemium & subscription
 
@@ -68,19 +67,19 @@ flutter pub get
 flutter run --dart-define-from-file=env/hive.json
 ```
 
-### Data & backend modes
+### Data modes
 
-The runtime mode is selected by the `env/` config file passed via `--dart-define-from-file`. Three modes are supported:
+The runtime mode is selected by the `env/` config file passed via `--dart-define-from-file`. Two modes are supported:
 
-| Mode           | File                | Data storage                                                                    | Auth                                            |
-| -------------- | ------------------- | ------------------------------------------------------------------------------- | ----------------------------------------------- |
-| Hive (default) | `env/hive.json`     | Local on-device (Hive)                                                          | Guest / local mock                              |
-| Firebase       | `env/firebase.json` (local; see `.example`) | Firebase (cloud data + auth)                                                    | Google Sign-In (Settings) + anonymous guest     |
-| Server         | `env/server.json`   | Self-hosted backend — **gRPC** game data (`grpcUrl`) + **HTTP** auth (`apiUrl`) | Email/password + registration (no verification) |
+| Mode           | File                | Data storage                                | Auth                                        |
+| -------------- | ------------------- | ------------------------------------------- | ------------------------------------------- |
+| Hive (default) | `env/hive.json`     | Local on-device (Hive)                      | Guest / local                               |
+| Firebase       | `env/firebase.json` (local; see `.example`) | Firebase (cloud data + auth)                | Google Sign-In (Settings) + anonymous guest |
 
-- **Hive** — local-first mode, no backend required; the login page is skipped and the app enters directly (guest/local auth), Firebase is never initialized.
+- **Hive** — local-first mode, no account or network required; the login page is skipped and the app enters directly (guest/local auth), Firebase is never initialized.
 - **Firebase** — SDK may initialize at startup, but **no anonymous Auth / Firestore** until the user signs in from Settings. Before that, gameplay uses on-device Hive (same as local-first). Weak networks cannot block entering the app (cloud restore is timed out and falls back to Hive).
-- **Server** — targets the self-hosted Go backend over **two transports**: email **auth** goes over HTTP REST (`POST {apiUrl}/api/v1/auth/login` / `/api/v1/auth/register`, JWT, no email verification), while **game data** (tasks, character, shop, achievements, stats) uses **gRPC** stubs generated from `proto/`. Both endpoints are read from `env/server.json`: `apiUrl` defaults to `http://localhost:8080`, `grpcUrl` to `localhost:9000`.
+
+> **Scope note:** the client code still contains a third `server` mode (self-hosted backend over gRPC + HTTP). It is **not part of the MVP** — the server module is not part of this repository and no shipped build uses it. `env/server.json` and the `server` network implementation remain in the tree for future development.
 
 #### `env/firebase.json` (required keys, gitignored)
 
@@ -103,7 +102,7 @@ cp env/firebase.json.example env/firebase.json
 
 Replace every `YOUR_*` value from Firebase Console (or `google-services.json`). `lib/firebase_options.dart` reads these via `--dart-define-from-file`. Do **not** commit the filled `env/firebase.json`, `google-services.json`, or Android signing files — see root `.gitignore` and `docs/firebase-setup.md`.
 
-The active mode is exposed through `EnvConstants` (`lib/core/constants/env_constants.dart`) — `networkMode`, `authMode`, `apiBaseUrl`, `grpcUrl`, Firebase option fields, and helpers `isHive()` / `isFirebase()` / `isServer()`.
+The active mode is exposed through `EnvConstants` (`lib/core/constants/env_constants.dart`) — `networkMode`, `authMode`, Firebase option fields, and the helpers `isHive()` / `isFirebase()` (`isServer()` / `apiBaseUrl` / `grpcUrl` belong to the future server mode).
 
 ## Project Layout
 
@@ -178,5 +177,5 @@ flutter test
 
 ## Related
 
-- Monorepo root — [../README.md](../README.md)
-- Backend (`server/`), shared contracts (`proto/`), product & design docs (`docs/`)
+- Repository root — [../README.md](../README.md)
+- Data contracts (`proto/`), product & design docs (`docs/`)

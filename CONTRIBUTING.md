@@ -1,6 +1,6 @@
 # Contributing to HabitForge
 
-Thanks for your interest in contributing! This project is a full-stack Flutter + Go monorepo, and contributions are welcome in code, docs, design, and testing.
+Thanks for your interest in contributing! This project is a Flutter mobile app repository, and contributions are welcome in code, docs, design, and testing.
 
 ## Getting Started
 
@@ -25,14 +25,13 @@ make test
 ## Project Structure
 
 - `app/` — Flutter client
-- `server/` — Go backend
-- `proto/` — shared API contracts (planned)
+- `proto/` — data contracts (protobuf source for the generated Dart models)
 - `docs/` — product and architecture docs
+- `legal/` — privacy policy and terms of service
 
 ## Code Style
 
 - Flutter: follow `analysis_options.yaml`, run `flutter analyze`.
-- Go: run `go fmt` and `go vet`.
 - Keep PRs focused and descriptive.
 - Add tests for new logic when practical.
 
@@ -40,7 +39,7 @@ make test
 
 Please include:
 
-- Environment (OS, Flutter/Go versions)
+- Environment (OS, Flutter version)
 - Steps to reproduce
 - Expected vs actual behavior
 - Logs or screenshots if available

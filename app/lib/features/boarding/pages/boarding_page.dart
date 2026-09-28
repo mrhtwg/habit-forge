@@ -35,7 +35,7 @@ class BoardingPage extends GetView<BoardingController> {
                 // Welcome step = first screen after splash (no login page in hive).
                 if (step == 0) ...[
                   const TermsPrivacyFooter(),
-                  SizedBox(height: 12.h),
+                  SizedBox(height: 22.h),
                 ],
                 _buildBottomButton(step),
                 SizedBox(height: 30.h),

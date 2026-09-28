@@ -1,14 +1,18 @@
 # Shared Proto Contracts
 
-Single source of truth for the HabitForge API contracts, shared by the Flutter
-client (`app/`) and the Go backend (`server/`). Each consumer generates its own
-language code from these protos.
+Single source of truth for the HabitForge data contracts. The Flutter client
+(`app/`) generates its Dart data models from these protos.
+
+> The MVP has **no server**. Earlier revisions of this README described a Go
+> backend consuming the same protos; that module is not part of this repository.
+> The `go_package` options and `google.api.http` annotations are kept so a
+> backend can be reintroduced later.
 
 ## Layout
 
 ```text
 proto/
-├── buf.yaml / buf.gen.yaml   # buf module + codegen config
+├── buf.yaml / buf.gen.yaml   # buf module + Go codegen config (unused until a server returns)
 ├── api/
 │   ├── auth/                 # register / login / oauth / me
 │   ├── user/                 # preferences & wallet
@@ -22,36 +26,25 @@ proto/
 
 ## Generating code
 
-- **Go (server)** — protos → `server/api/<service>/v1/*.pb.go` (HTTP + gRPC):
+- **Dart (app)** — protos → `app/lib/generated/protos/<service>/v1/*.dart`:
 
   ```bash
   # from the repository root
   make proto
 
-  # or manually
-  cd proto
-  buf generate --path api/auth/v1 --path api/user/v1 --path api/character/v1 \
-    --path api/task/v1 --path api/shop/v1 --path api/achievement/v1 --path api/stats/v1
-  ```
-
-- **Dart (app)** — protos → `app/lib/generated/protos/<service>/v1/*.dart`:
-
-  ```bash
+  # or directly
   cd app
-  ./generate_proto.sh --grpc       # Dart messages + gRPC client stubs (default flow)
+  ./generate_proto.sh
   ```
 
-  (`protoc` + `protoc-gen-dart` + barrel files). Full guide: `docs/proto-guide.md`.
+  Requires `protoc` + `protoc-gen-dart` and also emits barrel files. Full guide:
+  `docs/proto-guide.md`.
 
 ## Toolchain
 
 ```bash
-go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
-go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
-go install github.com/go-kratos/kratos/cmd/protoc-gen-go-http/v2@latest
-go install github.com/bufbuild/buf/cmd/buf@latest
-export PATH="$PATH:$(go env GOPATH)/bin"
+brew install protobuf
+flutter pub global activate protoc_plugin 24.0.0
+export PATH="$PATH:$HOME/.pub-cache/bin"
+protoc-gen-dart --version
 ```
-
-> If `proxy.golang.org` is unreachable (e.g. in mainland China), use a mirror:
-> `GOPROXY=https://goproxy.cn,direct go install ...`

@@ -3,7 +3,7 @@
 ###############################################################################
 # HabitForge · Proto → Dart code generator
 #
-# Source:   ../proto/                 # shared contracts (app + server)
+# Source:   ../proto/                 # shared contracts (client data models)
 #   ├── api/<service>/v1/*.proto
 #   └── third_party/google/api/       # google.api.http annotations
 #
