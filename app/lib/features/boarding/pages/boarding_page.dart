@@ -294,6 +294,7 @@ class BoardingPage extends GetView<BoardingController> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Text(
                                     cls.$2.tr,

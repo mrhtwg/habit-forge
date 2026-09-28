@@ -70,3 +70,4 @@ dist/
 firebase-debug.log*
 firebase-debug.*.log*
 .firebaserc
+*.aab
