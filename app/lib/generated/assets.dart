@@ -17,11 +17,15 @@ class Assets {
 
   static const String fontsNunitoRegular = "assets/fonts/Nunito-Regular.ttf";
 
+  static const String imagesSharedCloud = "assets/images/shared/cloud.webp";
+
   static const String imagesSharedIcExp = "assets/images/shared/ic_exp.webp";
 
   static const String imagesSharedIcGem = "assets/images/shared/ic_gem.webp";
 
   static const String imagesSharedIcGold = "assets/images/shared/ic_gold.webp";
+
+  static const String imagesSharedSun = "assets/images/shared/sun.webp";
 
   static const String legalPrivacyPolicy = "assets/legal/privacy-policy.html";
 

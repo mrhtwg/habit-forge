@@ -9,6 +9,7 @@ import 'package:habit_forge_app/core/services/subscription_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/boarding/controllers/boarding_controller.dart';
+import 'package:habit_forge_app/generated/assets.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pbenum.dart';
 import 'package:habit_forge_app/widgets/terms_privacy_footer.dart';
 
@@ -537,30 +538,20 @@ class BoardingPage extends GetView<BoardingController> {
           Positioned(
             top: 14.h,
             right: 20.w,
-            child: Container(
+            child: Image.asset(
+              Assets.imagesSharedSun,
               width: 56.w,
               height: 56.w,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: const RadialGradient(
-                  colors: [Color(0xFFFFE38A), AppColors.gold],
-                ),
-                border: Border.all(color: AppColors.border, width: 2),
-              ),
             ),
           ),
           // Cloud
           Positioned(
             top: 22.h,
             left: 24.w,
-            child: Container(
+            child: Image.asset(
+              Assets.imagesSharedCloud,
               width: 64.w,
-              height: 26.h,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(999),
-                border: Border.all(color: const Color(0xFFD6EAF7), width: 1.5),
-              ),
+              height: 26.w,
             ),
           ),
           Center(child: child),
@@ -572,7 +563,7 @@ class BoardingPage extends GetView<BoardingController> {
             child: ClipRRect(
               borderRadius: const BorderRadius.vertical(bottom: Radius.circular(26)),
               child: Container(
-                height: 34.h,
+                height: 36.h,
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(colors: [Color(0xFF9FE29F), Color(0xFF5FCE74)]),
                 ),
