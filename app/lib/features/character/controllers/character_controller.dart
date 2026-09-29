@@ -1,40 +1,20 @@
-import 'dart:async';
-
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/network/network_registry.dart';
-import 'package:habit_forge_app/core/services/achievement_unlock_service.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart';
 
+/// Character-page actions.
+///
+/// Death recovery is owned by `DeathRecoveryService` (app-wide, so it also runs
+/// while this page is closed) — do not re-implement a recovery timer here.
 class CharacterController extends GetxController {
   String currentAnimation = 'idle';
-  Timer? _deathTimer;
 
   /// Spends one available stat point (delegated to the storage layer), then
   /// refreshes the shared character mirror so other pages see the change.
   Future<void> allocateStat(String statName) async {
     await NetworkRegistry.ins.allocateStatPoint(_statType(statName));
     await UserService.to.loadCharacter();
-  }
-
-  /// Revives the character when the death-recovery timer has elapsed.
-  Future<void> checkDeathRecovery() async {
-    final char = UserService.to.character.value;
-    if (char == null || !char.isDead) return;
-    if (DateTime.now().isAfter(DateTime.fromMillisecondsSinceEpoch(char.deathRecoveryUntil.toInt()))) {
-      final unlockedBefore = await AchievementUnlockService.snapshotUnlockedIds();
-      await NetworkRegistry.ins.reviveCharacter();
-      await UserService.to.loadCharacter();
-      await UserService.to.loadUserPrefs();
-      final unlocked = await AchievementUnlockService.newlyUnlockedSince(unlockedBefore);
-      await AchievementUnlockService.presentUnlocks(unlocked);
-    }
-  }
-
-  @override
-  void dispose() {
-    _deathTimer?.cancel();
-    super.dispose();
   }
 
   void updateAnimation(String animation) {

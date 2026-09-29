@@ -83,10 +83,17 @@ class QuestsController extends GetxController {
 
   Future<void> toggleComplete(Task task) async {
     if (task.isCompleted) return;
+    if (UserService.to.character.value?.isDead ?? false) {
+      Toast.warning(LanKey.deathBlocked.tr);
+      return;
+    }
     final levelBefore = UserService.to.character.value?.level ?? 1;
     final unlockedBefore = await AchievementUnlockService.snapshotUnlockedIds();
     final result = await _hive.completeTask(task.id);
-    if (result.isFailure) return;
+    if (result.isFailure) {
+      Toast.error(result.message);
+      return;
+    }
 
     UserService.to.loadUserPrefs();
     UserService.to.loadCharacter();

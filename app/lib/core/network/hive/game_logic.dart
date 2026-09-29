@@ -1,5 +1,8 @@
+import 'dart:math';
+
 import 'package:fixnum/fixnum.dart';
 import 'package:habit_forge_app/core/extensions/date_extensions.dart';
+import 'package:habit_forge_app/core/network/hive/class_profiles.dart';
 import 'package:habit_forge_app/core/network/hive/game_constants.dart';
 import 'package:habit_forge_app/core/network/hive/shop_config.dart';
 import 'package:habit_forge_app/generated/protos/achievement/v1/achievement.pb.dart';
@@ -7,6 +10,7 @@ import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart'
 import 'package:habit_forge_app/generated/protos/shared/v1/shared.pbenum.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';
 import 'package:habit_forge_app/generated/protos/user/v1/user.pb.dart';
+import 'package:uuid/uuid.dart';
 
 /// Pure game rules shared by the local storage implementations (hive/firebase).
 ///
@@ -18,6 +22,61 @@ import 'package:habit_forge_app/generated/protos/user/v1/user.pb.dart';
 /// instance.
 class GameLogic {
   GameLogic._();
+
+  /// Builds the level-1 character for [characterClass].
+  ///
+  /// The ONLY place a character is created: both storage implementations call
+  /// it, so the class screen and the live character can never drift apart.
+  static Character newCharacter(CharacterClass characterClass) {
+    final profile = ClassProfiles.of(characterClass);
+    return Character()
+      ..id = const Uuid().v4()
+      ..characterClass = characterClass
+      ..level = 1
+      ..currentExp = Int64(0)
+      ..currentHp = GameConstants.maxHpFor(profile.vitality)
+      ..maxExp = Int64(GameConstants.expForLevel(1))
+      ..baseStats = profile.toStats()
+      ..availableStatPoints = 0
+      ..isDead = false;
+  }
+
+  /// Raises a save's base stats up to its class floor.
+  ///
+  /// Characters created before classes had their own stats start from all-zero
+  /// stats, which both contradicts the class screen and swallows the first
+  /// points the player allocates. Only ever raises a stat to the class value,
+  /// so it never removes invested points; returns null when nothing changes so
+  /// callers persist exactly once.
+  static Character? classBaselinePatch(Character c) {
+    final p = ClassProfiles.of(c.characterClass);
+    final s = c.baseStats;
+    final str = max(s.strength, p.strength);
+    final intel = max(s.intelligence, p.intelligence);
+    final def = max(s.defense, p.defense);
+    final vit = max(s.vitality, p.vitality);
+    if (str == s.strength && intel == s.intelligence && def == s.defense && vit == s.vitality) {
+      return null;
+    }
+    return (c.deepCopy()..freeze()).rebuild(
+      (x) => x
+        ..baseStats = (CharacterStats()
+          ..strength = str
+          ..intelligence = intel
+          ..agility = s.agility
+          ..defense = def
+          ..vitality = vit
+          ..luck = s.luck),
+    );
+  }
+
+  /// Applies missed-daily HP damage, scaled by the class perk (the Ranger takes
+  /// half). Returns [c] untouched when there is no damage or the hero is dead.
+  static Character applyOverduePenalty(Character c, int damage) {
+    if (damage <= 0 || c.isDead) return c;
+    final scaled = (damage * ClassProfiles.of(c.characterClass).hpPenaltyScale).round();
+    return takeDamage(c, scaled);
+  }
 
   // ── Rewards ──
 
@@ -236,7 +295,8 @@ class GameLogic {
   /// respected verbatim and never scaled by stats.
   static int expReward(Task task, Character character) {
     if (task.customExpReward > 0) return task.customExpReward;
-    final base = GameConstants.baseExpReward(task.difficulty) * GameConstants.streakMultiplier(task.streak);
+    final base = GameConstants.baseExpReward(task.difficulty) *
+        GameConstants.streakMultiplier(task.streak, perDay: ClassProfiles.of(character.characterClass).streakGrowth);
     return (base * (1 + effectiveStats(character).intelligence * 0.01)).round();
   }
 
@@ -307,13 +367,17 @@ class GameLogic {
     );
   }
 
-  /// Revives a dead character with the recovery HP.
-  static Character revive(Character c) => (c.deepCopy()..freeze()).rebuild(
-        (x) => x
-          ..isDead = false
-          ..currentHp = GameConstants.deathRecoveryHp
-          ..deathRecoveryUntil = Int64.ZERO,
-      );
+  /// Revives a dead character with its class recovery HP (the Warrior comes
+  /// back with more HP).
+  static Character revive(Character c) {
+    final hp = ClassProfiles.of(c.characterClass).recoveryHp;
+    return (c.deepCopy()..freeze()).rebuild(
+      (x) => x
+        ..isDead = false
+        ..currentHp = min(hp, maxHpOf(c))
+        ..deathRecoveryUntil = Int64.ZERO,
+    );
+  }
 
   /// Toggles the skipped flag.
   static Task skip(Task task) => (task.deepCopy()..freeze()).rebuild((t) => t..isSkipped = !t.isSkipped);
@@ -335,7 +399,9 @@ class GameLogic {
         ..isDead = dead
         ..deathRecoveryUntil = dead
             ? Int64(
-                DateTime.now().add(const Duration(minutes: GameConstants.deathRecoveryMinutes)).millisecondsSinceEpoch,
+                DateTime.now()
+                    .add(Duration(minutes: ClassProfiles.of(frozen.characterClass).recoveryMinutes))
+                    .millisecondsSinceEpoch,
               )
             : Int64.ZERO,
     );

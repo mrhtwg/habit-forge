@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/network/network_registry.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
 import 'package:habit_forge_app/core/services/achievement_unlock_service.dart';
@@ -26,6 +27,10 @@ class HomeController extends GetxController {
   }
 
   Future<void> onTaskComplete(Task task) async {
+    if (UserService.to.character.value?.isDead ?? false) {
+      Toast.warning(LanKey.deathBlocked.tr);
+      return;
+    }
     final levelBefore = UserService.to.character.value?.level ?? 1;
     final unlockedBefore = await AchievementUnlockService.snapshotUnlockedIds();
     final result = await NetworkRegistry.ins.completeTask(task.id);

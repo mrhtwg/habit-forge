@@ -212,19 +212,28 @@ class StatisticsPage extends GetView<StatisticsController> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: List.generate(7, (i) {
                       final count = weekdayCounts[i];
+                      // Fraction of the available bar area (already within 0..1).
                       final h = maxCount == 0 ? 0.04 : count / maxCount;
                       final isHot = weekdayCounts[i] == maxCount && maxCount > 0;
                       return Expanded(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            Container(
-                              margin: EdgeInsets.symmetric(horizontal: 4.w),
-                              height: 130.h * h,
-                              decoration: BoxDecoration(
-                                color: isHot ? AppColors.primary : AppColors.gold,
-                                border: Border.all(color: AppColors.border, width: 2),
-                                borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
+                            // The bar takes the leftover height above the weekday
+                            // label, so the label is always reserved and the
+                            // tallest bar can never overflow this 130.h box.
+                            Expanded(
+                              child: FractionallySizedBox(
+                                alignment: Alignment.bottomCenter,
+                                heightFactor: h,
+                                child: Container(
+                                  margin: EdgeInsets.symmetric(horizontal: 4.w),
+                                  decoration: BoxDecoration(
+                                    color: isHot ? AppColors.primary : AppColors.gold,
+                                    border: Border.all(color: AppColors.border, width: 2),
+                                    borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
+                                  ),
+                                ),
                               ),
                             ),
                             SizedBox(height: 4.h),

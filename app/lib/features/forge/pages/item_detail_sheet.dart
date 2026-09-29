@@ -9,9 +9,8 @@ import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/forge/controllers/forge_controller.dart';
 import 'package:habit_forge_app/generated/assets.dart';
-import 'package:habit_forge_app/generated/protos/shared/v1/shared.pbenum.dart';
 import 'package:habit_forge_app/generated/protos/shop/v1/shop.pb.dart';
-import 'package:habit_forge_app/widgets/shop_item_icon.dart';
+import 'package:habit_forge_app/widgets/item_widget.dart';
 import 'package:habit_forge_app/widgets/toast_widget.dart';
 
 class ItemDetailSheet extends StatelessWidget {
@@ -25,7 +24,6 @@ class ItemDetailSheet extends StatelessWidget {
     final affordable = controller.canAfford(item);
     final shortfall = controller.shortfall(item);
     final isSkin = controller.isSkin(item);
-    final rarityColor = ShopItemIcon.rarityColor(item.rarity);
 
     return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
@@ -45,40 +43,34 @@ class ItemDetailSheet extends StatelessWidget {
             ),
           ),
           SizedBox(height: 20.h),
-          // Icon frame (rarity-tinted gradient + rarity border)
-          Container(
+
+          ItemWidget(
+            item: item,
             width: 88.w,
             height: 88.w,
-            decoration: BoxDecoration(
-              gradient: ShopItemIcon.rarityGradient(item.rarity),
-              border: Border.all(color: rarityColor, width: 3),
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: const [BoxShadow(color: Color(0xFFEFDFC4), offset: Offset(0, 5))],
-            ),
-            child: ShopItemIcon(itemId: item.id, iconFile: ShopConfig.iconOf(item.id), size: 48.w),
           ),
           SizedBox(height: 14.h),
           Text(item.name, style: textStyleBold(fontSize: 20.sp, color: AppColors.textPrimary)),
           SizedBox(height: 8.h),
           // Rarity pill
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
-            decoration: BoxDecoration(
-              color: rarityColor.withValues(alpha: 0.15),
-              border: Border.all(color: rarityColor, width: 1.2),
-              borderRadius: BorderRadius.circular(999),
-            ),
-            child: Text(
-              switch (item.rarity) {
-                EquipmentRarity.EQUIPMENT_RARITY_COMMON => LanKey.common.tr,
-                EquipmentRarity.EQUIPMENT_RARITY_RARE => LanKey.rare.tr,
-                EquipmentRarity.EQUIPMENT_RARITY_EPIC => LanKey.epic.tr,
-                EquipmentRarity.EQUIPMENT_RARITY_LEGENDARY => LanKey.legendary.tr,
-                _ => throw UnimplementedError(),
-              },
-              style: textStyleBold(fontSize: 11.sp, color: rarityColor).copyWith(letterSpacing: 0.5),
-            ),
-          ),
+          // Container(
+          //   padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+          //   decoration: BoxDecoration(
+          //     color: rarityColor.withValues(alpha: 0.15),
+          //     border: Border.all(color: rarityColor, width: 1.2),
+          //     borderRadius: BorderRadius.circular(999),
+          //   ),
+          //   child: Text(
+          //     switch (item.rarity) {
+          //       EquipmentRarity.EQUIPMENT_RARITY_COMMON => LanKey.common.tr,
+          //       EquipmentRarity.EQUIPMENT_RARITY_RARE => LanKey.rare.tr,
+          //       EquipmentRarity.EQUIPMENT_RARITY_EPIC => LanKey.epic.tr,
+          //       EquipmentRarity.EQUIPMENT_RARITY_LEGENDARY => LanKey.legendary.tr,
+          //       _ => throw UnimplementedError(),
+          //     },
+          //     style: textStyleBold(fontSize: 11.sp, color: rarityColor).copyWith(letterSpacing: 0.5),
+          //   ),
+          // ),
           // Attribute bonus chips (equipment only; appearance grants none).
           Builder(
             builder: (context) {
@@ -93,7 +85,7 @@ class ItemDetailSheet extends StatelessWidget {
               ];
               if (chips.isEmpty) return const SizedBox.shrink();
               return Padding(
-                padding: EdgeInsets.only(top: 10.h),
+                padding: EdgeInsets.symmetric(horizontal: 60.w, vertical: 10.h),
                 child: Wrap(
                   spacing: 6.w,
                   runSpacing: 6.h,
@@ -228,7 +220,7 @@ class ItemDetailSheet extends StatelessWidget {
             ],
             Flexible(
               child: Text(
-                showPrice ? '$label · ${item.price}' : label,
+                showPrice ? '$label · ${controller.priceOf(item)}' : label,
                 textAlign: TextAlign.center,
                 style: textStyleBold(fontSize: 15.sp, color: fg),
               ),

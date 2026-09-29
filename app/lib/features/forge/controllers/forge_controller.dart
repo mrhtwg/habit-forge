@@ -25,6 +25,7 @@ class ForgeController extends GetxController {
 
   Timer? _countdownTimer;
   int _rotationWindow = -1;
+  bool _refreshingDeal = false;
 
   ShopItem? get dailyDealItem {
     final deal = dailyDeal.value;
@@ -45,10 +46,14 @@ class ForgeController extends GetxController {
     return currencyOf(item) == ShopCurrency.SHOP_CURRENCY_GEMS ? prefs.currentGems.toInt() : prefs.currentGold.toInt();
   }
 
-  bool canAfford(ShopItem item) => balanceOf(item) >= item.price.toInt();
+  /// Price the player actually pays today: the deal of the day discounts one
+  /// item, and this is the number shown and charged everywhere.
+  int priceOf(ShopItem item) => ShopConfig.effectivePrice(item.price.toInt(), item.id, dailyDeal.value);
+
+  bool canAfford(ShopItem item) => balanceOf(item) >= priceOf(item);
 
   int shortfall(ShopItem item) {
-    final needed = item.price.toInt() - balanceOf(item);
+    final needed = priceOf(item) - balanceOf(item);
     return needed > 0 ? needed : 0;
   }
 
@@ -134,10 +139,15 @@ class ForgeController extends GetxController {
   void _updateCountdown() {
     final now = DateTime.now();
 
-    // Daily deal remaining time.
+    // Daily deal remaining time. Once it expires (local midnight) the deal is
+    // re-fetched, so the banner and the charged price switch days together.
     final deal = dailyDeal.value;
     final remaining = DateTime.fromMillisecondsSinceEpoch(deal.expiresAt.toInt()).difference(now);
     countdown.value = remaining.isNegative ? '00:00:00' : _fmt(remaining);
+    if (remaining.isNegative && deal.expiresAt.toInt() > 0 && !_refreshingDeal) {
+      _refreshingDeal = true;
+      _initDailyDeal().whenComplete(() => _refreshingDeal = false);
+    }
 
     // 2-hour rotation: swap the batch the moment a new window starts.
     final window = ShopConfig.rotationWindowOf(now);

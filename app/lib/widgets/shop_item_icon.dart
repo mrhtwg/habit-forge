@@ -11,25 +11,28 @@ class ShopItemIcon extends StatelessWidget {
 
   /// Optional asset filename inside `assets/images/equipments/`.
   final String? iconFile;
-  final double size;
 
-  const ShopItemIcon({super.key, required this.itemId, this.iconFile, this.size = 36});
+  const ShopItemIcon({
+    super.key,
+    required this.itemId,
+    this.iconFile,
+  });
 
   @override
   Widget build(BuildContext context) {
     final file = iconFile;
-    if (file == null || file.isEmpty) return _vector(size);
+    if (file == null || file.isEmpty) return _vector();
     return Image.asset(
       'assets/images/equipments/$file',
-      width: size,
-      height: size,
+      // width: size,
+      // height: size,
       fit: BoxFit.contain,
       gaplessPlayback: true,
-      errorBuilder: (_, __, ___) => _vector(size),
+      errorBuilder: (_, __, ___) => _vector(),
     );
   }
 
-  Widget _vector(double s) => Icon(icon(itemId), size: s, color: AppColors.primaryDark);
+  Widget _vector() => Icon(icon(itemId), color: AppColors.primaryDark);
 
   /// Solid rarity accent color (tile border / labels). The tile background
   /// uses the same hue as a gradient (see [rarityGradient]).

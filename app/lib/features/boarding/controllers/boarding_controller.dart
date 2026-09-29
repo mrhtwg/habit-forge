@@ -68,8 +68,8 @@ class BoardingController extends GetxController {
 
   void selectHabit(String title) => firstHabitTitle.value = title;
 
-  void skip() {
-    NetworkRegistry.ins.createCharacter(CharacterClass.CHARACTER_CLASS_WARRIOR);
-    Get.offNamed(Routers.main);
-  }
+  /// "Skip" finishes onboarding early — but with the class the player picked
+  /// on step 2 (it used to always create a Warrior) and with the first habit
+  /// they typed, so skipping never silently discards their choices.
+  void skip() => complete();
 }

@@ -10,6 +10,7 @@ import 'package:habit_forge_app/core/di/injection_container.dart';
 import 'package:habit_forge_app/core/network/hive/shop_config.dart';
 import 'package:habit_forge_app/core/network/network_bootstrap.dart';
 import 'package:habit_forge_app/core/services/audio_service.dart';
+import 'package:habit_forge_app/core/services/death_recovery_service.dart';
 import 'package:habit_forge_app/core/services/firebase_auth_service.dart';
 import 'package:habit_forge_app/core/services/haptic_service.dart';
 import 'package:habit_forge_app/core/services/server_auth_service.dart';
@@ -48,6 +49,9 @@ void main() async {
   Get.put(UserService(), permanent: true);
   await UserService.to.init();
   await ShopConfig.load();
+
+  // Owns the death → recovery → revive loop; must outlive every page.
+  Get.put(DeathRecoveryService(), permanent: true);
 
   final subscription = SubscriptionService();
   Get.put(subscription, permanent: true);

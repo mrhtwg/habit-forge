@@ -6,6 +6,7 @@ import 'package:habit_forge_app/features/home/widgets/bottom_nav.dart';
 import 'package:habit_forge_app/features/main/controllers/main_controller.dart';
 import 'package:habit_forge_app/features/profile/pages/profile_page.dart';
 import 'package:habit_forge_app/features/quests/pages/quests_page.dart';
+import 'package:habit_forge_app/widgets/death_overlay.dart';
 
 class MainPage extends GetView<MainController> {
   const MainPage({super.key});
@@ -21,7 +22,13 @@ class MainPage extends GetView<MainController> {
 
     return Obx(
       () => Scaffold(
-        body: IndexedStack(index: controller.currentIndex.value, children: tabs),
+        body: Stack(
+          children: [
+            IndexedStack(index: controller.currentIndex.value, children: tabs),
+            // Death/recovery state is app-wide: show it from every tab.
+            const DeathOverlay(),
+          ],
+        ),
         bottomNavigationBar: BottomNav(
           currentIndex: controller.currentIndex.value,
           onTabChanged: controller.onTabChanged,

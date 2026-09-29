@@ -2,7 +2,6 @@ import 'package:fixnum/fixnum.dart';
 import 'package:grpc/grpc.dart';
 import 'package:habit_forge_app/core/network/api_response.dart';
 import 'package:habit_forge_app/core/network/hive/character_box.dart';
-import 'package:habit_forge_app/core/network/hive/game_constants.dart';
 import 'package:habit_forge_app/core/network/hive/game_logic.dart';
 import 'package:habit_forge_app/core/network/hive/shop_box.dart';
 import 'package:habit_forge_app/core/network/hive/shop_config.dart';
@@ -39,16 +38,7 @@ class NetworkHiveImpl implements NetworkInterface {
       );
     }
 
-    Character character = Character()
-      ..id = Uuid().v4()
-      ..characterClass = characterClass
-      ..level = 1
-      ..currentExp = Int64(0)
-      ..currentHp = GameConstants.initialHp
-      ..maxExp = Int64(GameConstants.expForLevel(1))
-      ..baseStats = CharacterStats()
-      ..availableStatPoints = 0
-      ..isDead = false;
+    final character = GameLogic.newCharacter(characterClass);
     CharacterBox.ins.createCharacter(character);
     return ApiResponse.success(CreateCharacterReply(character: character));
   }
@@ -180,7 +170,7 @@ class NetworkHiveImpl implements NetworkInterface {
 
   @override
   Future<ApiResponse<GetCharacterReply>> getCharacter() async {
-    final char = await CharacterBox.ins.getCharacter();
+    var char = await CharacterBox.ins.getCharacter();
     if (char == null) {
       return ApiResponse.fromGrpcError(
         StatusCode.notFound,
@@ -188,6 +178,13 @@ class NetworkHiveImpl implements NetworkInterface {
         errorReasonValue: null,
         reason: null,
       );
+    }
+    // One-time class baseline for saves created before classes had stats
+    // (idempotent: returns null once the class floor is met).
+    final patched = GameLogic.classBaselinePatch(char);
+    if (patched != null) {
+      CharacterBox.ins.updateCharacter(patched);
+      char = patched;
     }
     return ApiResponse.success(GetCharacterReply(character: char));
   }
@@ -207,7 +204,7 @@ class NetworkHiveImpl implements NetworkInterface {
     if (penalty > 0) {
       final character = CharacterBox.ins.getCharacter();
       if (character != null && !character.isDead) {
-        CharacterBox.ins.updateCharacter(GameLogic.takeDamage(character, penalty));
+        CharacterBox.ins.updateCharacter(GameLogic.applyOverduePenalty(character, penalty));
       }
     }
 
@@ -251,15 +248,21 @@ class NetworkHiveImpl implements NetworkInterface {
       return ApiResponse.failure(code: StatusCode.alreadyExists, message: 'Item already owned');
     }
 
+    // Charge today's deal price when this item is the deal of the day.
+    // Recomputed here rather than taken from the UI, so the charge can never
+    // disagree with what the shop showed.
+    final deal = ShopConfig.dailyDealFor(CharacterBox.ins.getCharacter()?.id ?? 'guest', DateTime.now());
+    final price = ShopConfig.effectivePrice(item.price.toInt(), itemId, deal);
+
     // The item itself defines its currency (config.yml): skins cost gems,
     // equipment/accessories cost gold. The caller's hint is ignored.
     final payWithGems = ShopConfig.currencyOf(itemId) == ShopCurrency.SHOP_CURRENCY_GEMS;
     final userPrefs = UserBox.ins.getUserPrefs();
     if (payWithGems) {
-      if (userPrefs.currentGems < item.price) {
+      if (userPrefs.currentGems < price) {
         return ApiResponse.failure(code: StatusCode.failedPrecondition, message: 'Not enough gems');
       }
-      final updated = GameLogic.addGems(userPrefs, -item.price.toInt());
+      final updated = GameLogic.addGems(userPrefs, -price);
       UserBox.ins.updateUserPrefs(updated);
       UserBox.ins.updateOwnedItemIds([...owned, itemId]);
       final char = CharacterBox.ins.getCharacter();
@@ -273,10 +276,10 @@ class NetworkHiveImpl implements NetworkInterface {
       return ApiResponse.success(BuyItemReply(item: item, balance: updated.currentGems));
     }
 
-    if (userPrefs.currentGold < item.price) {
+    if (userPrefs.currentGold < price) {
       return ApiResponse.failure(code: StatusCode.failedPrecondition, message: 'Not enough gold');
     }
-    final updated = GameLogic.addGold(userPrefs, -item.price.toInt());
+    final updated = GameLogic.addGold(userPrefs, -price);
     UserBox.ins.updateUserPrefs(updated);
     UserBox.ins.updateOwnedItemIds([...owned, itemId]);
     final char = CharacterBox.ins.getCharacter();
@@ -364,13 +367,8 @@ class NetworkHiveImpl implements NetworkInterface {
 
   @override
   Future<ApiResponse<DailyDeal>> getDailyDeal() async {
-    return ApiResponse.success(
-      DailyDeal(
-        itemId: 'sword_flame',
-        discountPercent: 30,
-        expiresAt: Int64(DateTime.now().add(const Duration(days: 1)).millisecondsSinceEpoch),
-      ),
-    );
+    final seed = CharacterBox.ins.getCharacter()?.id ?? 'guest';
+    return ApiResponse.success(ShopConfig.dailyDealFor(seed, DateTime.now()));
   }
 
   @override

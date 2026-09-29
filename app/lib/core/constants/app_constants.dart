@@ -13,47 +13,4 @@ class AppConstants {
     'Fitness',
   ];
   AppConstants._();
-
-  // static TaskType taskTypeFromInt(int type) {
-  //   switch (type) {
-  //     case TaskTypeHabit:
-  //       return TaskType.habit;
-  //     case TaskTypeDaily:
-  //       return TaskType.daily;
-  //     case TaskTypeTodo:
-  //       return TaskType.todo;
-  //     default:
-  //       return TaskType.habit;
-  //   }
-  // }
 }
-
-// enum TaskType {
-//   habit,
-//   daily,
-//   todo,
-// }
-
-// extension TaskTypeExtension on TaskType {
-//   String get str {
-//     switch (this) {
-//       case TaskType.habit:
-//         return 'Habit';
-//       case TaskType.daily:
-//         return 'Daily';
-//       case TaskType.todo:
-//         return 'Todo';
-//     }
-//   }
-
-//   int get value {
-//     switch (this) {
-//       case TaskType.habit:
-//         return TaskTypeHabit;
-//       case TaskType.daily:
-//         return TaskTypeDaily;
-//       case TaskType.todo:
-//         return TaskTypeTodo;
-//     }
-//   }
-// }

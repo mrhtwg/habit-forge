@@ -9,7 +9,6 @@ class GameConstants {
   /// HP cap of a character with the given VIT: base 100 + 2 per point.
   static int maxHpFor(int vitality) => maxHp + vitality * 2;
 
-  static const int initialHp = 100;
   static const int deathRecoveryMinutes = 30;
   static const int deathRecoveryHp = 50;
   static const int completeTaskAddHp = 20;
@@ -62,7 +61,9 @@ class GameConstants {
     return (currentExp * 100 / needed).round();
   }
 
-  static double streakMultiplier(int streak) {
-    return min(2.0, 1.0 + streak * 0.02);
+  /// Streak reward multiplier, capped at 2.0. [perDay] is the growth per
+  /// streak day: 0.02 by default, and the Mage class grows twice as fast.
+  static double streakMultiplier(int streak, {double perDay = 0.02}) {
+    return min(2.0, 1.0 + streak * perDay);
   }
 }

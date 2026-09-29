@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:habit_forge_app/core/common/utils/sp_utils.dart';
 import 'package:habit_forge_app/core/di/injection_container.dart';
 import 'package:habit_forge_app/core/network/hive/character_box.dart';
+import 'package:habit_forge_app/core/network/hive/class_profiles.dart';
 import 'package:habit_forge_app/core/network/hive/game_constants.dart';
 import 'package:habit_forge_app/core/network/hive/game_logic.dart';
 import 'package:habit_forge_app/core/network/hive/shop_box.dart';
@@ -63,7 +64,11 @@ void main() {
     final first = await api.createCharacter(CharacterClass.CHARACTER_CLASS_WARRIOR);
     expect(first.isSuccess, isTrue);
     expect(first.data?.character.level, 1);
-    expect(first.data?.character.currentHp, GameConstants.initialHp);
+    expect(
+      first.data?.character.currentHp,
+      GameConstants.maxHpFor(ClassProfiles.warrior.vitality),
+      reason: 'a class starts at its own full HP',
+    );
     expect(first.data?.character.currentExp.toInt(), 0);
 
     // Second create must fail (already exists).
@@ -202,7 +207,7 @@ void main() {
     await api.reviveCharacter();
     final revived = CharacterBox.ins.getCharacter()!;
     expect(revived.isDead, isFalse);
-    expect(revived.currentHp, GameConstants.deathRecoveryHp);
+    expect(revived.currentHp, ClassProfiles.warrior.recoveryHp);
   });
 
   test('earn gold → shop purchase → equip & unequip (item effect)', () async {

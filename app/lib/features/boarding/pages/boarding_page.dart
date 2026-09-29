@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import 'package:habit_forge_app/core/common/animation/frame_sequence_player.dart';
 import 'package:habit_forge_app/core/constants/env_constants.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
+import 'package:habit_forge_app/core/network/hive/class_profiles.dart';
+import 'package:habit_forge_app/core/network/hive/game_constants.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
 import 'package:habit_forge_app/core/services/subscription_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
@@ -202,26 +204,28 @@ class BoardingPage extends GetView<BoardingController> {
 
   // ── Step 2: Class ──
   Widget _classContent() {
-    final classes = <(CharacterClass, LanKey, LanKey, List<double>, Color)>[
+    // Stat numbers and perks come straight from the class profiles, so what a
+    // card promises is exactly what the game applies.
+    final classes = <(CharacterClass, LanKey, LanKey, ClassProfile, Color)>[
       (
         CharacterClass.CHARACTER_CLASS_WARRIOR,
         LanKey.warrior,
         LanKey.braveAndTough,
-        [0.92, 0.7, 0.45],
+        ClassProfiles.warrior,
         AppColors.primary,
       ),
       (
         CharacterClass.CHARACTER_CLASS_MAGE,
         LanKey.mage,
         LanKey.cleverAndCurious,
-        [0.45, 0.7, 0.95],
+        ClassProfiles.mage,
         AppColors.primaryDark,
       ),
       (
         CharacterClass.CHARACTER_CLASS_RANGER,
         LanKey.ranger,
         LanKey.swiftAndSteady,
-        [0.65, 0.7, 0.85],
+        ClassProfiles.ranger,
         AppColors.greenDark,
       ),
     ];
@@ -314,7 +318,7 @@ class BoardingPage extends GetView<BoardingController> {
                               ),
                               SizedBox(height: 8.h),
                               Row(
-                                children: cls.$4.map((v) {
+                                children: cls.$4.barRatios.map((v) {
                                   return Expanded(
                                     child: Padding(
                                       padding: EdgeInsets.only(right: 5.w),
@@ -361,9 +365,76 @@ class BoardingPage extends GetView<BoardingController> {
             },
           ),
         ),
+        SizedBox(height: 12.h),
+        _buildClassDetail(),
       ],
     );
   }
+
+  /// What the selected class actually does, kept out of the list rows so they
+  /// stay compact — sits right above the "Choose …" button.
+  Widget _buildClassDetail() {
+    return Obx(() {
+      final cls = controller.selectedClass.value;
+      final profile = ClassProfiles.of(cls);
+      return Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: AppColors.border, width: 2),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: const [BoxShadow(color: Color(0xFFEFDFC4), offset: Offset(0, 3))],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              profile.spread.map((e) => '${_statLabel(e.$1).tr} ${e.$2}').join('  ·  '),
+              style: textStyleBold(fontSize: 12.sp, color: AppColors.textPrimary),
+            ),
+            SizedBox(height: 4.h),
+            Text(
+              _effectLine(profile),
+              style: textStyleMedium(fontSize: 11.5.sp, color: AppColors.textSecondary),
+            ),
+            SizedBox(height: 5.h),
+            Text(
+              LanKey.classPerkFor(cls).trParams({
+                'hp': '${profile.recoveryHp}',
+                'min': '${profile.recoveryMinutes}',
+              }),
+              style: textStyleBold(fontSize: 11.5.sp, color: _classColor(cls)),
+            ),
+          ],
+        ),
+      );
+    });
+  }
+
+  /// The class's stats translated into the effects they actually have.
+  String _effectLine(ClassProfile p) {
+    final parts = <String>[
+      LanKey.classEffectHp.trParams({'n': '${GameConstants.maxHpFor(p.vitality)}'}),
+      if (p.strength > 0) LanKey.classEffectGold.trParams({'n': '${p.strength}'}),
+      if (p.intelligence > 0) LanKey.classEffectExp.trParams({'n': '${p.intelligence}'}),
+      if (p.defense > 0) LanKey.classEffectDef.trParams({'n': '${p.defense}'}),
+    ];
+    return parts.join('  ·  ');
+  }
+
+  Color _classColor(CharacterClass cls) => switch (cls) {
+        CharacterClass.CHARACTER_CLASS_WARRIOR => AppColors.primary,
+        CharacterClass.CHARACTER_CLASS_MAGE => AppColors.primaryDark,
+        _ => AppColors.greenDark,
+      };
+
+  LanKey _statLabel(ClassStat stat) => switch (stat) {
+        ClassStat.strength => LanKey.statStr,
+        ClassStat.intelligence => LanKey.statInt,
+        ClassStat.defense => LanKey.statDef,
+        ClassStat.vitality => LanKey.statVit,
+      };
 
   // ── Step 3: Habit ──
   Widget _habitContent() {

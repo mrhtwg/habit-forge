@@ -50,8 +50,8 @@ class ForgePage extends GetView<ForgeController> {
       final deal = controller.dailyDeal.value;
       final item = controller.dailyDealItem;
       if (item == null) return const SizedBox.shrink();
-      final original = item.price;
-      final discounted = original - (original * deal.discountPercent ~/ 100);
+      final original = item.price.toInt();
+      final discounted = ShopConfig.effectivePrice(original, item.id, deal);
       return Padding(
         padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 0),
         child: GestureDetector(
@@ -286,6 +286,7 @@ class ForgePage extends GetView<ForgeController> {
               boxShadow: const [BoxShadow(color: Color(0xFFEFDFC4), offset: Offset(0, 4))],
             ),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ItemWidget(item: item),
                 SizedBox(height: 8.h),
@@ -322,7 +323,7 @@ class ForgePage extends GetView<ForgeController> {
                       ),
                       SizedBox(width: 4.w),
                       Text(
-                        '${item.price}',
+                        '${controller.priceOf(item)}',
                         style: textStyleBold(
                           fontSize: 14.sp,
                           color: ShopConfig.currencyOf(item.id) == ShopCurrency.SHOP_CURRENCY_GEMS

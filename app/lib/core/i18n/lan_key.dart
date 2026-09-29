@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:habit_forge_app/generated/protos/character/v1/character.pbenum.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.pbenum.dart';
 
 /// Translation keys for the app (see en_us.dart / zh_cn.dart).
@@ -56,6 +57,13 @@ enum LanKey {
   buyFirstShopItem, // 'Buy first shop item'
   backFromTheDead, // 'Back from the Dead'
   dieAndRecover, // 'Die and recover'
+  deathTitle, // 'You have fallen'
+  deathBody, // 'Your hero is down...'
+  deathCountdown, // 'Recovery in {t}'
+  deathBanner, // 'Recovering · {t}'
+  deathBlocked, // 'Your hero is recovering...'
+  deathKeepBrowsing, // 'Keep browsing'
+  revived, // 'Your hero is back on their feet!'
   addQuest, // '+ Add'
   goodMorningAdventurer, // 'Good morning, adventurer!'
   aFreshDayAwaits, // 'A fresh day awaits'
@@ -136,7 +144,14 @@ enum LanKey {
   getStarted, // 'Get Started'
   enterTheRealm, // 'Enter the Realm'
   chooseYourHero, // 'Choose your hero'
-  classesGrowDifferently, // 'Each class grows a little differently'
+  classesGrowDifferently, // 'Each class starts with different stats...'
+  classPerkWarrior, // 'Revive with 75 HP · 20 min recovery'
+  classPerkMage, // 'Streak bonus grows 2x faster'
+  classPerkRanger, // 'Missed dailies cost half the HP'
+  classEffectHp, // 'Max HP {n}'
+  classEffectGold, // 'Gold +{n}%'
+  classEffectExp, // 'EXP +{n}%'
+  classEffectDef, // 'Damage taken -{n}'
   warrior, // 'Warrior'
   braveAndTough, // 'Brave and tough. Big HP, bigger heart.'
   mage, // 'Mage'
@@ -309,5 +324,12 @@ enum LanKey {
         'habit' => habit,
         'daily' => daily,
         _ => todo,
+      };
+
+  /// Class perk label (onboarding class card + character page header).
+  static LanKey classPerkFor(CharacterClass value) => switch (value) {
+        CharacterClass.CHARACTER_CLASS_MAGE => classPerkMage,
+        CharacterClass.CHARACTER_CLASS_RANGER => classPerkRanger,
+        _ => classPerkWarrior,
       };
 }

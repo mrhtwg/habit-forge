@@ -4,7 +4,6 @@ import 'package:fixnum/fixnum.dart';
 import 'package:grpc/grpc.dart';
 import 'package:habit_forge_app/core/extensions/date_extensions.dart';
 import 'package:habit_forge_app/core/network/api_response.dart';
-import 'package:habit_forge_app/core/network/hive/game_constants.dart';
 import 'package:habit_forge_app/core/network/hive/game_logic.dart';
 import 'package:habit_forge_app/core/network/hive/shop_config.dart';
 import 'package:habit_forge_app/core/network/network_interface.dart';
@@ -145,8 +144,8 @@ class NetworkFirebaseImpl implements NetworkInterface {
       if (data == null) return;
       if ((data['lastPenaltyDate'] as num?)?.toInt() == today) return;
       var character = _characterFrom(data);
-      if (character != null && !character.isDead && damage > 0) {
-        character = GameLogic.takeDamage(character, damage);
+      if (character != null) {
+        character = GameLogic.applyOverduePenalty(character, damage);
       }
       tx.update(userRef, {
         'lastPenaltyDate': today,
@@ -183,16 +182,7 @@ class NetworkFirebaseImpl implements NetworkInterface {
         if (data == null) throw _Biz('unauthenticated', StatusCode.unauthenticated);
         if (_characterFrom(data) != null) throw _Biz('Character already exists', StatusCode.alreadyExists);
 
-        final character = Character()
-          ..id = const Uuid().v4()
-          ..characterClass = characterClass
-          ..level = 1
-          ..currentExp = Int64(0)
-          ..currentHp = GameConstants.initialHp
-          ..maxExp = Int64(GameConstants.expForLevel(1))
-          ..baseStats = CharacterStats()
-          ..availableStatPoints = 0
-          ..isDead = false;
+        final character = GameLogic.newCharacter(characterClass);
 
         final prefs = _prefsFrom(data)..charactorClass = characterClass;
         tx.update(_userRef(), {
@@ -211,9 +201,16 @@ class NetworkFirebaseImpl implements NetworkInterface {
   Future<ApiResponse<GetCharacterReply>> getCharacter() async {
     if (_uid == null) return _unauthenticated();
     final snap = await _userRef().get();
-    final character = _characterFrom(snap.data());
+    var character = _characterFrom(snap.data());
     if (character == null) {
       return ApiResponse.failure(code: StatusCode.notFound, message: 'Character not found');
+    }
+    // One-time class baseline for saves created before classes had stats
+    // (idempotent: returns null once the class floor is met).
+    final patched = GameLogic.classBaselinePatch(character);
+    if (patched != null) {
+      await _userRef().update({'character': _toMap(patched)});
+      character = patched;
     }
     return ApiResponse.success(GetCharacterReply(character: character));
   }
@@ -493,6 +490,11 @@ class NetworkFirebaseImpl implements NetworkInterface {
     if (item == null) {
       return ApiResponse.failure(code: StatusCode.notFound, message: 'Item not found');
     }
+    // Charge today's deal price when this item is the deal of the day.
+    // Recomputed here rather than taken from the UI, so the charge can never
+    // disagree with what the shop showed.
+    final deal = ShopConfig.dailyDealFor(_uid ?? 'guest', DateTime.now());
+    final price = ShopConfig.effectivePrice(item.price.toInt(), itemId, deal);
     try {
       final result = await _db.runTransaction((tx) async {
         final snap = await tx.get(_userRef());
@@ -504,11 +506,11 @@ class NetworkFirebaseImpl implements NetworkInterface {
         final payWithGems = ShopConfig.currencyOf(itemId) == ShopCurrency.SHOP_CURRENCY_GEMS;
         var prefs = _prefsFrom(data);
         if (payWithGems) {
-          if (prefs.currentGems < item.price) throw _Biz('Not enough gems', StatusCode.failedPrecondition);
-          prefs = GameLogic.addGems(prefs, -item.price.toInt());
+          if (prefs.currentGems < price) throw _Biz('Not enough gems', StatusCode.failedPrecondition);
+          prefs = GameLogic.addGems(prefs, -price);
         } else {
-          if (prefs.currentGold < item.price) throw _Biz('Not enough gold', StatusCode.failedPrecondition);
-          prefs = GameLogic.addGold(prefs, -item.price.toInt());
+          if (prefs.currentGold < price) throw _Biz('Not enough gold', StatusCode.failedPrecondition);
+          prefs = GameLogic.addGold(prefs, -price);
         }
 
         final nextOwned = [...owned, itemId];
@@ -545,13 +547,7 @@ class NetworkFirebaseImpl implements NetworkInterface {
 
   @override
   Future<ApiResponse<DailyDeal>> getDailyDeal() async {
-    return ApiResponse.success(
-      DailyDeal(
-        itemId: 'sword_flame',
-        discountPercent: 30,
-        expiresAt: Int64(DateTime.now().add(const Duration(days: 1)).millisecondsSinceEpoch),
-      ),
-    );
+    return ApiResponse.success(ShopConfig.dailyDealFor(_uid ?? 'guest', DateTime.now()));
   }
 
   // ── Achievements ──

@@ -8,14 +8,16 @@ import 'package:habit_forge_app/widgets/shop_item_icon.dart';
 
 class ItemWidget extends StatelessWidget {
   final ShopItem item;
+  final double? width;
+  final double? height;
 
-  const ItemWidget({super.key, required this.item});
+  const ItemWidget({super.key, required this.item, this.width, this.height});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 64.w,
-      height: 64.w,
+      width: this.width ?? 64.w,
+      height: this.height ?? 64.w,
       padding: EdgeInsets.all(8.w),
       decoration: BoxDecoration(
         gradient: ShopItemIcon.rarityGradient(item.rarity),
@@ -25,7 +27,10 @@ class ItemWidget extends StatelessWidget {
       child: Stack(
         children: [
           Center(
-            child: ShopItemIcon(itemId: item.id, iconFile: ShopConfig.iconOf(item.id), size: 36.w),
+            child: ShopItemIcon(
+              itemId: item.id,
+              iconFile: ShopConfig.iconOf(item.id),
+            ),
           ),
           if (!SubscriptionService.to.canAccessShopItem(item))
             Positioned(

@@ -4,7 +4,10 @@ import 'package:get/get.dart';
 import 'package:habit_forge_app/core/common/animation/frame_sequence_player.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/network/hive/game_constants.dart';
+import 'package:habit_forge_app/core/network/hive/class_profiles.dart';
+import 'package:habit_forge_app/core/network/hive/game_logic.dart';
 import 'package:habit_forge_app/core/network/network_registry.dart';
+import 'package:habit_forge_app/core/services/death_recovery_service.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_spacing.dart';
@@ -14,6 +17,7 @@ import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart'
 import 'package:habit_forge_app/generated/protos/shared/v1/shared.pbenum.dart';
 import 'package:habit_forge_app/widgets/hud_bar.dart';
 import 'package:habit_forge_app/widgets/toast_widget.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class CharacterPage extends GetView<CharacterController> {
   const CharacterPage({super.key});
@@ -95,6 +99,7 @@ class CharacterPage extends GetView<CharacterController> {
 
   // ─────────── Header: back + name + hero circular frame + idle animation ───────────
   Widget _buildHeader(Character char) {
+    final perk = ClassProfiles.of(char.characterClass);
     return Container(
       width: double.infinity,
       decoration: const BoxDecoration(
@@ -126,17 +131,32 @@ class CharacterPage extends GetView<CharacterController> {
                     child: const Icon(Icons.arrow_back_rounded, size: 20, color: AppColors.textPrimary),
                   ),
                 ),
-                const Spacer(),
-                Text(
-                  switch (char.characterClass) {
-                    CharacterClass.CHARACTER_CLASS_WARRIOR => LanKey.warrior.tr.toUpperCase(),
-                    CharacterClass.CHARACTER_CLASS_MAGE => LanKey.mage.tr.toUpperCase(),
-                    CharacterClass.CHARACTER_CLASS_RANGER => LanKey.ranger.tr.toUpperCase(),
-                    _ => '',
-                  },
-                  style: textStyleBold(fontSize: 16.sp, color: AppColors.textSecondary),
+                Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        switch (char.characterClass) {
+                          CharacterClass.CHARACTER_CLASS_WARRIOR => LanKey.warrior.tr.toUpperCase(),
+                          CharacterClass.CHARACTER_CLASS_MAGE => LanKey.mage.tr.toUpperCase(),
+                          CharacterClass.CHARACTER_CLASS_RANGER => LanKey.ranger.tr.toUpperCase(),
+                          _ => '',
+                        },
+                        style: textStyleBold(fontSize: 16.sp, color: AppColors.textSecondary),
+                      ),
+                      SizedBox(height: 2.h),
+                      // The perk the player was promised when picking the class.
+                      Text(
+                        LanKey.classPerkFor(char.characterClass).trParams({
+                          'hp': '${perk.recoveryHp}',
+                          'min': '${perk.recoveryMinutes}',
+                        }),
+                        textAlign: TextAlign.center,
+                        style: textStyleMedium(fontSize: 10.sp, color: AppColors.textSecondary),
+                      ),
+                    ],
+                  ),
                 ),
-                const Spacer(),
                 // Attribute help (right side mirrors the back button).
                 GestureDetector(
                   onTap: _showAttributesHelp,
@@ -183,11 +203,16 @@ class CharacterPage extends GetView<CharacterController> {
               ],
             ),
           ),
-          // EXP progress
+          // EXP + HP progress
           Padding(
-            padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 6.w),
+            padding: EdgeInsets.fromLTRB(6.w, 16.h, 6.w, 8.h),
             child: HudBar(label: 'EXP', color: AppColors.gold, text: _xpText()),
           ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(6.w, 0, 6.w, 12.h),
+            child: HudBar(label: 'HP', color: AppColors.coral, text: _hpText()),
+          ),
+          _buildRecoveryNotice(),
         ],
       ),
     );
@@ -198,6 +223,41 @@ class CharacterPage extends GetView<CharacterController> {
     final level = char?.level ?? 1;
     final needed = GameConstants.expForLevel(level);
     return '${char?.currentExp ?? 0}/$needed';
+  }
+
+  String _hpText() {
+    final char = UserService.to.character.value;
+    final max = GameLogic.maxHpOf(char);
+    return '${char?.currentHp ?? max}/$max';
+  }
+
+  /// Recovery countdown, shown only while the hero is dead.
+  Widget _buildRecoveryNotice() {
+    return Obx(() {
+      final char = UserService.to.character.value;
+      if (char == null || !char.isDead) return const SizedBox.shrink();
+      final countdown = DeathRecoveryService.formatRemaining(DeathRecoveryService.to.secondsLeft.value);
+      return Container(
+        margin: EdgeInsets.symmetric(horizontal: 6.w),
+        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+        decoration: BoxDecoration(
+          color: AppColors.redLight,
+          border: Border.all(color: AppColors.coralDark, width: 2),
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(PhosphorIcons.skull(PhosphorIconsStyle.fill), size: 16.w, color: AppColors.coralDark),
+            SizedBox(width: 8.w),
+            Text(
+              LanKey.deathCountdown.trParams({'t': countdown}),
+              style: textStyleBold(fontSize: 12.sp, color: AppColors.coralDark),
+            ),
+          ],
+        ),
+      );
+    });
   }
 
   // ─────────── Attributes ───────────

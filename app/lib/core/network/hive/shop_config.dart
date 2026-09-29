@@ -68,6 +68,57 @@ class ShopConfig {
     return midnight.add(Duration(minutes: (rotationWindowOf(now) + 1) * 120));
   }
 
+  // ── Deal of the day (rotates at local midnight) ──
+
+  /// Discount percentages a deal can roll.
+  static const List<int> _dealDiscounts = [30, 20, 40];
+
+  /// The deal of the day for [userSeed] on the local day of [now].
+  ///
+  /// A pure function of (seed, local date): every restart and both storage
+  /// modes derive the same deal, so it needs no persistence, and it flips at
+  /// local midnight (when [DailyDeal.expiresAt] passes). Legendary gear is
+  /// excluded so a free player never gets a deal they are not allowed to buy.
+  static DailyDeal dailyDealFor(String userSeed, DateTime now) {
+    final pool = _dealPool();
+    if (pool.isEmpty) return DailyDeal();
+    final dayKey = '${now.year}-${now.month}-${now.day}';
+    var seed = _stableSeed('$userSeed|$dayKey');
+    seed = (seed * 1103515245 + 12345) & 0x7FFFFFFF;
+    final item = pool[seed % pool.length];
+    seed = (seed * 1103515245 + 12345) & 0x7FFFFFFF;
+    return DailyDeal(
+      itemId: item.id,
+      discountPercent: _dealDiscounts[seed % _dealDiscounts.length],
+      expiresAt: Int64(DateTime(now.year, now.month, now.day + 1).millisecondsSinceEpoch),
+    );
+  }
+
+  /// Items a deal may land on (everything a player is allowed to buy).
+  static List<ShopItem> _dealPool() {
+    final buyable = shopItems.where((i) => i.rarity != EquipmentRarity.EQUIPMENT_RARITY_LEGENDARY).toList();
+    return buyable.isNotEmpty ? buyable : shopItems;
+  }
+
+  /// The price actually charged for [itemId]: [basePrice] minus [deal]'s
+  /// discount when the deal is for that item. Floors the result, so the charge
+  /// is never above the price the UI showed. The UI and both storage
+  /// implementations call this — never re-derive the discount elsewhere.
+  static int effectivePrice(int basePrice, String itemId, DailyDeal? deal) {
+    if (deal == null || deal.discountPercent <= 0 || deal.itemId != itemId) return basePrice;
+    final discounted = (basePrice * (100 - deal.discountPercent)) ~/ 100;
+    return discounted < 0 ? 0 : discounted;
+  }
+
+  /// FNV-1a — stable across platforms and runs, unlike `String.hashCode`.
+  static int _stableSeed(String value) {
+    var hash = 0x811C9DC5;
+    for (final unit in value.codeUnits) {
+      hash = ((hash ^ unit) * 0x01000193) & 0xFFFFFFFF;
+    }
+    return hash;
+  }
+
   /// Deterministic rotating batch for the current 2-hour window: up to [size]
   /// picks from [catalog], with at least one epic/legendary when the catalog
   /// has any. The same window always yields the same picks, so the shop stays
