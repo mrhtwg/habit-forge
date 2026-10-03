@@ -86,14 +86,31 @@ Rules are **not** applied automatically from the repo. Until you deploy them, ev
 ```bash
 cd app
 # npm i -g firebase-tools && firebase login && firebase use <your-project-id>
-firebase deploy --only firestore:rules
+npm run deploy:rules          # == firebase deploy --only firestore:rules
 ```
+
+**Test the rules before deploying them**
+
+```bash
+cd app
+npm run test:rules            # starts the Firestore emulator, then `node --test`
+```
+
+This is a dependency-free test (emulator REST API + unsigned JWTs), so it works
+without a package registry and is safe to run in CI. It covers the ledger's
+contract — `users/{uid}/events/**` is append-only and range-capped,
+`entitlement/**` is readable but never client-writable — plus the guard that the
+caps in `lib/core/network/ledger/ledger_event.dart` and in `firestore.rules`
+agree. See `docs/data-ledger-plan.md` §13 for what the ledger is and why.
 
 3. Authentication → Sign-in method → enable **Google** (Anonymous is **not** required; the app plays on local Hive until Settings sign-in)
 
-> Firebase mode runs game logic on the client (same as Hive). Firestore rules only
-> isolate per-user data. For a server-authoritative economy / IAP verification, use
-> Cloud Functions (or a self-hosted backend) later — the MVP has no server.
+> Firebase mode runs game *logic* on the client (same as Hive). Firestore rules
+> isolate per-user data and enforce the ledger's append-only contract, but they
+> do **not** make the economy authoritative. Two things move to the server:
+> the append-only ledger's *consumer* (a future replay) and the paid
+> entitlement — the latter via `functions/` once the Blaze plan is enabled
+> (`functions/README.md`, and `docs/data-ledger-plan.md` §3.3).
 
 ### Step 5b: Fix `DEVELOPER_ERROR` / Google Sign-In on device
 

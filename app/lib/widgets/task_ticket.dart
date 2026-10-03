@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/network/hive/game_constants.dart';
+import 'package:habit_forge_app/core/network/hive/game_logic.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/generated/assets.dart';
@@ -32,6 +33,9 @@ class TaskTicket extends StatelessWidget {
   Widget build(BuildContext context) {
     final done = task.isCompleted;
     final tagColor = _tagColors();
+    // A negative habit ("bad habit") pays nothing: tapping it logs a slip and
+    // costs HP, so the card shows the cost instead of a reward.
+    final isNegative = GameLogic.isNegative(task);
     final exp = task.customExpReward > 0 ? task.customExpReward : GameConstants.baseExpReward(task.difficulty);
     final gold = task.customGoldReward > 0 ? task.customGoldReward : GameConstants.baseGoldReward(task.difficulty);
 
@@ -136,14 +140,18 @@ class TaskTicket extends StatelessWidget {
                     ],
                   ),
                 ),
-                // Rewards
+                // Rewards — or, for a negative habit, what a slip costs.
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    _rewardChip(icon: Assets.imagesSharedIcExp, text: '+$exp', color: AppColors.goldLight),
-                    SizedBox(height: 5.h),
-                    _rewardChip(icon: Assets.imagesSharedIcGold, text: '+$gold', color: AppColors.goldLight),
-                  ],
+                  children: isNegative
+                      ? [
+                          _costChip(text: '-${GameLogic.slipDamage(task)}'),
+                        ]
+                      : [
+                          _rewardChip(icon: Assets.imagesSharedIcExp, text: '+$exp', color: AppColors.goldLight),
+                          SizedBox(height: 5.h),
+                          _rewardChip(icon: Assets.imagesSharedIcGold, text: '+$gold', color: AppColors.goldLight),
+                        ],
                 ),
               ],
             ),
@@ -177,6 +185,9 @@ class TaskTicket extends StatelessWidget {
   }
 
   (Color, Color) _tagColors() {
+    if (GameLogic.isNegative(task)) {
+      return (const Color(0xFFFFE3E3), const Color(0xFFD34F4F));
+    }
     switch (task.type) {
       case TaskType.TASK_TYPE_DAILY:
         return (const Color(0xFFD9F0FF), const Color(0xFF2673C9));
@@ -188,6 +199,7 @@ class TaskTicket extends StatelessWidget {
   }
 
   String _typeLabel() {
+    if (GameLogic.isNegative(task)) return LanKey.badHabitBadge.tr;
     switch (task.type) {
       case TaskType.TASK_TYPE_DAILY:
         return LanKey.dailyBadge.tr;
@@ -196,5 +208,25 @@ class TaskTicket extends StatelessWidget {
       default:
         return LanKey.habitBadge.tr;
     }
+  }
+
+  /// The HP a logged slip costs — the negative-habit counterpart of a reward.
+  Widget _costChip({required String text}) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 2.h),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFE3E3),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.border, width: 1.2),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.favorite_rounded, size: 11.w, color: const Color(0xFFD34F4F)),
+          SizedBox(width: 2.w),
+          Text(text, style: textStyleBold(fontSize: 11.sp, color: AppColors.textPrimary)),
+        ],
+      ),
+    );
   }
 }

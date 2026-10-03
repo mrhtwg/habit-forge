@@ -1,20 +1,124 @@
 rules_version = '2';
+
+// HabitForge game data rules.
+//
+// Game rules (EXP/gold/HP) still run on the client in firebase mode, so these
+// rules enforce ownership, not economy integrity — see docs/data-ledger-plan.md
+// §2 for why server-authoritative rewards are deliberately out of scope for now.
+//
+// What they DO enforce is the ledger's contract (plan §6.5):
+//
+//   * users/{uid}/events/** is append-only, shape-checked and range-capped, so
+//     "乱写一条 +999999" has to actively bypass the rules instead of being a
+//     one-line change in a modified client;
+//   * users/{uid}/entitlement/** is written by Cloud Functions only. A client
+//     may read what it bought, but can never grant itself premium (plan §3.3).
+//
+// The caps below mirror lib/core/network/ledger/ledger_event.dart (LedgerLimits)
+// and are covered by the emulator tests in firebase/test/. A row the client
+// considers valid must never be rejected here: a rejected row aborts the whole
+// atomic write and would break the game action itself.
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Each signed-in user can only read/write their own game document tree.
-    // Game rules (EXP/gold/HP) run on the client in firebase mode — these
-    // rules enforce ownership, not economy integrity. Use Cloud Functions /
-    // the Go backend when you need server-authoritative economy.
+
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    function isNumber(v) {
+      return v is int || v is float;
+    }
+
+    function abs(v) {
+      return v < 0 ? -v : v;
+    }
+
+    function within(v, limit) {
+      return isNumber(v) && abs(v) <= limit;
+    }
+
+    // One ledger row, exactly as lib/core/network/ledger/ledger_event.dart
+    // writes it (data-ledger-plan.md §6.2).
+    function isValidEvent(d, eventId) {
+      return d.keys().hasAll([
+          'eventId', 'type', 'at', 'localDate', 'exp', 'gold', 'gems', 'hp',
+          'taskId', 'itemId', 'refs', 'rulesVersion', 'schemaVersion'
+        ])
+        && d.keys().hasOnly([
+          'eventId', 'type', 'at', 'localDate', 'exp', 'gold', 'gems', 'hp',
+          'taskId', 'itemId', 'refs', 'rulesVersion', 'schemaVersion'
+        ])
+        // The id must match the document id: a random id would break replay
+        // idempotency, which is the whole point of the ledger (§6.4).
+        && d.eventId == eventId
+        && d.type in [
+          'opening_balance', 'task_completed', 'habit_slipped', 'daily_penalty',
+          'revive', 'purchase', 'stat_allocated', 'achievement_unlocked'
+        ]
+        && d.at is int && d.at > 0
+        && d.localDate is string && d.localDate.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+        && d.schemaVersion == 1
+        && d.rulesVersion is string && d.rulesVersion.size() > 0
+        && d.taskId is string && d.itemId is string
+        && d.refs is map && d.refs.size() <= 8
+        && deltasWithinCaps(d);
+    }
+
+    // opening_balance snapshots whatever a long-lived save already holds, so it
+    // is exempt from the per-event caps and gets its own, far larger bound.
+    function deltasWithinCaps(d) {
+      return d.type == 'opening_balance'
+        ? within(d.exp, 10000000) && within(d.gold, 10000000) && within(d.gems, 10000000) && within(d.hp, 10000000)
+        : within(d.exp, 1000) && within(d.gold, 2000) && within(d.gems, 500) && within(d.hp, 500);
+    }
+
     match /users/{uid} {
-      allow read, write: if request.auth != null && request.auth.uid == uid;
+      allow read, write: if isOwner(uid);
 
       match /tasks/{taskId} {
-        allow read, write: if request.auth != null && request.auth.uid == uid;
+        allow read, write: if isOwner(uid);
       }
 
       match /achievements/{achievementId} {
-        allow read, write: if request.auth != null && request.auth.uid == uid;
+        allow read, write: if isOwner(uid);
       }
+
+      // Append-only ledger: create once, never updated, never deleted.
+      match /events/{eventId} {
+        allow read: if isOwner(uid);
+        allow create: if isOwner(uid) && isValidEvent(request.resource.data, eventId);
+        allow update, delete: if false;
+      }
+
+      // Purchased entitlements, one document per purchased product so several
+      // purchases can coexist and the client picks the highest active tier.
+      // Written by Cloud Functions (the Admin SDK bypasses these rules),
+      // readable by the owner, never writable by a client.
+      match /entitlement/{productId} {
+        allow read: if isOwner(uid);
+        allow write: if false;
+      }
+
+      // Receipt-verification requests (plan §3.3). A client may *ask* for a
+      // receipt to be checked — it can never publish the result: the outcome is
+      // written back by the Cloud Function, and `users/{uid}/entitlement/**`
+      // above is the only thing that grants premium.
+      match /purchaseRequests/{requestId} {
+        allow read: if isOwner(uid);
+        allow create: if isOwner(uid) && isValidPurchaseRequest(request.resource.data);
+        allow update, delete: if false;
+      }
+    }
+
+    function isValidPurchaseRequest(d) {
+      return d.keys().hasAll(['store', 'productId', 'purchaseToken', 'requestedAt'])
+        && d.keys().hasOnly(['store', 'productId', 'purchaseToken', 'orderId', 'requestedAt'])
+        && d.store in ['google_play', 'apple_app_store']
+        && d.productId is string && d.productId.size() > 0 && d.productId.size() <= 120
+        && d.purchaseToken is string && d.purchaseToken.size() > 0 && d.purchaseToken.size() <= 8192
+        && (!d.keys().hasAny(['orderId']) || (d.orderId is string && d.orderId.size() <= 200))
+        && d.requestedAt is int;
     }
   }
 }

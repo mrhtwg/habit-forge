@@ -77,41 +77,51 @@ class NetworkHiveImpl implements NetworkInterface {
     }
 
     // Rewards (streak-aware EXP + gold, scaled by INT / STR stat bonuses).
+    // A negative habit is a *slip*: it earns nothing and costs HP instead.
+    final isSlip = GameLogic.isNegative(task);
     final _gainExp = GameLogic.expReward(task, character);
     final _gainGold = GameLogic.goldReward(task, character);
 
-    // Wallet + lifetime completed-task counter.
-    final _userFreezon = UserBox.ins.getUserPrefs()..freeze();
-    final _newUserPrefs = _userFreezon.rebuild(
-      (user) => user
-        ..currentGold = user.currentGold + _gainGold
-        ..todayTasksCompleted = user.todayTasksCompleted + 1
-        ..totalTasksCompleted = user.totalTasksCompleted + 1
-        ..firstTaskDate =
-            user.firstTaskDate == Int64(0) ? Int64(DateTime.now().millisecondsSinceEpoch) : user.firstTaskDate,
-    );
-    UserBox.ins.updateUserPrefs(_newUserPrefs);
+    // Wallet + lifetime completed-task counter. Logging a slip is not a
+    // completed task: the wallet and the counters (which feed achievements)
+    // must not move, or a bad habit would farm "complete 50 tasks".
+    var prefs = UserBox.ins.getUserPrefs()..freeze();
+    if (!isSlip) {
+      prefs = prefs.rebuild(
+        (user) => user
+          ..currentGold = user.currentGold + _gainGold
+          ..todayTasksCompleted = user.todayTasksCompleted + 1
+          ..totalTasksCompleted = user.totalTasksCompleted + 1
+          ..firstTaskDate =
+              user.firstTaskDate == Int64(0) ? Int64(DateTime.now().millisecondsSinceEpoch) : user.firstTaskDate,
+      );
+      UserBox.ins.updateUserPrefs(prefs);
+    }
 
     // Leveling (see GameLogic.gainExp): EXP lives inside the current level
     // (0..expForLevel(level)); crossing the threshold spends it and levels up
     // with the remainder carrying over. maxExp mirrors the next level's need.
-    final (newCharacter, newLevel) = GameLogic.gainExp(character, _gainExp);
+    final newCharacter =
+        isSlip ? GameLogic.applySlip(character, task) : GameLogic.gainExp(character, _gainExp).$1;
     CharacterBox.ins.updateCharacter(newCharacter);
 
     // Mark the task complete (streak / completedAt) and persist.
     final newTask = await TaskBox.ins.completeTask(task);
 
-    // Achievements: total_tasks / streak / level conditions.
-    await _unlockEligibleAchievements(
-      totalTasks: _newUserPrefs.totalTasksCompleted.toInt(),
-      streak: newTask.streak,
-      level: newCharacter.level,
-    );
+    // Achievements: total_tasks / streak / level conditions. A slip moves none
+    // of them, so there is nothing to evaluate.
+    if (!isSlip) {
+      await _unlockEligibleAchievements(
+        totalTasks: prefs.totalTasksCompleted.toInt(),
+        streak: newTask.streak,
+        level: newCharacter.level,
+      );
+    }
 
     return ApiResponse.success(
       CompleteTaskReply(
         task: newTask,
-        prefs: _newUserPrefs,
+        prefs: prefs,
         character: newCharacter,
         expReward: _gainExp,
         goldReward: _gainGold,

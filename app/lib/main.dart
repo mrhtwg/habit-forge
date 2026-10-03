@@ -11,6 +11,7 @@ import 'package:habit_forge_app/core/network/hive/shop_config.dart';
 import 'package:habit_forge_app/core/network/network_bootstrap.dart';
 import 'package:habit_forge_app/core/services/audio_service.dart';
 import 'package:habit_forge_app/core/services/death_recovery_service.dart';
+import 'package:habit_forge_app/core/services/entitlement_service.dart';
 import 'package:habit_forge_app/core/services/firebase_auth_service.dart';
 import 'package:habit_forge_app/core/services/haptic_service.dart';
 import 'package:habit_forge_app/core/services/server_auth_service.dart';
@@ -52,6 +53,11 @@ void main() async {
 
   // Owns the death → recovery → revive loop; must outlive every page.
   Get.put(DeathRecoveryService(), permanent: true);
+
+  // Server-owned premium entitlement (data-ledger-plan.md §3.3). Registered here
+  // so the subscription service can mirror it; it only starts listening once a
+  // cloud identity exists (see FirebaseSession.useCloudBackend).
+  Get.put(EntitlementService(), permanent: true);
 
   final subscription = SubscriptionService();
   Get.put(subscription, permanent: true);

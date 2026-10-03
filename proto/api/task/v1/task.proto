@@ -122,6 +122,12 @@ message Task {
   int64 created_at = 18;
   // Last update time, unix millis.
   int64 updated_at = 19;
+  // Whether this habit is a NEGATIVE one (a "bad habit" the player tracks in
+  // order to reduce it). Recording a slip costs HP instead of granting rewards,
+  // and *not* recording it is the good outcome — so a negative habit is never
+  // counted as a missed task. Only meaningful for TASK_TYPE_HABIT; ignored for
+  // dailies and todos.
+  bool is_negative = 20;
 }
 
 // ListTasksRequest — filters for listing tasks.

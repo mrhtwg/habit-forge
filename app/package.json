@@ -1,0 +1,11 @@
+{
+  "name": "habitforge-firebase",
+  "private": true,
+  "type": "module",
+  "description": "Firestore rules tests for the HabitForge ledger. No npm dependencies on purpose: the tests use the emulator's REST API and unsigned JWTs, so they run offline and in CI without a package registry.",
+  "scripts": {
+    "test:rules": "firebase emulators:exec --only firestore --project demo-habitforge \"node --test firebase/test/firestore.rules.test.mjs\"",
+    "emit:ledger-fixtures": "dart run tool/emit_ledger_fixtures.dart",
+    "deploy:rules": "firebase deploy --only firestore:rules"
+  }
+}

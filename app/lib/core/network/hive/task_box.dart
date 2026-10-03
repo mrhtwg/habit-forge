@@ -74,6 +74,8 @@ class TaskBox {
       ..customGoldReward = task.customGoldReward
       ..priority = task.priority
       ..hpPenalty = task.hpPenalty
+      // Negative habits are the only tasks whose polarity the player chooses.
+      ..isNegative = task.isNegative
       ..createdAt = Int64(DateTime.now().millisecondsSinceEpoch)
       ..updatedAt = Int64(DateTime.now().millisecondsSinceEpoch);
 

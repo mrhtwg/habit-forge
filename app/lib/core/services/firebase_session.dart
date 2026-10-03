@@ -6,6 +6,7 @@ import 'package:habit_forge_app/core/network/api_response.dart';
 import 'package:habit_forge_app/core/network/network_firebase_impl.dart';
 import 'package:habit_forge_app/core/network/network_hive_impl.dart';
 import 'package:habit_forge_app/core/network/network_registry.dart';
+import 'package:habit_forge_app/core/services/entitlement_service.dart';
 import 'package:habit_forge_app/core/services/firebase_auth_service.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/generated/protos/auth/v1/auth.pb.dart';
@@ -29,6 +30,12 @@ class FirebaseSession {
   /// Play offline / before Settings auth — no Firestore, no anonymous login.
   static Future<void> useLocalBackend() async {
     await _dropAnonymousIfAny();
+    // Signed out for real: there is no account left to verify premium against,
+    // so drop the server entitlement. A mere network fallback keeps it — the
+    // user is still signed in and simply offline.
+    if (!hasLinkedCloudUser && Get.isRegistered<EntitlementService>()) {
+      await EntitlementService.to.stop();
+    }
     NetworkRegistry.register(NetworkHiveImpl());
     await NetworkRegistry.ins.init();
     if (!UserService.to.isLoggedIn()) {
@@ -40,7 +47,13 @@ class FirebaseSession {
   static Future<ApiResponse<LoginReply>> useCloudBackend({String provider = 'google'}) async {
     NetworkRegistry.register(NetworkFirebaseImpl());
     await NetworkRegistry.ins.init();
-    return NetworkRegistry.ins.login(provider);
+    final result = await NetworkRegistry.ins.login(provider);
+    // Premium is verified against the account we just signed in with
+    // (data-ledger-plan.md §3.3). No-op unless the build uses `entitlement=server`.
+    if (Get.isRegistered<EntitlementService>()) {
+      await EntitlementService.to.start();
+    }
+    return result;
   }
 
   /// Splash helper: restore cloud only when already signed in; otherwise local.

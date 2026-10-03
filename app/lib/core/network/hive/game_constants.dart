@@ -3,6 +3,14 @@ import 'dart:math';
 import 'package:habit_forge_app/generated/protos/task/v1/task.pbenum.dart';
 
 class GameConstants {
+  /// Version of the reward / level / HP formulas in this build.
+  ///
+  /// Every ledger row records it (`docs/data-ledger-plan.md` §6.2), so a future
+  /// server-side replay can tell which rules produced a number: rows written
+  /// before a rebalance stay interpretable. Bump it whenever a formula here or
+  /// in `ClassProfiles` changes.
+  static const String rulesVersion = '2026.09';
+
   static const int maxLevel = 50;
   static const int maxHp = 100;
 
@@ -38,6 +46,22 @@ class GameConstants {
         return 20;
       default:
         return 5;
+    }
+  }
+
+  /// HP a negative habit costs per logged slip when the task carries no explicit
+  /// `hpPenalty`. Mirrors the gold table on purpose: a habit that is twice as
+  /// hard to kick should bite twice as hard.
+  static int defaultHpPenalty(TaskDifficulty difficulty) {
+    switch (difficulty) {
+      case TaskDifficulty.TASK_DIFFICULTY_EASY:
+        return 5;
+      case TaskDifficulty.TASK_DIFFICULTY_MEDIUM:
+        return 10;
+      case TaskDifficulty.TASK_DIFFICULTY_HARD:
+        return 20;
+      default:
+        return 10;
     }
   }
 

@@ -97,6 +97,7 @@ const Task$json = {
     {'1': 'is_skipped', '3': 17, '4': 1, '5': 8, '10': 'isSkipped'},
     {'1': 'created_at', '3': 18, '4': 1, '5': 3, '10': 'createdAt'},
     {'1': 'updated_at', '3': 19, '4': 1, '5': 3, '10': 'updatedAt'},
+    {'1': 'is_negative', '3': 20, '4': 1, '5': 8, '10': 'isNegative'},
   ],
 };
 
@@ -113,7 +114,8 @@ final $typed_data.Uint8List taskDescriptor = $convert.base64Decode(
     'ChJjdXN0b21fZ29sZF9yZXdhcmQYDiABKAVSEGN1c3RvbUdvbGRSZXdhcmQSGgoIcHJpb3JpdH'
     'kYDyABKAlSCHByaW9yaXR5Eh0KCmhwX3BlbmFsdHkYECABKAVSCWhwUGVuYWx0eRIdCgppc19z'
     'a2lwcGVkGBEgASgIUglpc1NraXBwZWQSHQoKY3JlYXRlZF9hdBgSIAEoA1IJY3JlYXRlZEF0Eh'
-    '0KCnVwZGF0ZWRfYXQYEyABKANSCXVwZGF0ZWRBdA==');
+    '0KCnVwZGF0ZWRfYXQYEyABKANSCXVwZGF0ZWRBdBIfCgtpc19uZWdhdGl2ZRgUIAEoCFIKaXNO'
+    'ZWdhdGl2ZQ==');
 
 @$core.Deprecated('Use listTasksRequestDescriptor instead')
 const ListTasksRequest$json = {

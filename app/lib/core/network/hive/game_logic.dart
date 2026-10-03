@@ -108,6 +108,31 @@ class GameLogic {
   /// 0=Mon .. 6=Sun — matches the task form and proto comment.
   static int weekdayIndex(DateTime d) => d.weekday - 1;
 
+  /// Whether [task] is a **negative habit** — a "bad habit" the player tracks in
+  /// order to reduce it.
+  ///
+  /// Recording one is a *slip*: it costs HP instead of granting rewards, and
+  /// being un-recorded is the good outcome, so it is never treated as a missed
+  /// task. Only habits can be negative; the flag is ignored for dailies and
+  /// todos so a stray value can never change how an existing task behaves.
+  static bool isNegative(Task task) => task.type == TaskType.TASK_TYPE_HABIT && task.isNegative;
+
+  /// HP a logged slip costs: the task's own `hpPenalty` when set, otherwise the
+  /// difficulty default.
+  ///
+  /// Deliberately **not** scaled by the class penalty perk: the Ranger's
+  /// reduction is about not being punished for forgetting a task, while a slip is
+  /// something the player deliberately logged. Effective DEF still absorbs part of
+  /// it inside [takeDamage].
+  static int slipDamage(Task task) {
+    final configured = task.hpPenalty > 0 ? task.hpPenalty : GameConstants.defaultHpPenalty(task.difficulty);
+    return configured < 1 ? 1 : configured;
+  }
+
+  /// Applies a logged slip to [c] (DEF applies, minimum 1 damage, death and the
+  /// recovery window are handled by [takeDamage]).
+  static Character applySlip(Character c, Task task) => takeDamage(c, slipDamage(task));
+
   /// Whether [task] is scheduled on [day] (calendar date, local).
   static bool isDueOn(Task task, DateTime day) {
     switch (task.type) {
@@ -138,11 +163,17 @@ class GameLogic {
   /// HP damage from tasks that were due and left uncompleted yesterday.
   /// Skipped tasks and tasks completed yesterday are exempt. Missed days
   /// before yesterday are forgiven.
+  ///
+  /// **Habits never punish a missed day** (neither polarity): a habit is the
+  /// flexible task next to the rigid daily — that is why both exist. Only dailies
+  /// and overdue todos cost HP. For a negative habit the reasoning is even
+  /// stronger: *not* logging it is the outcome the player wants.
   static int overduePenalty(Iterable<Task> tasks, DateTime yesterday) {
     final y = yesterday.dateOnly;
     var damage = 0;
     for (final task in tasks) {
       if (task.isSkipped) continue;
+      if (task.type == TaskType.TASK_TYPE_HABIT) continue;
       final completedAt = DateTime.fromMillisecondsSinceEpoch(task.completedAt.toInt()).dateOnly;
       if (task.isCompleted && completedAt.isSameDay(y)) continue;
       if (task.type == TaskType.TASK_TYPE_TODO) {
@@ -226,16 +257,26 @@ class GameLogic {
   }
 
   /// Marks the task complete and bumps the streak (once per day).
+  ///
+  /// A negative habit is *recorded*, not achieved: logging a slip **resets** its
+  /// streak (PRD FR-TSK-02) instead of building one — a streak of slips would be
+  /// perverse and would also feed the "7-day streak" achievement. `isCompleted`
+  /// still gates the one-log-per-day rule and is cleared by [rolloverIfNeeded]
+  /// tomorrow.
   static Task completeTask(Task task) {
     final now = DateTime.now();
     final frozen = task.deepCopy()..freeze();
-    final newStreak =
-        DateTime.fromMillisecondsSinceEpoch(frozen.lastStreakDate.toInt()).isToday ? frozen.streak : frozen.streak + 1;
+    final negative = isNegative(frozen);
+    final newStreak = negative
+        ? 0
+        : DateTime.fromMillisecondsSinceEpoch(frozen.lastStreakDate.toInt()).isToday
+            ? frozen.streak
+            : frozen.streak + 1;
     return frozen.rebuild(
       (t) => t
         ..isCompleted = true
         ..streak = newStreak
-        ..lastStreakDate = Int64(now.millisecondsSinceEpoch)
+        ..lastStreakDate = negative ? Int64.ZERO : Int64(now.millisecondsSinceEpoch)
         ..completedAt = Int64(now.millisecondsSinceEpoch)
         ..updatedAt = Int64(now.millisecondsSinceEpoch),
     );
@@ -293,7 +334,11 @@ class GameLogic {
   /// Base EXP reward for a task, including the streak multiplier and the
   /// character's effective INT bonus (+1% per point). Custom rewards are
   /// respected verbatim and never scaled by stats.
+  ///
+  /// A negative habit grants **nothing** — logging a slip is not an achievement
+  /// (and its rewards would be perverse anyway).
   static int expReward(Task task, Character character) {
+    if (isNegative(task)) return 0;
     if (task.customExpReward > 0) return task.customExpReward;
     final base = GameConstants.baseExpReward(task.difficulty) *
         GameConstants.streakMultiplier(task.streak, perDay: ClassProfiles.of(character.characterClass).streakGrowth);
@@ -340,8 +385,9 @@ class GameLogic {
 
   /// Base gold reward for a task, scaled by the character's effective STR
   /// bonus (+1% per point). Custom rewards are respected verbatim and never
-  /// scaled.
+  /// scaled. A negative habit pays nothing (see [expReward]).
   static int goldReward(Task task, Character character) {
+    if (isNegative(task)) return 0;
     if (task.customGoldReward > 0) return task.customGoldReward;
     final base = GameConstants.baseGoldReward(task.difficulty);
     return (base * (1 + effectiveStats(character).strength * 0.01)).round();

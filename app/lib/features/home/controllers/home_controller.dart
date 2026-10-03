@@ -1,8 +1,11 @@
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
+import 'package:habit_forge_app/core/network/hive/game_logic.dart';
 import 'package:habit_forge_app/core/network/network_registry.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
 import 'package:habit_forge_app/core/services/achievement_unlock_service.dart';
+import 'package:habit_forge_app/core/services/audio_service.dart';
+import 'package:habit_forge_app/core/services/haptic_service.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/features/rewards/reward_popup.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';
@@ -31,6 +34,9 @@ class HomeController extends GetxController {
       Toast.warning(LanKey.deathBlocked.tr);
       return;
     }
+    // A negative habit ("bad habit") logs a slip: HP lost, nothing earned.
+    final isSlip = GameLogic.isNegative(task);
+    final hpBefore = UserService.to.character.value?.currentHp ?? 0;
     final levelBefore = UserService.to.character.value?.level ?? 1;
     final unlockedBefore = await AchievementUnlockService.snapshotUnlockedIds();
     final result = await NetworkRegistry.ins.completeTask(task.id);
@@ -43,6 +49,16 @@ class HomeController extends GetxController {
     UserService.to.loadUserPrefs();
     UserService.to.loadCharacter();
     loadTodayTasks();
+
+    if (isSlip) {
+      // No reward popup and no achievement sweep: nothing was earned. A fatal slip
+      // is surfaced by the death overlay (DeathRecoveryService).
+      Get.find<AudioService>().playHpDamage();
+      Get.find<HapticService>().error();
+      Toast.warning(LanKey.slipLogged.trParams({'hp': '${hpBefore - reply.character.currentHp}'}));
+      return;
+    }
+
     await RewardPopup.showTaskReward(reply, levelBefore);
 
     final unlocked = await AchievementUnlockService.newlyUnlockedSince(unlockedBefore);

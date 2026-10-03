@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/common/utils/log.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
+import 'package:habit_forge_app/core/network/hive/game_logic.dart';
 import 'package:habit_forge_app/core/network/network_registry.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
 import 'package:habit_forge_app/core/services/audio_service.dart';
@@ -87,6 +88,10 @@ class QuestsController extends GetxController {
       Toast.warning(LanKey.deathBlocked.tr);
       return;
     }
+    // A negative habit is a "bad habit": tapping it logs a slip, which costs HP
+    // instead of granting a reward (see GameLogic.isNegative).
+    final isSlip = GameLogic.isNegative(task);
+    final hpBefore = UserService.to.character.value?.currentHp ?? 0;
     final levelBefore = UserService.to.character.value?.level ?? 1;
     final unlockedBefore = await AchievementUnlockService.snapshotUnlockedIds();
     final result = await _hive.completeTask(task.id);
@@ -101,6 +106,17 @@ class QuestsController extends GetxController {
 
     final audio = Get.find<AudioService>();
     final haptic = Get.find<HapticService>();
+
+    if (isSlip) {
+      // No reward popup and no achievement sweep: nothing was earned. A fatal slip
+      // is handled by the death overlay (DeathRecoveryService) on top of this.
+      final lost = hpBefore - result.data!.character.currentHp;
+      audio.playHpDamage();
+      haptic.error();
+      Toast.warning(LanKey.slipLogged.trParams({'hp': '$lost'}));
+      return;
+    }
+
     audio.playComplete();
     haptic.success();
 

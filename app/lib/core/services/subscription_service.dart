@@ -6,13 +6,14 @@ import 'package:habit_forge_app/core/common/utils/log.dart';
 import 'package:habit_forge_app/core/common/utils/sp_keys.dart';
 import 'package:habit_forge_app/core/common/utils/sp_utils.dart';
 import 'package:habit_forge_app/core/constants/env_constants.dart';
+import 'package:habit_forge_app/core/services/entitlement_service.dart';
 import 'package:habit_forge_app/core/services/subscription_tier.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart';
 import 'package:habit_forge_app/generated/protos/shared/v1/shared.pbenum.dart';
 import 'package:habit_forge_app/generated/protos/shop/v1/shop.pb.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 
-/// Owns Play Billing purchases and local entitlement state.
+/// Owns Play Billing purchases and the tier the rest of the app reads.
 ///
 /// Freemium rules (store / cloud builds):
 /// - Free: 3 habits, warrior only, week stats, ads, no legendary gear
@@ -21,6 +22,19 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 ///
 /// Hive (local open-source) builds skip IAP and treat every gate as unlocked —
 /// self-compiled clients can change one line anyway; locks only add friction.
+///
+/// ## Two entitlement sources (`docs/data-ledger-plan.md` §3.3)
+///
+/// - `entitlement=local` (default): [tier] is loaded from, and written to,
+///   `shared_preferences`. Fine for development; a patched client or a rooted
+///   device can simply edit the value.
+/// - `entitlement=server`: [tier] mirrors [EntitlementService] — the
+///   `users/{uid}/entitlement` documents that only Cloud Functions can write.
+///   The client then never persists a tier it decided itself; a purchase is
+///   *requested* for verification and the server publishes the result.
+///
+/// [tier] stays the observable the UI reads in both modes, so gating code does
+/// not care which source is in charge.
 class SubscriptionService extends GetxService {
   static SubscriptionService get to => Get.find();
 
@@ -35,21 +49,43 @@ class SubscriptionService extends GetxService {
   /// Local-first open builds: no store, full content.
   bool get isHiveUnlocked => EnvConstants.isHive();
 
-  Future<SubscriptionService> init() async {
-    final saved = SpUtils.ins.getString(SpKeys.subscriptionTier);
-    tier.value = _parseTier(saved);
+  /// Whether the server owns premium in this build (see the class docs).
+  bool get isServerEntitlement => EntitlementService.isServerAuthoritative;
 
+  Future<SubscriptionService> init() async {
     if (isHiveUnlocked) {
       Log.d('Hive mode: premium gates unlocked, IAP skipped');
       return this;
     }
 
+    if (isServerEntitlement) {
+      // The server publishes the tier; mirror it into [tier] for the UI and
+      // never write it to local storage.
+      tier.value = EntitlementService.to.serverTier.value ?? SubscriptionTier.free;
+      ever(EntitlementService.to.serverTier, (serverTier) {
+        tier.value = serverTier ?? SubscriptionTier.free;
+      });
+      await _initBilling();
+      return this;
+    }
+
+    final saved = SpUtils.ins.getString(SpKeys.subscriptionTier);
+    tier.value = _parseTier(saved);
+
+    await _initBilling();
+    return this;
+  }
+
+  /// Store connection, product list and a silent restore. Shared by both modes:
+  /// buying and restoring stay client actions, only the *result* is verified
+  /// server-side when [isServerEntitlement].
+  Future<void> _initBilling() async {
     try {
       final available = await _iap.isAvailable();
       isStoreAvailable.value = available;
       if (!available) {
         Log.w('IAP store unavailable — debug unlock still works');
-        return this;
+        return;
       }
       _purchaseSub = _iap.purchaseStream.listen(
         _onPurchases,
@@ -61,7 +97,6 @@ class SubscriptionService extends GetxService {
       Log.w('IAP init failed: $e');
       isStoreAvailable.value = false;
     }
-    return this;
   }
 
   @override
@@ -150,7 +185,15 @@ class SubscriptionService extends GetxService {
   }
 
   /// Debug / internal QA unlock (also used when store products are missing).
+  ///
+  /// Cannot work in `entitlement=server` builds by design: only the verification
+  /// Function may write an entitlement. QA there needs a Play license-test
+  /// account with a real (test-mode) purchase.
   Future<void> unlockDebug(SubscriptionTier t) async {
+    if (isServerEntitlement) {
+      Log.w('debug unlock is unavailable with entitlement=server — use a license-test purchase');
+      return;
+    }
     await _setTier(t);
     Log.d('Debug unlock → $t');
   }
@@ -168,19 +211,49 @@ class SubscriptionService extends GetxService {
         continue;
       }
       if (p.status == PurchaseStatus.purchased || p.status == PurchaseStatus.restored) {
-        final t = SubscriptionProducts.tierForProduct(p.productID);
-        if (t != null && t.rank > best.rank) best = t;
+        if (isServerEntitlement) {
+          // Buying and restoring stay client actions; the *result* is verified by
+          // the Cloud Function, which is the only writer of `entitlement`.
+          await _requestVerification(p);
+        } else {
+          final t = SubscriptionProducts.tierForProduct(p.productID);
+          if (t != null && t.rank > best.rank) best = t;
+        }
       }
       if (p.pendingCompletePurchase) {
         await _iap.completePurchase(p);
       }
     }
-    if (best.rank > tier.value.rank || best != tier.value) {
+    if (!isServerEntitlement && (best.rank > tier.value.rank || best != tier.value)) {
       await _setTier(best);
     }
   }
 
+  /// Asks the server to verify a store receipt (`docs/data-ledger-plan.md` §3.3).
+  ///
+  /// The receipt travels to `users/{uid}/purchaseRequests`; the Function checks
+  /// it with Play/App Store and publishes the entitlement. Nothing the client
+  /// writes here grants premium, so a modified client gains nothing.
+  Future<void> _requestVerification(PurchaseDetails purchase) async {
+    final store = defaultTargetPlatform == TargetPlatform.iOS ? 'apple_app_store' : 'google_play';
+    final accepted = await EntitlementService.to.requestVerification(
+      store: store,
+      productId: purchase.productID,
+      purchaseToken: purchase.verificationData.serverVerificationData,
+      orderId: purchase.purchaseID ?? '',
+    );
+    if (!accepted) {
+      Log.w('could not request verification for ${purchase.productID}');
+    }
+  }
+
   Future<void> _setTier(SubscriptionTier t) async {
+    if (isServerEntitlement) {
+      // Never persist a tier this client decided: the server is the authority,
+      // and a local copy would only add a second, forgeable source of truth.
+      Log.w('ignoring local tier write ($t) — entitlement=server');
+      return;
+    }
     tier.value = t;
     await SpUtils.ins.putString(SpKeys.subscriptionTier, t.name);
   }

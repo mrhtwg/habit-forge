@@ -81,7 +81,7 @@ class TaskServiceClient extends $grpc.Client {
     return $createUnaryCall(_$completeTask, request, options: options);
   }
 
-  /// SkipTask marks a task completed and grants EXP/gold rewards.
+  /// SkipTask skips a task (todos are postponed to tomorrow).
   $grpc.ResponseFuture<$0.SkipTaskReply> skipTask(
     $0.SkipTaskRequest request, {
     $grpc.CallOptions? options,

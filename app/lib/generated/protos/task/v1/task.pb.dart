@@ -45,6 +45,7 @@ class Task extends $pb.GeneratedMessage {
     $core.bool? isSkipped,
     $fixnum.Int64? createdAt,
     $fixnum.Int64? updatedAt,
+    $core.bool? isNegative,
   }) {
     final result = create();
     if (id != null) result.id = id;
@@ -66,6 +67,7 @@ class Task extends $pb.GeneratedMessage {
     if (isSkipped != null) result.isSkipped = isSkipped;
     if (createdAt != null) result.createdAt = createdAt;
     if (updatedAt != null) result.updatedAt = updatedAt;
+    if (isNegative != null) result.isNegative = isNegative;
     return result;
   }
 
@@ -103,6 +105,7 @@ class Task extends $pb.GeneratedMessage {
     ..aOB(17, _omitFieldNames ? '' : 'isSkipped')
     ..aInt64(18, _omitFieldNames ? '' : 'createdAt')
     ..aInt64(19, _omitFieldNames ? '' : 'updatedAt')
+    ..aOB(20, _omitFieldNames ? '' : 'isNegative')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -300,6 +303,20 @@ class Task extends $pb.GeneratedMessage {
   $core.bool hasUpdatedAt() => $_has(18);
   @$pb.TagNumber(19)
   void clearUpdatedAt() => $_clearField(19);
+
+  /// Whether this habit is a NEGATIVE one (a "bad habit" the player tracks in
+  /// order to reduce it). Recording a slip costs HP instead of granting rewards,
+  /// and *not* recording it is the good outcome — so a negative habit is never
+  /// counted as a missed task. Only meaningful for TASK_TYPE_HABIT; ignored for
+  /// dailies and todos.
+  @$pb.TagNumber(20)
+  $core.bool get isNegative => $_getBF(19);
+  @$pb.TagNumber(20)
+  set isNegative($core.bool value) => $_setBool(19, value);
+  @$pb.TagNumber(20)
+  $core.bool hasIsNegative() => $_has(19);
+  @$pb.TagNumber(20)
+  void clearIsNegative() => $_clearField(20);
 }
 
 /// ListTasksRequest — filters for listing tasks.

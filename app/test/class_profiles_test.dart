@@ -2,7 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:habit_forge_app/core/network/hive/class_profiles.dart';
 import 'package:habit_forge_app/core/network/hive/game_logic.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart';
-import 'package:habit_forge_app/generated/protos/character/v1/character.pbenum.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';
 
 /// The class screen promises per-class stats and perks, so those differences

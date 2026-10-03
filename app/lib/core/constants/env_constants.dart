@@ -35,6 +35,18 @@ class EnvConstants {
         _ => throw ArgumentError('Invalid network mode: $_networkMode'),
       };
 
+  /// Who owns the premium entitlement (`docs/data-ledger-plan.md` §3.3):
+  /// 'local' (default — the tier is cached in shared_preferences, which a
+  /// modified client or a rooted device can edit) or 'server' (the tier comes
+  /// from `users/{uid}/entitlement`, written only by Cloud Functions).
+  ///
+  /// Store builds should switch this to 'server' once the purchase-verification
+  /// Function is deployed — see `functions/README.md`. It needs the Blaze plan.
+  static const String entitlement = String.fromEnvironment('entitlement', defaultValue: 'local');
+
+  /// Whether the server is the authority for premium in this build.
+  static bool usesServerEntitlement() => entitlement == 'server';
+
   /// Whether auth runs against Firebase.
   static bool isAuthFirebase() => authMode == firebase;
 

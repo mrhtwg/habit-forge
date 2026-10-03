@@ -262,6 +262,9 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
   String _priority = '';
   int _hpPenalty = 10;
 
+  /// A "bad habit": recording a slip costs HP instead of granting rewards.
+  bool _isNegative = false;
+
   @override
   Widget build(BuildContext context) {
     final ctrl = Get.find<QuestsController>();
@@ -348,6 +351,8 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
                 ),
               ),
             ),
+            // Habit polarity (good / bad habit).
+            if (_type == TaskType.TASK_TYPE_HABIT) ..._buildHabitKindFields(),
             // Type-specific fields
             if (_type == TaskType.TASK_TYPE_DAILY) ..._buildDailyFields(),
             if (_type == TaskType.TASK_TYPE_TODO) ..._buildTodoFields(),
@@ -404,6 +409,7 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
 
                   // Only the caller-known fields travel to the storage layer;
                   // ids, timestamps and rewards are owned by the implementation.
+                  final isBadHabit = _type == TaskType.TASK_TYPE_HABIT && _isNegative;
                   final params = Task(
                     title: _titleCtrl.text.trim(),
                     description: _descCtrl.text.trim().isNotEmpty ? _descCtrl.text.trim() : null,
@@ -413,7 +419,11 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
                     dueDate: _type == TaskType.TASK_TYPE_TODO ? _dueDate : null,
                     repeatDays: _type == TaskType.TASK_TYPE_DAILY ? _repeatDays : [],
                     priority: _type == TaskType.TASK_TYPE_TODO ? _priority : '',
-                    hpPenalty: _type == TaskType.TASK_TYPE_DAILY ? _hpPenalty : 10,
+                    // The penalty is only ever *used* by dailies (a missed day) and
+                    // by negative habits (a logged slip): a plain habit is never
+                    // punished for a day it was not done.
+                    hpPenalty: _type == TaskType.TASK_TYPE_DAILY || isBadHabit ? _hpPenalty : 10,
+                    isNegative: isBadHabit,
                   );
                   if (isEdit) {
                     ctrl.updateTask(widget.task!.id, params);
@@ -458,6 +468,69 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
     _repeatDays = List.from(widget.task?.repeatDays ?? []);
     _priority = widget.task?.priority ?? '';
     _hpPenalty = widget.task?.hpPenalty ?? 10;
+    _isNegative = widget.task?.isNegative ?? false;
+  }
+
+  // ── Habit-specific ──
+
+  /// Good/bad habit switch.
+  ///
+  /// A bad habit inverts the loop: the player tracks something they want to
+  /// *reduce*, so logging a slip costs HP and earns nothing — and not logging one
+  /// is the good outcome, which is why a habit is never punished for a missed day.
+  List<Widget> _buildHabitKindFields() {
+    return [
+      SizedBox(height: 14.h),
+      _buildSectionLabel(LanKey.habitKind.tr),
+      SizedBox(height: 8.h),
+      Container(
+        padding: EdgeInsets.all(4.w),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF3E7CE),
+          border: Border.all(color: AppColors.border, width: 2),
+          borderRadius: BorderRadius.circular(999),
+        ),
+        child: Row(
+          children: [
+            _habitKindOption(label: LanKey.goodHabit.tr, negative: false),
+            _habitKindOption(label: LanKey.badHabit.tr, negative: true),
+          ],
+        ),
+      ),
+      SizedBox(height: 6.h),
+      Text(
+        _isNegative ? LanKey.badHabitHint.trParams({'hp': '$_hpPenalty'}) : LanKey.goodHabitHint.tr,
+        style: textStyleRegular(
+          fontSize: 11.sp,
+          color: _isNegative ? AppColors.coralDark : AppColors.textMuted,
+        ),
+      ),
+      if (_isNegative) ...[
+        SizedBox(height: 10.h),
+        _buildHpPenaltyRow(),
+      ],
+    ];
+  }
+
+  Widget _habitKindOption({required String label, required bool negative}) {
+    final active = _isNegative == negative;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => setState(() => _isNegative = negative),
+        child: Container(
+          padding: EdgeInsets.symmetric(vertical: 9.h),
+          decoration: BoxDecoration(
+            color: active ? (negative ? AppColors.coralDark : AppColors.greenDark) : Colors.transparent,
+            borderRadius: BorderRadius.circular(999),
+          ),
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: textStyleBold(fontSize: 13.sp, color: active ? Colors.white : AppColors.textSecondary),
+          ),
+        ),
+      ),
+    );
   }
 
   // ── Daily-specific ──
@@ -540,6 +613,16 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
 
   // ── Reward preview ──
   Widget _buildRewardRow() {
+    // A bad habit has no reward — it has a cost.
+    if (_type == TaskType.TASK_TYPE_HABIT && _isNegative) {
+      return Row(
+        children: [
+          Text(LanKey.slipCost.tr, style: textStyleBold(fontSize: 13.sp, color: AppColors.textSecondary)),
+          const Spacer(),
+          Text('-$_hpPenalty HP', style: textStyleBold(fontSize: 14.sp, color: AppColors.coralDark)),
+        ],
+      );
+    }
     final exp = GameConstants.baseExpReward(_difficulty);
     final gold = GameConstants.baseGoldReward(_difficulty);
     return Row(
