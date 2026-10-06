@@ -10,6 +10,7 @@ class DefaultFirebaseOptions {
   static const String _messagingSenderId = String.fromEnvironment('messagingSenderId');
   static const String _projectId = String.fromEnvironment('projectId');
   static const String _storageBucket = String.fromEnvironment('storageBucket');
+  static const String googleServerClientId = String.fromEnvironment('googleServerClientId');
 
   static FirebaseOptions get android => FirebaseOptions(
         apiKey: _apiKey,
@@ -28,8 +29,9 @@ class DefaultFirebaseOptions {
   static bool get isConfigured {
     const key = _apiKey;
     const project = _projectId;
-    if (key.isEmpty || project.isEmpty) return false;
-    if (key.startsWith('YOUR_') || project.startsWith('YOUR_')) return false;
+    if (key.isEmpty || project.isEmpty || googleServerClientId.isEmpty) return false;
+    if (key.startsWith('YOUR_') || project.startsWith('YOUR_') || googleServerClientId.startsWith('YOUR_'))
+      return false;
     return true;
   }
 }

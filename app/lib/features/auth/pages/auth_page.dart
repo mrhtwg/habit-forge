@@ -75,20 +75,33 @@ class AuthPage extends GetView<AuthController> {
                   style: textStyleHand(fontSize: 18.sp, color: AppColors.textSecondary),
                 ),
                 SizedBox(height: 50.h),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () => controller.signInWithGoogleFromSettings(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: AppColors.textPrimary,
-                      padding: EdgeInsets.symmetric(vertical: 15.h),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(48.r),
-                        side: BorderSide(color: AppColors.border, width: 2),
+                // Disabled while a flow is running: a second tap would ask
+                // Credential Manager for a second sheet while the first one is
+                // closing, which Android reports as
+                // "onCancelled at PHASE_CLIENT_ALREADY_HIDDEN".
+                Obx(
+                  () => SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed:
+                          controller.isLoading.value ? null : () => controller.signInWithGoogleFromSettings(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: AppColors.textPrimary,
+                        padding: EdgeInsets.symmetric(vertical: 15.h),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(48.r),
+                          side: BorderSide(color: AppColors.border, width: 2),
+                        ),
                       ),
+                      child: controller.isLoading.value
+                          ? SizedBox(
+                              width: 18.w,
+                              height: 18.w,
+                              child: const CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : Text(LanKey.continueWithGoogle.tr, style: textStyleBold(fontSize: 15.sp)),
                     ),
-                    child: Text(LanKey.continueWithGoogle.tr, style: textStyleBold(fontSize: 15.sp)),
                   ),
                 ),
                 // Guest path: no account, progress stays on this device. Kept as a

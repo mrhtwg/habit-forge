@@ -64,7 +64,14 @@ class AuthController extends GetxController {
       final link = await FirebaseAuthService.to.linkOrSignInWithGoogle();
       if (link.canceled) return false;
       if (link.error != null) {
-        Toast.error('${LanKey.googleLoginFailed.tr}: ${link.error}');
+        // Google's own account service being unreachable is the one failure the
+        // player can actually fix (VPN / network), so it gets its own message
+        // instead of the generic "failed: [16] Account reauth failed.".
+        Toast.error(
+          link.googleServicesUnreachable
+              ? LanKey.googleSignInNeedsGoogle.tr
+              : '${LanKey.googleLoginFailed.tr}: ${link.error}',
+        );
         return false;
       }
 

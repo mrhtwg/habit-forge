@@ -1,10 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:habit_forge_app/core/common/utils/log.dart';
+import 'package:habit_forge_app/core/services/google_signin_errors.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 /// Result of a Google sign-in / link attempt from Settings.
@@ -16,16 +19,24 @@ class GoogleLinkResult {
   /// existed (anonymous upgrade failed with credential-already-in-use).
   final bool usedExistingAccount;
 
+  /// True when the failure was Google's *account service* being unreachable
+  /// (`[16] Account reauth failed.` / `[7] Network error.`). The player needs a
+  /// working route to Google — a VPN on a blocked network — rather than a
+  /// different account.
+  final bool googleServicesUnreachable;
+
   const GoogleLinkResult({
     this.error,
     this.canceled = false,
     this.usedExistingAccount = false,
+    this.googleServicesUnreachable = false,
   });
 
   const GoogleLinkResult.canceled() : this(canceled: true);
   const GoogleLinkResult.linked() : this();
   const GoogleLinkResult.existing() : this(usedExistingAccount: true);
   GoogleLinkResult.failed(String message) : this(error: message);
+  GoogleLinkResult.noGoogleConnectivity(String message) : this(error: message, googleServicesUnreachable: true);
 }
 
 /// Firebase Auth wrapper.
@@ -34,6 +45,10 @@ class FirebaseAuthService extends GetxService {
 
   bool _available = false;
 
+  /// True while a Google sheet is on screen. Credential Manager shows one at a
+  /// time, so a duplicate request has to be ignored rather than started.
+  bool _googleFlowInFlight = false;
+
   User? get currentUser => _available ? _auth.currentUser : null;
   bool get isAvailable => _available;
   bool get isAnonymous => _available && (_auth.currentUser?.isAnonymous ?? false);
@@ -41,11 +56,8 @@ class FirebaseAuthService extends GetxService {
   FirebaseAuth get _auth => FirebaseAuth.instance;
   GoogleSignIn get _googleSignIn => GoogleSignIn.instance;
 
-  Future<void> initGoogleSignIn() async {
-    if (!_available) return;
-    try {
-      await _googleSignIn.initialize();
-    } catch (_) {}
+  Future<void> initGoogleSignIn({required String serverClientId}) async {
+    await _googleSignIn.initialize(serverClientId: serverClientId);
   }
 
   void markAvailable() => _available = true;
@@ -74,10 +86,22 @@ class FirebaseAuthService extends GetxService {
     await signOut();
   }
 
-  /// Settings Google entry: link anonymous → Google when possible; otherwise
-  /// sign into the existing Google account (caller handles overwrite confirm).
+  /// Settings → Firebase **and** the startup gate: Google picker only.
+  ///
+  /// Two guards matter here, both learned the hard way on Android:
+  ///
+  ///  * **one flow at a time** — Credential Manager can only show one selector, so
+  ///    a second request while the first sheet is closing comes back as
+  ///    `onCancelled at PHASE_CLIENT_ALREADY_HIDDEN`;
+  ///  * **cancellation is not an error** — dismissing the sheet must not produce a
+  ///    red toast (see [GoogleSignInErrors]).
   Future<GoogleLinkResult> linkOrSignInWithGoogle() async {
     if (!_available) return GoogleLinkResult.failed('Firebase not configured');
+    if (_googleFlowInFlight) {
+      Log.d('Google Sign-In already in flight — ignoring the duplicate request');
+      return const GoogleLinkResult.canceled();
+    }
+    _googleFlowInFlight = true;
     try {
       final account = await _googleSignIn.authenticate();
       final idToken = account.authentication.idToken;
@@ -105,14 +129,44 @@ class FirebaseAuthService extends GetxService {
       }
       return const GoogleLinkResult.existing();
     } on GoogleSignInException catch (e) {
-      if (e.code == GoogleSignInExceptionCode.canceled) {
-        return const GoogleLinkResult.canceled();
+      debugPrint("==== GoogleSignIn Exception ====");
+      debugPrint("code: ${e.code}");
+      debugPrint("message: ${e.description}");
+      debugPrint("details: ${e.details}");
+      final failure = GoogleSignInErrors.classify(
+        e,
+        code: e.code.name,
+        description: e.description,
+        details: e.details,
+      );
+      switch (failure) {
+        case GoogleSignInFailure.dismissed:
+          Log.d('Google Sign-In dismissed (${e.code.name}): ${e.description}');
+          return const GoogleLinkResult.canceled();
+        case GoogleSignInFailure.googleServicesUnreachable:
+          Log.w('Google Sign-In blocked: Google account services unreachable (${e.description})');
+          return GoogleLinkResult.noGoogleConnectivity(e.description ?? e.code.name);
+        case GoogleSignInFailure.other:
+          return GoogleLinkResult.failed('Google sign-in failed: ${e.code.name}');
       }
-      return GoogleLinkResult.failed('Google sign-in failed: ${e.code.name}');
     } on FirebaseAuthException catch (e) {
       return GoogleLinkResult.failed(_mapError(e));
     } catch (e) {
-      return GoogleLinkResult.failed(e.toString());
+      // The sheet can also surface as a bare platform exception, with the real
+      // reason (and its bracketed code) only in the message.
+      final failure = GoogleSignInErrors.classify(e);
+      switch (failure) {
+        case GoogleSignInFailure.dismissed:
+          Log.d('Google Sign-In dismissed: $e');
+          return const GoogleLinkResult.canceled();
+        case GoogleSignInFailure.googleServicesUnreachable:
+          Log.w('Google Sign-In blocked: $e');
+          return GoogleLinkResult.noGoogleConnectivity(e.toString());
+        case GoogleSignInFailure.other:
+          return GoogleLinkResult.failed(e.toString());
+      }
+    } finally {
+      _googleFlowInFlight = false;
     }
   }
 
@@ -182,6 +236,12 @@ class FirebaseAuthService extends GetxService {
     if (!user.providerData.any((provider) => provider.providerId == GoogleAuthProvider.PROVIDER_ID)) {
       return 'This account must be deleted after signing in with Google.';
     }
+    // Same one-sheet rule as the sign-in flow: two Google prompts at once make
+    // Android answer one of them with PHASE_CLIENT_ALREADY_HIDDEN.
+    if (_googleFlowInFlight) {
+      return 'Another Google prompt is already open — try again in a moment.';
+    }
+    _googleFlowInFlight = true;
 
     try {
       final account = await _googleSignIn.authenticate();
@@ -219,12 +279,27 @@ class FirebaseAuthService extends GetxService {
       } catch (_) {}
       return null;
     } on GoogleSignInException catch (e) {
-      if (e.code == GoogleSignInExceptionCode.canceled) return 'Reauthentication canceled';
+      if (GoogleSignInErrors.needsGoogleConnectivity(
+        e,
+        code: e.code.name,
+        description: e.description,
+        details: e.details,
+      )) {
+        return 'Reauthentication needs a connection to Google (${e.description})';
+      }
+      if (GoogleSignInErrors.isCancel(e, code: e.code.name, description: e.description, details: e.details)) {
+        return 'Reauthentication canceled';
+      }
       return 'Google sign-in failed: ${e.code.name}';
     } on FirebaseAuthException catch (e) {
       return _mapError(e);
     } catch (e) {
+      // A dismissed sheet can arrive as a bare platform exception; report it as a
+      // cancellation instead of leaking "…onCancelled at PHASE_…" to the player.
+      if (GoogleSignInErrors.isCancel(e)) return 'Reauthentication canceled';
       return e.toString();
+    } finally {
+      _googleFlowInFlight = false;
     }
   }
 

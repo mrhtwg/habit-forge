@@ -111,6 +111,7 @@ const Map<LanKey, String> zhCN = {
   LanKey.mergeLocalIntoCloud: '合并本机进度到云端',
   LanKey.mergeDone: '已把本机进度并入账号',
   LanKey.mergeFailed: '合并失败',
+  LanKey.googleSignInNeedsGoogle: 'Google 登录需要连接 Google 服务，当前网络访问不到（accounts.google.com 超时）。请开启 VPN 后重试。',
   LanKey.reward: '奖励',
   LanKey.dueDateAndPriority: '截止日期与优先级',
   LanKey.pickDate: '选择日期',

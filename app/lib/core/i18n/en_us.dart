@@ -112,6 +112,8 @@ const Map<LanKey, String> enUS = {
   LanKey.mergeLocalIntoCloud: 'Merge this device into the account',
   LanKey.mergeDone: 'Local progress merged into your account',
   LanKey.mergeFailed: 'Merge failed',
+  LanKey.googleSignInNeedsGoogle:
+      'Google sign-in needs to reach Google services, which this network is blocking. Connect a VPN and try again.',
   LanKey.reward: 'Reward',
   LanKey.dueDateAndPriority: 'Due Date & Priority',
   LanKey.pickDate: 'Pick date',

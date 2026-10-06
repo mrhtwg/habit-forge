@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:habit_forge_app/core/common/utils/log.dart';
 import 'package:habit_forge_app/core/common/utils/sp_utils.dart';
 import 'package:habit_forge_app/core/i18n/app_locale.dart';
 import 'package:habit_forge_app/core/network/hive/shop_config.dart';
@@ -98,11 +99,11 @@ class SplashController extends GetxController {
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       ).timeout(FirebaseSession.networkTimeout);
+      await firebaseAuth.initGoogleSignIn(serverClientId: DefaultFirebaseOptions.googleServerClientId);
       firebaseAuth.markAvailable();
-      await firebaseAuth.initGoogleSignIn();
-      debugPrint('Firebase SDK initialized (auth deferred to Settings)');
+      Log.d('Firebase SDK initialized (auth deferred to Settings)');
     } catch (e) {
-      debugPrint('Firebase not configured ($e). Local Hive will be used until sign-in.');
+      Log.d('Firebase not configured ($e). Local Hive will be used until sign-in.');
     }
   }
 

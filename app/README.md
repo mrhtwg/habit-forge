@@ -83,7 +83,8 @@ cp env/firebase.json.example env/firebase.json
   "appId": "YOUR_ANDROID_APP_ID",
   "messagingSenderId": "YOUR_PROJECT_NUMBER",
   "projectId": "YOUR_PROJECT_ID",
-  "storageBucket": "YOUR_PROJECT_ID.appspot.com"
+  "storageBucket": "YOUR_PROJECT_ID.appspot.com",
+  "googleServerClientId": "YOUR_WEB_OAUTH_CLIENT_ID.apps.googleusercontent.com"
 }
 ```
 

@@ -36,7 +36,8 @@ Flutter reads Firebase options from this file via `--dart-define-from-file` (not
   "appId": "YOUR_ANDROID_APP_ID",
   "messagingSenderId": "YOUR_PROJECT_NUMBER",
   "projectId": "YOUR_PROJECT_ID",
-  "storageBucket": "YOUR_PROJECT_ID.appspot.com"
+  "storageBucket": "YOUR_PROJECT_ID.appspot.com",
+  "googleServerClientId": "YOUR_WEB_OAUTH_CLIENT_ID.apps.googleusercontent.com"
 }
 ```
 
@@ -45,6 +46,7 @@ Flutter reads Firebase options from this file via `--dart-define-from-file` (not
 | `apiKey`            | Firebase Console → Project Settings → General → Web API Key (or `google-services.json` → `api_key.current_key`) |
 | `appId`             | `google-services.json` → `client[].client_info.mobilesdk_app_id`                                                |
 | `messagingSenderId` | Project number / `project_number`                                                                               |
+| `googleServerClientId` | `google-services.json` → `oauth_client[]` where `client_type` is `3`                                      |
 | `projectId`         | Project ID / `project_id`                                                                                       |
 | `storageBucket`     | Usually `<project-id>.appspot.com` or `<project-id>.firebasestorage.app`                                        |
 
@@ -128,6 +130,12 @@ keytool -list -v -alias forge \
 2. Firebase Console → Project Settings → Your Android app → Add fingerprint
 3. Download a fresh `google-services.json` into `android/app/`
 4. Rebuild the app (`flutter clean && flutter run --dart-define-from-file=env/firebase.json`)
+
+For Google Play Internal/Closed/Open testing, also copy the **App signing key
+certificate SHA-1** from Play Console → Setup → App integrity. Play-delivered
+builds are signed with that certificate rather than the upload key. If it is
+missing, Android Credential Manager may incorrectly report the configuration
+failure as `GoogleSignInExceptionCode.canceled` after account selection.
 
 Also ensure `env/firebase.json` `projectId` / `appId` / `apiKey` match the same project as `google-services.json`.
 

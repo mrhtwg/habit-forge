@@ -114,6 +114,7 @@ enum LanKey {
   mergeLocalIntoCloud, // 'Merge this device into the account'
   mergeDone, // 'Local progress merged into your account'
   mergeFailed, // 'Merge failed'
+  googleSignInNeedsGoogle, // 'Google sign-in needs a connection to Google services…'
   reward, // 'Reward'
   dueDateAndPriority, // 'Due Date & Priority'
   pickDate, // 'Pick date'

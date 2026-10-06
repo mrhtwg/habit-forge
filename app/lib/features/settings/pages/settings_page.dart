@@ -271,49 +271,49 @@ class SettingsPage extends GetView<SettingsController> {
   }
 }
 
-class _CustomToggle extends StatelessWidget {
-  final bool value;
-  final ValueChanged<bool> onChanged;
+// class _CustomToggle extends StatelessWidget {
+//   final bool value;
+//   final ValueChanged<bool> onChanged;
 
-  const _CustomToggle({
-    required this.value,
-    required this.onChanged,
-  });
+//   const _CustomToggle({
+//     required this.value,
+//     required this.onChanged,
+//   });
 
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => onChanged(!value),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        width: 44,
-        height: 24,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          color: value ? AppColors.primary : AppColors.elevated,
-        ),
-        child: Stack(
-          children: [
-            AnimatedPositioned(
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeInOut,
-              left: value ? 22 : 2,
-              top: 2,
-              child: Container(
-                width: 20,
-                height: 20,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return GestureDetector(
+//       onTap: () => onChanged(!value),
+//       child: AnimatedContainer(
+//         duration: const Duration(milliseconds: 200),
+//         width: 44,
+//         height: 24,
+//         decoration: BoxDecoration(
+//           borderRadius: BorderRadius.circular(12),
+//           color: value ? AppColors.primary : AppColors.elevated,
+//         ),
+//         child: Stack(
+//           children: [
+//             AnimatedPositioned(
+//               duration: const Duration(milliseconds: 200),
+//               curve: Curves.easeInOut,
+//               left: value ? 22 : 2,
+//               top: 2,
+//               child: Container(
+//                 width: 20,
+//                 height: 20,
+//                 decoration: const BoxDecoration(
+//                   shape: BoxShape.circle,
+//                   color: Colors.white,
+//                 ),
+//               ),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 class _LanguageOption extends StatelessWidget {
   final String label;
@@ -333,31 +333,31 @@ class _LanguageOption extends StatelessWidget {
   }
 }
 
-class _PreferenceRow extends StatelessWidget {
-  final String label;
-  final bool value;
-  final ValueChanged<bool> onChanged;
+// class _PreferenceRow extends StatelessWidget {
+//   final String label;
+//   final bool value;
+//   final ValueChanged<bool> onChanged;
 
-  const _PreferenceRow({
-    required this.label,
-    required this.value,
-    required this.onChanged,
-  });
+//   const _PreferenceRow({
+//     required this.label,
+//     required this.value,
+//     required this.onChanged,
+//   });
 
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label, style: textStyleRegular(color: AppColors.textPrimary, fontSize: 15)),
-          _CustomToggle(value: value, onChanged: onChanged),
-        ],
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Padding(
+//       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+//       child: Row(
+//         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//         children: [
+//           Text(label, style: textStyleRegular(color: AppColors.textPrimary, fontSize: 15)),
+//           _CustomToggle(value: value, onChanged: onChanged),
+//         ],
+//       ),
+//     );
+//   }
+// }
 
 class _SectionHeader extends StatelessWidget {
   final String title;
