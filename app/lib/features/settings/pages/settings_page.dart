@@ -1,7 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:habit_forge_app/core/constants/env_constants.dart';
 import 'package:habit_forge_app/core/i18n/app_locale.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
@@ -12,7 +13,6 @@ import 'package:habit_forge_app/core/services/subscription_tier.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/features/auth/controllers/auth_controller.dart';
-import 'package:habit_forge_app/features/auth/pages/email_login_sheet.dart';
 import 'package:habit_forge_app/features/settings/controllers/settings_controller.dart';
 import 'package:habit_forge_app/features/webview/models/habit_webview_entity.dart';
 import 'package:habit_forge_app/generated/assets.dart';
@@ -75,52 +75,55 @@ class SettingsPage extends GetView<SettingsController> {
                   _SectionHeader(LanKey.account.tr),
                   _SettingsCard(child: _buildAccountSection(context)),
                   const SizedBox(height: 20),
-                  if (!EnvConstants.isHive()) ...[
-                    _SectionHeader(LanKey.premium.tr),
-                    Obx(() {
-                      final tier = SubscriptionService.to.tier.value;
-                      final label = switch (tier) {
-                        SubscriptionTier.monthly => LanKey.planMonthly.tr,
-                        SubscriptionTier.yearly => LanKey.planYearly.tr,
-                        SubscriptionTier.lifetime => LanKey.planLifetime.tr,
-                        _ => LanKey.planFree.tr,
-                      };
-                      return _SettingsCard(
-                        child: ListTile(
-                          leading: const Icon(Icons.workspace_premium_rounded, color: AppColors.goldDark),
-                          title: Text(
-                            tier.isPremium ? label : LanKey.premium.tr,
-                            style: textStyleRegular(color: AppColors.textPrimary),
-                          ),
-                          subtitle: Text(
-                            tier.isPremium ? LanKey.currentPlan.tr : LanKey.premiumSubtitle.tr,
-                            style: textStyleRegular(color: AppColors.textMuted, fontSize: 12),
-                          ),
-                          trailing: const Icon(Icons.chevron_right_rounded, color: AppColors.textMuted),
-                          onTap: () => Get.toNamed(Routers.subscription),
+                  _SectionHeader(LanKey.premium.tr),
+                  Obx(() {
+                    final tier = SubscriptionService.to.tier.value;
+                    final label = switch (tier) {
+                      SubscriptionTier.monthly => LanKey.planMonthly.tr,
+                      SubscriptionTier.yearly => LanKey.planYearly.tr,
+                      SubscriptionTier.lifetime => LanKey.planLifetime.tr,
+                      _ => LanKey.planFree.tr,
+                    };
+                    return _SettingsCard(
+                      child: ListTile(
+                        leading: const Icon(Icons.workspace_premium_rounded, color: AppColors.goldDark),
+                        title: Text(
+                          tier.isPremium ? label : LanKey.premium.tr,
+                          style: textStyleRegular(color: AppColors.textPrimary),
                         ),
-                      );
-                    }),
-                    const SizedBox(height: 20),
-                  ],
-                  _SectionHeader(LanKey.preferences.tr),
-                  _SettingsCard(
-                    child: Column(
-                      children: [
-                        _PreferenceRow(
-                          label: LanKey.sound.tr,
-                          value: Get.find<AudioService>().enabled,
-                          onChanged: (v) => Get.find<AudioService>().setEnabled(v),
+                        subtitle: Text(
+                          tier.isPremium ? LanKey.currentPlan.tr : LanKey.premiumSubtitle.tr,
+                          style: textStyleRegular(color: AppColors.textMuted, fontSize: 12),
                         ),
-                        const Divider(color: AppColors.elevated, height: 1, thickness: 1),
-                        _PreferenceRow(
-                          label: LanKey.haptic.tr,
-                          value: Get.find<HapticService>().enabled,
-                          onChanged: (v) => Get.find<HapticService>().setEnabled(v),
-                        ),
-                      ],
-                    ),
-                  ),
+                        trailing: const Icon(Icons.chevron_right_rounded, color: AppColors.textMuted),
+                        onTap: () => Get.toNamed(Routers.subscription),
+                      ),
+                    );
+                  }),
+                  // const SizedBox(height: 20),
+                  // _SectionHeader(LanKey.preferences.tr),
+                  // _SettingsCard(
+
+                  //   child: Column(
+                  //     children: [
+                  //       Obx(
+                  //         () => _PreferenceRow(
+                  //           label: LanKey.sound.tr,
+                  //           value: Get.find<AudioService>().enabled,
+                  //           onChanged: (v) => Get.find<AudioService>().setEnabled(v),
+                  //         ),
+                  //       ),
+                  //       const Divider(color: AppColors.elevated, height: 1, thickness: 1),
+                  //       Obx(
+                  //         () => _PreferenceRow(
+                  //           label: LanKey.haptic.tr,
+                  //           value: Get.find<HapticService>().enabled,
+                  //           onChanged: (v) => Get.find<HapticService>().setEnabled(v),
+                  //         ),
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
                   const SizedBox(height: 20),
                   _SectionHeader(LanKey.language.tr),
                   _SettingsCard(
@@ -162,28 +165,6 @@ class SettingsPage extends GetView<SettingsController> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  if (EnvConstants.isHive()) ...[
-                    _SectionHeader(LanKey.data.tr),
-                    _SettingsCard(
-                      child: ListTile(
-                        leading: Icon(Icons.recycling_outlined, color: AppColors.textPrimary.withValues(alpha: 0.5)),
-                        title: Text(LanKey.resetAllData.tr, style: textStyleRegular(color: AppColors.red)),
-                        onTap: () async {
-                          final confirmed = await ConfirmDialog.show(
-                            context,
-                            title: LanKey.resetGame.tr,
-                            message: LanKey.resetAllConfirm.tr,
-                            confirmLabel: LanKey.reset.tr,
-                            isDestructive: true,
-                          );
-                          if (confirmed == true) {
-                            controller.resetAllData();
-                          }
-                        },
-                      ),
-                    ),
-                  ],
                 ],
               ),
             ),
@@ -194,19 +175,6 @@ class SettingsPage extends GetView<SettingsController> {
   }
 
   Widget _buildAccountSection(BuildContext context) {
-    // Hive: local-only identity, no cloud auth entry.
-    if (EnvConstants.isHive()) {
-      return ListTile(
-        dense: true,
-        leading: const Icon(Icons.person_outline, color: AppColors.textSecondary),
-        title: Text(LanKey.guest.tr, style: textStyleRegular(color: AppColors.textPrimary)),
-        subtitle: Text(
-          LanKey.playingLocally.tr,
-          style: textStyleRegular(color: AppColors.textMuted, fontSize: 12),
-        ),
-      );
-    }
-
     return Obx(() {
       final auth = AuthController.to;
       // Touch loading so the row rebuilds while Google sheet is open.
@@ -226,32 +194,21 @@ class SettingsPage extends GetView<SettingsController> {
           ),
           if (!linked) ...[
             const Divider(color: AppColors.elevated, height: 1, thickness: 1),
-            if (EnvConstants.isAuthFirebase())
-              ListTile(
-                dense: true,
-                leading: loading
-                    ? SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primaryDark),
-                      )
-                    : const Icon(Icons.g_mobiledata_rounded, color: AppColors.primaryDark),
-                title: Text(
-                  LanKey.continueWithGoogle.tr,
-                  style: textStyleRegular(color: AppColors.primaryDark),
-                ),
-                onTap: loading ? null : () => auth.signInWithGoogleFromSettings(context),
+            ListTile(
+              dense: true,
+              leading: loading
+                  ? SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primaryDark),
+                    )
+                  : const Icon(Icons.g_mobiledata_rounded, color: AppColors.primaryDark),
+              title: Text(
+                LanKey.continueWithGoogle.tr,
+                style: textStyleRegular(color: AppColors.primaryDark),
               ),
-            if (EnvConstants.isAuthServer())
-              ListTile(
-                dense: true,
-                leading: const Icon(Icons.email_rounded, color: AppColors.primaryDark),
-                title: Text(
-                  LanKey.continueWithEmail.tr,
-                  style: textStyleRegular(color: AppColors.primaryDark),
-                ),
-                onTap: loading ? null : () => EmailLoginSheet.show(context),
-              ),
+              onTap: loading ? null : () => auth.signInWithGoogleFromSettings(context),
+            ),
           ],
           if (linked) ...[
             const Divider(color: AppColors.elevated, height: 1, thickness: 1),
@@ -271,6 +228,41 @@ class SettingsPage extends GetView<SettingsController> {
                   await auth.logout();
                 }
               },
+            ),
+            const Divider(color: AppColors.elevated, height: 1, thickness: 1),
+            ListTile(
+              dense: true,
+              leading: const Icon(Icons.person_remove_rounded, color: AppColors.red),
+              title: Text(LanKey.deleteAccount.tr, style: textStyleRegular(color: AppColors.red)),
+              onTap: loading
+                  ? null
+                  : () async {
+                      HapticService.to.light();
+                      unawaited(AudioService.to.playTap());
+                      final understood = await ConfirmDialog.show(
+                        context,
+                        title: LanKey.deleteAccount.tr,
+                        message: LanKey.deleteAccountWarning.tr,
+                        confirmLabel: LanKey.continueLabel.tr,
+                        isDestructive: true,
+                      );
+                      if (understood != true || !context.mounted) return;
+
+                      HapticService.to.medium();
+                      unawaited(AudioService.to.playDestructiveWarning());
+                      final confirmed = await ConfirmDialog.show(
+                        context,
+                        title: LanKey.deleteAccountFinalTitle.tr,
+                        message: LanKey.deleteAccountFinalWarning.tr,
+                        confirmLabel: LanKey.deleteAccount.tr,
+                        isDestructive: true,
+                      );
+                      if (confirmed != true) return;
+
+                      HapticService.to.heavy();
+                      unawaited(AudioService.to.playDestructiveWarning());
+                      await auth.deleteAccount();
+                    },
             ),
           ],
         ],

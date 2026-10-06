@@ -2,20 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
+import 'package:habit_forge_app/core/i18n/app_locale.dart';
 import 'package:habit_forge_app/core/network/hive/game_constants.dart';
 import 'package:habit_forge_app/core/network/hive/game_logic.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/generated/assets.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.dart';
+import 'package:habit_forge_app/widgets/toast_widget.dart';
+import 'package:intl/intl.dart';
 
 /// Bright cartoon "task ticket" card (shared by the home / tasks pages).
 ///
 /// Swipe **right** to skip and swipe **left** to delete when the matching
 /// callbacks are provided; otherwise the card has no slide actions.
-class TaskTicket extends StatelessWidget {
+class TaskTicket extends StatefulWidget {
   final Task task;
-  final VoidCallback onComplete;
+  final Future<void> Function() onComplete;
   final VoidCallback? onSkip;
   final VoidCallback? onDelete;
   final VoidCallback? onLongPress;
@@ -30,8 +33,33 @@ class TaskTicket extends StatelessWidget {
   });
 
   @override
+  State<TaskTicket> createState() => _TaskTicketState();
+}
+
+class _TaskTicketState extends State<TaskTicket> {
+  bool _busy = false;
+
+  Task get task => widget.task;
+  VoidCallback? get onSkip => _busy ? null : widget.onSkip;
+  VoidCallback? get onDelete => _busy ? null : widget.onDelete;
+  VoidCallback? get onLongPress => _busy ? null : widget.onLongPress;
+
+  Future<void> _complete() async {
+    if (_busy || task.isCompleted) return;
+    setState(() => _busy = true);
+    try {
+      await widget.onComplete();
+    } catch (_) {
+      Toast.error(LanKey.actionFailed.tr);
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final done = task.isCompleted;
+    final duration = MediaQuery.disableAnimationsOf(context) ? Duration.zero : const Duration(milliseconds: 220);
     final tagColor = _tagColors();
     // A negative habit ("bad habit") pays nothing: tapping it logs a slip and
     // costs HP, so the card shows the cost instead of a reward.
@@ -77,7 +105,9 @@ class TaskTicket extends StatelessWidget {
               ),
         child: GestureDetector(
           onLongPress: onLongPress,
-          child: Container(
+          onTap: onLongPress,
+          child: AnimatedContainer(
+            duration: duration,
             padding: EdgeInsets.all(12.w),
             decoration: BoxDecoration(
               color: done ? const Color(0xFFEAF8EF) : Colors.white,
@@ -89,8 +119,9 @@ class TaskTicket extends StatelessWidget {
               children: [
                 // Complete check button
                 GestureDetector(
-                  onTap: done ? null : onComplete,
-                  child: Container(
+                  onTap: done || _busy ? null : _complete,
+                  child: AnimatedContainer(
+                    duration: duration,
                     width: 40.w,
                     height: 40.w,
                     decoration: BoxDecoration(
@@ -99,7 +130,19 @@ class TaskTicket extends StatelessWidget {
                       border: Border.all(color: AppColors.border, width: 2.5),
                       boxShadow: const [BoxShadow(color: Color(0xFFE9D9BE), offset: Offset(0, 3))],
                     ),
-                    child: done ? const Icon(Icons.check_rounded, color: Colors.white, size: 24) : null,
+                    child: AnimatedSwitcher(
+                      duration: duration,
+                      transitionBuilder: (child, animation) => ScaleTransition(scale: animation, child: child),
+                      child: done
+                          ? Icon(Icons.check_rounded, key: const ValueKey('done'), color: Colors.white, size: 24.w)
+                          : _busy
+                              ? Padding(
+                                  key: const ValueKey('busy'),
+                                  padding: EdgeInsets.all(9.w),
+                                  child: const CircularProgressIndicator(strokeWidth: 2),
+                                )
+                              : const SizedBox.shrink(key: ValueKey('ready')),
+                    ),
                   ),
                 ),
                 SizedBox(width: 12.w),
@@ -137,6 +180,22 @@ class TaskTicket extends StatelessWidget {
                           ],
                         ],
                       ),
+                      if (task.type == TaskType.TASK_TYPE_TODO && task.dueDate.toInt() > 0) ...[
+                        SizedBox(height: 5.h),
+                        Text(
+                          DateFormat.yMMMd(AppLocale.languageCode()).format(
+                            DateTime.fromMillisecondsSinceEpoch(task.dueDate.toInt()),
+                          ),
+                          style: textStyleMedium(fontSize: 10.sp, color: AppColors.textSecondary),
+                        ),
+                      ],
+                      if (task.priority.isNotEmpty) ...[
+                        SizedBox(height: 3.h),
+                        Text(
+                          LanKey.priorityLabel.trParams({'value': task.priority}),
+                          style: textStyleBold(fontSize: 10.sp, color: AppColors.primaryDark),
+                        ),
+                      ],
                     ],
                   ),
                 ),

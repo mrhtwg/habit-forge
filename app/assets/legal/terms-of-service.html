@@ -146,29 +146,23 @@
   </section>
 
   <section id="modes">
-    <h2>3. Accounts and data modes</h2>
-    <p>HabitForge supports three data modes, selected at runtime through the app's configuration:</p>
+    <h2>3. Accounts and data storage</h2>
+    <p>HabitForge supports guest play and optional Firebase cloud accounts:</p>
     <table>
       <tr><th>Mode</th><th>What it means for you</th></tr>
       <tr>
-        <td><strong>Local (default)</strong></td>
-        <td>No account. Game data lives in local on-device storage. Sign-in is skipped (guest mode).</td>
+        <td><strong>Guest</strong></td>
+        <td>No account is required. Game data stays in local on-device storage until you link an account.</td>
       </tr>
       <tr>
-        <td><strong>Cloud (Firebase)</strong></td>
-        <td>Sign in with Google (and, where enabled, Apple). Authentication and cloud storage are provided by
-        Firebase/Google services under their own terms.</td>
-      </tr>
-      <tr>
-        <td><strong>Self-hosted server</strong></td>
-        <td>Sign in with email and password against a backend operated by you or your provider. Game data is
-        exchanged with that backend.</td>
+        <td><strong>Firebase account</strong></td>
+        <td>Sign in with Google. Authentication and cloud storage are provided by Firebase/Google services
+        under their own terms.</td>
       </tr>
     </table>
     <p>
-      You are responsible for keeping your credentials confidential and for the security of any backend you
-      operate yourself. We may suspend access to cloud or server features if we reasonably believe they are
-      being abused.
+      You are responsible for keeping your credentials confidential. We may suspend access to cloud features
+      if we reasonably believe they are being abused.
     </p>
   </section>
 
@@ -176,7 +170,7 @@
     <h2>4. Your content</h2>
     <p>
       You keep all rights to the content you create in HabitForge — task titles, notes, tags, dates and any
-      other text you enter. You grant us (and, in cloud or server modes, the relevant service provider) only
+      other text you enter. You grant us and the relevant cloud service provider only
       the limited permission needed to store, sync and display that content back to you so the app can
       function. We do not use your task content for advertising.
     </p>
@@ -305,8 +299,7 @@
   <section id="thirdparty">
     <h2>7. Third-party services</h2>
     <p>
-      Depending on the mode you enable, HabitForge relies on third-party components with their own terms and
-      privacy practices, including:
+      HabitForge relies on third-party components with their own terms and privacy practices, including:
     </p>
     <ul>
       <li><strong>Google Firebase</strong> (authentication and cloud storage) and <strong>Google Sign-In</strong>;</li>
@@ -314,7 +307,6 @@
       Premium payments and subscriptions under its own terms and is the only party that sees your payment
       method and billing details;</li>
       <li><strong>Apple</strong> Sign in with Apple, where enabled;</li>
-      <li>a <strong>self-hosted backend</strong> operated by you or your provider in server mode;</li>
       <li>open-source libraries bundled with the app (UI, local storage, audio playback, networking).</li>
     </ul>
   </section>

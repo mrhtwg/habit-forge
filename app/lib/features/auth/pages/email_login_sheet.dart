@@ -7,7 +7,7 @@ import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:habit_forge_app/core/theme/app_typography.dart';
 import 'package:habit_forge_app/features/auth/controllers/auth_controller.dart';
 
-/// Email/password form shown as a bottom sheet from Settings (server mode).
+/// Firebase email/password form shown as a bottom sheet.
 /// Does not navigate to [EmailLoginPage] / AuthPage.
 class EmailLoginSheet extends StatefulWidget {
   const EmailLoginSheet({super.key});

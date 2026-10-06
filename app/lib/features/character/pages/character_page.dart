@@ -3,9 +3,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/common/animation/frame_sequence_player.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
-import 'package:habit_forge_app/core/network/hive/game_constants.dart';
 import 'package:habit_forge_app/core/network/hive/class_profiles.dart';
+import 'package:habit_forge_app/core/network/hive/game_constants.dart';
 import 'package:habit_forge_app/core/network/hive/game_logic.dart';
+import 'package:habit_forge_app/core/network/hive/shop_config.dart';
 import 'package:habit_forge_app/core/network/network_registry.dart';
 import 'package:habit_forge_app/core/services/death_recovery_service.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
@@ -441,15 +442,26 @@ class CharacterPage extends GetView<CharacterController> {
     );
   }
 
-  void _showEquipSheet(BuildContext context, EquipmentSlot slot) {
+  Future<void> _showEquipSheet(BuildContext context, EquipmentSlot slot) async {
+    try {
+      await _loadEquipSheet(context, slot);
+    } catch (_) {
+      Toast.error(LanKey.actionFailed.tr);
+    }
+  }
+
+  Future<void> _loadEquipSheet(BuildContext context, EquipmentSlot slot) async {
     final char = UserService.to.character.value;
     if (char == null) return;
 
-    final owned = UserService.to.userPrefs.value.items;
-    if (owned.isEmpty) {
-      Toast.show(LanKey.noItemsForSlot.tr);
+    final result = await NetworkRegistry.ins.listOwnedItems();
+    if (!context.mounted) return;
+    if (result.isFailure) {
+      Toast.error(result.message);
       return;
     }
+    final ids = result.data!.itemIds.toSet();
+    final owned = ShopConfig.shopItems.where((item) => ids.contains(item.id) && item.slot == slot).toList();
 
     Get.bottomSheet(
       Container(
@@ -458,56 +470,69 @@ class CharacterPage extends GetView<CharacterController> {
           color: AppColors.surface,
           borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.sheetRadius)),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: AppColors.textMuted,
-                  borderRadius: BorderRadius.circular(2),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.textMuted,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              LanKey.selectSlot.trParams({'slot': _slotLabel(slot)}),
-              style: textStyleBold(fontSize: 16.sp, color: AppColors.textPrimary),
-            ),
-            const SizedBox(height: 12),
-            ListTile(
-              leading: Icon(Icons.close_rounded, color: AppColors.textMuted, size: 20),
-              title: Text(LanKey.noneUnequip.tr, style: textStyleRegular(color: AppColors.textMuted)),
-              onTap: () {
-                NetworkRegistry.ins.equipItem('', slot);
-                UserService.to.loadCharacter();
-                Get.back();
-              },
-            ),
-            ...owned.map(
-              (item) => ListTile(
-                leading: const Icon(Icons.shield_rounded, color: AppColors.primary, size: 24),
-                title: Text(
-                  item.id.replaceAll('_', ' ').toUpperCase(),
-                  style: textStyleRegular(color: AppColors.textPrimary),
-                ),
-                trailing: char.equipment[slot] == item
-                    ? const Icon(Icons.check_circle_rounded, color: AppColors.green, size: 20)
-                    : null,
-                onTap: () {
-                  NetworkRegistry.ins.equipItem(item.id, slot);
-                  UserService.to.loadCharacter();
+              const SizedBox(height: 16),
+              Text(
+                LanKey.selectSlot.trParams({'slot': _slotLabel(slot)}),
+                style: textStyleBold(fontSize: 16.sp, color: AppColors.textPrimary),
+              ),
+              const SizedBox(height: 12),
+              ListTile(
+                leading: Icon(Icons.close_rounded, color: AppColors.textMuted, size: 20),
+                title: Text(LanKey.noneUnequip.tr, style: textStyleRegular(color: AppColors.textMuted)),
+                onTap: () async {
                   Get.back();
+                  await _equipItem('', slot);
                 },
               ),
-            ),
-          ],
+              ...owned.map(
+                (item) => ListTile(
+                  leading: const Icon(Icons.shield_rounded, color: AppColors.primary, size: 24),
+                  title: Text(
+                    item.id.replaceAll('_', ' ').toUpperCase(),
+                    style: textStyleRegular(color: AppColors.textPrimary),
+                  ),
+                  trailing: char.equipment[GameLogic.slotKey(slot)] == item.id
+                      ? const Icon(Icons.check_circle_rounded, color: AppColors.green, size: 20)
+                      : null,
+                  onTap: () async {
+                    Get.back();
+                    await _equipItem(item.id, slot);
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  Future<void> _equipItem(String id, EquipmentSlot slot) async {
+    try {
+      final result = await NetworkRegistry.ins.equipItem(id, slot);
+      if (result.isFailure) {
+        Toast.error(result.message);
+        return;
+      }
+      await UserService.to.loadCharacter();
+    } catch (_) {
+      Toast.error(LanKey.actionFailed.tr);
+    }
   }
 
   IconData _slotIcon(EquipmentSlot slot) {

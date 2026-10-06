@@ -5,6 +5,7 @@ import 'package:habit_forge_app/generated/protos/task/v1/task.pbenum.dart';
 /// Translation keys for the app (see en_us.dart / zh_cn.dart).
 /// Usage: `LanKey.done.tr`, `LanKey.priorityLabel.trParams({'value': x})`.
 enum LanKey {
+  actionFailed,
   done, // 'Done'
   skip, // 'Skip'
   postpone, // 'Postpone'
@@ -104,6 +105,15 @@ enum LanKey {
   badHabitBadge, // 'BAD HABIT'
   slipCost, // 'Cost per slip'
   slipLogged, // 'Slip logged: -@hp HP'
+  guestModeNote, // 'Progress stays on this device until you bind an account.'
+  bindAccountBanner, // 'Bind an account so a new phone does not lose your progress'
+  bindNow, // 'Bind'
+  cloudSaveChoiceTitle, // 'This account already has a cloud save'
+  cloudSaveChoiceBody, // 'This device has progress too. Choose what to keep:'
+  useCloudSave, // 'Use the cloud save (replaces this device)'
+  mergeLocalIntoCloud, // 'Merge this device into the account'
+  mergeDone, // 'Local progress merged into your account'
+  mergeFailed, // 'Merge failed'
   reward, // 'Reward'
   dueDateAndPriority, // 'Due Date & Priority'
   pickDate, // 'Pick date'
@@ -208,6 +218,12 @@ enum LanKey {
   guest, // 'Guest'
   signOut, // 'Sign Out'
   signOutConfirm, // 'Are you sure you want to sign out?'
+  deleteAccount,
+  deleteAccountWarning,
+  deleteAccountFinalTitle,
+  deleteAccountFinalWarning,
+  accountDeleted,
+  accountDeleteFailed,
   preferences, // 'Preferences'
   sound, // 'Sound'
   haptic, // 'Haptic'
@@ -269,6 +285,12 @@ enum LanKey {
   restoreDone, // 'Purchases restored'
   purchaseUnavailable, // 'Purchase unavailable. Try again later.'
   purchaseSuccess, // 'Welcome to Premium!'
+  purchaseVerifying,
+  purchasePending,
+  purchaseSignInRequired,
+  restoreRequested,
+  lifetimeRequiresCancel,
+  billingDisclosure,
   habitLimitReached, // 'Free plan allows @n habits. Upgrade for unlimited.'
   premiumRequired, // 'Premium required'
   premiumClassLocked, // 'Upgrade to unlock this class'

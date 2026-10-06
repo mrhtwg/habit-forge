@@ -26,7 +26,7 @@ class ProfilePage extends GetView<ProfileController> {
             child: ListView(
               padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 24.h),
               children: [
-                _buildStatsRow(),
+                Obx(() => _buildStatsRow()),
                 SizedBox(height: 16.h),
                 _buildQuickLink(
                   icon: Icons.military_tech_rounded,

@@ -6,7 +6,7 @@ import 'package:habit_forge_app/widgets/toast_widget.dart';
 
 class ProfileController extends GetxController {
   final tasks = <Task>[].obs;
-  final totalTasksCompleted = 0.obs;
+  int get totalTasksCompleted => UserService.to.userPrefs.value.totalTasksCompleted.toInt();
 
   @override
   void onInit() {

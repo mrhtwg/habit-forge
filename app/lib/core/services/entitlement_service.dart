@@ -1,17 +1,17 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:crypto/crypto.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/common/utils/log.dart';
-import 'package:habit_forge_app/core/constants/env_constants.dart';
 import 'package:habit_forge_app/core/services/subscription_tier.dart';
 
 /// Server-owned premium entitlement (`docs/data-ledger-plan.md` §3.3).
 ///
-/// The plan's second rule: 订阅权益改成"服务端说了算". In
-/// `--dart-define=entitlement=server` builds the tier comes from
-/// `users/{uid}/entitlement/{store}` — a document only Cloud Functions can
+/// The plan's second rule: 订阅权益改成"服务端说了算". The tier comes from
+/// `users/{uid}/entitlement/{productId}` — documents only Cloud Functions can
 /// write, because `firebase/firestore.rules` denies every client write to that
 /// subcollection. So patching the app or editing local files no longer buys
 /// premium, which is the entire point: premium unlockers are a real business.
@@ -21,9 +21,6 @@ import 'package:habit_forge_app/core/services/subscription_tier.dart';
 /// Cloud Function re-checks the receipt with the store and is the sole writer of
 /// the entitlement.
 ///
-/// The default build (`entitlement=local`) keeps the pre-ledger behaviour
-/// (entitlement cached in `shared_preferences`), because switching authority
-/// requires the Function to be deployed and the Blaze plan to be enabled.
 class EntitlementService extends GetxService {
   static EntitlementService get to => Get.find();
 
@@ -33,9 +30,7 @@ class EntitlementService extends GetxService {
   final isListening = false.obs;
 
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _sub;
-
-  /// Whether the server is the authority for premium in this build.
-  static bool get isServerAuthoritative => EnvConstants.usesServerEntitlement();
+  Timer? _expiryTimer;
 
   /// Subscribes to the entitlement documents of the signed-in user.
   ///
@@ -44,21 +39,15 @@ class EntitlementService extends GetxService {
   /// claim to verify, and Firestore serves the last known entitlement from its
   /// own cache while offline.
   Future<void> start() async {
-    if (!isServerAuthoritative) return;
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) {
-      Log.w('entitlement=server but no cloud identity yet — premium stays unverified');
+      Log.w('no cloud identity yet — premium stays unverified');
       _set(null);
       return;
     }
     await _sub?.cancel();
-    _sub = FirebaseFirestore.instance
-        .collection('users')
-        .doc(uid)
-        .collection('entitlement')
-        .snapshots()
-        .listen(
-          (snapshot) => _set(tierOf(snapshot.docs.map((doc) => doc.data()))),
+    _sub = FirebaseFirestore.instance.collection('users').doc(uid).collection('entitlement').snapshots().listen(
+          (snapshot) => _applyDocuments(snapshot.docs.map((doc) => doc.data()).toList()),
           onError: (Object error) => Log.w('entitlement listener: $error'),
         );
     isListening.value = true;
@@ -66,6 +55,7 @@ class EntitlementService extends GetxService {
 
   Future<void> stop() async {
     await _sub?.cancel();
+    _expiryTimer?.cancel();
     _sub = null;
     isListening.value = false;
     _set(null);
@@ -83,16 +73,26 @@ class EntitlementService extends GetxService {
     Log.d('server entitlement → ${tier?.name ?? 'free'}');
   }
 
+  void _applyDocuments(List<Map<String, dynamic>> documents) {
+    _expiryTimer?.cancel();
+    _set(tierOf(documents));
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final expiries = documents
+        .where((data) => data['active'] == true && data['tier'] != 'lifetime')
+        .map((data) => (data['expiresAt'] as num?)?.toInt() ?? 0)
+        .where((expiresAt) => expiresAt > now)
+        .toList();
+    if (expiries.isEmpty) return;
+    expiries.sort();
+    _expiryTimer = Timer(Duration(milliseconds: expiries.first - now + 1000), () => _applyDocuments(documents));
+  }
+
   /// Asks the server to verify a store purchase.
   ///
-  /// The client can only *request*: the request document is created with a
-  /// deterministic id derived from the receipt, so retrying is a no-op (a second
-  /// `set` would be an update, which the rules deny — that is the "request
-  /// already in flight" case, reported as true). Nothing here can grant premium;
-  /// the Function decides after checking with the store.
-  ///
-  /// Returns false when the request could not be written at all.
-  Future<bool> requestVerification({
+  /// The client can only *request*. Every attempt gets a new document while the
+  /// Function enforces purchase-token uniqueness globally, so transient backend
+  /// failures remain retryable without allowing receipt replay.
+  Future<PurchaseVerificationStatus> requestVerification({
     required String store,
     required String productId,
     required String purchaseToken,
@@ -101,51 +101,60 @@ class EntitlementService extends GetxService {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) {
       Log.w('purchase verification needs a signed-in user (FirebaseSession first)');
-      return false;
+      return PurchaseVerificationStatus.failed;
     }
     if (purchaseToken.isEmpty) {
       Log.w('purchase has no receipt to verify (productId=$productId)');
-      return false;
+      return PurchaseVerificationStatus.failed;
     }
+    final requestId = requestIdFor(
+      store: store,
+      purchaseToken: purchaseToken,
+      nonce: DateTime.now().microsecondsSinceEpoch.toString(),
+    );
+    final request =
+        FirebaseFirestore.instance.collection('users').doc(uid).collection('purchaseRequests').doc(requestId);
     try {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(uid)
-          .collection('purchaseRequests')
-          .doc(requestIdFor(store: store, purchaseToken: purchaseToken))
-          .set(<String, Object>{
+      await request.set(<String, Object>{
         'store': store,
         'productId': productId,
         'purchaseToken': purchaseToken,
         'orderId': orderId,
         'requestedAt': DateTime.now().millisecondsSinceEpoch,
       });
-      return true;
+      final snapshot = await request.snapshots().firstWhere((event) {
+        final status = event.data()?['status'];
+        return status == 'verified' || status == 'not_entitled' || status == 'rejected' || status == 'error';
+      }).timeout(const Duration(seconds: 45));
+      return switch (snapshot.data()?['status']) {
+        'verified' => PurchaseVerificationStatus.verified,
+        'not_entitled' || 'rejected' => PurchaseVerificationStatus.rejected,
+        _ => PurchaseVerificationStatus.failed,
+      };
     } on FirebaseException catch (e) {
-      // permission-denied == the document already exists (create-only rules).
       Log.w('verification request for $productId: ${e.code}');
-      return e.code == 'permission-denied' || e.code == 'already-exists';
+      return PurchaseVerificationStatus.failed;
+    } on TimeoutException {
+      Log.w('verification request for $productId timed out');
+      return PurchaseVerificationStatus.pending;
     } catch (e) {
       Log.w('verification request for $productId failed: $e');
-      return false;
+      return PurchaseVerificationStatus.failed;
     }
   }
 
-  /// Deterministic request id: one verification per receipt, and re-asking for
-  /// the same receipt cannot flood the Function.
-  static String requestIdFor({required String store, required String purchaseToken}) =>
-      '$store-${_fingerprint(purchaseToken)}';
+  /// SHA-256 receipt fingerprint plus a nonce. The Function's global claim is
+  /// the source of idempotency; unique request ids keep transient errors retryable.
+  static String requestIdFor({required String store, required String purchaseToken, String nonce = ''}) =>
+      '$store-${_fingerprint(purchaseToken)}${nonce.isEmpty ? '' : '-$nonce'}';
+
+  /// Stable Play Billing account id. The raw Firebase uid never leaves the app.
+  static String accountTokenFor(String uid) => sha256.convert(utf8.encode(uid)).toString();
 
   /// Small stable hash of the receipt — the token itself (`serverVerificationData`
   /// can be a multi-KB Play token or an iOS receipt blob) is too long for a
   /// document id.
-  static String _fingerprint(String value) {
-    var hash = 0x811C9DC5;
-    for (final unit in value.codeUnits) {
-      hash = ((hash ^ unit) * 0x01000193) & 0xFFFFFFFF;
-    }
-    return hash.toRadixString(16).padLeft(8, '0');
-  }
+  static String _fingerprint(String value) => sha256.convert(utf8.encode(value)).toString();
 
   /// The highest tier that is currently active among [docs], or null for free.
   ///
@@ -177,7 +186,9 @@ class EntitlementService extends GetxService {
     // end of the paid period.
     if (tier == SubscriptionTier.lifetime) return tier;
     final expiresAt = (data['expiresAt'] as num?)?.toInt() ?? 0;
-    if (expiresAt <= 0) return tier;
+    if (expiresAt <= 0) return null;
     return expiresAt > nowMs ? tier : null;
   }
 }
+
+enum PurchaseVerificationStatus { verified, rejected, pending, failed }

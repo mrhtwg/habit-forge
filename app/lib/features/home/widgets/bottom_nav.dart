@@ -6,12 +6,12 @@ import 'package:habit_forge_app/core/theme/app_theme.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class BottomNav extends StatelessWidget {
-  static final _tabs = [
-    (label: LanKey.home.tr, icon: PhosphorIcons.house(PhosphorIconsStyle.fill)),
-    (label: LanKey.quests.tr, icon: PhosphorIcons.scroll(PhosphorIconsStyle.fill)),
-    (label: LanKey.forge.tr, icon: PhosphorIcons.hammer(PhosphorIconsStyle.fill)),
-    (label: LanKey.profile.tr, icon: PhosphorIcons.user(PhosphorIconsStyle.fill)),
-  ];
+  static List<({String label, IconData icon})> get _tabs => [
+        (label: LanKey.home.tr, icon: PhosphorIcons.house(PhosphorIconsStyle.fill)),
+        (label: LanKey.quests.tr, icon: PhosphorIcons.scroll(PhosphorIconsStyle.fill)),
+        (label: LanKey.forge.tr, icon: PhosphorIcons.hammer(PhosphorIconsStyle.fill)),
+        (label: LanKey.profile.tr, icon: PhosphorIcons.user(PhosphorIconsStyle.fill)),
+      ];
   final int currentIndex;
 
   final ValueChanged<int> onTabChanged;
@@ -38,7 +38,9 @@ class BottomNav extends StatelessWidget {
             child: GestureDetector(
               onTap: () => onTabChanged(index),
               behavior: HitTestBehavior.opaque,
-              child: Container(
+              child: AnimatedContainer(
+                duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : const Duration(milliseconds: 220),
+                curve: Curves.easeOutCubic,
                 margin: EdgeInsets.symmetric(horizontal: 6.w),
                 padding: EdgeInsets.symmetric(vertical: 6.h),
                 decoration: BoxDecoration(
@@ -49,7 +51,9 @@ class BottomNav extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     // Active icon placed on a circular background
-                    Container(
+                    AnimatedContainer(
+                      duration:
+                          MediaQuery.disableAnimationsOf(context) ? Duration.zero : const Duration(milliseconds: 220),
                       width: 32.w,
                       height: 32.w,
                       decoration: BoxDecoration(

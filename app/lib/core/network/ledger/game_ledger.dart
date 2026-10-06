@@ -94,6 +94,32 @@ class GameLedger {
         },
       );
 
+  /// A device (guest) save was merged into the account.
+  ///
+  /// Carries the deltas **actually applied by this merge** (never a re-statement
+  /// of the device's totals), so re-merging the same device — or merging after
+  /// playing more on it — keeps `opening + Σ rows = balance` exact. HP is not
+  /// merged on purpose: HP is a momentary state, not progress.
+  static LedgerEvent accountMerged({
+    required int goldDelta,
+    required int gemsDelta,
+    required int expDelta,
+    required String deviceId,
+    required DateTime now,
+    int hpDelta = 0,
+  }) =>
+      LedgerEvent(
+        eventId: LedgerEvent.accountMergedId(deviceId, now.millisecondsSinceEpoch),
+        type: LedgerEventType.accountMerged,
+        at: now.millisecondsSinceEpoch,
+        localDate: LedgerEvent.localDateKey(now),
+        exp: expDelta,
+        gold: goldDelta,
+        gems: gemsDelta,
+        hp: hpDelta,
+        refs: <String, Object>{'source': 'device', 'device': deviceId},
+      );
+
   /// Settling missed dailies: one row per user per local day, carrying the HP
   /// that was actually applied (damage is clamped at 0 HP, so the row can never
   /// exceed the character's cap).

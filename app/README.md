@@ -37,14 +37,14 @@ The app is **local-first**: all game data lives in Hive on-device. Firebase Auth
 ### Onboarding & auth
 
 - 4-step onboarding: Welcome → Class → Habit → Ready
-- Hive (local) mode is **local-first**: splash auto-mints a guest session and never forces login; optional Sign In lives in Settings once Firebase auth is configured
-- Firebase mode offers **Google Sign-In only** (email/Apple to be added later)
+- The app uses Firebase for cloud identity and signed-in saves
+- Guest play remains local-first in Hive until the player links a Google account
 
 ### Freemium & subscription
 
 - Free: 3 habit slots, Warrior only, week stats, ads allowed, no legendary gear
 - Premium monthly / yearly / lifetime unlock unlimited habits, all classes, advanced stats, exclusive gear, no ads (see `docs/subscription.md`)
-- Play Billing via `in_app_purchase`; debug builds can unlock tiers from Settings → Premium when store products are missing
+- Play Billing via `in_app_purchase`; paid access is enabled only after server-side purchase verification
 
 ## Tech Stack
 
@@ -64,22 +64,12 @@ The app is **local-first**: all game data lives in Hive on-device. Firebase Auth
 ```bash
 cd app
 flutter pub get
-flutter run --dart-define-from-file=env/hive.json
+flutter run --dart-define-from-file=env/firebase.json
 ```
 
-### Data modes
+### Data storage
 
-The runtime mode is selected by the `env/` config file passed via `--dart-define-from-file`. Two modes are supported:
-
-| Mode           | File                | Data storage                                | Auth                                        |
-| -------------- | ------------------- | ------------------------------------------- | ------------------------------------------- |
-| Hive (default) | `env/hive.json`     | Local on-device (Hive)                      | Guest / local                               |
-| Firebase       | `env/firebase.json` (local; see `.example`) | Firebase (cloud data + auth)                | Google Sign-In (Settings) + anonymous guest |
-
-- **Hive** — local-first mode, no account or network required; the login page is skipped and the app enters directly (guest/local auth), Firebase is never initialized.
-- **Firebase** — SDK may initialize at startup, but **no anonymous Auth / Firestore** until the user signs in from Settings. Before that, gameplay uses on-device Hive (same as local-first). Weak networks cannot block entering the app (cloud restore is timed out and falls back to Hive).
-
-> **Scope note:** the client code still contains a third `server` mode (self-hosted backend over gRPC + HTTP). It is **not part of the MVP** — the server module is not part of this repository and no shipped build uses it. `env/server.json` and the `server` network implementation remain in the tree for future development.
+Firebase is the only cloud backend. Signed-out guest progress stays in on-device Hive and can be merged into a Firebase account later. Weak networks cannot block entering the app because cloud restore times out and falls back to the local guest save.
 
 #### `env/firebase.json` (required keys, gitignored)
 
@@ -89,9 +79,6 @@ cp env/firebase.json.example env/firebase.json
 
 ```json
 {
-  "env": "firebase",
-  "network": "firebase",
-  "auth": "firebase",
   "apiKey": "YOUR_ANDROID_API_KEY",
   "appId": "YOUR_ANDROID_APP_ID",
   "messagingSenderId": "YOUR_PROJECT_NUMBER",
@@ -102,18 +89,16 @@ cp env/firebase.json.example env/firebase.json
 
 Replace every `YOUR_*` value from Firebase Console (or `google-services.json`). `lib/firebase_options.dart` reads these via `--dart-define-from-file`. Do **not** commit the filled `env/firebase.json`, `google-services.json`, or Android signing files — see root `.gitignore` and `docs/firebase-setup.md`.
 
-The active mode is exposed through `EnvConstants` (`lib/core/constants/env_constants.dart`) — `networkMode`, `authMode`, Firebase option fields, and the helpers `isHive()` / `isFirebase()` (`isServer()` / `apiBaseUrl` / `grpcUrl` belong to the future server mode).
-
 ## Project Layout
 
 ```text
 app/
 ├── lib/
-│   ├── main.dart                 # entry: Hive init, services, Firebase (prod), runApp
+│   ├── main.dart                 # entry: services, Firebase, runApp
 │   ├── app.dart                  # HabitForgeApp: GetMaterialApp, theme, routes
 │   ├── core/
 │   │   ├── common/               # frame-sequence animation player
-│   │   ├── constants/            # app / env / game constants
+│   │   ├── constants/            # app / game constants
 │   │   ├── extensions/           # date helpers
 │   │   ├── routes/               # GetX route table
 │   │   ├── services/             # audio, haptics, Hive, Firebase auth

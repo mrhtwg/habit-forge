@@ -48,10 +48,11 @@ class FirebaseSession {
     NetworkRegistry.register(NetworkFirebaseImpl());
     await NetworkRegistry.ins.init();
     final result = await NetworkRegistry.ins.login(provider);
-    // Premium is verified against the account we just signed in with
-    // (data-ledger-plan.md §3.3). No-op unless the build uses `entitlement=server`.
-    if (Get.isRegistered<EntitlementService>()) {
-      await EntitlementService.to.start();
+    // Premium is verified against the account we just signed in with.
+    if (result.isSuccess) {
+      if (Get.isRegistered<EntitlementService>()) {
+        await EntitlementService.to.start();
+      }
     }
     return result;
   }

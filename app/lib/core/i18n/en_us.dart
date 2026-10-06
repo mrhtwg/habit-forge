@@ -2,6 +2,7 @@ import 'lan_key.dart';
 
 /// English (US) copy — keyed by LanKey.
 const Map<LanKey, String> enUS = {
+  LanKey.actionFailed: 'Could not finish this action. Please try again.',
   LanKey.done: 'Done',
   LanKey.skip: 'Skip',
   LanKey.postpone: 'Postpone',
@@ -102,6 +103,15 @@ const Map<LanKey, String> enUS = {
   LanKey.badHabitBadge: 'BAD HABIT',
   LanKey.slipCost: 'Cost per slip',
   LanKey.slipLogged: 'Slip logged: -@hp HP',
+  LanKey.guestModeNote: 'As a guest your progress stays on this device. Bind an account to sync it.',
+  LanKey.bindAccountBanner: 'Bind an account so a new phone does not lose your progress',
+  LanKey.bindNow: 'Bind',
+  LanKey.cloudSaveChoiceTitle: 'This account already has a cloud save',
+  LanKey.cloudSaveChoiceBody: 'This device has progress too. Choose what to keep:',
+  LanKey.useCloudSave: 'Use the cloud save (replaces this device)',
+  LanKey.mergeLocalIntoCloud: 'Merge this device into the account',
+  LanKey.mergeDone: 'Local progress merged into your account',
+  LanKey.mergeFailed: 'Merge failed',
   LanKey.reward: 'Reward',
   LanKey.dueDateAndPriority: 'Due Date & Priority',
   LanKey.pickDate: 'Pick date',
@@ -207,6 +217,14 @@ const Map<LanKey, String> enUS = {
   LanKey.guest: 'Guest',
   LanKey.signOut: 'Sign Out',
   LanKey.signOutConfirm: 'Are you sure you want to sign out?',
+  LanKey.deleteAccount: 'Delete Account',
+  LanKey.deleteAccountWarning:
+      'This permanently deletes your hero, quests, achievements, cloud save, and Premium entitlement. Google Play subscriptions are not canceled automatically; cancel them in Google Play first. This cannot be undone.',
+  LanKey.deleteAccountFinalTitle: 'Delete account permanently?',
+  LanKey.deleteAccountFinalWarning:
+      'You will be asked to verify your Google account. After deletion, this adventure cannot be restored.',
+  LanKey.accountDeleted: 'Your account and data were deleted',
+  LanKey.accountDeleteFailed: 'Could not delete account',
   LanKey.preferences: 'Preferences',
   LanKey.sound: 'Sound',
   LanKey.haptic: 'Haptic',
@@ -267,6 +285,14 @@ const Map<LanKey, String> enUS = {
   LanKey.restoreDone: 'Purchases restored',
   LanKey.purchaseUnavailable: 'Purchase unavailable. Try again later.',
   LanKey.purchaseSuccess: 'Welcome to Premium!',
+  LanKey.purchaseVerifying: 'Purchase received. Verifying with Google Play…',
+  LanKey.purchasePending: 'Payment is pending. Premium unlocks after Google Play confirms it.',
+  LanKey.purchaseSignInRequired: 'Sign in before purchasing so Premium can be restored on your devices.',
+  LanKey.restoreRequested: 'Checking your Google Play purchases…',
+  LanKey.lifetimeRequiresCancel:
+      'Cancel your current subscription in Google Play before buying Lifetime to avoid double billing.',
+  LanKey.billingDisclosure:
+      'Monthly and yearly plans renew automatically unless canceled in Google Play. Lifetime is a one-time purchase. Google Play shows the final local price before payment.',
   LanKey.habitLimitReached: 'Free plan allows @n habits. Upgrade for unlimited.',
   LanKey.premiumRequired: 'Premium required',
   LanKey.premiumClassLocked: 'Upgrade to unlock this class',

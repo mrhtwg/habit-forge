@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:habit_forge_app/core/constants/app_constants.dart';
 import 'package:habit_forge_app/core/extensions/task_extensions.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
+import 'package:habit_forge_app/core/i18n/app_locale.dart';
 import 'package:habit_forge_app/core/network/hive/game_constants.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
@@ -48,15 +49,15 @@ class _DatePickerSheet extends StatefulWidget {
 }
 
 class _DatePickerSheetState extends State<_DatePickerSheet> {
-  static final _weekdayLabels = [
-    LanKey.mon.tr,
-    LanKey.tue.tr,
-    LanKey.wed.tr,
-    LanKey.thu.tr,
-    LanKey.fri.tr,
-    LanKey.sat.tr,
-    LanKey.sun.tr,
-  ];
+  List<String> get _weekdayLabels => [
+        LanKey.mon.tr,
+        LanKey.tue.tr,
+        LanKey.wed.tr,
+        LanKey.thu.tr,
+        LanKey.fri.tr,
+        LanKey.sat.tr,
+        LanKey.sun.tr,
+      ];
 
   late final DateTime _today;
   late final DateTime _maxDate;
@@ -242,15 +243,15 @@ class _DatePickerSheetState extends State<_DatePickerSheet> {
 }
 
 class _TaskFormSheetState extends State<TaskFormSheet> {
-  static final _weekdayLabels = [
-    LanKey.mon.tr,
-    LanKey.tue.tr,
-    LanKey.wed.tr,
-    LanKey.thu.tr,
-    LanKey.fri.tr,
-    LanKey.sat.tr,
-    LanKey.sun.tr,
-  ];
+  List<String> get _weekdayLabels => [
+        LanKey.mon.tr,
+        LanKey.tue.tr,
+        LanKey.wed.tr,
+        LanKey.thu.tr,
+        LanKey.fri.tr,
+        LanKey.sat.tr,
+        LanKey.sun.tr,
+      ];
   late TextEditingController _titleCtrl;
   late TextEditingController _descCtrl;
   TaskType _type = TaskType.TASK_TYPE_HABIT;
@@ -264,6 +265,7 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
 
   /// A "bad habit": recording a slip costs HP instead of granting rewards.
   bool _isNegative = false;
+  bool _saving = false;
 
   @override
   Widget build(BuildContext context) {
@@ -272,7 +274,7 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
     final isEdit = widget.task != null;
 
     return Padding(
-      padding: EdgeInsets.only(bottom: padding.top),
+      padding: EdgeInsets.only(bottom: padding.bottom),
       child: SingleChildScrollView(
         padding: EdgeInsets.all(20.w),
         child: Column(
@@ -391,54 +393,66 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
               child: PressableButton(
                 borderWidth: 2.5,
                 padding: EdgeInsets.symmetric(vertical: 15.h),
-                onTap: () {
-                  if (_titleCtrl.text.trim().isEmpty) {
-                    Toast.error(LanKey.titleRequired.tr);
-                    return;
-                  }
-                  // Daily tasks require at least one repeat day.
-                  if (_type == TaskType.TASK_TYPE_DAILY && _repeatDays.isEmpty) {
-                    Toast.warning(LanKey.selectAtLeastOneDay.tr);
-                    return;
-                  }
-                  // Todo tasks require a due date (0 means not set).
-                  if (_type == TaskType.TASK_TYPE_TODO && (_dueDate == null || _dueDate!.toInt() <= 0)) {
-                    Toast.warning(LanKey.dueDateRequired.tr);
-                    return;
-                  }
+                onTap: _saving
+                    ? null
+                    : () async {
+                        if (_saving) return;
+                        if (_titleCtrl.text.trim().isEmpty) {
+                          Toast.error(LanKey.titleRequired.tr);
+                          return;
+                        }
+                        // Daily tasks require at least one repeat day.
+                        if (_type == TaskType.TASK_TYPE_DAILY && _repeatDays.isEmpty) {
+                          Toast.warning(LanKey.selectAtLeastOneDay.tr);
+                          return;
+                        }
+                        // Todo tasks require a due date (0 means not set).
+                        if (_type == TaskType.TASK_TYPE_TODO && (_dueDate == null || _dueDate!.toInt() <= 0)) {
+                          Toast.warning(LanKey.dueDateRequired.tr);
+                          return;
+                        }
 
-                  // Only the caller-known fields travel to the storage layer;
-                  // ids, timestamps and rewards are owned by the implementation.
-                  final isBadHabit = _type == TaskType.TASK_TYPE_HABIT && _isNegative;
-                  final params = Task(
-                    title: _titleCtrl.text.trim(),
-                    description: _descCtrl.text.trim().isNotEmpty ? _descCtrl.text.trim() : null,
-                    type: _type,
-                    difficulty: _difficulty,
-                    tags: _tags,
-                    dueDate: _type == TaskType.TASK_TYPE_TODO ? _dueDate : null,
-                    repeatDays: _type == TaskType.TASK_TYPE_DAILY ? _repeatDays : [],
-                    priority: _type == TaskType.TASK_TYPE_TODO ? _priority : '',
-                    // The penalty is only ever *used* by dailies (a missed day) and
-                    // by negative habits (a logged slip): a plain habit is never
-                    // punished for a day it was not done.
-                    hpPenalty: _type == TaskType.TASK_TYPE_DAILY || isBadHabit ? _hpPenalty : 10,
-                    isNegative: isBadHabit,
-                  );
-                  if (isEdit) {
-                    ctrl.updateTask(widget.task!.id, params);
-                    Get.back();
-                  } else {
-                    ctrl.createTask(params).then((ok) {
-                      if (ok) Get.back();
-                    });
-                  }
-                },
+                        // Only the caller-known fields travel to the storage layer;
+                        // ids, timestamps and rewards are owned by the implementation.
+                        final isBadHabit = _type == TaskType.TASK_TYPE_HABIT && _isNegative;
+                        final params = Task(
+                          title: _titleCtrl.text.trim(),
+                          description: _descCtrl.text.trim().isNotEmpty ? _descCtrl.text.trim() : null,
+                          type: _type,
+                          difficulty: _difficulty,
+                          tags: _tags,
+                          dueDate: _type == TaskType.TASK_TYPE_TODO ? _dueDate : null,
+                          repeatDays: _type == TaskType.TASK_TYPE_DAILY ? _repeatDays : [],
+                          priority: _type == TaskType.TASK_TYPE_TODO ? _priority : '',
+                          // The penalty is only ever *used* by dailies (a missed day) and
+                          // by negative habits (a logged slip): a plain habit is never
+                          // punished for a day it was not done.
+                          hpPenalty: _type == TaskType.TASK_TYPE_DAILY || isBadHabit ? _hpPenalty : 10,
+                          isNegative: isBadHabit,
+                        );
+                        final sheetRoute = ModalRoute.of(context);
+                        setState(() => _saving = true);
+                        try {
+                          final saved =
+                              isEdit ? await ctrl.updateTask(widget.task!.id, params) : await ctrl.createTask(params);
+                          if (saved && mounted && sheetRoute?.isCurrent == true) Navigator.of(context).pop();
+                        } catch (_) {
+                          Toast.error(LanKey.actionFailed.tr);
+                        } finally {
+                          if (mounted) setState(() => _saving = false);
+                        }
+                      },
                 child: Center(
-                  child: Text(
-                    isEdit ? LanKey.saveChanges.tr : LanKey.createQuest.tr,
-                    style: textStyleBold(fontSize: 16.sp, color: Colors.white),
-                  ),
+                  child: _saving
+                      ? SizedBox(
+                          width: 20.w,
+                          height: 20.w,
+                          child: const CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                        )
+                      : Text(
+                          isEdit ? LanKey.saveChanges.tr : LanKey.createQuest.tr,
+                          style: textStyleBold(fontSize: 16.sp, color: Colors.white),
+                        ),
                 ),
               ),
             ),
@@ -774,7 +788,8 @@ class _TaskFormSheetState extends State<TaskFormSheet> {
                     SizedBox(width: 8.w),
                     Text(
                       _dueDate != null
-                          ? DateFormat('MMM d, yyyy').format((DateTime.fromMillisecondsSinceEpoch(_dueDate!.toInt())))
+                          ? DateFormat.yMMMd(AppLocale.languageCode())
+                              .format(DateTime.fromMillisecondsSinceEpoch(_dueDate!.toInt()))
                           : LanKey.pickDate.tr,
                       style: textStyleRegular(
                         fontSize: 12.sp,

@@ -21,6 +21,11 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Global purchase-token ownership is written by Admin SDK only. No client
+    // may read or write another account's claim.
+    match /purchaseClaims/{claimId} {
+      allow read, write: if false;
+    }
 
     function isOwner(uid) {
       return request.auth != null && request.auth.uid == uid;
@@ -54,7 +59,8 @@ service cloud.firestore {
         && d.eventId == eventId
         && d.type in [
           'opening_balance', 'task_completed', 'habit_slipped', 'daily_penalty',
-          'revive', 'purchase', 'stat_allocated', 'achievement_unlocked'
+          'revive', 'purchase', 'stat_allocated', 'achievement_unlocked',
+          'account_merged'
         ]
         && d.at is int && d.at > 0
         && d.localDate is string && d.localDate.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
@@ -65,10 +71,11 @@ service cloud.firestore {
         && deltasWithinCaps(d);
     }
 
-    // opening_balance snapshots whatever a long-lived save already holds, so it
-    // is exempt from the per-event caps and gets its own, far larger bound.
+    // opening_balance snapshots whatever a long-lived save already holds, and a
+    // merge can import a whole device's history at once, so both are exempt from
+    // the per-event caps and get their own, far larger bound instead.
     function deltasWithinCaps(d) {
-      return d.type == 'opening_balance'
+      return (d.type == 'opening_balance' || d.type == 'account_merged')
         ? within(d.exp, 10000000) && within(d.gold, 10000000) && within(d.gems, 10000000) && within(d.hp, 10000000)
         : within(d.exp, 1000) && within(d.gold, 2000) && within(d.gems, 500) && within(d.hp, 500);
     }

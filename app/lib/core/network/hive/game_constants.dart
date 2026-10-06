@@ -80,6 +80,38 @@ class GameConstants {
     return 100 + (level - 1) * 50 + pow(level - 1, 2).toInt() * 10;
   }
 
+  /// Lifetime EXP represented by [level] plus the progress inside it — the
+  /// inverse of [progressForLifetimeExp].
+  ///
+  /// Needed wherever two saves' progress has to be added before it can be turned
+  /// back into a single level (the account merge, `ProgressMergeService`).
+  static int lifetimeExpOf(int level, int currentExp) {
+    var total = 0;
+    for (var i = 1; i < level && i <= maxLevel; i++) {
+      total += expForLevel(i);
+    }
+    return total + (currentExp < 0 ? 0 : currentExp);
+  }
+
+  /// Level and in-level EXP after earning [lifetimeExp] in total.
+  ///
+  /// This is the level-up rule of `GameLogic.gainExp` expressed once: EXP is
+  /// consumed per level, the remainder carries over, and at [maxLevel] the bar
+  /// clamps to one level (overflow is discarded). `GameLogic` and the ledger
+  /// reconciliation both go through here, so the curve cannot drift between the
+  /// game and its books.
+  static ({int level, int inLevelExp, bool capped}) progressForLifetimeExp(int lifetimeExp) {
+    var level = 1;
+    var remaining = lifetimeExp < 0 ? 0 : lifetimeExp;
+    while (level < maxLevel && remaining >= expForLevel(level)) {
+      remaining -= expForLevel(level);
+      level++;
+    }
+    final capped = level >= maxLevel;
+    final inLevel = capped && remaining > expForLevel(level) ? expForLevel(level) : remaining;
+    return (level: level, inLevelExp: inLevel, capped: capped);
+  }
+
   static int expProgress(int currentExp, int level) {
     final needed = expForLevel(level);
     return (currentExp * 100 / needed).round();

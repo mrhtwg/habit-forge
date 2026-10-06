@@ -144,6 +144,24 @@
       },
       "rulesVersion": "2026.09",
       "schemaVersion": 1
+    },
+    {
+      "eventId": "merge_fixture-device_1790670600000",
+      "type": "account_merged",
+      "at": 1790670600000,
+      "localDate": "2026-09-29",
+      "exp": 120,
+      "gold": 250,
+      "gems": 5,
+      "hp": 0,
+      "taskId": "",
+      "itemId": "",
+      "refs": {
+        "source": "device",
+        "device": "fixture-device"
+      },
+      "rulesVersion": "2026.09",
+      "schemaVersion": 1
     }
   ]
 }

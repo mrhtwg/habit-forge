@@ -33,6 +33,14 @@ enum LedgerEventType {
   /// to anyone auditing the books.
   habitSlipped('habit_slipped'),
 
+  /// A device (guest) save was merged into this account (`ProgressMergeService`).
+  ///
+  /// One row carrying the deltas that were actually applied, so the books stay
+  /// additive even though the merged progress came from a save with its own
+  /// history. Deltas are always against what this device already contributed, so
+  /// re-merging the same device adds nothing.
+  accountMerged('account_merged'),
+
   /// Missed dailies were settled: −HP.
   dailyPenalty('daily_penalty'),
 
@@ -223,6 +231,9 @@ class LedgerEvent {
     }
     if (type == LedgerEventType.taskCompleted && taskId.isEmpty) return 'task_completed needs a taskId';
     if (type == LedgerEventType.habitSlipped && taskId.isEmpty) return 'habit_slipped needs a taskId';
+    if (type == LedgerEventType.accountMerged) {
+      return _withinOpeningBalance() ?? null;
+    }
     if (type == LedgerEventType.purchase && itemId.isEmpty) return 'purchase needs an itemId';
     if (isOpeningBalance) {
       return _withinOpeningBalance() ?? null;
@@ -278,6 +289,12 @@ class LedgerEvent {
   static String statAllocatedId(String uid, int pointsBefore, String stat) => 'stat_${uid}_${pointsBefore}_$stat';
 
   static String achievementId(String achievementId) => 'achv_$achievementId';
+
+  /// One merge row per device per applied delta set: re-running a merge that
+  /// changed nothing produces no row at all, and a later merge that moved a
+  /// number again gets a fresh id (so the books never lose the second
+  /// adjustment). Two devices therefore never collide.
+  static String accountMergedId(String deviceId, int at) => 'merge_${deviceId}_$at';
 
   static String openingBalanceId(int ledgerStartedAt) => 'opening_balance_$ledgerStartedAt';
 

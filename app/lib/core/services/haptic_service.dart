@@ -5,7 +5,14 @@ import 'package:habit_forge_app/core/common/utils/sp_utils.dart';
 
 class HapticService extends GetxService {
   static HapticService get to => Get.find();
-  bool _enabled = true;
+  final _enabledState = true.obs;
+  bool get _enabled => _enabledState.value;
+
+  @override
+  void onInit() {
+    super.onInit();
+    _enabledState.value = SpUtils.ins.getBool(SpKeys.hapticEnabled) ?? true;
+  }
 
   void error() {
     if (_enabled) {
@@ -27,7 +34,7 @@ class HapticService extends GetxService {
   }
 
   void setEnabled(bool v) {
-    _enabled = v;
+    _enabledState.value = v;
     SpUtils.ins.putBool(SpKeys.hapticEnabled, v);
   }
 

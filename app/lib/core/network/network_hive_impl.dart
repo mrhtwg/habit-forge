@@ -1,5 +1,5 @@
 import 'package:fixnum/fixnum.dart';
-import 'package:grpc/grpc.dart';
+import 'package:habit_forge_app/core/network/api_status_code.dart';
 import 'package:habit_forge_app/core/network/api_response.dart';
 import 'package:habit_forge_app/core/network/hive/character_box.dart';
 import 'package:habit_forge_app/core/network/hive/game_logic.dart';
@@ -101,8 +101,7 @@ class NetworkHiveImpl implements NetworkInterface {
     // Leveling (see GameLogic.gainExp): EXP lives inside the current level
     // (0..expForLevel(level)); crossing the threshold spends it and levels up
     // with the remainder carrying over. maxExp mirrors the next level's need.
-    final newCharacter =
-        isSlip ? GameLogic.applySlip(character, task) : GameLogic.gainExp(character, _gainExp).$1;
+    final newCharacter = isSlip ? GameLogic.applySlip(character, task) : GameLogic.gainExp(character, _gainExp).$1;
     CharacterBox.ins.updateCharacter(newCharacter);
 
     // Mark the task complete (streak / completedAt) and persist.
@@ -209,7 +208,7 @@ class NetworkHiveImpl implements NetworkInterface {
     await UserBox.ins.init();
     await ShopBox.ins.init();
 
-    // Hive mode: settle overdue-task HP penalties at startup (once per day).
+    // Local guest storage: settle overdue-task HP penalties at startup (once per day).
     final penalty = TaskBox.ins.collectOverduePenalty();
     if (penalty > 0) {
       final character = CharacterBox.ins.getCharacter();

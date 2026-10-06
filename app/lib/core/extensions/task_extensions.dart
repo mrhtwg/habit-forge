@@ -1,4 +1,5 @@
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
+import 'package:habit_forge_app/core/network/hive/game_logic.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';
 
 extension TaskDifficultyX on TaskDifficulty {
@@ -33,14 +34,6 @@ extension TaskTypeX on TaskType {
 
 extension TaskX on Task {
   bool get isDueToday {
-    if (type == TaskType.TASK_TYPE_DAILY) {
-      final today = DateTime.now().weekday - 1;
-      return repeatDays.contains(today);
-    }
-    if (type == TaskType.TASK_TYPE_TODO) {
-      final now = DateTime.now();
-      return DateTime.fromMillisecondsSinceEpoch(dueDate.toInt()).isBefore(now.add(const Duration(days: 1)));
-    }
-    return type == TaskType.TASK_TYPE_HABIT;
+    return GameLogic.isDueOn(this, DateTime.now());
   }
 }

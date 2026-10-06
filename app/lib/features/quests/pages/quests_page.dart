@@ -211,6 +211,7 @@ class QuestsPage extends GetView<QuestsController> {
         itemBuilder: (context, i) {
           final task = tasks[i];
           return TaskTicket(
+            key: ValueKey(task.id),
             task: task,
             onComplete: () => controller.toggleComplete(task),
             onSkip: () => controller.toggleSkip(task),
@@ -285,6 +286,15 @@ class QuestsPage extends GetView<QuestsController> {
             Text(task.title, style: textStyleBold(fontSize: 18.sp)),
             SizedBox(height: 16.h),
             _menuItem(
+              icon: Icons.edit_rounded,
+              color: AppColors.primary,
+              label: LanKey.editQuest.tr,
+              onTap: () {
+                Get.back();
+                TaskFormSheet.show(context, task: task);
+              },
+            ),
+            _menuItem(
               icon: Icons.skip_next_rounded,
               color: AppColors.warning,
               label: LanKey.skip.tr,
@@ -308,7 +318,7 @@ class QuestsPage extends GetView<QuestsController> {
               label: LanKey.delete.tr,
               onTap: () {
                 Get.back();
-                controller.deleteTask(task.id);
+                _confirmDelete(context, task);
               },
             ),
           ],

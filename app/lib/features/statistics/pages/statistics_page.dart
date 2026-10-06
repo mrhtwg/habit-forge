@@ -5,7 +5,6 @@ import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/network/hive/game_constants.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
 import 'package:habit_forge_app/core/services/subscription_service.dart';
-import 'package:habit_forge_app/core/services/subscription_tier.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
@@ -47,7 +46,7 @@ class StatisticsPage extends GetView<StatisticsController> {
   Widget _buildStatsPage(TimePeriod period) {
     return Obx(() {
       // Observe entitlement so unlocking Premium refreshes locked tabs.
-      final premium = SubscriptionService.to.tier.value != SubscriptionTier.free;
+      final premium = SubscriptionService.to.canUseAdvancedStats;
       if (period != TimePeriod.week && !premium) {
         return _buildPremiumLock();
       }
@@ -118,7 +117,15 @@ class StatisticsPage extends GetView<StatisticsController> {
       final rateChange =
           prevCompleted.length > 0 ? ((totalCompleted - prevCompleted.length) / prevCompleted.length * 100).round() : 0;
 
-      const weekdayLabels = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+      final weekdayLabels = [
+        LanKey.mon.tr,
+        LanKey.tue.tr,
+        LanKey.wed.tr,
+        LanKey.thu.tr,
+        LanKey.fri.tr,
+        LanKey.sat.tr,
+        LanKey.sun.tr,
+      ];
       final weekdayCounts = List.filled(7, 0);
       for (final t in currentCompleted) {
         weekdayCounts[(DateTime.fromMillisecondsSinceEpoch(t.completedAt.toInt()).weekday - 1) % 7]++;
@@ -200,7 +207,11 @@ class StatisticsPage extends GetView<StatisticsController> {
                     Text(LanKey.questsCompleted.tr, style: textStyleBold(fontSize: 15.sp)),
                     const Spacer(),
                     Text(
-                      LanKey.last7Days.tr,
+                      switch (period) {
+                        TimePeriod.week => LanKey.last7Days.tr,
+                        TimePeriod.month => LanKey.month.tr,
+                        TimePeriod.all => LanKey.all.tr,
+                      },
                       style: textStyleBold(fontSize: 11.sp, color: AppColors.textMuted),
                     ),
                   ],

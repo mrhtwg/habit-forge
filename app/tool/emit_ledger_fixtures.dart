@@ -100,6 +100,7 @@ List<Map<String, Object?>> buildLedgerFixtures() {
     ),
     GameLedger.statAllocated(uid: uid, stat: StatType.STAT_TYPE_STRENGTH, pointsBefore: 3, now: now),
     GameLedger.achievementUnlocked(achievement: achievement, now: now),
+    GameLedger.accountMerged(goldDelta: 250, gemsDelta: 5, expDelta: 120, deviceId: 'fixture-device', now: now),
   ];
 
   for (final row in rows) {

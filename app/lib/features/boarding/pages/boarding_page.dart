@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/common/animation/frame_sequence_player.dart';
-import 'package:habit_forge_app/core/constants/env_constants.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/network/hive/class_profiles.dart';
 import 'package:habit_forge_app/core/network/hive/game_constants.dart';
-import 'package:habit_forge_app/core/routes/app_routes.dart';
 import 'package:habit_forge_app/core/services/subscription_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
@@ -145,23 +143,7 @@ class BoardingPage extends GetView<BoardingController> {
                 ),
                 child: const Icon(Icons.arrow_back_rounded, size: 18, color: AppColors.textPrimary),
               ),
-            )
-          else if (!EnvConstants.isHive() && !EnvConstants.isFirebase() && !EnvConstants.isServer()) ...[
-            // Legacy only — cloud modes sign in from Settings, not AuthPage.
-            GestureDetector(
-              onTap: () => Get.offAllNamed(Routers.login),
-              child: Container(
-                width: 34.w,
-                height: 34.w,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white,
-                  border: Border.all(color: AppColors.border, width: 2),
-                ),
-                child: const Icon(Icons.arrow_back_rounded, size: 18, color: AppColors.textPrimary),
-              ),
             ),
-          ],
           if (step > 0) SizedBox(width: 10.w),
           Text(
             LanKey.stepOf.trParams({'n': '${step + 1}', 'total': controller.totalStepsCount.toString()}),

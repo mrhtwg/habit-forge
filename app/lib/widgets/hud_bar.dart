@@ -32,9 +32,15 @@ class HudBar extends StatelessWidget {
               border: Border.all(color: AppColors.border, width: 2),
               borderRadius: BorderRadius.circular(999),
             ),
-            child: FractionallySizedBox(
-              alignment: Alignment.centerLeft,
-              widthFactor: ratio,
+            child: TweenAnimationBuilder<double>(
+              tween: Tween<double>(begin: ratio, end: ratio),
+              duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : const Duration(milliseconds: 450),
+              curve: Curves.easeOutCubic,
+              builder: (context, value, child) => FractionallySizedBox(
+                alignment: Alignment.centerLeft,
+                widthFactor: value,
+                child: child,
+              ),
               child: Container(
                 decoration: BoxDecoration(
                   color: color,

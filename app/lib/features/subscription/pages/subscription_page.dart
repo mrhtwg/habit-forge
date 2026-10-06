@@ -1,8 +1,8 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
+import 'package:habit_forge_app/features/auth/controllers/auth_controller.dart';
 import 'package:habit_forge_app/core/services/subscription_service.dart';
 import 'package:habit_forge_app/core/services/subscription_tier.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
@@ -44,61 +44,61 @@ class SubscriptionPage extends StatelessWidget {
                     _perk(LanKey.premiumPerkStats.tr),
                     _perk(LanKey.premiumPerkGear.tr),
                     _perk(LanKey.premiumPerkAds.tr),
+                    if (sub.purchaseState.value != PurchaseFlowState.idle) ...[
+                      SizedBox(height: 12.h),
+                      _purchaseStatus(sub.purchaseState.value),
+                    ],
                     SizedBox(height: 20.h),
                     _planCard(
                       title: LanKey.planMonthly.tr,
-                      price: _priceOf(sub, SubscriptionTier.monthly, '\$4.99'),
+                      price: _priceOf(sub, SubscriptionTier.monthly),
                       badge: null,
                       active: tier == SubscriptionTier.monthly,
-                      onTap: () => _buy(sub, SubscriptionTier.monthly),
+                      enabled: !sub.isProcessing,
+                      onTap: () => _buy(context, sub, SubscriptionTier.monthly),
                     ),
                     SizedBox(height: 10.h),
                     _planCard(
                       title: LanKey.planYearly.tr,
-                      price: _priceOf(sub, SubscriptionTier.yearly, '\$29.99'),
+                      price: _priceOf(sub, SubscriptionTier.yearly),
                       badge: LanKey.bestValue.tr,
                       active: tier == SubscriptionTier.yearly,
-                      onTap: () => _buy(sub, SubscriptionTier.yearly),
+                      enabled: !sub.isProcessing,
+                      onTap: () => _buy(context, sub, SubscriptionTier.yearly),
                     ),
                     SizedBox(height: 10.h),
                     _planCard(
                       title: LanKey.planLifetime.tr,
-                      price: _priceOf(sub, SubscriptionTier.lifetime, '\$49.99'),
+                      price: _priceOf(sub, SubscriptionTier.lifetime),
                       badge: null,
                       active: tier == SubscriptionTier.lifetime,
-                      onTap: () => _buy(sub, SubscriptionTier.lifetime),
+                      enabled: !sub.isProcessing,
+                      onTap: () => _buy(context, sub, SubscriptionTier.lifetime),
+                    ),
+                    SizedBox(height: 12.h),
+                    Text(
+                      LanKey.billingDisclosure.tr,
+                      textAlign: TextAlign.center,
+                      style: textStyleMedium(fontSize: 11.sp, color: AppColors.textMuted),
                     ),
                     SizedBox(height: 16.h),
                     TextButton(
-                      onPressed: sub.isBusy.value
+                      onPressed: sub.isProcessing
                           ? null
                           : () async {
-                              await sub.restorePurchases();
-                              Toast.success(LanKey.restoreDone.tr);
+                              if (!await _ensureSignedIn(context)) return;
+                              final requested = await sub.restorePurchases();
+                              if (requested) {
+                                Toast.show(LanKey.restoreRequested.tr);
+                              } else {
+                                Toast.warning(LanKey.purchaseUnavailable.tr);
+                              }
                             },
                       child: Text(
                         LanKey.restorePurchases.tr,
                         style: textStyleBold(fontSize: 14.sp, color: AppColors.primaryDark),
                       ),
                     ),
-                    if (kDebugMode) ...[
-                      SizedBox(height: 8.h),
-                      Text(
-                        'Debug unlock',
-                        style: textStyleBold(fontSize: 12.sp, color: AppColors.textMuted),
-                      ),
-                      SizedBox(height: 6.h),
-                      Wrap(
-                        spacing: 8.w,
-                        children: [
-                          for (final t in SubscriptionTier.values)
-                            ActionChip(
-                              label: Text(t.name),
-                              onPressed: () => sub.unlockDebug(t),
-                            ),
-                        ],
-                      ),
-                    ],
                   ],
                 );
               }),
@@ -109,16 +109,33 @@ class SubscriptionPage extends StatelessWidget {
     );
   }
 
-  Future<void> _buy(SubscriptionService sub, SubscriptionTier tier) async {
-    final ok = await sub.buy(tier);
-    if (!ok) {
-      Toast.warning(LanKey.purchaseUnavailable.tr);
-    } else if (sub.isPremium) {
-      Toast.success(LanKey.purchaseSuccess.tr);
+  Future<void> _buy(BuildContext context, SubscriptionService sub, SubscriptionTier tier) async {
+    if (!await _ensureSignedIn(context)) return;
+    final result = await sub.buy(tier);
+    switch (result) {
+      case PurchaseFlowResult.started:
+        return;
+      case PurchaseFlowResult.signInRequired:
+        Toast.warning(LanKey.purchaseSignInRequired.tr);
+        return;
+      case PurchaseFlowResult.cancelSubscriptionFirst:
+        Toast.warning(LanKey.lifetimeRequiresCancel.tr);
+        return;
+      case PurchaseFlowResult.unavailable || PurchaseFlowResult.failed:
+        Toast.warning(LanKey.purchaseUnavailable.tr);
+        return;
+      case PurchaseFlowResult.canceled:
+        return;
     }
   }
 
-  String _priceOf(SubscriptionService sub, SubscriptionTier tier, String fallback) {
+  Future<bool> _ensureSignedIn(BuildContext context) async {
+    if (AuthController.to.hasCloudIdentity) return true;
+    Toast.show(LanKey.purchaseSignInRequired.tr);
+    return AuthController.to.signInWithGoogleFromSettings(context);
+  }
+
+  String _priceOf(SubscriptionService sub, SubscriptionTier tier) {
     final id = switch (tier) {
       SubscriptionTier.monthly => SubscriptionProducts.monthly,
       SubscriptionTier.yearly => SubscriptionProducts.yearly,
@@ -128,7 +145,31 @@ class SubscriptionPage extends StatelessWidget {
     for (final ProductDetails p in sub.products) {
       if (p.id == id) return p.price;
     }
-    return fallback;
+    return '—';
+  }
+
+  Widget _purchaseStatus(PurchaseFlowState state) {
+    final (text, color, icon) = switch (state) {
+      PurchaseFlowState.verified => (LanKey.purchaseSuccess.tr, AppColors.greenDark, Icons.verified_rounded),
+      PurchaseFlowState.pending => (LanKey.purchasePending.tr, AppColors.warning, Icons.schedule_rounded),
+      PurchaseFlowState.failed => (LanKey.purchaseUnavailable.tr, AppColors.error, Icons.error_outline_rounded),
+      _ => (LanKey.purchaseVerifying.tr, AppColors.primaryDark, Icons.sync_rounded),
+    };
+    return Container(
+      padding: EdgeInsets.all(12.w),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(14.r),
+        border: Border.all(color: color.withValues(alpha: 0.35)),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: color, size: 20.w),
+          SizedBox(width: 8.w),
+          Expanded(child: Text(text, style: textStyleMedium(fontSize: 12.sp, color: color))),
+        ],
+      ),
+    );
   }
 
   Widget _header() {
@@ -187,10 +228,11 @@ class SubscriptionPage extends StatelessWidget {
     required String price,
     required String? badge,
     required bool active,
+    required bool enabled,
     required VoidCallback onTap,
   }) {
     return GestureDetector(
-      onTap: active ? null : onTap,
+      onTap: active || !enabled ? null : onTap,
       child: Container(
         padding: EdgeInsets.all(14.w),
         decoration: BoxDecoration(

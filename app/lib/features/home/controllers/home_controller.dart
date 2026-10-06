@@ -15,7 +15,7 @@ class HomeController extends GetxController {
   final todayTasks = <Task>[].obs;
 
   void loadTodayTasks() async {
-    final result = await NetworkRegistry.ins.listTasks();
+    final result = await NetworkRegistry.ins.listTasks(onlyDueToday: true);
     result.when(onSuccess: (reply) => todayTasks.value = reply.tasks, onFailure: (code, msg) => Toast.error(msg));
   }
 
@@ -30,6 +30,7 @@ class HomeController extends GetxController {
   }
 
   Future<void> onTaskComplete(Task task) async {
+    if (task.isCompleted) return;
     if (UserService.to.character.value?.isDead ?? false) {
       Toast.warning(LanKey.deathBlocked.tr);
       return;
@@ -59,6 +60,13 @@ class HomeController extends GetxController {
       return;
     }
 
+    if (reply.character.level > levelBefore) {
+      Get.find<AudioService>().playLevelUp();
+      Get.find<HapticService>().heavy();
+    } else {
+      Get.find<AudioService>().playComplete();
+      Get.find<HapticService>().success();
+    }
     await RewardPopup.showTaskReward(reply, levelBefore);
 
     final unlocked = await AchievementUnlockService.newlyUnlockedSince(unlockedBefore);
@@ -67,18 +75,27 @@ class HomeController extends GetxController {
   }
 
   Future<void> onTaskDelete(String id) async {
-    await NetworkRegistry.ins.deleteTask(id);
+    final result = await NetworkRegistry.ins.deleteTask(id);
+    if (result.isFailure) {
+      Toast.error(result.message);
+      return;
+    }
     loadTodayTasks();
   }
 
   /// Skips the task (marked skipped; todos get due date pushed to tomorrow).
   Future<void> onTaskPostpone(Task task) async {
-    await NetworkRegistry.ins.skipTask(task.id);
-    loadTodayTasks();
+    await onTaskSkip(task);
   }
 
   Future<void> onTaskSkip(Task task) async {
-    await NetworkRegistry.ins.skipTask(task.id);
+    final result = await NetworkRegistry.ins.skipTask(task.id);
+    if (result.isFailure) {
+      Toast.error(result.message);
+      return;
+    }
+    await UserService.to.loadCharacter();
+    await UserService.to.loadUserPrefs();
     loadTodayTasks();
   }
 }

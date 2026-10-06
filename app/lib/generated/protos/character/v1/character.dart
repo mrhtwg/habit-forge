@@ -3,4 +3,3 @@
 
 export 'character_error.pb.dart';
 export 'character.pb.dart';
-export 'character.pbgrpc.dart';

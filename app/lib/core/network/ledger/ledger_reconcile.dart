@@ -190,17 +190,12 @@ LedgerAudit auditLedger({
 
 /// Level and in-level progress for [lifetimeExp], mirroring
 /// `GameLogic.gainExp` exactly (including the max-level clamp).
-({int level, int inLevelExp, bool capped}) deriveProgress(int lifetimeExp) {
-  var level = 1;
-  var remaining = lifetimeExp < 0 ? 0 : lifetimeExp;
-  while (level < GameConstants.maxLevel && remaining >= GameConstants.expForLevel(level)) {
-    remaining -= GameConstants.expForLevel(level);
-    level++;
-  }
-  final capped = level >= GameConstants.maxLevel;
-  final inLevel = capped && remaining > GameConstants.expForLevel(level) ? GameConstants.expForLevel(level) : remaining;
-  return (level: level, inLevelExp: inLevel, capped: capped);
-}
+///
+/// Thin alias of [GameConstants.progressForLifetimeExp] so the game, the account
+/// merge and this audit all read the same curve — kept under this name because it
+/// reads better at the call sites below.
+({int level, int inLevelExp, bool capped}) deriveProgress(int lifetimeExp) =>
+    GameConstants.progressForLifetimeExp(lifetimeExp);
 
 /// Coerces a JSON value to `int`. Firestore's own REST payload encodes integers
 /// as strings (`{"integerValue": "5"}`), and proto3 JSON encodes int64 the same

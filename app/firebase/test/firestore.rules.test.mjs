@@ -7,7 +7,8 @@
 //   2. ownership        — another user, or nobody, cannot touch your events;
 //   3. caps + shape      — a row the client would never write is denied;
 //   4. entitlement      — a client may read its purchases, never write them;
-//   5. fixtures          — every row shape GameLedger produces IS accepted.
+//   5. purchase claims   — token ownership is invisible and immutable to clients;
+//   6. fixtures          — every row shape GameLedger produces IS accepted.
 //
 // Deliberately dependency-free: it talks to the emulator's REST API and mints
 // unsigned JWTs, which the emulator accepts (it does not verify signatures, it
@@ -284,4 +285,19 @@ test('a client can ask for receipt verification but not publish the result', asy
     body: JSON.stringify({ fields: toFields({ ...request, purchaseToken: '' }) }),
   });
   assertDenied(emptyToken, 'request without a receipt');
+});
+
+test('global purchase-token claims are inaccessible to clients', async () => {
+  const path = `${BASE}/purchaseClaims/token-${RUN}`;
+  const read = await fetch(path, { headers: auth(OWNER) });
+  assertDenied(read, 'client reading purchase-token ownership');
+
+  const write = await fetch(path, {
+    method: 'PATCH',
+    headers: auth(OWNER),
+    body: JSON.stringify({
+      fields: toFields({ uid: OWNER, productId: 'habitforge_premium_lifetime' }),
+    }),
+  });
+  assertDenied(write, 'client claiming a purchase token');
 });

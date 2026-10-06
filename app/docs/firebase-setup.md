@@ -32,9 +32,6 @@ Flutter reads Firebase options from this file via `--dart-define-from-file` (not
 
 ```json
 {
-  "env": "firebase",
-  "network": "firebase",
-  "auth": "firebase",
   "apiKey": "YOUR_ANDROID_API_KEY",
   "appId": "YOUR_ANDROID_APP_ID",
   "messagingSenderId": "YOUR_PROJECT_NUMBER",
@@ -134,7 +131,7 @@ keytool -list -v -alias forge \
 
 Also ensure `env/firebase.json` `projectId` / `appId` / `apiKey` match the same project as `google-services.json`.
 
-### Step 6: Run the app in firebase mode
+### Step 6: Run the app
 
 ```bash
 cd app

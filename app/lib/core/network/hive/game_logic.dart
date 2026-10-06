@@ -133,6 +133,70 @@ class GameLogic {
   /// recovery window are handled by [takeDamage]).
   static Character applySlip(Character c, Task task) => takeDamage(c, slipDamage(task));
 
+  // ── Account merge (ProgressMergeService) ──
+
+  /// Lifetime EXP of [c]: everything spent on previous levels plus the progress
+  /// inside the current one. Two saves' EXP can only be added in this space.
+  static int lifetimeExpOf(Character c) => GameConstants.lifetimeExpOf(c.level, c.currentExp.toInt());
+
+  /// Merges a device (guest) hero into the account's hero — one-way, additive
+  /// where adding is meaningful, and never destructive. See
+  /// `docs/data-ledger-plan.md` §13.7 for the rules and the reasoning.
+  ///
+  ///  - the account keeps its **class, equipment, stats and HP**: those are
+  ///    identity, not progress, and re-deriving them from two saves would
+  ///    silently reroll a hero;
+  ///  - **EXP is summed** as lifetime EXP and the level is re-derived from the
+  ///    curve, so both saves keep what they earned; the levels that come out of
+  ///    it pay their stat points;
+  ///  - stat points already spent are never touched (only the new points are
+  ///    added), so a merge cannot refund or double-spend them;
+  ///  - the account is **never de-leveled** (see [withLifetimeExp]).
+  static Character mergeProgress(Character account, Character local) =>
+      withLifetimeExp(account, lifetimeExpOf(account) + lifetimeExpOf(local));
+
+  /// Sets the character's progress to [lifetimeExp].
+  ///
+  /// A lower total than the account already has is ignored — a device whose
+  /// contribution shrank (it spent currency locally) must not roll the player's
+  /// level back. Levels gained grant their stat points; none are ever removed.
+  static Character withLifetimeExp(Character account, int lifetimeExp) {
+    final a = account.deepCopy()..freeze();
+    final current = lifetimeExpOf(a);
+    final target = lifetimeExp < current ? current : lifetimeExp;
+    final merged = GameConstants.progressForLifetimeExp(target);
+    final gainedLevels = merged.level - a.level;
+    final points = a.availableStatPoints + (gainedLevels > 0 ? gainedLevels * GameConstants.statPointsPerLevel : 0);
+    return a.rebuild(
+      (c) => c
+        ..level = merged.level
+        ..currentExp = Int64(merged.inLevelExp)
+        ..maxExp = Int64(GameConstants.expForLevel(merged.level))
+        ..availableStatPoints = points < 0 ? 0 : points,
+    );
+  }
+
+  /// Merges wallet and lifetime counters.
+  ///
+  /// Gold and gems are **summed**: the two saves were played independently, so
+  /// they are two separate pots rather than two views of one. `todayTasksCompleted`
+  /// is a per-day figure and therefore takes the larger value instead of
+  /// doubling, and `firstTaskDate` keeps the earlier start.
+  static UserPrefs mergePrefs(UserPrefs account, UserPrefs local) {
+    final a = account.deepCopy()..freeze();
+    final dates = <int>[a.firstTaskDate.toInt(), local.firstTaskDate.toInt()].where((d) => d > 0).toList();
+    return a.rebuild(
+      (u) => u
+        ..currentGold = a.currentGold + local.currentGold
+        ..currentGems = a.currentGems + local.currentGems
+        ..totalTasksCompleted = a.totalTasksCompleted + local.totalTasksCompleted
+        ..todayTasksCompleted = Int64(
+          max(a.todayTasksCompleted.toInt(), local.todayTasksCompleted.toInt()),
+        )
+        ..firstTaskDate = Int64(dates.isEmpty ? 0 : dates.reduce(min)),
+    );
+  }
+
   /// Whether [task] is scheduled on [day] (calendar date, local).
   static bool isDueOn(Task task, DateTime day) {
     switch (task.type) {

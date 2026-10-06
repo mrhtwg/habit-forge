@@ -1,3 +1,7 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -167,6 +171,61 @@ class FirebaseAuthService extends GetxService {
     try {
       await _googleSignIn.signOut();
     } catch (_) {}
+  }
+
+  /// Reauthenticates with Google, asks the trusted Cloud Function to recursively
+  /// delete cloud data and Firebase Auth, then clears the local provider session.
+  Future<String?> deleteAccount() async {
+    if (!_available) return 'Firebase not configured';
+    final user = _auth.currentUser;
+    if (user == null || user.isAnonymous) return 'No linked account';
+    if (!user.providerData.any((provider) => provider.providerId == GoogleAuthProvider.PROVIDER_ID)) {
+      return 'This account must be deleted after signing in with Google.';
+    }
+
+    try {
+      final account = await _googleSignIn.authenticate();
+      final idToken = account.authentication.idToken;
+      if (idToken == null) return 'No ID token received from Google';
+
+      final credential = GoogleAuthProvider.credential(idToken: idToken);
+      await user.reauthenticateWithCredential(credential);
+      final freshToken = await user.getIdToken(true);
+      if (freshToken == null || freshToken.isEmpty) return 'Unable to verify your identity';
+
+      final projectId = Firebase.app().options.projectId;
+      final uri = Uri.parse('https://us-central1-$projectId.cloudfunctions.net/deleteAccount');
+      final client = HttpClient();
+      try {
+        final request = await client.postUrl(uri).timeout(const Duration(seconds: 15));
+        request.headers.contentType = ContentType.json;
+        request.headers.set(HttpHeaders.authorizationHeader, 'Bearer $freshToken');
+        request.write(jsonEncode({'data': <String, Object?>{}}));
+        final response = await request.close().timeout(const Duration(seconds: 120));
+        final body = await utf8.decoder.bind(response).join();
+        final payload = body.isEmpty ? const <String, dynamic>{} : jsonDecode(body) as Map<String, dynamic>;
+        if (response.statusCode != HttpStatus.ok || payload['error'] != null) {
+          final error = payload['error'];
+          final message = error is Map ? error['message']?.toString() : null;
+          return message ?? 'Account deletion failed';
+        }
+      } finally {
+        client.close(force: true);
+      }
+
+      await _auth.signOut();
+      try {
+        await _googleSignIn.signOut();
+      } catch (_) {}
+      return null;
+    } on GoogleSignInException catch (e) {
+      if (e.code == GoogleSignInExceptionCode.canceled) return 'Reauthentication canceled';
+      return 'Google sign-in failed: ${e.code.name}';
+    } on FirebaseAuthException catch (e) {
+      return _mapError(e);
+    } catch (e) {
+      return e.toString();
+    }
   }
 
   String _mapError(FirebaseAuthException e) {

@@ -310,6 +310,45 @@ void main() {
       );
       expect(row.validate(), contains('taskId'));
     });
+
+    test('a merge row carries the deltas applied for one device', () {
+      final row = GameLedger.accountMerged(
+        goldDelta: 250,
+        gemsDelta: 5,
+        expDelta: 120,
+        deviceId: 'dev1',
+        now: DateTime(2026, 9, 29),
+      );
+
+      expect(row.type, LedgerEventType.accountMerged);
+      expect(row.eventId, startsWith('merge_dev1_'));
+      expect(row.gold, 250);
+      expect(row.gems, 5);
+      expect(row.exp, 120);
+      expect(row.hp, 0, reason: 'HP is not merged');
+      expect(row.refs['device'], 'dev1');
+      expect(row.validate(), isNull);
+    });
+
+    test('a merge may import a whole save, so it uses the opening-balance caps', () {
+      final big = GameLedger.accountMerged(
+        goldDelta: 500000,
+        gemsDelta: 12000,
+        expDelta: 900000,
+        deviceId: 'dev1',
+        now: DateTime(2026, 9, 29),
+      );
+      expect(big.validate(), isNull, reason: 'a long local save must be importable');
+
+      final absurd = GameLedger.accountMerged(
+        goldDelta: LedgerLimits.openingBalance + 1,
+        gemsDelta: 0,
+        expDelta: 0,
+        deviceId: 'dev1',
+        now: DateTime(2026, 9, 29),
+      );
+      expect(absurd.validate(), contains('out of range'));
+    });
   });
 }
 

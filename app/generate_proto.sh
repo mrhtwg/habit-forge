@@ -10,8 +10,7 @@
 # Output:   lib/generated/protos/<service>/v1/*.dart
 #
 # Usage:
-#   ./generate_proto.sh              # generate all modules (messages only, REST mode)
-#   ./generate_proto.sh --grpc       # also generate the gRPC client (add the grpc dep)
+#   ./generate_proto.sh              # generate all message models
 #   ./generate_proto.sh --clean      # remove the generated directory
 #   ./generate_proto.sh --help       # show help
 #
@@ -39,13 +38,11 @@ Usage:
     ./generate_proto.sh [options]
 
 Options:
-    --grpc      also generate the gRPC client (.pbgrpc.dart); requires the grpc package
     --clean     remove the lib/generated/protos directory
     --help, -h  show this help
 
 Examples:
-    ./generate_proto.sh            # generate messages (REST/JSON mode, default)
-    ./generate_proto.sh --grpc     # generate messages + gRPC client
+    ./generate_proto.sh            # generate message models
 
 EOF
   exit 0
@@ -79,7 +76,7 @@ clean() {
   exit 0
 }
 
-# Generate barrel files (export all .pb.dart / .pbgrpc.dart in each module)
+# Generate barrel files (export all .pb.dart files in each module)
 generate_barrels() {
   local count=0
   for module_dir in "$DART_OUT_DIR"/*; do
@@ -94,7 +91,6 @@ generate_barrels() {
         base=$(basename "$f")
         case "$base" in
           *.pb.dart)    [ "${base##*.pb.}" != "json" ] && [ "${base##*.pb.}" != "enum" ] && pb_files+=("$base") ;;
-          *.pbgrpc.dart) pb_files+=("$base") ;;
         esac
       done < <(find "$version_dir" -maxdepth 1 -name "*.dart" -print0)
       if [ ${#pb_files[@]} -gt 0 ]; then
@@ -116,11 +112,9 @@ generate_barrels() {
 }
 
 # ── Argument parsing ──
-GRPC=0
 case "$1" in
   --help|-h) show_help ;;
   --clean)   clean ;;
-  --grpc)    GRPC=1 ;;
 esac
 
 check_tools
@@ -135,9 +129,6 @@ fi
 rm -rf "$DART_OUT_DIR"
 mkdir -p "$DART_OUT_DIR"
 
-DART_OPT="$DART_OUT_DIR"
-[ $GRPC -eq 1 ] && DART_OPT="grpc:$DART_OUT_DIR" && info "Enabling gRPC client generation"
-
 info "Proto directory: $PROTOCOL_DIR"
 info "Output directory: $DART_OUT_DIR"
 
@@ -148,7 +139,7 @@ info "Output directory: $DART_OUT_DIR"
 protoc \
   --proto_path="$PROTOCOL_DIR" \
   --proto_path="$PROTOCOL_DIR/third_party" \
-  --dart_out="$DART_OPT" \
+  --dart_out="$DART_OUT_DIR" \
   "$PROTOCOL_DIR"/api/*/v1/*.proto
 
 # Flatten "api/<svc>/v1" → "<svc>/v1" so imports stay

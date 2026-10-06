@@ -25,7 +25,7 @@ import 'package:habit_forge_app/features/webview/pages/habit_webview_page.dart';
 class AppPages {
   static final List<GetPage> pages = [
     fadeInPage(name: Routers.splash, binding: SplashBinding(), page: () => SplashPage()),
-    fadeInPage(name: Routers.login, binding: AuthBinding(), page: () => AuthPage()),
+    fadeInPage(name: Routers.login, binding: AuthBinding(), page: () => const AuthPage(asGate: true)),
     fadeInPage(name: Routers.boarding, binding: BoardBinding(), page: () => BoardingPage()),
     fadeInPage(name: Routers.main, binding: MainBinding(), page: () => MainPage()),
     cupertinoPage(name: Routers.emailLogin, binding: AuthBinding(), page: () => EmailLoginPage()),

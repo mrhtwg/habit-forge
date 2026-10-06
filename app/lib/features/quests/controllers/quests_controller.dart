@@ -67,19 +67,26 @@ class QuestsController extends GetxController {
         return false;
       }
     }
-    await NetworkRegistry.ins.createTask(task);
+    final result = await NetworkRegistry.ins.createTask(task);
+    if (result.isFailure) {
+      Toast.error(result.message);
+      return false;
+    }
     getTasks();
     return true;
   }
 
   Future<void> deleteTask(String id) async {
-    await _hive.deleteTask(id);
+    final result = await _hive.deleteTask(id);
+    if (result.isFailure) {
+      Toast.error(result.message);
+      return;
+    }
     getTasks();
   }
 
   Future<void> onTaskPostpone(Task task) async {
-    await _hive.skipTask(task.id);
-    getTasks();
+    await toggleSkip(task);
   }
 
   Future<void> toggleComplete(Task task) async {
@@ -117,16 +124,16 @@ class QuestsController extends GetxController {
       return;
     }
 
-    audio.playComplete();
-    haptic.success();
-
     final reply = result.data!;
     final leveledUp = reply.character.level > levelBefore;
-    await RewardPopup.showTaskReward(reply, levelBefore);
     if (leveledUp) {
       audio.playLevelUp();
       haptic.heavy();
+    } else {
+      audio.playComplete();
+      haptic.success();
     }
+    await RewardPopup.showTaskReward(reply, levelBefore);
 
     final unlocked = await AchievementUnlockService.newlyUnlockedSince(unlockedBefore);
     // Gem rewards may have been applied — refresh wallet chips.
@@ -135,12 +142,30 @@ class QuestsController extends GetxController {
   }
 
   Future<void> toggleSkip(Task task) async {
-    await _hive.skipTask(task.id);
+    final result = await _hive.skipTask(task.id);
+    if (result.isFailure) {
+      Toast.error(result.message);
+      return;
+    }
+    await UserService.to.loadCharacter();
+    await UserService.to.loadUserPrefs();
     getTasks();
   }
 
-  Future<void> updateTask(String id, Task task) async {
-    await _hive.updateTask(id, task);
+  Future<bool> updateTask(String id, Task task) async {
+    final current = tasks.firstWhereOrNull((candidate) => candidate.id == id);
+    if (task.type == TaskType.TASK_TYPE_HABIT &&
+        current?.type != TaskType.TASK_TYPE_HABIT &&
+        !SubscriptionService.to.canCreateHabit(habitCount)) {
+      Toast.warning(LanKey.habitLimitReached.trParams({'n': '${SubscriptionLimits.freeHabitSlots}'}));
+      return false;
+    }
+    final result = await _hive.updateTask(id, task);
+    if (result.isFailure) {
+      Toast.error(result.message);
+      return false;
+    }
     getTasks();
+    return true;
   }
 }

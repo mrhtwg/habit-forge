@@ -1,7 +1,10 @@
+import 'dart:math';
+
 import 'package:firebase_auth/firebase_auth.dart' hide UserInfo;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fixnum/fixnum.dart';
-import 'package:grpc/grpc.dart';
+import 'package:habit_forge_app/core/network/api_status_code.dart';
+import 'package:habit_forge_app/core/common/utils/log.dart';
 import 'package:habit_forge_app/core/extensions/date_extensions.dart';
 import 'package:habit_forge_app/core/network/api_response.dart';
 import 'package:habit_forge_app/core/network/hive/game_logic.dart';
@@ -9,6 +12,7 @@ import 'package:habit_forge_app/core/network/hive/shop_config.dart';
 import 'package:habit_forge_app/core/network/ledger/game_ledger.dart';
 import 'package:habit_forge_app/core/network/ledger/ledger_event.dart';
 import 'package:habit_forge_app/core/network/network_interface.dart';
+import 'package:habit_forge_app/core/services/progress_merge_service.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/generated/protos/achievement/v1/achievement.pb.dart';
 import 'package:habit_forge_app/generated/protos/auth/v1/auth.pb.dart';
@@ -20,7 +24,7 @@ import 'package:habit_forge_app/generated/protos/user/v1/user.pb.dart';
 import 'package:protobuf/protobuf.dart';
 import 'package:uuid/uuid.dart';
 
-/// Firestore-backed storage (firebase mode).
+/// Firestore-backed storage for signed-in players.
 ///
 /// Auth is owned by [FirebaseAuth] (Google Sign-In on Android). Game rules run
 /// on-device via [GameLogic] — the same engine as hive — and the resulting
@@ -169,6 +173,215 @@ class NetworkFirebaseImpl implements NetworkInterface {
       });
     });
     _ledgerOpenForUid = uid;
+  }
+
+  // ── Guest → account merge ──
+
+  /// Merges a device save into the signed-in account (`ProgressMergeService`).
+  ///
+  /// Idempotent per device: the account remembers, under `mergedSources.{deviceId}`,
+  /// what that device has already contributed, so the operation applies
+  /// `currentLocalTotals − alreadyContributed` and re-signing in can never double
+  /// a wallet. Economy, character, items, achievements and the ledger row are one
+  /// transaction; the (potentially large) task union follows in chunked batches,
+  /// because tasks are not part of the ledger invariant.
+  ///
+  /// Returns false when nothing could be merged.
+  Future<bool> mergeLocalProgress(LocalProgressSnapshot local) async {
+    final uid = _uid;
+    if (uid == null) return false;
+    if (local.isEmpty) return true;
+
+    final now = DateTime.now();
+    final userRef = _userRef();
+
+    try {
+      final applied = await _db.runTransaction((tx) async {
+        final data = (await tx.get(userRef)).data();
+        if (data == null) throw _Biz('Not signed in', StatusCode.unauthenticated);
+
+        final accountPrefs = _prefsFrom(data);
+        final accountCharacter = _characterFrom(data);
+
+        // What this device already contributed (empty on the first merge).
+        final sources = <String, dynamic>{
+          for (final e in ((data['mergedSources'] as Map?) ?? const {}).entries) '${e.key}': e.value,
+        };
+        final previous = <String, dynamic>{
+          for (final e in (((sources[local.deviceId] as Map?) ?? const {}).entries)) '${e.key}': e.value,
+        };
+        final prevGold = _intOf(previous['gold']);
+        final prevGems = _intOf(previous['gems']);
+        final prevExp = _intOf(previous['exp']);
+        final prevTasks = _intOf(previous['tasks']);
+
+        final localGold = local.prefs.currentGold.toInt();
+        final localGems = local.prefs.currentGems.toInt();
+        final localTasks = local.prefs.totalTasksCompleted.toInt();
+        final localCharacter = local.character;
+        final localExp = localCharacter == null ? 0 : GameLogic.lifetimeExpOf(localCharacter);
+
+        // Replace this device's contribution with its current totals. Never
+        // negative (a device cannot debit more than it ever added).
+        final mergedGold = accountPrefs.currentGold.toInt() + (localGold - prevGold);
+        final mergedGems = accountPrefs.currentGems.toInt() + (localGems - prevGems);
+        final mergedTasks = accountPrefs.totalTasksCompleted.toInt() + (localTasks - prevTasks);
+
+        var mergedPrefs = (accountPrefs.deepCopy()..freeze()).rebuild(
+          (u) => u
+            ..currentGold = Int64(mergedGold < 0 ? 0 : mergedGold)
+            ..currentGems = Int64(mergedGems < 0 ? 0 : mergedGems)
+            ..totalTasksCompleted = Int64(mergedTasks < 0 ? 0 : mergedTasks)
+            ..todayTasksCompleted = Int64(
+              max(accountPrefs.todayTasksCompleted.toInt(), local.prefs.todayTasksCompleted.toInt()),
+            )
+            ..firstTaskDate = Int64(
+              _earliestPositive(accountPrefs.firstTaskDate.toInt(), local.prefs.firstTaskDate.toInt()),
+            ),
+        );
+
+        // A fresh account adopts the device's hero outright — this is the case
+        // that used to silently drop a guest's save. An existing hero receives
+        // the device's lifetime EXP (identity stays the account's).
+        final mergedCharacter = accountCharacter == null
+            ? localCharacter
+            : (localCharacter == null
+                ? accountCharacter
+                : GameLogic.withLifetimeExp(
+                    accountCharacter,
+                    GameLogic.lifetimeExpOf(accountCharacter) + (localExp - prevExp),
+                  ));
+
+        final owned = <String>{..._ownedFrom(data), ...local.ownedItemIds}.toList()..sort();
+        final unlocked = {..._unlockedFrom(data), ...local.unlockedAchievements.map((a) => a.id)};
+        for (final achievement in local.unlockedAchievements) {
+          if (!_unlockedFrom(data).contains(achievement.id)) {
+            tx.set(_achievementsCol().doc(achievement.id), _toMap(achievement));
+          }
+        }
+
+        // Deltas are measured against what is actually stored, so the ledger row
+        // always equals the balance change (clamps included).
+        final goldDelta = mergedPrefs.currentGold.toInt() - accountPrefs.currentGold.toInt();
+        final gemsDelta = mergedPrefs.currentGems.toInt() - accountPrefs.currentGems.toInt();
+        final expDelta = (mergedCharacter == null || accountCharacter == null)
+            ? 0
+            : GameLogic.lifetimeExpOf(mergedCharacter) - GameLogic.lifetimeExpOf(accountCharacter);
+        final hpDelta = (mergedCharacter == null || accountCharacter == null)
+            ? 0
+            : mergedCharacter.currentHp - accountCharacter.currentHp;
+
+        // Ledger: a fresh account records the merged state as its opening
+        // balance (an extra adjustment row would double-count everything); an
+        // account that already has books gets exactly one merge row carrying the
+        // deltas that were actually applied.
+        final rows = <LedgerEvent>[];
+        final userFields = <String, dynamic>{
+          'prefs': _toMap(mergedPrefs),
+          if (mergedCharacter != null) 'character': _toMap(mergedCharacter),
+          'ownedItemIds': owned,
+          'unlockedAchievementIds': unlocked.toList(),
+          'mergedSources': <String, dynamic>{
+            ...sources,
+            local.deviceId: <String, dynamic>{
+              'gold': localGold,
+              'gems': localGems,
+              'exp': localExp,
+              'tasks': localTasks,
+              'at': now.millisecondsSinceEpoch,
+            },
+          },
+        };
+
+        if (_intOrNull(data['ledgerStartedAt']) == null) {
+          if (mergedCharacter != null) {
+            final at = now.millisecondsSinceEpoch;
+            userFields['ledgerStartedAt'] = at;
+            rows.add(
+              GameLedger.openingBalance(
+                prefs: mergedPrefs,
+                character: mergedCharacter,
+                now: now,
+                ledgerStartedAt: at,
+                note: 'merged device save',
+              ),
+            );
+          }
+        } else if (goldDelta != 0 || gemsDelta != 0 || expDelta != 0 || hpDelta != 0) {
+          rows.add(
+            GameLedger.accountMerged(
+              goldDelta: goldDelta,
+              gemsDelta: gemsDelta,
+              expDelta: expDelta,
+              hpDelta: hpDelta,
+              deviceId: local.deviceId,
+              now: now,
+            ),
+          );
+        }
+
+        tx.set(userRef, <String, dynamic>{...userFields, ..._appendEvents(tx, data, rows)}, SetOptions(merge: true));
+
+        return local.tasks.length;
+      });
+
+      // Tasks after the economy: union by id, chunked to stay under the batch
+      // limit. A failure here loses no currency and is retried on the next merge.
+      await _mergeTasks(local.tasks);
+
+      Log.d('merged device ${local.deviceId}: $applied task(s) considered');
+      return true;
+    } on _Biz catch (e) {
+      Log.w('merge failed: ${e.message}');
+      return false;
+    } catch (e) {
+      Log.w('merge failed: $e');
+      return false;
+    }
+  }
+
+  /// Union of [tasks] into the account's task collection, 400 writes per batch.
+  ///
+  /// Same id on both sides means the device save descends from this account, so
+  /// the copy touched last wins and neither streak nor completion state is rolled
+  /// back. The account's tasks are read once and compared in Dart rather than by
+  /// a `whereIn` query, which is capped at 30 values. If the write fails nothing
+  /// is deleted: the local copy stays in Hive and the next merge retries.
+  Future<void> _mergeTasks(List<Task> tasks) async {
+    if (tasks.isEmpty) return;
+    final accountTasks = await _tasksCol().get();
+    final accountById = {for (final doc in accountTasks.docs) doc.id: doc};
+
+    const chunkSize = 400;
+    for (var start = 0; start < tasks.length; start += chunkSize) {
+      final chunk = tasks.sublist(start, min(start + chunkSize, tasks.length));
+      final batch = _db.batch();
+      var writes = 0;
+      for (final task in chunk) {
+        final doc = accountById[task.id];
+        if (doc == null) {
+          batch.set(_tasksCol().doc(task.id), _toMap(task));
+          writes++;
+          continue;
+        }
+        final accountTask = _fromMap(Task(), doc.data());
+        if (task.updatedAt.toInt() > accountTask.updatedAt.toInt()) {
+          batch.set(doc.reference, _toMap(task));
+          writes++;
+        }
+      }
+      if (writes > 0) await batch.commit();
+    }
+  }
+
+  static int _intOf(Object? raw) => raw is num ? raw.toInt() : 0;
+
+  static int? _intOrNull(Object? raw) => raw is num ? raw.toInt() : null;
+
+  static int _earliestPositive(int a, int b) {
+    final values = [a, b].where((v) => v > 0).toList();
+    if (values.isEmpty) return 0;
+    return values.reduce(min);
   }
 
   // ── Lifecycle ──
@@ -561,8 +774,7 @@ class NetworkFirebaseImpl implements NetworkInterface {
               ..currentGold = user.currentGold + gainGold
               ..todayTasksCompleted = user.todayTasksCompleted + 1
               ..totalTasksCompleted = user.totalTasksCompleted + 1
-              ..firstTaskDate =
-                  user.firstTaskDate == Int64(0) ? Int64(now.millisecondsSinceEpoch) : user.firstTaskDate,
+              ..firstTaskDate = user.firstTaskDate == Int64(0) ? Int64(now.millisecondsSinceEpoch) : user.firstTaskDate,
           );
         }
         var newCharacter = character;

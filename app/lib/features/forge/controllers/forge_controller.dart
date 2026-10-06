@@ -58,9 +58,17 @@ class ForgeController extends GetxController {
   }
 
   /// Equips an owned item into its own slot (skins have no equipment slot).
-  void equip(ShopItem item) {
-    NetworkRegistry.ins.equipItem(item.id, item.slot);
-    UserService.to.loadCharacter();
+  Future<void> equip(ShopItem item) async {
+    try {
+      final result = await NetworkRegistry.ins.equipItem(item.id, item.slot);
+      if (result.isFailure) {
+        Toast.error(result.message);
+        return;
+      }
+      await UserService.to.loadCharacter();
+    } catch (_) {
+      Toast.error(LanKey.actionFailed.tr);
+    }
   }
 
   bool isOwned(String itemId) => ownedIds.contains(itemId);

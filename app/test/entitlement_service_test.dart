@@ -39,16 +39,37 @@ void main() {
   });
 
   test('a revoked or refunded document does not count', () {
-    expect(EntitlementService.tierOf([{'tier': 'lifetime', 'active': false}], now: now), isNull);
+    expect(
+      EntitlementService.tierOf(
+        [
+          {'tier': 'lifetime', 'active': false},
+        ],
+        now: now,
+      ),
+      isNull,
+    );
   });
 
   test('a lapsed subscription stops counting without a store notification', () {
-    expect(EntitlementService.tierOf([{'tier': 'monthly', 'active': true, 'expiresAt': nowMs - 1}], now: now), isNull);
+    expect(
+      EntitlementService.tierOf(
+        [
+          {'tier': 'monthly', 'active': true, 'expiresAt': nowMs - 1},
+        ],
+        now: now,
+      ),
+      isNull,
+    );
   });
 
   test('lifetime never expires, even with a stale expiry field', () {
     expect(
-      EntitlementService.tierOf([{'tier': 'lifetime', 'active': true, 'expiresAt': 1}], now: now),
+      EntitlementService.tierOf(
+        [
+          {'tier': 'lifetime', 'active': true, 'expiresAt': 1},
+        ],
+        now: now,
+      ),
       SubscriptionTier.lifetime,
     );
   });
@@ -65,15 +86,22 @@ void main() {
       ),
       isNull,
     );
-    // A subscription without an expiry is trusted until the server replaces it
-    // (the verification Function always writes one for subscriptions).
-    expect(EntitlementService.tierOf([{'tier': 'monthly', 'active': true}], now: now), SubscriptionTier.monthly);
+    // A malformed subscription without an expiry fails closed.
+    expect(
+      EntitlementService.tierOf(
+        [
+          {'tier': 'monthly', 'active': true},
+        ],
+        now: now,
+      ),
+      isNull,
+    );
   });
 
-  test('the request id is deterministic and fits a document id', () {
+  test('the request id uses a stable receipt fingerprint and supports retry nonces', () {
     final receipt = 'a' * 5000;
     final id = EntitlementService.requestIdFor(store: 'google_play', purchaseToken: receipt);
-    expect(id.length, lessThan(64), reason: 'a Play token is far too long to use as-is');
+    expect(id.length, lessThan(100), reason: 'a Play token is far too long to use as-is');
     expect(id, startsWith('google_play-'));
     expect(
       id,
@@ -82,5 +110,17 @@ void main() {
     );
     expect(id, isNot(EntitlementService.requestIdFor(store: 'google_play', purchaseToken: '${receipt}b')));
     expect(id, isNot(EntitlementService.requestIdFor(store: 'apple_app_store', purchaseToken: receipt)));
+    expect(
+      EntitlementService.requestIdFor(store: 'google_play', purchaseToken: receipt, nonce: 'retry'),
+      '$id-retry',
+    );
+  });
+
+  test('billing account token is stable without exposing the uid', () {
+    const uid = 'firebase-user-123';
+    final token = EntitlementService.accountTokenFor(uid);
+    expect(token, hasLength(64));
+    expect(token, isNot(contains(uid)));
+    expect(token, EntitlementService.accountTokenFor(uid));
   });
 }

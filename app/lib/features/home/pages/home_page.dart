@@ -68,10 +68,17 @@ class HomePage extends GetView<HomeController> {
                 itemCount: tasks.length,
                 separatorBuilder: (_, __) => SizedBox(height: 10.h),
                 itemBuilder: (context, index) => TaskTicket(
+                  key: ValueKey(tasks[index].id),
                   task: tasks[index],
                   onComplete: () => controller.onTaskComplete(tasks[index]),
                   onSkip: () => controller.onTaskSkip(tasks[index]),
                   onDelete: () => _confirmDelete(context, tasks[index]),
+                  onLongPress: tasks[index].isCompleted
+                      ? null
+                      : () async {
+                          await TaskFormSheet.show(context, task: tasks[index]);
+                          controller.loadTodayTasks();
+                        },
                 ),
               ),
             ),
@@ -226,7 +233,10 @@ class HomePage extends GetView<HomeController> {
           ),
           SizedBox(height: 18.h),
           PressableButton(
-            onTap: () => TaskFormSheet.show(Get.context!),
+            onTap: () async {
+              await TaskFormSheet.show(Get.context!);
+              controller.loadTodayTasks();
+            },
             padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
             child: Row(
               mainAxisSize: MainAxisSize.min,
