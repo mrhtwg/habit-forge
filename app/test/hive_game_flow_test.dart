@@ -269,7 +269,7 @@ void main() {
   test('achievements unlock and grant gems', () async {
     final before = await api.listAchievements();
     expect(before.isSuccess, isTrue);
-    expect(before.data!.achievements.length, greaterThan(0));
+    expect(before.data!.achievements.length, 130);
 
     // Complete tasks until total_tasks >= 1 (first_task already satisfied) and
     // push the character past level 5 (level_5) using a big custom-EXP task.

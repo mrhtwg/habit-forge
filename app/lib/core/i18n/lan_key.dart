@@ -153,6 +153,16 @@ enum LanKey {
   week, // 'Week'
   month, // 'Month'
   achievementUnlocked, // 'Achievement unlocked!'
+  achievementTasksTitle,
+  achievementTasksDescription,
+  achievementStreakTitle,
+  achievementStreakDescription,
+  achievementLevelTitle,
+  achievementLevelDescription,
+  achievementPurchaseTitle,
+  achievementPurchaseDescription,
+  achievementRecoveryTitle,
+  achievementRecoveryDescription,
   questComplete, // 'Quest complete!'
   newAchievement, // 'New achievement'
   niceWork, // 'Nice work!'

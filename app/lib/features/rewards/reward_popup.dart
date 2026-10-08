@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:habit_forge_app/core/achievements/achievement_catalog.dart';
 import 'package:habit_forge_app/core/common/animation/frame_sequence_player.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/services/haptic_service.dart';
@@ -114,7 +115,10 @@ class RewardPopup {
               border: Border.all(color: AppColors.border, width: 3),
               boxShadow: const [BoxShadow(color: Color(0x55B56A00), offset: Offset(0, 5))],
             ),
-            child: Icon(Icons.emoji_events_rounded, size: 48.w, color: AppColors.goldDark),
+            child: Padding(
+              padding: EdgeInsets.all(7.w),
+              child: Image.asset(AchievementCatalog.iconPath(achievement.id), fit: BoxFit.contain),
+            ),
           ),
           SizedBox(height: 16.h),
           Text(
@@ -124,14 +128,14 @@ class RewardPopup {
           ),
           SizedBox(height: 6.h),
           Text(
-            LanKey.achievementTitle(achievement.id).tr,
+            AchievementCatalog.title(achievement),
             textAlign: TextAlign.center,
             style: textStyleBlack(fontSize: 26.sp, color: const Color(0xFF7A4A00))
                 .copyWith(decoration: TextDecoration.none),
           ),
           SizedBox(height: 8.h),
           Text(
-            LanKey.achievementDescription(achievement.id).tr,
+            AchievementCatalog.description(achievement),
             textAlign: TextAlign.center,
             style: textStyleMedium(fontSize: 13.sp, color: const Color(0xFF7A4A00))
                 .copyWith(decoration: TextDecoration.none, height: 1.35),

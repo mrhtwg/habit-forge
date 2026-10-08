@@ -30,7 +30,7 @@ The app is **local-first**: all game data lives in Hive on-device. Firebase Auth
 
 ### Progress & profile
 
-- **Achievements** with unlock thresholds and gem rewards
+- **100 achievements** across quests, streaks, hero levels, Forge ownership, and recovery, with illustrated badges and gem rewards
 - **Statistics** page with time-segment bar charts and streak leaderboards
 - Profile page with quick links; settings for sound, haptics, and notifications
 
