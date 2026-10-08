@@ -873,6 +873,43 @@ class NetworkFirebaseImpl implements NetworkInterface {
     return ApiResponse.success(GetPrefsReply(prefs: _prefsFrom(snap.data())));
   }
 
+  @override
+  Future<ApiResponse<GetPrefsReply>> claimRewardedAdReward(
+    String rewardId, {
+    int gems = 5,
+    int gold = 0,
+  }) async {
+    if (_uid == null) return _unauthenticated();
+    try {
+      final prefs = await _db.runTransaction((tx) async {
+        final userRef = _userRef();
+        final snap = await tx.get(userRef);
+        final data = snap.data();
+        if (data == null) throw _Biz('Not signed in', StatusCode.unauthenticated);
+        var updated = _prefsFrom(data);
+        if (gems > 0) updated = GameLogic.addGems(updated, gems);
+        if (gold > 0) updated = GameLogic.addGold(updated, gold);
+        final event = GameLedger.rewardedAd(
+          rewardId: rewardId,
+          gems: gems,
+          gold: gold,
+          now: DateTime.now(),
+        );
+        tx.update(userRef, <String, dynamic>{
+          'prefs': _toMap(updated),
+          ..._appendEvents(tx, data, [event]),
+        });
+        return updated;
+      });
+      return ApiResponse.success(GetPrefsReply(prefs: prefs));
+    } on _Biz catch (e) {
+      return ApiResponse.failure(code: e.code, message: e.message);
+    } catch (e) {
+      Log.w('rewarded ad reward failed: $e');
+      return ApiResponse.failure(code: StatusCode.internal, message: 'Unable to claim ad reward');
+    }
+  }
+
   // ── Shop ──
 
   @override

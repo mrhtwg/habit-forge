@@ -18,8 +18,10 @@ import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 /// Owns Play Billing purchases and the tier the rest of the app reads.
 ///
 /// Freemium rules (store / cloud builds):
-/// - Free: 3 habits, warrior only, week stats, ads, no legendary gear
+/// - Free: 3 habits, warrior only, week stats, non-intrusive ads, no legendary gear
 /// - Premium (monthly/yearly/lifetime): unlocks the rest
+/// - Both tiers may opt into rewarded ads for bonus resources; premium users
+///   are never shown forced/interstitial ads.
 /// - Yearly/Lifetime: yearly exclusive shop ids
 ///
 /// Premium is always server-authoritative. The client launches Play Billing and

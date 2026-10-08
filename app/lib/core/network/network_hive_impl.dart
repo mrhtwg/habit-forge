@@ -364,6 +364,19 @@ class NetworkHiveImpl implements NetworkInterface {
   }
 
   @override
+  Future<ApiResponse<GetPrefsReply>> claimRewardedAdReward(
+    String rewardId, {
+    int gems = 5,
+    int gold = 0,
+  }) async {
+    var prefs = UserBox.ins.getUserPrefs();
+    if (gems > 0) prefs = GameLogic.addGems(prefs, gems);
+    if (gold > 0) prefs = GameLogic.addGold(prefs, gold);
+    UserBox.ins.updateUserPrefs(prefs);
+    return ApiResponse.success(GetPrefsReply(prefs: prefs));
+  }
+
+  @override
   Future<ApiResponse<ListShopItemsReply>> listShopItems() async {
     final items = await ShopBox.ins.listItems();
     return ApiResponse.success(ListShopItemsReply(items: items));

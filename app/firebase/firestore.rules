@@ -60,7 +60,7 @@ service cloud.firestore {
         && d.type in [
           'opening_balance', 'task_completed', 'habit_slipped', 'daily_penalty',
           'revive', 'purchase', 'stat_allocated', 'achievement_unlocked',
-          'account_merged'
+          'account_merged', 'rewarded_ad'
         ]
         && d.at is int && d.at > 0
         && d.localDate is string && d.localDate.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')

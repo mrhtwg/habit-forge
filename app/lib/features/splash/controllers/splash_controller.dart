@@ -13,6 +13,7 @@ import 'package:habit_forge_app/core/services/firebase_auth_service.dart';
 import 'package:habit_forge_app/core/services/firebase_session.dart';
 import 'package:habit_forge_app/core/services/haptic_service.dart';
 import 'package:habit_forge_app/core/services/subscription_service.dart';
+import 'package:habit_forge_app/core/services/rewarded_ad_service.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/features/auth/controllers/auth_controller.dart';
 import 'package:habit_forge_app/firebase_options.dart';
@@ -74,6 +75,8 @@ class SplashController extends GetxController {
 
     final subscription = SubscriptionService();
     Get.put(subscription, permanent: true);
+    final rewardedAds = RewardedAdService();
+    Get.put(rewardedAds, permanent: true);
 
     await Future.wait<void>([
       initializeDateFormatting('zh', null),
@@ -81,6 +84,7 @@ class SplashController extends GetxController {
       ShopConfig.load(),
       _initializeFirebase(firebaseAuth),
       subscription.init(),
+      rewardedAds.init(),
     ]);
 
     // Auth state must be inspected only after Firebase initialization finishes.

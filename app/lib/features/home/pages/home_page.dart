@@ -15,6 +15,7 @@ import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';
 import 'package:habit_forge_app/widgets/confirm_dialog.dart';
 import 'package:habit_forge_app/widgets/hud_bar.dart';
 import 'package:habit_forge_app/widgets/pressable_button.dart';
+import 'package:habit_forge_app/widgets/rewarded_ad_card.dart';
 import 'package:habit_forge_app/widgets/task_ticket.dart';
 import 'package:habit_forge_app/widgets/wallet_chip.dart';
 
@@ -59,6 +60,7 @@ class HomePage extends GetView<HomeController> {
               ],
             ),
           ),
+          const RewardedAdCard(),
           if (tasks.isEmpty)
             Expanded(child: _emptyState())
           else

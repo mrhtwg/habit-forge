@@ -71,6 +71,14 @@ abstract class NetworkInterface {
 
   Future<ApiResponse<GetPrefsReply>> getPrefs();
 
+  /// Claims the reward after the Google Mobile Ads SDK reports a completed
+  /// rewarded-ad view.
+  Future<ApiResponse<GetPrefsReply>> claimRewardedAdReward(
+    String rewardId, {
+    int gems = 5,
+    int gold = 0,
+  });
+
   // ── Shop ──
 
   Future<ApiResponse<ListShopItemsReply>> listShopItems();

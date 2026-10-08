@@ -22,9 +22,6 @@ class AchievementsPage extends GetView<AchievementsController> {
           children: [
             _buildHeader(),
             Expanded(child: _buildWaterfall()),
-            // _achievementCard(controller.achievements[0]),
-            // _achievementCard(controller.achievements[1]),
-            // _achievementCard(controller.achievements[2]),
           ],
         ),
       ),
@@ -126,75 +123,65 @@ class AchievementsPage extends GetView<AchievementsController> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Stack(
-            children: [
-              SizedBox(
-                width: double.infinity,
-                height: 142.w,
-                child: Container(
-                  padding: EdgeInsets.all(8.w),
-                  decoration: BoxDecoration(
-                    color: color.withValues(alpha: unlocked ? 0.15 : 0.07),
-                    borderRadius: BorderRadius.circular(15.r),
-                  ),
-                  child: Align(
-                    alignment: Alignment.center,
-                    child: unlocked
-                        ? _buildIcon(achievement, color)
-                        : ColorFiltered(
-                            // Matrix greyscale (see AchievementCatalog.lockedFilter):
-                            // a BlendMode filter would tint the whole grid viewport.
-                            colorFilter: AchievementCatalog.lockedFilter,
-                            child: _buildIcon(achievement, color),
-                          ),
-                  ),
-                ),
+          SizedBox(
+            width: double.infinity,
+            height: 142.w,
+            child: Container(
+              padding: EdgeInsets.all(8.w),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: unlocked ? 0.15 : 0.07),
+                borderRadius: BorderRadius.circular(15.r),
               ),
-              if (!unlocked)
-                Positioned(
-                  right: 6.w,
-                  top: 6.h,
-                  child: Container(
-                    padding: EdgeInsets.all(4.w),
-                    decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                    child: Icon(Icons.lock_rounded, size: 14.w, color: AppColors.textMuted),
-                  ),
-                ),
-            ],
-          ),
-          SizedBox(height: 9.h),
-          Text(
-            AchievementCatalog.title(achievement),
-            style: textStyleBold(fontSize: 13.sp, color: unlocked ? AppColors.textPrimary : AppColors.textSecondary),
-          ),
-          SizedBox(height: 3.h),
-          Text(
-            AchievementCatalog.description(achievement),
-            style: textStyleMedium(fontSize: 10.5.sp, color: AppColors.textSecondary).copyWith(height: 1.3),
-          ),
-          SizedBox(height: 9.h),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(4.r),
-            child: LinearProgressIndicator(
-              minHeight: 6.h,
-              value: ratio,
-              backgroundColor: const Color(0xFFE4DCCF),
-              valueColor: AlwaysStoppedAnimation(unlocked ? const Color(0xFF3FBE6B) : color),
+              child: Align(
+                alignment: Alignment.center,
+                child: unlocked
+                    ? _buildIcon(achievement, color)
+                    : Icon(
+                        Icons.question_mark_rounded,
+                        size: 82.w,
+                        color: color.withValues(alpha: 0.6),
+                      ),
+              ),
             ),
           ),
-          SizedBox(height: 5.h),
-          Row(
-            children: [
-              Text(
-                '$progress / ${achievement.threshold}',
-                style: textStyleBold(fontSize: 9.5.sp, color: AppColors.textMuted),
+          if (unlocked) ...[
+            SizedBox(height: 9.h),
+            Text(
+              AchievementCatalog.title(achievement),
+              style: textStyleBold(fontSize: 13.sp, color: unlocked ? AppColors.textPrimary : AppColors.textSecondary),
+            ),
+            SizedBox(height: 3.h),
+            Text(
+              AchievementCatalog.description(achievement),
+              style: textStyleMedium(fontSize: 10.5.sp, color: AppColors.textSecondary).copyWith(height: 1.3),
+            ),
+            SizedBox(height: 9.h),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4.r),
+              child: LinearProgressIndicator(
+                minHeight: 6.h,
+                value: ratio,
+                backgroundColor: const Color(0xFFE4DCCF),
+                valueColor: AlwaysStoppedAnimation(unlocked ? const Color(0xFF3FBE6B) : color),
               ),
-              const Spacer(),
-              Icon(Icons.diamond_rounded, size: 12.w, color: const Color(0xFF58B9E8)),
-              SizedBox(width: 2.w),
-              Text('+${achievement.gemReward}', style: textStyleBold(fontSize: 9.5.sp, color: AppColors.textSecondary)),
-            ],
-          ),
+            ),
+            SizedBox(height: 5.h),
+            Row(
+              children: [
+                Text(
+                  '$progress / ${achievement.threshold}',
+                  style: textStyleBold(fontSize: 9.5.sp, color: AppColors.textMuted),
+                ),
+                const Spacer(),
+                Icon(Icons.diamond_rounded, size: 12.w, color: const Color(0xFF58B9E8)),
+                SizedBox(width: 2.w),
+                Text(
+                  '+${achievement.gemReward}',
+                  style: textStyleBold(fontSize: 9.5.sp, color: AppColors.textSecondary),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );

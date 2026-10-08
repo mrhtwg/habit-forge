@@ -214,7 +214,7 @@ class ShopConfig {
           ),
         );
       }
-      if (defs.length >= 130) achievementDefs = defs;
+      if (defs.length >= 140) achievementDefs = defs;
 
       final items = <ShopItem>[
         ..._parseItems(doc['equipment']),

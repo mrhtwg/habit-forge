@@ -55,7 +55,10 @@ enum LedgerEventType {
   statAllocated('stat_allocated'),
 
   /// An achievement unlocked, paying out gems.
-  achievementUnlocked('achievement_unlocked');
+  achievementUnlocked('achievement_unlocked'),
+
+  /// A rewarded-ad view paid out a small bonus.
+  rewardedAd('rewarded_ad');
 
   const LedgerEventType(this.wire);
 
@@ -289,6 +292,8 @@ class LedgerEvent {
   static String statAllocatedId(String uid, int pointsBefore, String stat) => 'stat_${uid}_${pointsBefore}_$stat';
 
   static String achievementId(String achievementId) => 'achv_$achievementId';
+
+  static String rewardedAdId(String rewardId) => 'rewarded_ad_$rewardId';
 
   /// One merge row per device per applied delta set: re-running a merge that
   /// changed nothing produces no row at all, and a later merge that moved a

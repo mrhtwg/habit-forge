@@ -216,6 +216,22 @@ class GameLedger {
         refs: <String, Object>{'achievementId': achievement.id, 'threshold': achievement.threshold},
       );
 
+  static LedgerEvent rewardedAd({
+    required String rewardId,
+    required int gems,
+    int gold = 0,
+    required DateTime now,
+  }) =>
+      LedgerEvent(
+        eventId: LedgerEvent.rewardedAdId(rewardId),
+        type: LedgerEventType.rewardedAd,
+        at: now.millisecondsSinceEpoch,
+        localDate: LedgerEvent.localDateKey(now),
+        gems: gems,
+        gold: gold,
+        refs: <String, Object>{'rewardId': rewardId},
+      );
+
   // ── Readable keys for `refs` (the console is read by humans) ──
 
   static String taskTypeKey(TaskType type) => switch (type) {

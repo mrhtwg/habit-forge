@@ -5,6 +5,7 @@ import 'package:habit_forge_app/core/achievements/achievement_catalog.dart';
 import 'package:habit_forge_app/core/common/animation/frame_sequence_player.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/services/haptic_service.dart';
+import 'package:habit_forge_app/core/services/rewarded_ad_service.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
@@ -12,6 +13,8 @@ import 'package:habit_forge_app/generated/assets.dart';
 import 'package:habit_forge_app/generated/protos/achievement/v1/achievement.pb.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';
 import 'package:habit_forge_app/widgets/gain_exp_sheet.dart';
+import 'package:habit_forge_app/widgets/pressable_button.dart';
+import 'package:habit_forge_app/widgets/toast_widget.dart';
 
 class RewardPopup {
   /// Task rewards → bottom sheet; level-ups → centered dialog.
@@ -148,6 +151,10 @@ class RewardPopup {
               bg: Colors.white,
             ),
           ],
+          if (gems > 0) ...[
+            SizedBox(height: 16.h),
+            _DoubleRewardButton(gems: gems),
+          ],
           SizedBox(height: 18.h),
           GestureDetector(
             onTap: () => Get.back(),
@@ -224,6 +231,10 @@ class RewardPopup {
               ),
             ],
           ),
+          if (goldGained > 0) ...[
+            SizedBox(height: 16.h),
+            _DoubleRewardButton(gold: goldGained),
+          ],
           SizedBox(height: 16.h),
           GestureDetector(
             onTap: () => Get.back(),
@@ -271,5 +282,73 @@ class RewardPopup {
         ],
       ),
     );
+  }
+}
+
+class _DoubleRewardButton extends StatefulWidget {
+  const _DoubleRewardButton({this.gems = 0, this.gold = 0});
+
+  final int gems;
+  final int gold;
+
+  @override
+  State<_DoubleRewardButton> createState() => _DoubleRewardButtonState();
+}
+
+class _DoubleRewardButtonState extends State<_DoubleRewardButton> {
+  bool _claiming = false;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!Get.isRegistered<RewardedAdService>()) return const SizedBox.shrink();
+
+    final service = RewardedAdService.to;
+    return Obx(() {
+      final ready = service.isReady.value;
+      final enabled = ready && !_claiming;
+      return PressableButton(
+        onTap: enabled ? _claim : null,
+        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+        backgroundColor: enabled ? AppColors.primary : AppColors.textMuted,
+        shadowColor: enabled ? AppColors.primaryDark : AppColors.textMuted,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.ondemand_video_rounded, size: 17.w, color: Colors.white),
+            SizedBox(width: 6.w),
+            Flexible(
+              child: Text(
+                _claiming ? LanKey.rewardedAdLoading.tr : LanKey.rewardedAdDouble.tr,
+                textAlign: TextAlign.center,
+                style: textStyleBold(fontSize: 13.sp, color: Colors.white).copyWith(decoration: TextDecoration.none),
+              ),
+            ),
+          ],
+        ),
+      );
+    });
+  }
+
+  Future<void> _claim() async {
+    if (_claiming) return;
+    setState(() => _claiming = true);
+    try {
+      final granted = await RewardedAdService.to.showRewarded(
+        gems: widget.gems,
+        gold: widget.gold,
+      );
+      if (!mounted) return;
+      if (granted) {
+        Toast.success(LanKey.rewardedAdDoubleSuccess.tr);
+        Get.back();
+      } else {
+        Toast.warning(LanKey.rewardedAdFailed.tr);
+        setState(() => _claiming = false);
+      }
+    } catch (_) {
+      if (!mounted) return;
+      Toast.warning(LanKey.rewardedAdFailed.tr);
+      setState(() => _claiming = false);
+    }
   }
 }

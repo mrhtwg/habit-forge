@@ -126,7 +126,32 @@ abstract final class AchievementCatalog {
     45,
     50,
   ];
-  static const purchaseThresholds = <int>[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+  static const purchaseThresholds = <int>[
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+  ];
 
   static List<Achievement> definitions() => <Achievement>[
         ..._group('total_tasks', taskThresholds),
@@ -181,10 +206,7 @@ abstract final class AchievementCatalog {
       };
 
   static String iconPath(String id) {
-    final extension = id == 'first_task' || id.startsWith('tasks_') || id.startsWith('level_') || id.startsWith('streak_')
-        ? 'webp'
-        : 'png';
-    return 'assets/images/achievements/icons/$id.$extension';
+    return 'assets/images/achievements/icons/$id.webp';
   }
 
   /// Greyscale filter for locked achievements.
