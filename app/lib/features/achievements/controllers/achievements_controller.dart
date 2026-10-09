@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/network/network_registry.dart';
+import 'package:habit_forge_app/core/services/daily_login_reward_service.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/generated/protos/achievement/v1/achievement.pb.dart';
 import 'package:habit_forge_app/widgets/toast_widget.dart';
@@ -36,6 +37,8 @@ class AchievementsController extends GetxController {
                 'streak' => bestStreak,
                 'level' => level,
                 'purchases' => purchases,
+                'login_streak' =>
+                  Get.isRegistered<DailyLoginRewardService>() ? DailyLoginRewardService.to.currentStreak.value : 0,
                 'deaths' => achievement.isUnlocked ? 1 : 0,
                 _ => 0,
               },

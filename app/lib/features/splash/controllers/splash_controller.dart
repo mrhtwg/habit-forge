@@ -8,6 +8,7 @@ import 'package:habit_forge_app/core/network/hive/shop_config.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
 import 'package:habit_forge_app/core/services/audio_service.dart';
 import 'package:habit_forge_app/core/services/death_recovery_service.dart';
+import 'package:habit_forge_app/core/services/daily_login_reward_service.dart';
 import 'package:habit_forge_app/core/services/entitlement_service.dart';
 import 'package:habit_forge_app/core/services/firebase_auth_service.dart';
 import 'package:habit_forge_app/core/services/firebase_session.dart';
@@ -77,6 +78,7 @@ class SplashController extends GetxController {
     Get.put(subscription, permanent: true);
     final rewardedAds = RewardedAdService();
     Get.put(rewardedAds, permanent: true);
+    Get.put(DailyLoginRewardService(), permanent: true);
 
     await Future.wait<void>([
       initializeDateFormatting('zh', null),

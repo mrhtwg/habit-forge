@@ -33,6 +33,17 @@ class UserBox {
   }
 
   static const _ownedKey = 'ownedItemIds';
+  static const _dailyLoginKey = 'dailyLogin';
+
+  Map<String, dynamic> getDailyLoginState() {
+    final raw = _userBox.get(_dailyLoginKey);
+    if (raw is! Map) return <String, dynamic>{};
+    return raw.map((key, value) => MapEntry('$key', value));
+  }
+
+  void updateDailyLoginState({required String date, required int streak}) {
+    _userBox.put(_dailyLoginKey, <String, dynamic>{'date': date, 'streak': streak});
+  }
 
   List<String> getOwnedItemIds() {
     final raw = _userBox.get(_ownedKey);

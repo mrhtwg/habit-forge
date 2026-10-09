@@ -80,6 +80,8 @@ enum LanKey {
   rewardedAdFailed, // 'The reward could not be claimed'
   rewardedAdDouble, // 'Watch Ad for Double Rewards'
   rewardedAdDoubleSuccess, // 'Reward doubled'
+  rewardedAdRewardTitle, // 'Reward received'
+  rewardedAdRewardBody, // 'Thanks for supporting your adventure'
   home, // 'Home'
   quests, // 'Quests'
   profile, // 'Profile'
@@ -166,6 +168,8 @@ enum LanKey {
   achievementTasksDescription,
   achievementStreakTitle,
   achievementStreakDescription,
+  achievementLoginStreakTitle,
+  achievementLoginStreakDescription,
   achievementLevelTitle,
   achievementLevelDescription,
   achievementPurchaseTitle,
@@ -178,6 +182,9 @@ enum LanKey {
   continueLabel, // 'Continue'
   yourHeroReached, // 'Your hero reached'
   awesome, // 'Awesome!'
+  dailyLoginTitle, // 'Daily Login Reward'
+  dailyLoginDay, // 'Day @n streak'
+  dailyLoginMax, // '30-day reward reached'
   next, // 'Next'
   getStarted, // 'Get Started'
   enterTheRealm, // 'Enter the Realm'

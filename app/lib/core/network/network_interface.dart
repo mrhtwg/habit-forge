@@ -1,4 +1,5 @@
 import 'package:habit_forge_app/core/network/api_response.dart';
+import 'package:habit_forge_app/core/network/daily_login_reward.dart';
 import 'package:habit_forge_app/generated/protos/achievement/v1/achievement.pb.dart';
 import 'package:habit_forge_app/generated/protos/auth/v1/auth.pb.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart';
@@ -70,6 +71,9 @@ abstract class NetworkInterface {
   // ── User profile ──
 
   Future<ApiResponse<GetPrefsReply>> getPrefs();
+
+  /// Claims the current calendar day's login reward at most once.
+  Future<ApiResponse<DailyLoginReward>> claimDailyLoginReward();
 
   /// Claims the reward after the Google Mobile Ads SDK reports a completed
   /// rewarded-ad view.

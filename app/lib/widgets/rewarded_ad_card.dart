@@ -5,6 +5,7 @@ import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/services/rewarded_ad_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
+import 'package:habit_forge_app/features/rewards/reward_popup.dart';
 import 'package:habit_forge_app/widgets/pressable_button.dart';
 import 'package:habit_forge_app/widgets/toast_widget.dart';
 
@@ -57,7 +58,7 @@ class RewardedAdCard extends StatelessWidget {
                   ? () async {
                       final granted = await service.showRewarded();
                       if (granted) {
-                        Toast.success(LanKey.rewardedAdSuccess.tr);
+                        await RewardPopup.showRewardedAdReward(gems: RewardedAdService.rewardGems, gold: 0);
                       } else {
                         Toast.warning(LanKey.rewardedAdFailed.tr);
                       }

@@ -7,6 +7,7 @@ import 'package:habit_forge_app/core/network/api_status_code.dart';
 import 'package:habit_forge_app/core/common/utils/log.dart';
 import 'package:habit_forge_app/core/extensions/date_extensions.dart';
 import 'package:habit_forge_app/core/network/api_response.dart';
+import 'package:habit_forge_app/core/network/daily_login_reward.dart';
 import 'package:habit_forge_app/core/network/hive/game_logic.dart';
 import 'package:habit_forge_app/core/network/hive/shop_config.dart';
 import 'package:habit_forge_app/core/network/ledger/game_ledger.dart';
@@ -871,6 +872,78 @@ class NetworkFirebaseImpl implements NetworkInterface {
     if (_uid == null) return _unauthenticated();
     final snap = await _userRef().get();
     return ApiResponse.success(GetPrefsReply(prefs: _prefsFrom(snap.data())));
+  }
+
+  @override
+  Future<ApiResponse<DailyLoginReward>> claimDailyLoginReward() async {
+    if (_uid == null) return _unauthenticated();
+    try {
+      final result = await _db.runTransaction((tx) async {
+        final now = DateTime.now();
+        final date = LedgerEvent.localDateKey(now);
+        final userRef = _userRef();
+        final snap = await tx.get(userRef);
+        final data = snap.data();
+        if (data == null) throw _Biz('Not signed in', StatusCode.unauthenticated);
+
+        final rawState = data['dailyLogin'];
+        final state = rawState is Map ? rawState : const <String, dynamic>{};
+        final lastDate = state['date']?.toString();
+        final previousStreak = (state['streak'] as num?)?.toInt() ?? 0;
+        if (lastDate == date) {
+          return DailyLoginRewardSchedule.alreadyClaimed(streak: previousStreak, date: date);
+        }
+
+        final yesterday = LedgerEvent.localDateKey(now.subtract(const Duration(days: 1)));
+        final streak = lastDate == yesterday ? previousStreak + 1 : 1;
+        final unlocked = _unlockedFrom(data);
+        final fresh = GameLogic.newlyUnlocked(
+          defs: ShopConfig.achievementDefs,
+          unlockedIds: unlocked,
+          totalTasks: _prefsFrom(data).totalTasksCompleted.toInt(),
+          streak: 0,
+          level: _characterFrom(data)?.level ?? 1,
+          purchases: _ownedFrom(data).length,
+          loginStreak: streak,
+        );
+        for (final achievement in fresh) {
+          tx.set(_achievementsCol().doc(achievement.id), _toMap(achievement));
+          unlocked.add(achievement.id);
+        }
+
+        final reward = DailyLoginRewardSchedule.rewardFor(streak, date, unlocked: fresh);
+        var prefs = _prefsFrom(data);
+        prefs = GameLogic.addGold(prefs, reward.gold);
+        prefs = GameLogic.addGems(prefs, reward.gems);
+        for (final achievement in fresh) {
+          prefs = GameLogic.addGems(prefs, achievement.gemReward.toInt());
+        }
+
+        final rows = <LedgerEvent>[
+          GameLedger.dailyLogin(
+            date: date,
+            streak: streak,
+            gold: reward.gold,
+            gems: reward.gems,
+            now: now,
+          ),
+          for (final achievement in fresh) GameLedger.achievementUnlocked(achievement: achievement, now: now),
+        ];
+        tx.update(userRef, <String, dynamic>{
+          'dailyLogin': <String, dynamic>{'date': date, 'streak': streak},
+          'prefs': _toMap(prefs),
+          'unlockedAchievementIds': unlocked.toList(),
+          ..._appendEvents(tx, data, rows),
+        });
+        return reward;
+      });
+      return ApiResponse.success(result);
+    } on _Biz catch (e) {
+      return ApiResponse.failure(code: e.code, message: e.message);
+    } catch (e) {
+      Log.w('daily login reward failed: $e');
+      return ApiResponse.failure(code: StatusCode.internal, message: 'Unable to claim daily login reward');
+    }
   }
 
   @override

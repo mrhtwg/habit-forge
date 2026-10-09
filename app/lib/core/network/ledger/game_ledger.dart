@@ -232,6 +232,23 @@ class GameLedger {
         refs: <String, Object>{'rewardId': rewardId},
       );
 
+  static LedgerEvent dailyLogin({
+    required String date,
+    required int streak,
+    required int gold,
+    required int gems,
+    required DateTime now,
+  }) =>
+      LedgerEvent(
+        eventId: LedgerEvent.dailyLoginId(date),
+        type: LedgerEventType.dailyLogin,
+        at: now.millisecondsSinceEpoch,
+        localDate: date,
+        gold: gold,
+        gems: gems,
+        refs: <String, Object>{'date': date, 'streak': streak},
+      );
+
   // ── Readable keys for `refs` (the console is read by humans) ──
 
   static String taskTypeKey(TaskType type) => switch (type) {
@@ -248,8 +265,7 @@ class GameLedger {
         _ => 'unknown',
       };
 
-  static String currencyKey(ShopCurrency currency) =>
-      currency == ShopCurrency.SHOP_CURRENCY_GEMS ? 'gems' : 'gold';
+  static String currencyKey(ShopCurrency currency) => currency == ShopCurrency.SHOP_CURRENCY_GEMS ? 'gems' : 'gold';
 
   static String statKey(StatType stat) => switch (stat) {
         StatType.STAT_TYPE_STRENGTH => 'strength',

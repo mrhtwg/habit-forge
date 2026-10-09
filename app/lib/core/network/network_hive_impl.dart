@@ -1,6 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:habit_forge_app/core/network/api_status_code.dart';
 import 'package:habit_forge_app/core/network/api_response.dart';
+import 'package:habit_forge_app/core/network/daily_login_reward.dart';
 import 'package:habit_forge_app/core/network/hive/character_box.dart';
 import 'package:habit_forge_app/core/network/hive/game_logic.dart';
 import 'package:habit_forge_app/core/network/hive/shop_box.dart';
@@ -361,6 +362,49 @@ class NetworkHiveImpl implements NetworkInterface {
   @override
   Future<ApiResponse<GetPrefsReply>> getPrefs() async {
     return ApiResponse.success(GetPrefsReply(prefs: UserBox.ins.getUserPrefs()));
+  }
+
+  @override
+  Future<ApiResponse<DailyLoginReward>> claimDailyLoginReward() async {
+    final now = DateTime.now();
+    final date = _dateKey(now);
+    final state = UserBox.ins.getDailyLoginState();
+    final lastDate = state['date']?.toString();
+    final previousStreak = (state['streak'] as num?)?.toInt() ?? 0;
+    if (lastDate == date) {
+      return ApiResponse.success(DailyLoginRewardSchedule.alreadyClaimed(streak: previousStreak, date: date));
+    }
+
+    final yesterday = _dateKey(now.subtract(const Duration(days: 1)));
+    final streak = lastDate == yesterday ? previousStreak + 1 : 1;
+    final unlockedIds = UserBox.ins.getAchievements().map((a) => a.id).toSet();
+    final fresh = GameLogic.newlyUnlocked(
+      defs: ShopConfig.achievementDefs,
+      unlockedIds: unlockedIds,
+      totalTasks: UserBox.ins.getUserPrefs().totalTasksCompleted.toInt(),
+      streak: 0,
+      level: CharacterBox.ins.getCharacter()?.level ?? 1,
+      purchases: UserBox.ins.getOwnedItemIds().length,
+      loginStreak: streak,
+    );
+    final reward = DailyLoginRewardSchedule.rewardFor(streak, date, unlocked: fresh);
+    var prefs = UserBox.ins.getUserPrefs();
+    prefs = GameLogic.addGold(prefs, reward.gold);
+    prefs = GameLogic.addGems(prefs, reward.gems);
+    for (final achievement in fresh) {
+      UserBox.ins.updateAchievement(achievement);
+      prefs = GameLogic.addGems(prefs, achievement.gemReward.toInt());
+    }
+    UserBox.ins.updateUserPrefs(prefs);
+    UserBox.ins.updateDailyLoginState(date: date, streak: streak);
+    return ApiResponse.success(reward);
+  }
+
+  static String _dateKey(DateTime date) {
+    final y = date.year.toString().padLeft(4, '0');
+    final m = date.month.toString().padLeft(2, '0');
+    final d = date.day.toString().padLeft(2, '0');
+    return '$y-$m-$d';
   }
 
   @override

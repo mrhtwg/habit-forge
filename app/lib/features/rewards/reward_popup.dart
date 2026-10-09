@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:habit_forge_app/core/achievements/achievement_catalog.dart';
 import 'package:habit_forge_app/core/common/animation/frame_sequence_player.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
+import 'package:habit_forge_app/core/network/daily_login_reward.dart';
 import 'package:habit_forge_app/core/services/haptic_service.dart';
 import 'package:habit_forge_app/core/services/rewarded_ad_service.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
@@ -35,6 +36,56 @@ class RewardPopup {
         isScrollControlled: true,
       );
     }
+  }
+
+  static Future<void> showDailyLoginReward(DailyLoginReward reward) {
+    if (Get.isRegistered<HapticService>()) {
+      Get.find<HapticService>().success();
+    }
+    return Get.dialog(
+      Center(
+        child: TweenAnimationBuilder<double>(
+          tween: Tween(begin: 0.0, end: 1.0),
+          duration: const Duration(milliseconds: 450),
+          curve: Curves.elasticOut,
+          builder: (context, t, child) {
+            return Transform.scale(
+              scale: 0.72 + t * 0.28,
+              child: Opacity(opacity: t.clamp(0.0, 1.0), child: child),
+            );
+          },
+          child: _buildDailyLoginCard(reward),
+        ),
+      ),
+      barrierColor: const Color(0xCC2E1A4E),
+      barrierDismissible: false,
+      transitionDuration: const Duration(milliseconds: 200),
+    );
+  }
+
+  static Future<void> showRewardedAdReward({required int gems, required int gold}) {
+    if (Get.isRegistered<HapticService>()) {
+      Get.find<HapticService>().success();
+    }
+    return Get.dialog(
+      Center(
+        child: TweenAnimationBuilder<double>(
+          tween: Tween(begin: 0.0, end: 1.0),
+          duration: const Duration(milliseconds: 450),
+          curve: Curves.elasticOut,
+          builder: (context, t, child) {
+            return Transform.scale(
+              scale: 0.72 + t * 0.28,
+              child: Opacity(opacity: t.clamp(0.0, 1.0), child: child),
+            );
+          },
+          child: _buildRewardedAdCard(gems: gems, gold: gold),
+        ),
+      ),
+      barrierColor: const Color(0xCC2E1A4E),
+      barrierDismissible: false,
+      transitionDuration: const Duration(milliseconds: 200),
+    );
   }
 
   /// Full-screen style unlock celebration (PRD FR-ACH-01 / mockup 22).
@@ -169,6 +220,186 @@ class RewardPopup {
               ),
               child: Text(
                 LanKey.awesome.tr,
+                textAlign: TextAlign.center,
+                style: textStyleBold(fontSize: 15.sp, color: AppColors.textPrimary)
+                    .copyWith(decoration: TextDecoration.none),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static Widget _buildDailyLoginCard(DailyLoginReward reward) {
+    return Container(
+      width: 320.w,
+      padding: EdgeInsets.all(24.w),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFFFFF3C4), AppColors.gold, AppColors.goldDark],
+        ),
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: AppColors.border, width: 3),
+        boxShadow: const [BoxShadow(color: Color(0x663A2A4E), blurRadius: 24, offset: Offset(0, 10))],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 76.w,
+            height: 76.w,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white,
+              border: Border.all(color: AppColors.border, width: 3),
+              boxShadow: const [BoxShadow(color: Color(0x55B56A00), offset: Offset(0, 5))],
+            ),
+            child: Icon(Icons.local_fire_department_rounded, size: 48.w, color: const Color(0xFFFF7A32)),
+          ),
+          SizedBox(height: 14.h),
+          Text(
+            LanKey.dailyLoginTitle.tr,
+            style: textStyleBold(fontSize: 15.sp, color: const Color(0xFF7A4A00))
+                .copyWith(decoration: TextDecoration.none),
+          ),
+          SizedBox(height: 6.h),
+          Text(
+            LanKey.dailyLoginDay.trParams({'n': '${reward.day}'}),
+            style: textStyleBlack(fontSize: 27.sp, color: const Color(0xFF7A4A00))
+                .copyWith(decoration: TextDecoration.none),
+          ),
+          SizedBox(height: 16.h),
+          Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 10.w,
+            runSpacing: 8.h,
+            children: [
+              if (reward.gold > 0)
+                _rewardChip(
+                  icon: Assets.imagesSharedIcGold,
+                  text: LanKey.goldGained.trParams({'n': '${reward.gold}'}),
+                  bg: Colors.white,
+                ),
+              if (reward.gems > 0)
+                _rewardChip(
+                  icon: Assets.imagesSharedIcGem,
+                  text: LanKey.gemsGained.trParams({'n': '${reward.gems}'}),
+                  bg: Colors.white,
+                ),
+            ],
+          ),
+          if (reward.day >= DailyLoginRewardSchedule.maxDay) ...[
+            SizedBox(height: 12.h),
+            Text(
+              LanKey.dailyLoginMax.tr,
+              textAlign: TextAlign.center,
+              style: textStyleMedium(fontSize: 12.sp, color: const Color(0xFF7A4A00))
+                  .copyWith(decoration: TextDecoration.none),
+            ),
+          ],
+          SizedBox(height: 20.h),
+          GestureDetector(
+            onTap: () => Get.back(),
+            child: Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(vertical: 12.h),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(color: AppColors.border, width: 2.5),
+                borderRadius: BorderRadius.circular(999),
+                boxShadow: const [BoxShadow(color: Color(0x55B56A00), offset: Offset(0, 4))],
+              ),
+              child: Text(
+                LanKey.continueLabel.tr,
+                textAlign: TextAlign.center,
+                style: textStyleBold(fontSize: 15.sp, color: AppColors.textPrimary)
+                    .copyWith(decoration: TextDecoration.none),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static Widget _buildRewardedAdCard({required int gems, required int gold}) {
+    return Container(
+      width: 320.w,
+      padding: EdgeInsets.all(24.w),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFFFFF3C4), AppColors.gold, AppColors.goldDark],
+        ),
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: AppColors.border, width: 3),
+        boxShadow: const [BoxShadow(color: Color(0x663A2A4E), blurRadius: 24, offset: Offset(0, 10))],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 76.w,
+            height: 76.w,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white,
+              border: Border.all(color: AppColors.border, width: 3),
+              boxShadow: const [BoxShadow(color: Color(0x55B56A00), offset: Offset(0, 5))],
+            ),
+            child: Icon(Icons.card_giftcard_rounded, size: 44.w, color: AppColors.primary),
+          ),
+          SizedBox(height: 14.h),
+          Text(
+            LanKey.rewardedAdRewardTitle.tr,
+            style: textStyleBold(fontSize: 17.sp, color: const Color(0xFF7A4A00))
+                .copyWith(decoration: TextDecoration.none),
+          ),
+          SizedBox(height: 6.h),
+          Text(
+            LanKey.rewardedAdRewardBody.tr,
+            textAlign: TextAlign.center,
+            style: textStyleMedium(fontSize: 12.sp, color: const Color(0xFF7A4A00))
+                .copyWith(decoration: TextDecoration.none, height: 1.35),
+          ),
+          SizedBox(height: 18.h),
+          Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 10.w,
+            runSpacing: 8.h,
+            children: [
+              if (gold > 0)
+                _rewardChip(
+                  icon: Assets.imagesSharedIcGold,
+                  text: LanKey.goldGained.trParams({'n': '$gold'}),
+                  bg: Colors.white,
+                ),
+              if (gems > 0)
+                _rewardChip(
+                  icon: Assets.imagesSharedIcGem,
+                  text: LanKey.gemsGained.trParams({'n': '$gems'}),
+                  bg: Colors.white,
+                ),
+            ],
+          ),
+          SizedBox(height: 20.h),
+          GestureDetector(
+            onTap: () => Get.back(),
+            child: Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(vertical: 12.h),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(color: AppColors.border, width: 2.5),
+                borderRadius: BorderRadius.circular(999),
+                boxShadow: const [BoxShadow(color: Color(0x55B56A00), offset: Offset(0, 4))],
+              ),
+              child: Text(
+                LanKey.continueLabel.tr,
                 textAlign: TextAlign.center,
                 style: textStyleBold(fontSize: 15.sp, color: AppColors.textPrimary)
                     .copyWith(decoration: TextDecoration.none),
@@ -339,8 +570,8 @@ class _DoubleRewardButtonState extends State<_DoubleRewardButton> {
       );
       if (!mounted) return;
       if (granted) {
-        Toast.success(LanKey.rewardedAdDoubleSuccess.tr);
         Get.back();
+        await RewardPopup.showRewardedAdReward(gems: widget.gems, gold: widget.gold);
       } else {
         Toast.warning(LanKey.rewardedAdFailed.tr);
         setState(() => _claiming = false);

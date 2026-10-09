@@ -58,7 +58,10 @@ enum LedgerEventType {
   achievementUnlocked('achievement_unlocked'),
 
   /// A rewarded-ad view paid out a small bonus.
-  rewardedAd('rewarded_ad');
+  rewardedAd('rewarded_ad'),
+
+  /// A calendar-day login paid out the daily reward.
+  dailyLogin('daily_login');
 
   const LedgerEventType(this.wire);
 
@@ -294,6 +297,8 @@ class LedgerEvent {
   static String achievementId(String achievementId) => 'achv_$achievementId';
 
   static String rewardedAdId(String rewardId) => 'rewarded_ad_$rewardId';
+
+  static String dailyLoginId(String date) => 'daily_login_$date';
 
   /// One merge row per device per applied delta set: re-running a merge that
   /// changed nothing produces no row at all, and a later merge that moved a

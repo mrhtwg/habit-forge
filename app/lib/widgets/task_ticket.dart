@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/i18n/app_locale.dart';
+import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/network/hive/game_constants.dart';
 import 'package:habit_forge_app/core/network/hive/game_logic.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
@@ -66,9 +66,10 @@ class _TaskTicketState extends State<TaskTicket> {
     final isNegative = GameLogic.isNegative(task);
     final exp = task.customExpReward > 0 ? task.customExpReward : GameConstants.baseExpReward(task.difficulty);
     final gold = task.customGoldReward > 0 ? task.customGoldReward : GameConstants.baseGoldReward(task.difficulty);
+    final ticketRadius = BorderRadius.circular(18.r);
 
     return ClipRRect(
-      borderRadius: BorderRadius.circular(18),
+      borderRadius: ticketRadius,
       child: Slidable(
         key: ValueKey('task-ticket-${task.id}'),
         startActionPane: (onSkip == null || done)
@@ -83,7 +84,7 @@ class _TaskTicketState extends State<TaskTicket> {
                     foregroundColor: Colors.white,
                     icon: Icons.skip_next_rounded,
                     label: LanKey.skip.tr,
-                    borderRadius: BorderRadius.circular(18.r),
+                    borderRadius: ticketRadius,
                   ),
                 ],
               ),
@@ -99,7 +100,7 @@ class _TaskTicketState extends State<TaskTicket> {
                     foregroundColor: Colors.white,
                     icon: Icons.delete_rounded,
                     label: LanKey.delete.tr,
-                    borderRadius: BorderRadius.circular(18.r),
+                    borderRadius: ticketRadius,
                   ),
                 ],
               ),
@@ -111,7 +112,7 @@ class _TaskTicketState extends State<TaskTicket> {
             padding: EdgeInsets.all(12.w),
             decoration: BoxDecoration(
               color: done ? const Color(0xFFEAF8EF) : Colors.white,
-              borderRadius: BorderRadius.circular(18.r),
+              borderRadius: ticketRadius,
               border: Border.all(color: AppColors.border, width: 2.w),
               boxShadow: const [BoxShadow(color: Color(0xFFEFDFC4), offset: Offset(0, 4))],
             ),

@@ -94,6 +94,8 @@ abstract final class AchievementCatalog {
     1000,
   ];
 
+  static const loginStreakThresholds = <int>[3, 7, 14, 30];
+
   static const levelThresholds = <int>[
     2,
     3,
@@ -156,6 +158,7 @@ abstract final class AchievementCatalog {
   static List<Achievement> definitions() => <Achievement>[
         ..._group('total_tasks', taskThresholds),
         ..._group('streak', streakThresholds),
+        ..._group('login_streak', loginStreakThresholds),
         ..._group('level', levelThresholds),
         ..._group('purchases', purchaseThresholds),
         ..._group('deaths', const [1]),
@@ -192,6 +195,7 @@ abstract final class AchievementCatalog {
   static String title(Achievement achievement) => switch (achievement.conditionType) {
         'total_tasks' => LanKey.achievementTasksTitle.trParams({'n': '${achievement.threshold}'}),
         'streak' => LanKey.achievementStreakTitle.trParams({'n': '${achievement.threshold}'}),
+        'login_streak' => LanKey.achievementLoginStreakTitle.trParams({'n': '${achievement.threshold}'}),
         'level' => LanKey.achievementLevelTitle.trParams({'n': '${achievement.threshold}'}),
         'purchases' => LanKey.achievementPurchaseTitle.trParams({'n': '${achievement.threshold}'}),
         _ => LanKey.achievementRecoveryTitle.tr,
@@ -200,6 +204,7 @@ abstract final class AchievementCatalog {
   static String description(Achievement achievement) => switch (achievement.conditionType) {
         'total_tasks' => LanKey.achievementTasksDescription.trParams({'n': '${achievement.threshold}'}),
         'streak' => LanKey.achievementStreakDescription.trParams({'n': '${achievement.threshold}'}),
+        'login_streak' => LanKey.achievementLoginStreakDescription.trParams({'n': '${achievement.threshold}'}),
         'level' => LanKey.achievementLevelDescription.trParams({'n': '${achievement.threshold}'}),
         'purchases' => LanKey.achievementPurchaseDescription.trParams({'n': '${achievement.threshold}'}),
         _ => LanKey.achievementRecoveryDescription.tr,
@@ -228,6 +233,7 @@ abstract final class AchievementCatalog {
 
   static Color colorFor(String type) => switch (type) {
         'streak' => const Color(0xFFFF7A32),
+        'login_streak' => const Color(0xFFFFB52E),
         'level' => const Color(0xFF3D9BE9),
         'purchases' => const Color(0xFF2DB96D),
         'deaths' => const Color(0xFFE85B69),
@@ -237,6 +243,7 @@ abstract final class AchievementCatalog {
   static String _englishTitle(String type, int threshold) => switch (type) {
         'total_tasks' => 'Quest Master · $threshold',
         'streak' => 'Flame Keeper · $threshold',
+        'login_streak' => 'Daily Flame · $threshold',
         'level' => 'Rising Hero · Lv.$threshold',
         'purchases' => 'Forge Patron · $threshold',
         _ => 'Phoenix Soul',
@@ -245,6 +252,7 @@ abstract final class AchievementCatalog {
   static String _englishDescription(String type, int threshold) => switch (type) {
         'total_tasks' => 'Complete $threshold quests',
         'streak' => 'Reach a $threshold-day streak',
+        'login_streak' => 'Open the app for $threshold consecutive days',
         'level' => 'Reach hero level $threshold',
         'purchases' => 'Own $threshold Forge items',
         _ => 'Recover after falling in battle',

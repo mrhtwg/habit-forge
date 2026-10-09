@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:habit_forge_app/core/services/daily_login_reward_service.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/features/forge/controllers/forge_controller.dart';
 import 'package:habit_forge_app/features/home/controllers/home_controller.dart';
@@ -15,6 +16,19 @@ class MainController extends GetxController {
     Get.put(ForgeController());
     Get.put(QuestsController());
     Get.put(ProfileController());
+  }
+
+  @override
+  void onReady() {
+    super.onReady();
+    _claimDailyReward();
+  }
+
+  Future<void> _claimDailyReward() async {
+    if (!Get.isRegistered<DailyLoginRewardService>()) return;
+    await DailyLoginRewardService.to.claimIfNeeded();
+    await Future<void>.delayed(const Duration(milliseconds: 250));
+    await DailyLoginRewardService.to.presentPending();
   }
 
   @override

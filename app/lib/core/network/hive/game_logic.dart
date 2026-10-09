@@ -272,6 +272,7 @@ class GameLogic {
     required int level,
     int purchases = 0,
     int deaths = 0,
+    int loginStreak = 0,
   }) {
     final now = Int64(DateTime.now().millisecondsSinceEpoch);
     final out = <Achievement>[];
@@ -283,6 +284,7 @@ class GameLogic {
         'level' => level >= def.threshold,
         'purchases' => purchases >= def.threshold,
         'deaths' => deaths >= def.threshold,
+        'login_streak' => loginStreak >= def.threshold,
         _ => false,
       };
       if (!met) continue;
