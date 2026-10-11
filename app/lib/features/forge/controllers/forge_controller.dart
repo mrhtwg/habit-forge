@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/network/api_response.dart';
+import 'package:habit_forge_app/core/network/hive/equipment_rules.dart';
 import 'package:habit_forge_app/core/network/hive/shop_config.dart';
 import 'package:habit_forge_app/core/network/network_registry.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
@@ -39,6 +40,11 @@ class ForgeController extends GetxController {
   /// Whether the item is a character skin (bought with gems, not equipped to a
   /// weapon/helmet/armor/accessory slot).
   bool isSkin(ShopItem item) => ShopConfig.isSkin(item.id);
+
+  bool isCompatible(ShopItem item) {
+    final character = UserService.to.character.value;
+    return character != null && EquipmentRules.isCompatible(character, item);
+  }
 
   /// Current balance in the item's currency.
   int balanceOf(ShopItem item) {

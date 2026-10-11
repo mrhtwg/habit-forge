@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:habit_forge_app/core/common/animation/frame_sequence_player.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/network/hive/class_profiles.dart';
+import 'package:habit_forge_app/core/network/hive/equipment_rules.dart';
 import 'package:habit_forge_app/core/network/hive/game_constants.dart';
 import 'package:habit_forge_app/core/network/hive/game_logic.dart';
 import 'package:habit_forge_app/core/network/hive/shop_config.dart';
@@ -17,6 +18,7 @@ import 'package:habit_forge_app/features/character/controllers/character_control
 import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart';
 import 'package:habit_forge_app/generated/protos/shared/v1/shared.pbenum.dart';
 import 'package:habit_forge_app/widgets/hud_bar.dart';
+import 'package:habit_forge_app/widgets/shop_item_icon.dart';
 import 'package:habit_forge_app/widgets/toast_widget.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
@@ -64,7 +66,9 @@ class CharacterPage extends GetView<CharacterController> {
           children: EquipmentSlot.values
               .where((slot) => slot.value != EquipmentSlot.EQUIPMENT_SLOT_UNSPECIFIED.value)
               .map((slot) {
-            final equipped = char.equipment[slot];
+            final equippedId = char.equipment[GameLogic.slotKey(slot)];
+            final equippedItem =
+                equippedId == null ? null : ShopConfig.shopItems.where((item) => item.id == equippedId).firstOrNull;
             return GestureDetector(
               onTap: () => _showEquipSheet(context, slot),
               child: Column(
@@ -74,18 +78,22 @@ class CharacterPage extends GetView<CharacterController> {
                     height: 56.w,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: equipped != null ? AppColors.goldLight : Colors.white,
+                      color: equippedItem != null ? AppColors.goldLight : Colors.white,
                       border: Border.all(
-                        color: equipped != null ? AppColors.goldDark : AppColors.textMuted,
+                        color: equippedItem != null ? AppColors.goldDark : AppColors.textMuted,
                         width: 2.5,
                       ),
                       boxShadow: const [BoxShadow(color: Color(0xFFE9D9BE), offset: Offset(0, 3))],
                     ),
-                    child: Icon(
-                      _slotIcon(slot),
-                      size: 26.w,
-                      color: equipped != null ? AppColors.goldDark : AppColors.textMuted,
-                    ),
+                    child: equippedItem == null
+                        ? Icon(_slotIcon(slot), size: 26.w, color: AppColors.textMuted)
+                        : Padding(
+                            padding: EdgeInsets.all(10.w),
+                            child: ShopItemIcon(
+                              itemId: equippedItem.id,
+                              iconFile: ShopConfig.iconOf(equippedItem.id),
+                            ),
+                          ),
                   ),
                   SizedBox(height: 5.h),
                   Text(_slotLabel(slot), style: textStyleBold(fontSize: 10.sp, color: AppColors.textSecondary)),
@@ -461,7 +469,11 @@ class CharacterPage extends GetView<CharacterController> {
       return;
     }
     final ids = result.data!.itemIds.toSet();
-    final owned = ShopConfig.shopItems.where((item) => ids.contains(item.id) && item.slot == slot).toList();
+    final owned = ShopConfig.shopItems
+        .where(
+          (item) => ids.contains(item.id) && EquipmentRules.isCompatible(char, item, targetSlot: slot),
+        )
+        .toList();
 
     Get.bottomSheet(
       Container(
@@ -501,9 +513,13 @@ class CharacterPage extends GetView<CharacterController> {
               ),
               ...owned.map(
                 (item) => ListTile(
-                  leading: const Icon(Icons.shield_rounded, color: AppColors.primary, size: 24),
+                  leading: SizedBox(
+                    width: 40.w,
+                    height: 40.w,
+                    child: ShopItemIcon(itemId: item.id, iconFile: ShopConfig.iconOf(item.id)),
+                  ),
                   title: Text(
-                    item.id.replaceAll('_', ' ').toUpperCase(),
+                    item.name.isNotEmpty ? item.name : item.id.replaceAll('_', ' ').toUpperCase(),
                     style: textStyleRegular(color: AppColors.textPrimary),
                   ),
                   trailing: char.equipment[GameLogic.slotKey(slot)] == item.id

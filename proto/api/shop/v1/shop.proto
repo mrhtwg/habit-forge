@@ -61,6 +61,14 @@ message ShopItem {
   api.shared.v1.EquipmentSlot slot = 5;
   // Rarity 
   api.shared.v1.EquipmentRarity rarity = 6;
+  // Weapon or armor family, such as sword, bow, staff, robe, or plate.
+  string equipment_type = 7;
+  // Empty means every class; otherwise contains warrior, ranger, or mage.
+  repeated string allowed_classes = 8;
+  // Armor weight/family: none, cloth, light, medium, or heavy.
+  string armor_weight = 9;
+  // Minimum character level required to equip this item.
+  int32 required_level = 10;
 }
 
 // DailyDeal — a rotating discounted item.

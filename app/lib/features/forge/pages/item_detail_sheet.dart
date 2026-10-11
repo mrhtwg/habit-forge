@@ -24,6 +24,7 @@ class ItemDetailSheet extends StatelessWidget {
     final affordable = controller.canAfford(item);
     final shortfall = controller.shortfall(item);
     final isSkin = controller.isSkin(item);
+    final compatible = isSkin || controller.isCompatible(item);
 
     return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
@@ -52,6 +53,11 @@ class ItemDetailSheet extends StatelessWidget {
           SizedBox(height: 14.h),
           Text(item.name, style: textStyleBold(fontSize: 20.sp, color: AppColors.textPrimary)),
           SizedBox(height: 8.h),
+          if (!isSkin)
+            Text(
+              '${item.equipmentType.toUpperCase()} · ${item.allowedClasses.isEmpty ? 'ALL' : item.allowedClasses.join(' / ').toUpperCase()}',
+              style: textStyleBold(fontSize: 11.sp, color: AppColors.primaryDark),
+            ),
           // Rarity pill
           // Container(
           //   padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
@@ -112,7 +118,7 @@ class ItemDetailSheet extends StatelessWidget {
             child: SizedBox(
               width: double.infinity,
               height: 52.h,
-              child: _buildActionButton(controller, owned, affordable, shortfall, isSkin),
+              child: _buildActionButton(controller, owned, affordable, shortfall, isSkin, compatible),
             ),
           ),
           SizedBox(height: 28.h),
@@ -139,6 +145,7 @@ class ItemDetailSheet extends StatelessWidget {
     bool affordable,
     int shortfall,
     bool isSkin,
+    bool compatible,
   ) {
     final VoidCallback? onTap;
     final Color bg;
@@ -153,6 +160,12 @@ class ItemDetailSheet extends StatelessWidget {
       bg = AppColors.gold;
       fg = AppColors.textPrimary;
       label = LanKey.premiumGearLocked.tr;
+      showPrice = false;
+    } else if (owned && !compatible) {
+      onTap = null;
+      bg = AppColors.textMuted;
+      fg = Colors.white;
+      label = LanKey.equipmentNotCompatible.tr;
       showPrice = false;
     } else if (owned) {
       if (isSkin) {

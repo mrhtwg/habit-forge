@@ -233,18 +233,69 @@ class ShopConfig {
     final items = <ShopItem>[];
     for (final entry in (section as List? ?? const [])) {
       final m = (entry as Map).cast<String, dynamic>();
+      final id = m['id'] as String? ?? '';
+      final slot = _slotFor(m['slot'] as String?);
+      final inferred = _metadataFor(id, slot);
+      final configuredClasses = (m['allowed_classes'] as List?)?.map((value) => value.toString()).toList();
       items.add(
         ShopItem(
-          id: m['id'] as String? ?? '',
+          id: id,
           name: m['name'] as String? ?? '',
           description: m['description'] as String? ?? '',
           price: Int64(m['price'] as int? ?? 0),
-          slot: _slotFor(m['slot'] as String?),
+          slot: slot,
           rarity: _rarityFor(m['rarity'] as String?),
+          equipmentType: m['equipment_type'] as String? ?? inferred.equipmentType,
+          allowedClasses: configuredClasses ?? inferred.allowedClasses,
+          armorWeight: m['armor_weight'] as String? ?? inferred.armorWeight,
+          requiredLevel: m['required_level'] as int? ?? 1,
         ),
       );
     }
     return items;
+  }
+
+  static ({String equipmentType, List<String> allowedClasses, String armorWeight}) _metadataFor(
+    String id,
+    EquipmentSlot slot,
+  ) {
+    if (slot == EquipmentSlot.EQUIPMENT_SLOT_ACCESSORY) {
+      return (equipmentType: 'accessory', allowedClasses: <String>[], armorWeight: 'none');
+    }
+    if (id.startsWith('sword_') || id.startsWith('blade_')) {
+      return (equipmentType: 'sword', allowedClasses: ['warrior'], armorWeight: 'none');
+    }
+    if (id.startsWith('axe_')) {
+      return (equipmentType: 'axe', allowedClasses: ['warrior'], armorWeight: 'none');
+    }
+    if (id.startsWith('bow_')) {
+      return (equipmentType: 'bow', allowedClasses: ['ranger'], armorWeight: 'none');
+    }
+    if (id.startsWith('staff_')) {
+      return (equipmentType: 'staff', allowedClasses: ['mage'], armorWeight: 'none');
+    }
+    if (id == 'armor_tunic' || id == 'armor_rune' || id == 'armor_void') {
+      return (equipmentType: 'robe', allowedClasses: ['mage'], armorWeight: 'cloth');
+    }
+    if (id == 'armor_leather' || id == 'armor_wind') {
+      return (equipmentType: 'leather', allowedClasses: ['ranger'], armorWeight: 'light');
+    }
+    if (id == 'armor_scale') {
+      return (equipmentType: 'scale', allowedClasses: ['warrior', 'ranger'], armorWeight: 'medium');
+    }
+    if (id.startsWith('armor_')) {
+      return (equipmentType: 'plate', allowedClasses: ['warrior'], armorWeight: 'heavy');
+    }
+    if (id == 'helm_archer' || id == 'helm_hawkeye' || id == 'helm_sky') {
+      return (equipmentType: 'hood', allowedClasses: ['ranger'], armorWeight: 'light');
+    }
+    if (id == 'helm_sage' || id == 'helm_crown') {
+      return (equipmentType: 'circlet', allowedClasses: ['mage'], armorWeight: 'cloth');
+    }
+    if (id.startsWith('helm_')) {
+      return (equipmentType: 'helmet', allowedClasses: ['warrior'], armorWeight: 'heavy');
+    }
+    return (equipmentType: 'equipment', allowedClasses: <String>[], armorWeight: 'none');
   }
 
   /// Parses an optional `stats` map (keys: str/int/agi/def/vit/luk) into a
@@ -292,6 +343,10 @@ class ShopConfig {
         price: Int64(500),
         slot: EquipmentSlot.EQUIPMENT_SLOT_WEAPON,
         rarity: EquipmentRarity.EQUIPMENT_RARITY_EPIC,
+        equipmentType: 'sword',
+        allowedClasses: ['warrior'],
+        armorWeight: 'none',
+        requiredLevel: 1,
       ),
       ShopItem(
         id: 'armor_golden',
@@ -300,6 +355,10 @@ class ShopConfig {
         price: Int64(300),
         slot: EquipmentSlot.EQUIPMENT_SLOT_ARMOR,
         rarity: EquipmentRarity.EQUIPMENT_RARITY_RARE,
+        equipmentType: 'plate',
+        allowedClasses: ['warrior'],
+        armorWeight: 'heavy',
+        requiredLevel: 1,
       ),
       ShopItem(
         id: 'helm_dragon',
@@ -308,6 +367,10 @@ class ShopConfig {
         price: Int64(250),
         slot: EquipmentSlot.EQUIPMENT_SLOT_HELMET,
         rarity: EquipmentRarity.EQUIPMENT_RARITY_RARE,
+        equipmentType: 'helmet',
+        allowedClasses: ['warrior'],
+        armorWeight: 'heavy',
+        requiredLevel: 1,
       ),
       ShopItem(
         id: 'staff_arcane',
@@ -316,6 +379,10 @@ class ShopConfig {
         price: Int64(350),
         slot: EquipmentSlot.EQUIPMENT_SLOT_WEAPON,
         rarity: EquipmentRarity.EQUIPMENT_RARITY_EPIC,
+        equipmentType: 'staff',
+        allowedClasses: ['mage'],
+        armorWeight: 'none',
+        requiredLevel: 1,
       ),
     ];
   }

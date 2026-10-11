@@ -3,6 +3,7 @@ import 'package:habit_forge_app/core/network/api_status_code.dart';
 import 'package:habit_forge_app/core/network/api_response.dart';
 import 'package:habit_forge_app/core/network/daily_login_reward.dart';
 import 'package:habit_forge_app/core/network/hive/character_box.dart';
+import 'package:habit_forge_app/core/network/hive/equipment_rules.dart';
 import 'package:habit_forge_app/core/network/hive/game_logic.dart';
 import 'package:habit_forge_app/core/network/hive/shop_box.dart';
 import 'package:habit_forge_app/core/network/hive/shop_config.dart';
@@ -173,6 +174,16 @@ class NetworkHiveImpl implements NetworkInterface {
     final owned = UserBox.ins.getOwnedItemIds();
     if (itemId.isNotEmpty && !owned.contains(itemId)) {
       return ApiResponse.failure(code: StatusCode.failedPrecondition, message: 'Item not owned');
+    }
+    if (itemId.isNotEmpty) {
+      final item = ShopConfig.shopItems.where((candidate) => candidate.id == itemId).firstOrNull;
+      if (item == null) {
+        return ApiResponse.failure(code: StatusCode.notFound, message: 'Item not found');
+      }
+      if (!EquipmentRules.isCompatible(char, item, targetSlot: slot)) {
+        return ApiResponse.failure(
+            code: StatusCode.failedPrecondition, message: 'Item is not compatible with this hero');
+      }
     }
     CharacterBox.ins.updateCharacter(GameLogic.equip(char, GameLogic.slotKey(slot), itemId));
     return ApiResponse.success(EquipItemReply(), 'Equipped');

@@ -79,6 +79,8 @@ const Map<LanKey, String> zhCN = {
   LanKey.rewardedAdDoubleSuccess: '奖励已翻倍',
   LanKey.rewardedAdRewardTitle: '奖励已到账',
   LanKey.rewardedAdRewardBody: '资源已加入你的冒险旅程。',
+  LanKey.rewardedAdCooldown: '@time 后可观看',
+  LanKey.equipmentNotCompatible: '当前英雄无法装备',
   LanKey.home: '首页',
   LanKey.quests: '任务',
   LanKey.profile: '我的',

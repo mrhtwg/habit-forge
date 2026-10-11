@@ -9,6 +9,7 @@ import 'package:habit_forge_app/core/extensions/date_extensions.dart';
 import 'package:habit_forge_app/core/network/api_response.dart';
 import 'package:habit_forge_app/core/network/daily_login_reward.dart';
 import 'package:habit_forge_app/core/network/hive/game_logic.dart';
+import 'package:habit_forge_app/core/network/hive/equipment_rules.dart';
 import 'package:habit_forge_app/core/network/hive/shop_config.dart';
 import 'package:habit_forge_app/core/network/ledger/game_ledger.dart';
 import 'package:habit_forge_app/core/network/ledger/ledger_event.dart';
@@ -639,6 +640,13 @@ class NetworkFirebaseImpl implements NetworkInterface {
         final owned = _ownedFrom(data);
         if (itemId.isNotEmpty && !owned.contains(itemId)) {
           throw _Biz('Item not owned', StatusCode.failedPrecondition);
+        }
+        if (itemId.isNotEmpty) {
+          final item = ShopConfig.shopItems.where((candidate) => candidate.id == itemId).firstOrNull;
+          if (item == null) throw _Biz('Item not found', StatusCode.notFound);
+          if (!EquipmentRules.isCompatible(char, item, targetSlot: slot)) {
+            throw _Biz('Item is not compatible with this hero', StatusCode.failedPrecondition);
+          }
         }
         // Equipment changes effective stats, not the balances the ledger tracks
         // (plan §6.3: 装备/卸下 does not produce a row).

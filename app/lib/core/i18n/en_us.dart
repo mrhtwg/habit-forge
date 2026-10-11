@@ -80,6 +80,8 @@ const Map<LanKey, String> enUS = {
   LanKey.rewardedAdDoubleSuccess: 'Reward doubled',
   LanKey.rewardedAdRewardTitle: 'Reward received',
   LanKey.rewardedAdRewardBody: 'Your resources have been added to your adventure.',
+  LanKey.rewardedAdCooldown: 'Available in @time',
+  LanKey.equipmentNotCompatible: 'Not compatible with this hero',
   LanKey.home: 'Home',
   LanKey.quests: 'Quests',
   LanKey.profile: 'Profile',

@@ -10,12 +10,13 @@
 // ignore_for_file: deprecated_member_use_from_same_package, library_prefixes
 // ignore_for_file: non_constant_identifier_names, prefer_relative_imports
 
+import 'dart:async' as $async;
 import 'dart:core' as $core;
 
 import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:protobuf/protobuf.dart' as $pb;
 
-import '../../shared/v1/shared.pbenum.dart' as $1;
+import '../../shared/v1/shared.pbenum.dart' as $0;
 import 'shop.pbenum.dart';
 
 export 'package:protobuf/protobuf.dart' show GeneratedMessageGenericExtensions;
@@ -29,8 +30,12 @@ class ShopItem extends $pb.GeneratedMessage {
     $core.String? name,
     $core.String? description,
     $fixnum.Int64? price,
-    $1.EquipmentSlot? slot,
-    $1.EquipmentRarity? rarity,
+    $0.EquipmentSlot? slot,
+    $0.EquipmentRarity? rarity,
+    $core.String? equipmentType,
+    $core.Iterable<$core.String>? allowedClasses,
+    $core.String? armorWeight,
+    $core.int? requiredLevel,
   }) {
     final result = create();
     if (id != null) result.id = id;
@@ -39,6 +44,10 @@ class ShopItem extends $pb.GeneratedMessage {
     if (price != null) result.price = price;
     if (slot != null) result.slot = slot;
     if (rarity != null) result.rarity = rarity;
+    if (equipmentType != null) result.equipmentType = equipmentType;
+    if (allowedClasses != null) result.allowedClasses.addAll(allowedClasses);
+    if (armorWeight != null) result.armorWeight = armorWeight;
+    if (requiredLevel != null) result.requiredLevel = requiredLevel;
     return result;
   }
 
@@ -59,10 +68,14 @@ class ShopItem extends $pb.GeneratedMessage {
     ..aOS(2, _omitFieldNames ? '' : 'name')
     ..aOS(3, _omitFieldNames ? '' : 'description')
     ..aInt64(4, _omitFieldNames ? '' : 'price')
-    ..aE<$1.EquipmentSlot>(5, _omitFieldNames ? '' : 'slot',
-        enumValues: $1.EquipmentSlot.values)
-    ..aE<$1.EquipmentRarity>(6, _omitFieldNames ? '' : 'rarity',
-        enumValues: $1.EquipmentRarity.values)
+    ..aE<$0.EquipmentSlot>(5, _omitFieldNames ? '' : 'slot',
+        enumValues: $0.EquipmentSlot.values)
+    ..aE<$0.EquipmentRarity>(6, _omitFieldNames ? '' : 'rarity',
+        enumValues: $0.EquipmentRarity.values)
+    ..aOS(7, _omitFieldNames ? '' : 'equipmentType')
+    ..pPS(8, _omitFieldNames ? '' : 'allowedClasses')
+    ..aOS(9, _omitFieldNames ? '' : 'armorWeight')
+    ..aI(10, _omitFieldNames ? '' : 'requiredLevel')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -125,9 +138,9 @@ class ShopItem extends $pb.GeneratedMessage {
 
   /// Equipment slot this item occupies.
   @$pb.TagNumber(5)
-  $1.EquipmentSlot get slot => $_getN(4);
+  $0.EquipmentSlot get slot => $_getN(4);
   @$pb.TagNumber(5)
-  set slot($1.EquipmentSlot value) => $_setField(5, value);
+  set slot($0.EquipmentSlot value) => $_setField(5, value);
   @$pb.TagNumber(5)
   $core.bool hasSlot() => $_has(4);
   @$pb.TagNumber(5)
@@ -135,13 +148,47 @@ class ShopItem extends $pb.GeneratedMessage {
 
   /// Rarity
   @$pb.TagNumber(6)
-  $1.EquipmentRarity get rarity => $_getN(5);
+  $0.EquipmentRarity get rarity => $_getN(5);
   @$pb.TagNumber(6)
-  set rarity($1.EquipmentRarity value) => $_setField(6, value);
+  set rarity($0.EquipmentRarity value) => $_setField(6, value);
   @$pb.TagNumber(6)
   $core.bool hasRarity() => $_has(5);
   @$pb.TagNumber(6)
   void clearRarity() => $_clearField(6);
+
+  /// Weapon or armor family, such as sword, bow, staff, robe, or plate.
+  @$pb.TagNumber(7)
+  $core.String get equipmentType => $_getSZ(6);
+  @$pb.TagNumber(7)
+  set equipmentType($core.String value) => $_setString(6, value);
+  @$pb.TagNumber(7)
+  $core.bool hasEquipmentType() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearEquipmentType() => $_clearField(7);
+
+  /// Empty means every class; otherwise contains warrior, ranger, or mage.
+  @$pb.TagNumber(8)
+  $pb.PbList<$core.String> get allowedClasses => $_getList(7);
+
+  /// Armor weight/family: none, cloth, light, medium, or heavy.
+  @$pb.TagNumber(9)
+  $core.String get armorWeight => $_getSZ(8);
+  @$pb.TagNumber(9)
+  set armorWeight($core.String value) => $_setString(8, value);
+  @$pb.TagNumber(9)
+  $core.bool hasArmorWeight() => $_has(8);
+  @$pb.TagNumber(9)
+  void clearArmorWeight() => $_clearField(9);
+
+  /// Minimum character level required to equip this item.
+  @$pb.TagNumber(10)
+  $core.int get requiredLevel => $_getIZ(9);
+  @$pb.TagNumber(10)
+  set requiredLevel($core.int value) => $_setSignedInt32(9, value);
+  @$pb.TagNumber(10)
+  $core.bool hasRequiredLevel() => $_has(9);
+  @$pb.TagNumber(10)
+  void clearRequiredLevel() => $_clearField(10);
 }
 
 /// DailyDeal — a rotating discounted item.
@@ -660,6 +707,37 @@ class ListOwnedItemsReply extends $pb.GeneratedMessage {
   /// Owned item ids.
   @$pb.TagNumber(1)
   $pb.PbList<$core.String> get itemIds => $_getList(0);
+}
+
+/// ShopService — Forge shop: items, daily deals, purchases, owned items.
+class ShopServiceApi {
+  final $pb.RpcClient _client;
+
+  ShopServiceApi(this._client);
+
+  /// ListShopItems lists all purchasable shop items.
+  $async.Future<ListShopItemsReply> listShopItems(
+          $pb.ClientContext? ctx, ListShopItemsRequest request) =>
+      _client.invoke<ListShopItemsReply>(
+          ctx, 'ShopService', 'ListShopItems', request, ListShopItemsReply());
+
+  /// GetDailyDeal returns the current rotating discounted item.
+  $async.Future<GetDailyDealReply> getDailyDeal(
+          $pb.ClientContext? ctx, GetDailyDealRequest request) =>
+      _client.invoke<GetDailyDealReply>(
+          ctx, 'ShopService', 'GetDailyDeal', request, GetDailyDealReply());
+
+  /// BuyItem purchases an item with gold or gems.
+  $async.Future<BuyItemReply> buyItem(
+          $pb.ClientContext? ctx, BuyItemRequest request) =>
+      _client.invoke<BuyItemReply>(
+          ctx, 'ShopService', 'BuyItem', request, BuyItemReply());
+
+  /// ListOwnedItems lists items the current user owns.
+  $async.Future<ListOwnedItemsReply> listOwnedItems(
+          $pb.ClientContext? ctx, ListOwnedItemsRequest request) =>
+      _client.invoke<ListOwnedItemsReply>(
+          ctx, 'ShopService', 'ListOwnedItems', request, ListOwnedItemsReply());
 }
 
 const $core.bool _omitFieldNames =

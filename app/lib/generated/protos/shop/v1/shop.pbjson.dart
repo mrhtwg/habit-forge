@@ -54,6 +54,10 @@ const ShopItem$json = {
       '6': '.api.shared.v1.EquipmentRarity',
       '10': 'rarity'
     },
+    {'1': 'equipment_type', '3': 7, '4': 1, '5': 9, '10': 'equipmentType'},
+    {'1': 'allowed_classes', '3': 8, '4': 3, '5': 9, '10': 'allowedClasses'},
+    {'1': 'armor_weight', '3': 9, '4': 1, '5': 9, '10': 'armorWeight'},
+    {'1': 'required_level', '3': 10, '4': 1, '5': 5, '10': 'requiredLevel'},
   ],
 };
 
@@ -62,7 +66,10 @@ final $typed_data.Uint8List shopItemDescriptor = $convert.base64Decode(
     'CghTaG9wSXRlbRIOCgJpZBgBIAEoCVICaWQSEgoEbmFtZRgCIAEoCVIEbmFtZRIgCgtkZXNjcm'
     'lwdGlvbhgDIAEoCVILZGVzY3JpcHRpb24SFAoFcHJpY2UYBCABKANSBXByaWNlEjAKBHNsb3QY'
     'BSABKA4yHC5hcGkuc2hhcmVkLnYxLkVxdWlwbWVudFNsb3RSBHNsb3QSNgoGcmFyaXR5GAYgAS'
-    'gOMh4uYXBpLnNoYXJlZC52MS5FcXVpcG1lbnRSYXJpdHlSBnJhcml0eQ==');
+    'gOMh4uYXBpLnNoYXJlZC52MS5FcXVpcG1lbnRSYXJpdHlSBnJhcml0eRIlCg5lcXVpcG1lbnRf'
+    'dHlwZRgHIAEoCVINZXF1aXBtZW50VHlwZRInCg9hbGxvd2VkX2NsYXNzZXMYCCADKAlSDmFsbG'
+    '93ZWRDbGFzc2VzEiEKDGFybW9yX3dlaWdodBgJIAEoCVILYXJtb3JXZWlnaHQSJQoOcmVxdWly'
+    'ZWRfbGV2ZWwYCiABKAVSDXJlcXVpcmVkTGV2ZWw=');
 
 @$core.Deprecated('Use dailyDealDescriptor instead')
 const DailyDeal$json = {
@@ -204,3 +211,60 @@ const ListOwnedItemsReply$json = {
 final $typed_data.Uint8List listOwnedItemsReplyDescriptor =
     $convert.base64Decode(
         'ChNMaXN0T3duZWRJdGVtc1JlcGx5EhkKCGl0ZW1faWRzGAEgAygJUgdpdGVtSWRz');
+
+const $core.Map<$core.String, $core.dynamic> ShopServiceBase$json = {
+  '1': 'ShopService',
+  '2': [
+    {
+      '1': 'ListShopItems',
+      '2': '.api.shop.v1.ListShopItemsRequest',
+      '3': '.api.shop.v1.ListShopItemsReply',
+      '4': {}
+    },
+    {
+      '1': 'GetDailyDeal',
+      '2': '.api.shop.v1.GetDailyDealRequest',
+      '3': '.api.shop.v1.GetDailyDealReply',
+      '4': {}
+    },
+    {
+      '1': 'BuyItem',
+      '2': '.api.shop.v1.BuyItemRequest',
+      '3': '.api.shop.v1.BuyItemReply',
+      '4': {}
+    },
+    {
+      '1': 'ListOwnedItems',
+      '2': '.api.shop.v1.ListOwnedItemsRequest',
+      '3': '.api.shop.v1.ListOwnedItemsReply',
+      '4': {}
+    },
+  ],
+};
+
+@$core.Deprecated('Use shopServiceDescriptor instead')
+const $core.Map<$core.String, $core.Map<$core.String, $core.dynamic>>
+    ShopServiceBase$messageJson = {
+  '.api.shop.v1.ListShopItemsRequest': ListShopItemsRequest$json,
+  '.api.shop.v1.ListShopItemsReply': ListShopItemsReply$json,
+  '.api.shop.v1.ShopItem': ShopItem$json,
+  '.api.shop.v1.GetDailyDealRequest': GetDailyDealRequest$json,
+  '.api.shop.v1.GetDailyDealReply': GetDailyDealReply$json,
+  '.api.shop.v1.DailyDeal': DailyDeal$json,
+  '.api.shop.v1.BuyItemRequest': BuyItemRequest$json,
+  '.api.shop.v1.BuyItemReply': BuyItemReply$json,
+  '.api.shop.v1.ListOwnedItemsRequest': ListOwnedItemsRequest$json,
+  '.api.shop.v1.ListOwnedItemsReply': ListOwnedItemsReply$json,
+};
+
+/// Descriptor for `ShopService`. Decode as a `google.protobuf.ServiceDescriptorProto`.
+final $typed_data.Uint8List shopServiceDescriptor = $convert.base64Decode(
+    'CgtTaG9wU2VydmljZRJvCg1MaXN0U2hvcEl0ZW1zEiEuYXBpLnNob3AudjEuTGlzdFNob3BJdG'
+    'Vtc1JlcXVlc3QaHy5hcGkuc2hvcC52MS5MaXN0U2hvcEl0ZW1zUmVwbHkiGoLT5JMCFBISL2Fw'
+    'aS92MS9zaG9wL2l0ZW1zEnEKDEdldERhaWx5RGVhbBIgLmFwaS5zaG9wLnYxLkdldERhaWx5RG'
+    'VhbFJlcXVlc3QaHi5hcGkuc2hvcC52MS5HZXREYWlseURlYWxSZXBseSIfgtPkkwIZEhcvYXBp'
+    'L3YxL3Nob3AvZGFpbHktZGVhbBJuCgdCdXlJdGVtEhsuYXBpLnNob3AudjEuQnV5SXRlbVJlcX'
+    'Vlc3QaGS5hcGkuc2hvcC52MS5CdXlJdGVtUmVwbHkiK4LT5JMCJSIgL2FwaS92MS9zaG9wL2l0'
+    'ZW1zL3tpdGVtX2lkfS9idXk6ASoScgoOTGlzdE93bmVkSXRlbXMSIi5hcGkuc2hvcC52MS5MaX'
+    'N0T3duZWRJdGVtc1JlcXVlc3QaIC5hcGkuc2hvcC52MS5MaXN0T3duZWRJdGVtc1JlcGx5IhqC'
+    '0+STAhQSEi9hcGkvdjEvc2hvcC9vd25lZA==');

@@ -16,8 +16,11 @@ class RewardedAdCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final service = RewardedAdService.to;
     return Obx(() {
+      if (service.dailyLimitReached) return const SizedBox.shrink();
       final ready = service.isReady.value;
       final loading = service.isLoading.value;
+      final coolingDown = service.isCoolingDown;
+      final canWatch = ready && !coolingDown;
       return Container(
         margin: EdgeInsets.fromLTRB(20.w, 0, 20.w, 10.h),
         padding: EdgeInsets.fromLTRB(12.w, 10.h, 10.w, 10.h),
@@ -54,7 +57,7 @@ class RewardedAdCard extends StatelessWidget {
               ),
             ),
             PressableButton(
-              onTap: ready
+              onTap: canWatch
                   ? () async {
                       final granted = await service.showRewarded();
                       if (granted) {
@@ -65,10 +68,14 @@ class RewardedAdCard extends StatelessWidget {
                     }
                   : null,
               padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
-              backgroundColor: ready ? AppColors.primary : AppColors.textMuted,
-              shadowColor: ready ? AppColors.primaryDark : AppColors.textMuted,
+              backgroundColor: canWatch ? AppColors.primary : AppColors.textMuted,
+              shadowColor: canWatch ? AppColors.primaryDark : AppColors.textMuted,
               child: Text(
-                loading ? LanKey.rewardedAdLoading.tr : LanKey.rewardedAdWatch.tr,
+                loading
+                    ? LanKey.rewardedAdLoading.tr
+                    : coolingDown
+                        ? LanKey.rewardedAdCooldown.trParams({'time': service.cooldownLabel})
+                        : LanKey.rewardedAdWatch.tr,
                 style: textStyleBold(fontSize: 10.sp, color: Colors.white),
               ),
             ),

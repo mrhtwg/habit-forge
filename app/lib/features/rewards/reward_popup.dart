@@ -536,7 +536,7 @@ class _DoubleRewardButtonState extends State<_DoubleRewardButton> {
     final service = RewardedAdService.to;
     return Obx(() {
       final ready = service.isReady.value;
-      final enabled = ready && !_claiming;
+      final enabled = ready && service.canWatch(enforceHomeLimits: false) && !_claiming;
       return PressableButton(
         onTap: enabled ? _claim : null,
         padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
@@ -567,6 +567,7 @@ class _DoubleRewardButtonState extends State<_DoubleRewardButton> {
       final granted = await RewardedAdService.to.showRewarded(
         gems: widget.gems,
         gold: widget.gold,
+        enforceHomeLimits: false,
       );
       if (!mounted) return;
       if (granted) {

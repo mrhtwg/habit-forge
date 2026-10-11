@@ -82,6 +82,8 @@ enum LanKey {
   rewardedAdDoubleSuccess, // 'Reward doubled'
   rewardedAdRewardTitle, // 'Reward received'
   rewardedAdRewardBody, // 'Thanks for supporting your adventure'
+  rewardedAdCooldown, // 'Available in @time'
+  equipmentNotCompatible, // 'Not compatible with this hero'
   home, // 'Home'
   quests, // 'Quests'
   profile, // 'Profile'
