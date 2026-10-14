@@ -1,5 +1,6 @@
 import java.util.Properties
 import java.io.FileInputStream
+import java.util.Base64
 
 plugins {
     id("com.android.application")
@@ -7,6 +8,22 @@ plugins {
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
+
+// Flutter passes --dart-define values to Gradle as base64-encoded entries.
+// Read the AdMob App ID here because the Mobile Ads SDK requires it in the
+// native Android manifest, while keeping production IDs out of Hive/server builds.
+val flutterDartDefines = (project.findProperty("dart-defines") as? String)
+    .orEmpty()
+    .split(",")
+    .mapNotNull { encoded ->
+        runCatching { String(Base64.getDecoder().decode(encoded), Charsets.UTF_8) }.getOrNull()
+    }
+    .mapNotNull { define ->
+        val separator = define.indexOf('=')
+        if (separator > 0) define.substring(0, separator) to define.substring(separator + 1) else null
+    }
+    .toMap()
+val admobAppId = flutterDartDefines["admobAppIdAndroid"] ?: "ca-app-pub-3940256099942544~3347511713"
 
 // Load signing config from key.properties if present.
 // For open source builds, you can run without a release key:
@@ -38,6 +55,7 @@ android {
         targetSdk = 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        manifestPlaceholders["admobAppId"] = admobAppId
         ndk {
             abiFilters.clear()
             abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a"))
