@@ -44,14 +44,11 @@ class StatisticsPage extends GetView<StatisticsController> {
 
   /// Stats content for one time period (swipeable tab).
   Widget _buildStatsPage(TimePeriod period) {
-    return Obx(() {
-      // Observe entitlement so unlocking Premium refreshes locked tabs.
-      final premium = SubscriptionService.to.canUseAdvancedStats;
-      if (period != TimePeriod.week && !premium) {
-        return _buildPremiumLock();
-      }
-      return _buildStatsContent(period);
-    });
+    final premium = SubscriptionService.to.canUseAdvancedStats;
+    if (period != TimePeriod.week && !premium) {
+      return _buildPremiumLock();
+    }
+    return _buildStatsContent(period);
   }
 
   Widget _buildPremiumLock() {

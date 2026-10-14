@@ -34,6 +34,7 @@ class UserBox {
 
   static const _ownedKey = 'ownedItemIds';
   static const _dailyLoginKey = 'dailyLogin';
+  static const _taskBudgetKey = 'taskBudget';
 
   Map<String, dynamic> getDailyLoginState() {
     final raw = _userBox.get(_dailyLoginKey);
@@ -43,6 +44,40 @@ class UserBox {
 
   void updateDailyLoginState({required String date, required int streak}) {
     _userBox.put(_dailyLoginKey, <String, dynamic>{'date': date, 'streak': streak});
+  }
+
+  Map<String, dynamic> getTaskBudget(String date) {
+    final raw = _userBox.get(_taskBudgetKey);
+    if (raw is! Map || raw['date'] != date) return <String, dynamic>{'date': date, 'exp': 0, 'gold': 0};
+    return <String, dynamic>{
+      'date': date,
+      'exp': raw['exp'] is num ? (raw['exp'] as num).toInt() : 0,
+      'gold': raw['gold'] is num ? (raw['gold'] as num).toInt() : 0,
+    };
+  }
+
+  void updateTaskBudget({required String date, required int exp, required int gold}) {
+    final raw = _userBox.get(_taskBudgetKey);
+    _userBox.put(
+      _taskBudgetKey,
+      <String, dynamic>{
+        'date': date,
+        'exp': exp,
+        'gold': gold,
+        if (raw is Map && raw['date'] == date && raw['firstCompletionDate'] == date) 'firstCompletionDate': date,
+      },
+    );
+  }
+
+  bool hasFirstCompletionFor(String date) {
+    final raw = _userBox.get(_taskBudgetKey);
+    return raw is Map && raw['date'] == date && raw['firstCompletionDate'] == date;
+  }
+
+  void markFirstCompletionFor(String date) {
+    final budget = getTaskBudget(date);
+    budget['firstCompletionDate'] = date;
+    _userBox.put(_taskBudgetKey, budget);
   }
 
   List<String> getOwnedItemIds() {

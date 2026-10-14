@@ -4,6 +4,7 @@ import 'package:habit_forge_app/core/network/api_response.dart';
 import 'package:habit_forge_app/core/network/daily_login_reward.dart';
 import 'package:habit_forge_app/core/network/hive/character_box.dart';
 import 'package:habit_forge_app/core/network/hive/equipment_rules.dart';
+import 'package:habit_forge_app/core/network/hive/game_balance_config.dart';
 import 'package:habit_forge_app/core/network/hive/game_logic.dart';
 import 'package:habit_forge_app/core/network/hive/shop_box.dart';
 import 'package:habit_forge_app/core/network/hive/shop_config.dart';
@@ -81,14 +82,38 @@ class NetworkHiveImpl implements NetworkInterface {
     // Rewards (streak-aware EXP + gold, scaled by INT / STR stat bonuses).
     // A negative habit is a *slip*: it earns nothing and costs HP instead.
     final isSlip = GameLogic.isNegative(task);
-    final _gainExp = GameLogic.expReward(task, character);
-    final _gainGold = GameLogic.goldReward(task, character);
+    final rawExp = GameLogic.expReward(task, character);
+    final rawGold = GameLogic.goldReward(task, character);
+    final budgetDate = _dateKey(DateTime.now());
+    final budget = UserBox.ins.getTaskBudget(budgetDate);
+    final firstCompletion = !isSlip && !UserBox.ins.hasFirstCompletionFor(budgetDate);
+    final expRemaining = GameBalanceConfig.configuredTaskDailyExpCap - (budget['exp'] as int);
+    final goldRemaining = GameBalanceConfig.configuredTaskDailyGoldCap - (budget['gold'] as int);
+    final _gainExp = isSlip
+        ? 0
+        : expRemaining <= 0
+            ? 0
+            : rawExp < expRemaining
+                ? rawExp
+                : expRemaining;
+    final _gainGold = isSlip
+        ? 0
+        : goldRemaining <= 0
+            ? 0
+            : rawGold < goldRemaining
+                ? rawGold
+                : goldRemaining;
 
     // Wallet + lifetime completed-task counter. Logging a slip is not a
     // completed task: the wallet and the counters (which feed achievements)
     // must not move, or a bad habit would farm "complete 50 tasks".
     var prefs = UserBox.ins.getUserPrefs()..freeze();
     if (!isSlip) {
+      UserBox.ins.updateTaskBudget(
+        date: budgetDate,
+        exp: (budget['exp'] as int) + _gainExp,
+        gold: (budget['gold'] as int) + _gainGold,
+      );
       prefs = prefs.rebuild(
         (user) => user
           ..currentGold = user.currentGold + _gainGold
@@ -103,7 +128,12 @@ class NetworkHiveImpl implements NetworkInterface {
     // Leveling (see GameLogic.gainExp): EXP lives inside the current level
     // (0..expForLevel(level)); crossing the threshold spends it and levels up
     // with the remainder carrying over. maxExp mirrors the next level's need.
-    final newCharacter = isSlip ? GameLogic.applySlip(character, task) : GameLogic.gainExp(character, _gainExp).$1;
+    var newCharacter = isSlip ? GameLogic.applySlip(character, task) : GameLogic.gainExp(character, _gainExp).$1;
+    if (firstCompletion) {
+      final mageBonus = character.characterClass == CharacterClass.CHARACTER_CLASS_MAGE ? 5 : 0;
+      newCharacter = GameLogic.heal(newCharacter, GameBalanceConfig.firstCompletionHeal + mageBonus);
+      UserBox.ins.markFirstCompletionFor(budgetDate);
+    }
     CharacterBox.ins.updateCharacter(newCharacter);
 
     // Mark the task complete (streak / completedAt) and persist.
@@ -182,7 +212,9 @@ class NetworkHiveImpl implements NetworkInterface {
       }
       if (!EquipmentRules.isCompatible(char, item, targetSlot: slot)) {
         return ApiResponse.failure(
-            code: StatusCode.failedPrecondition, message: 'Item is not compatible with this hero');
+          code: StatusCode.failedPrecondition,
+          message: 'Item is not compatible with this hero',
+        );
       }
     }
     CharacterBox.ins.updateCharacter(GameLogic.equip(char, GameLogic.slotKey(slot), itemId));
@@ -272,7 +304,13 @@ class NetworkHiveImpl implements NetworkInterface {
     // Charge today's deal price when this item is the deal of the day.
     // Recomputed here rather than taken from the UI, so the charge can never
     // disagree with what the shop showed.
-    final deal = ShopConfig.dailyDealFor(CharacterBox.ins.getCharacter()?.id ?? 'guest', DateTime.now());
+    final character = CharacterBox.ins.getCharacter();
+    final deal = ShopConfig.dailyDealFor(
+      character?.id ?? 'guest',
+      DateTime.now(),
+      character: character,
+      ownedItemIds: UserBox.ins.getOwnedItemIds().toSet(),
+    );
     final price = ShopConfig.effectivePrice(item.price.toInt(), itemId, deal);
 
     // The item itself defines its currency (config.yml): skins cost gems,
@@ -421,7 +459,7 @@ class NetworkHiveImpl implements NetworkInterface {
   @override
   Future<ApiResponse<GetPrefsReply>> claimRewardedAdReward(
     String rewardId, {
-    int gems = 5,
+    int gems = 2,
     int gold = 0,
   }) async {
     var prefs = UserBox.ins.getUserPrefs();
@@ -445,7 +483,15 @@ class NetworkHiveImpl implements NetworkInterface {
   @override
   Future<ApiResponse<DailyDeal>> getDailyDeal() async {
     final seed = CharacterBox.ins.getCharacter()?.id ?? 'guest';
-    return ApiResponse.success(ShopConfig.dailyDealFor(seed, DateTime.now()));
+    final character = CharacterBox.ins.getCharacter();
+    return ApiResponse.success(
+      ShopConfig.dailyDealFor(
+        seed,
+        DateTime.now(),
+        character: character,
+        ownedItemIds: UserBox.ins.getOwnedItemIds().toSet(),
+      ),
+    );
   }
 
   @override

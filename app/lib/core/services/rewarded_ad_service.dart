@@ -7,6 +7,7 @@ import 'package:habit_forge_app/core/common/utils/log.dart';
 import 'package:habit_forge_app/core/common/utils/sp_keys.dart';
 import 'package:habit_forge_app/core/common/utils/sp_utils.dart';
 import 'package:habit_forge_app/core/network/network_registry.dart';
+import 'package:habit_forge_app/core/network/hive/game_balance_config.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:uuid/uuid.dart';
 
@@ -15,9 +16,9 @@ class RewardedAdService extends GetxService {
 
   static const androidTestAdUnitId = 'ca-app-pub-3940256099942544/5224354917';
   static const iOSTestAdUnitId = 'ca-app-pub-3940256099942544/1712485313';
-  static const rewardGems = 5;
+  static int get rewardGems => GameBalanceConfig.configuredAdGems;
   static const cooldown = Duration(minutes: 10);
-  static const dailyLimit = 5;
+  static int get dailyLimit => GameBalanceConfig.configuredAdClaimsPerDay;
 
   final isReady = false.obs;
   final isLoading = false.obs;
@@ -91,7 +92,7 @@ class RewardedAdService extends GetxService {
     );
   }
 
-  Future<bool> showRewarded({int gems = rewardGems, int gold = 0, bool enforceHomeLimits = true}) async {
+  Future<bool> showRewarded({int? gems, int gold = 0, bool enforceHomeLimits = true}) async {
     if (!canWatch(enforceHomeLimits: enforceHomeLimits)) return false;
     final ad = _rewardedAd;
     if (ad == null) {
@@ -134,9 +135,10 @@ class RewardedAdService extends GetxService {
         rewardCallbackStarted = true;
         try {
           final rewardId = const Uuid().v4();
+          final rewardGemAmount = gems ?? rewardGems;
           final response = await NetworkRegistry.ins.claimRewardedAdReward(
             rewardId,
-            gems: gems,
+            gems: rewardGemAmount,
             gold: gold,
           );
           if (response.isSuccess && response.data != null) {

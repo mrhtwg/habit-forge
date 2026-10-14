@@ -29,20 +29,17 @@ class MainPage extends GetView<MainController> {
             // Guest reminder: no account is bound, so an uninstall or a new phone
             // would lose this device's progress. Collapses to nothing once an
             // account is bound (or in local-only builds).
-            const SafeArea(bottom: false, child: AccountBindBanner()),
+            const AccountBindBanner(),
             Expanded(
               child: Stack(
                 children: [
-                  TabEntrance(
+                  IndexedStack(
                     index: controller.currentIndex.value,
-                    child: IndexedStack(
-                      index: controller.currentIndex.value,
-                      children: List.generate(
-                        tabs.length,
-                        (index) => TickerMode(
-                          enabled: index == controller.currentIndex.value,
-                          child: tabs[index],
-                        ),
+                    children: List.generate(
+                      tabs.length,
+                      (index) => TickerMode(
+                        enabled: index == controller.currentIndex.value,
+                        child: tabs[index],
                       ),
                     ),
                   ),

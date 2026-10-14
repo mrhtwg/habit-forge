@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:habit_forge_app/core/i18n/app_locale.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
+import 'package:habit_forge_app/core/network/hive/game_constants.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_spacing.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
@@ -359,12 +360,10 @@ class TaskTile extends StatelessWidget {
   }
 
   int _expReward() {
-    if (task.customExpReward > 0) return task.customExpReward;
     return _baseExp(task.difficulty);
   }
 
   int _goldReward() {
-    if (task.customGoldReward > 0) return task.customGoldReward;
     return _baseGold(task.difficulty);
   }
 
@@ -555,31 +554,11 @@ class _TaskDetailSheet extends StatelessWidget {
   }
 
   int _calcExp(Task t) {
-    if (t.customExpReward > 0) return t.customExpReward;
-    switch (t.difficulty) {
-      case TaskDifficulty.TASK_DIFFICULTY_EASY:
-        return 15;
-      case TaskDifficulty.TASK_DIFFICULTY_MEDIUM:
-        return 30;
-      case TaskDifficulty.TASK_DIFFICULTY_HARD:
-        return 50;
-      default:
-        return 15;
-    }
+    return GameConstants.baseExpReward(t.difficulty);
   }
 
   int _calcGold(Task t) {
-    if (t.customGoldReward > 0) return t.customGoldReward;
-    switch (t.difficulty) {
-      case TaskDifficulty.TASK_DIFFICULTY_EASY:
-        return 5;
-      case TaskDifficulty.TASK_DIFFICULTY_MEDIUM:
-        return 10;
-      case TaskDifficulty.TASK_DIFFICULTY_HARD:
-        return 20;
-      default:
-        return 5;
-    }
+    return GameConstants.baseGoldReward(t.difficulty);
   }
 
   void _confirmDelete(BuildContext context) {

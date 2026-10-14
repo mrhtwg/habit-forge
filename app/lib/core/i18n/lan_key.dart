@@ -69,7 +69,6 @@ enum LanKey {
   goodMorningAdventurer, // 'Good morning, adventurer!'
   aFreshDayAwaits, // 'A fresh day awaits'
   noQuestsToday, // 'No quests for today!'
-  dayClearAddFirstQuest, // 'Your day is clear. Add your first quest to start earning EXP and gold.'
   createQuest, // 'Create Quest'
   rewardedAdTitle, // 'Bonus Gems'
   rewardedAdDescription, // 'Watch a short ad to earn bonus gems'

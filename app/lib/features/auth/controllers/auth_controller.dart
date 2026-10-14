@@ -2,13 +2,14 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:habit_forge_app/core/common/utils/log.dart';
 import 'package:habit_forge_app/core/common/utils/sp_keys.dart';
 import 'package:habit_forge_app/core/common/utils/sp_utils.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/network/network_registry.dart';
 import 'package:habit_forge_app/core/routes/app_routes.dart';
-import 'package:habit_forge_app/core/services/cloud_login_policy.dart';
 import 'package:habit_forge_app/core/services/audio_service.dart';
+import 'package:habit_forge_app/core/services/cloud_login_policy.dart';
 import 'package:habit_forge_app/core/services/data_reset_service.dart';
 import 'package:habit_forge_app/core/services/entitlement_service.dart';
 import 'package:habit_forge_app/core/services/firebase_auth_service.dart';
@@ -126,6 +127,7 @@ class AuthController extends GetxController {
       return true;
     } catch (e) {
       Toast.error('${LanKey.googleLoginFailed.tr}: $e');
+      Log.e('${LanKey.googleLoginFailed.tr}: $e');
       await FirebaseAuthService.to.signOut();
       await FirebaseSession.useLocalBackend();
       return false;
@@ -303,10 +305,10 @@ class AuthController extends GetxController {
       UserService.to.tasks.assignAll(tasks.data?.tasks ?? []);
     }
     if (UserService.to.character.value == null) {
-      if (Get.currentRoute != Routers.boarding) {
+      if (Get.currentRoute == Routers.login) {
         Get.offAllNamed(Routers.boarding);
       }
-    } else if (Get.currentRoute == Routers.boarding) {
+    } else if (Get.currentRoute == Routers.login || Get.currentRoute == Routers.boarding) {
       Get.offAllNamed(Routers.main);
     }
   }

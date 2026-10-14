@@ -1,5 +1,4 @@
-import 'dart:math';
-
+import 'package:habit_forge_app/core/network/hive/game_balance_config.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.pbenum.dart';
 
 class GameConstants {
@@ -9,43 +8,43 @@ class GameConstants {
   /// server-side replay can tell which rules produced a number: rows written
   /// before a rebalance stay interpretable. Bump it whenever a formula here or
   /// in `ClassProfiles` changes.
-  static const String rulesVersion = '2026.09';
+  static const String rulesVersion = GameBalanceConfig.rulesVersion;
 
-  static const int maxLevel = 50;
-  static const int maxHp = 100;
+  static int get maxLevel => GameBalanceConfig.configuredMaxLevel;
+  static const int maxHp = GameBalanceConfig.maxHp;
 
   /// HP cap of a character with the given VIT: base 100 + 2 per point.
-  static int maxHpFor(int vitality) => maxHp + vitality * 2;
+  static int maxHpFor(int vitality) => maxHp + vitality.clamp(0, 60).toInt() * GameBalanceConfig.vitalityHpPerPoint;
 
-  static const int deathRecoveryMinutes = 30;
-  static const int deathRecoveryHp = 50;
-  static const int completeTaskAddHp = 20;
+  static const int deathRecoveryMinutes = GameBalanceConfig.deathRecoveryMinutes;
+  static int deathRecoveryHpFor(int maxHp, bool isWarrior) => (maxHp * (isWarrior ? 0.75 : 0.5)).round();
+  static const int completeTaskAddHp = GameBalanceConfig.levelUpHeal;
   static const int statPointsPerLevel = 1;
   GameConstants._();
 
   static int baseExpReward(TaskDifficulty difficulty) {
     switch (difficulty) {
       case TaskDifficulty.TASK_DIFFICULTY_EASY:
-        return 15;
+        return GameBalanceConfig.baseExp(difficulty);
       case TaskDifficulty.TASK_DIFFICULTY_MEDIUM:
-        return 30;
+        return GameBalanceConfig.baseExp(difficulty);
       case TaskDifficulty.TASK_DIFFICULTY_HARD:
-        return 50;
+        return GameBalanceConfig.baseExp(difficulty);
       default:
-        return 15;
+        return GameBalanceConfig.baseExp(difficulty);
     }
   }
 
   static int baseGoldReward(TaskDifficulty difficulty) {
     switch (difficulty) {
       case TaskDifficulty.TASK_DIFFICULTY_EASY:
-        return 5;
+        return GameBalanceConfig.baseGold(difficulty);
       case TaskDifficulty.TASK_DIFFICULTY_MEDIUM:
-        return 10;
+        return GameBalanceConfig.baseGold(difficulty);
       case TaskDifficulty.TASK_DIFFICULTY_HARD:
-        return 20;
+        return GameBalanceConfig.baseGold(difficulty);
       default:
-        return 5;
+        return GameBalanceConfig.baseGold(difficulty);
     }
   }
 
@@ -55,13 +54,13 @@ class GameConstants {
   static int defaultHpPenalty(TaskDifficulty difficulty) {
     switch (difficulty) {
       case TaskDifficulty.TASK_DIFFICULTY_EASY:
-        return 5;
+        return GameBalanceConfig.baseDamage(difficulty);
       case TaskDifficulty.TASK_DIFFICULTY_MEDIUM:
-        return 10;
+        return GameBalanceConfig.baseDamage(difficulty);
       case TaskDifficulty.TASK_DIFFICULTY_HARD:
-        return 20;
+        return GameBalanceConfig.baseDamage(difficulty);
       default:
-        return 10;
+        return GameBalanceConfig.baseDamage(difficulty);
     }
   }
 
@@ -77,7 +76,9 @@ class GameConstants {
   }
 
   static int expForLevel(int level) {
-    return 100 + (level - 1) * 50 + pow(level - 1, 2).toInt() * 10;
+    if (level >= maxLevel) return 0;
+    final index = (level - 1).clamp(0, GameBalanceConfig.configuredLevelExp.length - 1).toInt();
+    return GameBalanceConfig.configuredLevelExp[index];
   }
 
   /// Lifetime EXP represented by [level] plus the progress inside it — the
@@ -114,12 +115,14 @@ class GameConstants {
 
   static int expProgress(int currentExp, int level) {
     final needed = expForLevel(level);
+    if (needed <= 0) return 100;
     return (currentExp * 100 / needed).round();
   }
 
   /// Streak reward multiplier, capped at 2.0. [perDay] is the growth per
   /// streak day: 0.02 by default, and the Mage class grows twice as fast.
-  static double streakMultiplier(int streak, {double perDay = 0.02}) {
-    return min(2.0, 1.0 + streak * perDay);
+  static double streakMultiplier(int streak, {double perDay = 0.01}) {
+    final capped = streak.clamp(0, GameBalanceConfig.streakBonusCapBps ~/ GameBalanceConfig.streakBonusBps).toInt();
+    return 1.0 + capped * perDay;
   }
 }

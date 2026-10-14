@@ -1,0 +1,953 @@
+# HabitForge v1 functional equipment catalog
+# 3 classes x 4 slots x 5 tiers = 60 permanent gold equipment entries.
+equipment:
+
+  - id: eq_warrior_weapon_t1
+    slot: weapon
+    equipment_type: sword
+    allowed_classes: [warrior]
+    armor_weight: none
+    required_level: 1
+    name: T1 Longsword
+    description: Permanent warrior longsword with tier 1 functional stats.
+    price: 60
+    rarity: common
+    currency: gold
+    icon: sword_iron.webp
+    stats:
+      str: 2
+
+  - id: eq_warrior_weapon_t2
+    slot: weapon
+    equipment_type: sword
+    allowed_classes: [warrior]
+    armor_weight: none
+    required_level: 5
+    name: T2 Longsword
+    description: Permanent warrior longsword with tier 2 functional stats.
+    price: 180
+    rarity: rare
+    currency: gold
+    icon: sword_steel.webp
+    stats:
+      str: 4
+
+  - id: eq_warrior_weapon_t3
+    slot: weapon
+    equipment_type: sword
+    allowed_classes: [warrior]
+    armor_weight: none
+    required_level: 10
+    name: T3 Longsword
+    description: Permanent warrior longsword with tier 3 functional stats.
+    price: 400
+    rarity: epic
+    currency: gold
+    icon: sword_silver.webp
+    stats:
+      str: 6
+
+  - id: eq_warrior_weapon_t4
+    slot: weapon
+    equipment_type: sword
+    allowed_classes: [warrior]
+    armor_weight: none
+    required_level: 20
+    name: T4 Longsword
+    description: Permanent warrior longsword with tier 4 functional stats.
+    price: 740
+    rarity: epic
+    currency: gold
+    icon: sword_flame.webp
+    stats:
+      str: 8
+
+  - id: eq_warrior_weapon_t5
+    slot: weapon
+    equipment_type: sword
+    allowed_classes: [warrior]
+    armor_weight: none
+    required_level: 30
+    name: T5 Longsword
+    description: Permanent warrior longsword with tier 5 functional stats.
+    price: 1280
+    rarity: legendary
+    currency: gold
+    icon: blade_dusk.webp
+    stats:
+      str: 10
+
+  - id: eq_warrior_helmet_t1
+    slot: helmet
+    equipment_type: helmet
+    allowed_classes: [warrior]
+    armor_weight: none
+    required_level: 1
+    name: T1 War Helm
+    description: Permanent warrior war helm with tier 1 functional stats.
+    price: 60
+    rarity: common
+    currency: gold
+    icon: helm_iron.webp
+    stats:
+      str: 1
+      def: 1
+
+  - id: eq_warrior_helmet_t2
+    slot: helmet
+    equipment_type: helmet
+    allowed_classes: [warrior]
+    armor_weight: none
+    required_level: 5
+    name: T2 War Helm
+    description: Permanent warrior war helm with tier 2 functional stats.
+    price: 180
+    rarity: rare
+    currency: gold
+    icon: helm_guard.webp
+    stats:
+      str: 2
+      def: 2
+
+  - id: eq_warrior_helmet_t3
+    slot: helmet
+    equipment_type: helmet
+    allowed_classes: [warrior]
+    armor_weight: none
+    required_level: 10
+    name: T3 War Helm
+    description: Permanent warrior war helm with tier 3 functional stats.
+    price: 400
+    rarity: epic
+    currency: gold
+    icon: helm_knight.webp
+    stats:
+      str: 3
+      def: 3
+
+  - id: eq_warrior_helmet_t4
+    slot: helmet
+    equipment_type: helmet
+    allowed_classes: [warrior]
+    armor_weight: none
+    required_level: 20
+    name: T4 War Helm
+    description: Permanent warrior war helm with tier 4 functional stats.
+    price: 740
+    rarity: epic
+    currency: gold
+    icon: helm_warden.webp
+    stats:
+      str: 4
+      def: 4
+
+  - id: eq_warrior_helmet_t5
+    slot: helmet
+    equipment_type: helmet
+    allowed_classes: [warrior]
+    armor_weight: none
+    required_level: 30
+    name: T5 War Helm
+    description: Permanent warrior war helm with tier 5 functional stats.
+    price: 1280
+    rarity: legendary
+    currency: gold
+    icon: helm_dragon.webp
+    stats:
+      str: 5
+      def: 5
+
+  - id: eq_warrior_armor_t1
+    slot: armor
+    equipment_type: plate
+    allowed_classes: [warrior]
+    armor_weight: heavy
+    required_level: 1
+    name: T1 Plate Armor
+    description: Permanent warrior plate armor with tier 1 functional stats.
+    price: 60
+    rarity: common
+    currency: gold
+    icon: armor_tunic.webp
+    stats:
+      def: 1
+      vit: 1
+
+  - id: eq_warrior_armor_t2
+    slot: armor
+    equipment_type: plate
+    allowed_classes: [warrior]
+    armor_weight: heavy
+    required_level: 5
+    name: T2 Plate Armor
+    description: Permanent warrior plate armor with tier 2 functional stats.
+    price: 180
+    rarity: rare
+    currency: gold
+    icon: armor_chain.webp
+    stats:
+      def: 2
+      vit: 2
+
+  - id: eq_warrior_armor_t3
+    slot: armor
+    equipment_type: plate
+    allowed_classes: [warrior]
+    armor_weight: heavy
+    required_level: 10
+    name: T3 Plate Armor
+    description: Permanent warrior plate armor with tier 3 functional stats.
+    price: 400
+    rarity: epic
+    currency: gold
+    icon: armor_scale.webp
+    stats:
+      def: 3
+      vit: 3
+
+  - id: eq_warrior_armor_t4
+    slot: armor
+    equipment_type: plate
+    allowed_classes: [warrior]
+    armor_weight: heavy
+    required_level: 20
+    name: T4 Plate Armor
+    description: Permanent warrior plate armor with tier 4 functional stats.
+    price: 740
+    rarity: epic
+    currency: gold
+    icon: armor_plate.webp
+    stats:
+      def: 4
+      vit: 4
+
+  - id: eq_warrior_armor_t5
+    slot: armor
+    equipment_type: plate
+    allowed_classes: [warrior]
+    armor_weight: heavy
+    required_level: 30
+    name: T5 Plate Armor
+    description: Permanent warrior plate armor with tier 5 functional stats.
+    price: 1280
+    rarity: legendary
+    currency: gold
+    icon: armor_guardian.webp
+    stats:
+      def: 5
+      vit: 5
+
+  - id: eq_warrior_accessory_t1
+    slot: accessory
+    equipment_type: badge
+    allowed_classes: [warrior]
+    armor_weight: none
+    required_level: 1
+    name: T1 Oath Badge
+    description: Permanent warrior oath badge with tier 1 functional stats.
+    price: 60
+    rarity: common
+    currency: gold
+    icon: ring_iron.webp
+    stats:
+      int: 1
+      vit: 1
+
+  - id: eq_warrior_accessory_t2
+    slot: accessory
+    equipment_type: badge
+    allowed_classes: [warrior]
+    armor_weight: none
+    required_level: 5
+    name: T2 Oath Badge
+    description: Permanent warrior oath badge with tier 2 functional stats.
+    price: 180
+    rarity: rare
+    currency: gold
+    icon: band_brass.webp
+    stats:
+      int: 2
+      vit: 2
+
+  - id: eq_warrior_accessory_t3
+    slot: accessory
+    equipment_type: badge
+    allowed_classes: [warrior]
+    armor_weight: none
+    required_level: 10
+    name: T3 Oath Badge
+    description: Permanent warrior oath badge with tier 3 functional stats.
+    price: 400
+    rarity: epic
+    currency: gold
+    icon: ring_silver.webp
+    stats:
+      int: 3
+      vit: 3
+
+  - id: eq_warrior_accessory_t4
+    slot: accessory
+    equipment_type: badge
+    allowed_classes: [warrior]
+    armor_weight: none
+    required_level: 20
+    name: T4 Oath Badge
+    description: Permanent warrior oath badge with tier 4 functional stats.
+    price: 740
+    rarity: epic
+    currency: gold
+    icon: ring_ruby.webp
+    stats:
+      int: 4
+      vit: 4
+
+  - id: eq_warrior_accessory_t5
+    slot: accessory
+    equipment_type: badge
+    allowed_classes: [warrior]
+    armor_weight: none
+    required_level: 30
+    name: T5 Oath Badge
+    description: Permanent warrior oath badge with tier 5 functional stats.
+    price: 1280
+    rarity: legendary
+    currency: gold
+    icon: chain_eternal.webp
+    stats:
+      int: 5
+      vit: 5
+
+  - id: eq_mage_weapon_t1
+    slot: weapon
+    equipment_type: staff
+    allowed_classes: [mage]
+    armor_weight: none
+    required_level: 1
+    name: T1 Arcane Staff
+    description: Permanent mage arcane staff with tier 1 functional stats.
+    price: 50
+    rarity: common
+    currency: gold
+    icon: staff_willow.webp
+    stats:
+      int: 2
+
+  - id: eq_mage_weapon_t2
+    slot: weapon
+    equipment_type: staff
+    allowed_classes: [mage]
+    armor_weight: none
+    required_level: 5
+    name: T2 Arcane Staff
+    description: Permanent mage arcane staff with tier 2 functional stats.
+    price: 140
+    rarity: rare
+    currency: gold
+    icon: staff_willow.webp
+    stats:
+      int: 4
+
+  - id: eq_mage_weapon_t3
+    slot: weapon
+    equipment_type: staff
+    allowed_classes: [mage]
+    armor_weight: none
+    required_level: 10
+    name: T3 Arcane Staff
+    description: Permanent mage arcane staff with tier 3 functional stats.
+    price: 300
+    rarity: epic
+    currency: gold
+    icon: staff_arcane.webp
+    stats:
+      int: 6
+
+  - id: eq_mage_weapon_t4
+    slot: weapon
+    equipment_type: staff
+    allowed_classes: [mage]
+    armor_weight: none
+    required_level: 20
+    name: T4 Arcane Staff
+    description: Permanent mage arcane staff with tier 4 functional stats.
+    price: 550
+    rarity: epic
+    currency: gold
+    icon: staff_crystal.webp
+    stats:
+      int: 8
+
+  - id: eq_mage_weapon_t5
+    slot: weapon
+    equipment_type: staff
+    allowed_classes: [mage]
+    armor_weight: none
+    required_level: 30
+    name: T5 Arcane Staff
+    description: Permanent mage arcane staff with tier 5 functional stats.
+    price: 950
+    rarity: legendary
+    currency: gold
+    icon: staff_crystal.webp
+    stats:
+      int: 10
+
+  - id: eq_mage_helmet_t1
+    slot: helmet
+    equipment_type: circlet
+    allowed_classes: [mage]
+    armor_weight: none
+    required_level: 1
+    name: T1 Mage Circlet
+    description: Permanent mage mage circlet with tier 1 functional stats.
+    price: 50
+    rarity: common
+    currency: gold
+    icon: helm_sage.webp
+    stats:
+      int: 1
+      def: 1
+
+  - id: eq_mage_helmet_t2
+    slot: helmet
+    equipment_type: circlet
+    allowed_classes: [mage]
+    armor_weight: none
+    required_level: 5
+    name: T2 Mage Circlet
+    description: Permanent mage mage circlet with tier 2 functional stats.
+    price: 140
+    rarity: rare
+    currency: gold
+    icon: helm_sage.webp
+    stats:
+      int: 2
+      def: 2
+
+  - id: eq_mage_helmet_t3
+    slot: helmet
+    equipment_type: circlet
+    allowed_classes: [mage]
+    armor_weight: none
+    required_level: 10
+    name: T3 Mage Circlet
+    description: Permanent mage mage circlet with tier 3 functional stats.
+    price: 300
+    rarity: epic
+    currency: gold
+    icon: helm_crown.webp
+    stats:
+      int: 3
+      def: 3
+
+  - id: eq_mage_helmet_t4
+    slot: helmet
+    equipment_type: circlet
+    allowed_classes: [mage]
+    armor_weight: none
+    required_level: 20
+    name: T4 Mage Circlet
+    description: Permanent mage mage circlet with tier 4 functional stats.
+    price: 550
+    rarity: epic
+    currency: gold
+    icon: helm_crown.webp
+    stats:
+      int: 4
+      def: 4
+
+  - id: eq_mage_helmet_t5
+    slot: helmet
+    equipment_type: circlet
+    allowed_classes: [mage]
+    armor_weight: none
+    required_level: 30
+    name: T5 Mage Circlet
+    description: Permanent mage mage circlet with tier 5 functional stats.
+    price: 950
+    rarity: legendary
+    currency: gold
+    icon: helm_sky.webp
+    stats:
+      int: 5
+      def: 5
+
+  - id: eq_mage_armor_t1
+    slot: armor
+    equipment_type: robe
+    allowed_classes: [mage]
+    armor_weight: cloth
+    required_level: 1
+    name: T1 Mage Robe
+    description: Permanent mage mage robe with tier 1 functional stats.
+    price: 50
+    rarity: common
+    currency: gold
+    icon: armor_tunic.webp
+    stats:
+      def: 1
+      vit: 1
+
+  - id: eq_mage_armor_t2
+    slot: armor
+    equipment_type: robe
+    allowed_classes: [mage]
+    armor_weight: cloth
+    required_level: 5
+    name: T2 Mage Robe
+    description: Permanent mage mage robe with tier 2 functional stats.
+    price: 140
+    rarity: rare
+    currency: gold
+    icon: armor_rune.webp
+    stats:
+      def: 2
+      vit: 2
+
+  - id: eq_mage_armor_t3
+    slot: armor
+    equipment_type: robe
+    allowed_classes: [mage]
+    armor_weight: cloth
+    required_level: 10
+    name: T3 Mage Robe
+    description: Permanent mage mage robe with tier 3 functional stats.
+    price: 300
+    rarity: epic
+    currency: gold
+    icon: armor_rune.webp
+    stats:
+      def: 3
+      vit: 3
+
+  - id: eq_mage_armor_t4
+    slot: armor
+    equipment_type: robe
+    allowed_classes: [mage]
+    armor_weight: cloth
+    required_level: 20
+    name: T4 Mage Robe
+    description: Permanent mage mage robe with tier 4 functional stats.
+    price: 550
+    rarity: epic
+    currency: gold
+    icon: armor_void.webp
+    stats:
+      def: 4
+      vit: 4
+
+  - id: eq_mage_armor_t5
+    slot: armor
+    equipment_type: robe
+    allowed_classes: [mage]
+    armor_weight: cloth
+    required_level: 30
+    name: T5 Mage Robe
+    description: Permanent mage mage robe with tier 5 functional stats.
+    price: 950
+    rarity: legendary
+    currency: gold
+    icon: armor_void.webp
+    stats:
+      def: 5
+      vit: 5
+
+  - id: eq_mage_accessory_t1
+    slot: accessory
+    equipment_type: starstone
+    allowed_classes: [mage]
+    armor_weight: none
+    required_level: 1
+    name: T1 Starstone
+    description: Permanent mage starstone with tier 1 functional stats.
+    price: 50
+    rarity: common
+    currency: gold
+    icon: pendant_moon.webp
+    stats:
+      str: 1
+      vit: 1
+
+  - id: eq_mage_accessory_t2
+    slot: accessory
+    equipment_type: starstone
+    allowed_classes: [mage]
+    armor_weight: none
+    required_level: 5
+    name: T2 Starstone
+    description: Permanent mage starstone with tier 2 functional stats.
+    price: 140
+    rarity: rare
+    currency: gold
+    icon: amulet_sun.webp
+    stats:
+      str: 2
+      vit: 2
+
+  - id: eq_mage_accessory_t3
+    slot: accessory
+    equipment_type: starstone
+    allowed_classes: [mage]
+    armor_weight: none
+    required_level: 10
+    name: T3 Starstone
+    description: Permanent mage starstone with tier 3 functional stats.
+    price: 300
+    rarity: epic
+    currency: gold
+    icon: relic_void.webp
+    stats:
+      str: 3
+      vit: 3
+
+  - id: eq_mage_accessory_t4
+    slot: accessory
+    equipment_type: starstone
+    allowed_classes: [mage]
+    armor_weight: none
+    required_level: 20
+    name: T4 Starstone
+    description: Permanent mage starstone with tier 4 functional stats.
+    price: 550
+    rarity: epic
+    currency: gold
+    icon: relic_void.webp
+    stats:
+      str: 4
+      vit: 4
+
+  - id: eq_mage_accessory_t5
+    slot: accessory
+    equipment_type: starstone
+    allowed_classes: [mage]
+    armor_weight: none
+    required_level: 30
+    name: T5 Starstone
+    description: Permanent mage starstone with tier 5 functional stats.
+    price: 950
+    rarity: legendary
+    currency: gold
+    icon: chain_eternal.webp
+    stats:
+      str: 5
+      vit: 5
+
+  - id: eq_ranger_weapon_t1
+    slot: weapon
+    equipment_type: bow
+    allowed_classes: [ranger]
+    armor_weight: none
+    required_level: 1
+    name: T1 Longbow
+    description: Permanent ranger longbow with tier 1 functional stats.
+    price: 70
+    rarity: common
+    currency: gold
+    icon: bow_yew.webp
+    stats:
+      str: 1
+      int: 1
+
+  - id: eq_ranger_weapon_t2
+    slot: weapon
+    equipment_type: bow
+    allowed_classes: [ranger]
+    armor_weight: none
+    required_level: 5
+    name: T2 Longbow
+    description: Permanent ranger longbow with tier 2 functional stats.
+    price: 200
+    rarity: rare
+    currency: gold
+    icon: bow_hunter.webp
+    stats:
+      str: 2
+      int: 2
+
+  - id: eq_ranger_weapon_t3
+    slot: weapon
+    equipment_type: bow
+    allowed_classes: [ranger]
+    armor_weight: none
+    required_level: 10
+    name: T3 Longbow
+    description: Permanent ranger longbow with tier 3 functional stats.
+    price: 440
+    rarity: epic
+    currency: gold
+    icon: bow_gale.webp
+    stats:
+      str: 3
+      int: 3
+
+  - id: eq_ranger_weapon_t4
+    slot: weapon
+    equipment_type: bow
+    allowed_classes: [ranger]
+    armor_weight: none
+    required_level: 20
+    name: T4 Longbow
+    description: Permanent ranger longbow with tier 4 functional stats.
+    price: 800
+    rarity: epic
+    currency: gold
+    icon: bow_gale.webp
+    stats:
+      str: 4
+      int: 4
+
+  - id: eq_ranger_weapon_t5
+    slot: weapon
+    equipment_type: bow
+    allowed_classes: [ranger]
+    armor_weight: none
+    required_level: 30
+    name: T5 Longbow
+    description: Permanent ranger longbow with tier 5 functional stats.
+    price: 1380
+    rarity: legendary
+    currency: gold
+    icon: bow_phoenix.webp
+    stats:
+      str: 5
+      int: 5
+
+  - id: eq_ranger_helmet_t1
+    slot: helmet
+    equipment_type: hood
+    allowed_classes: [ranger]
+    armor_weight: none
+    required_level: 1
+    name: T1 Ranger Hood
+    description: Permanent ranger ranger hood with tier 1 functional stats.
+    price: 70
+    rarity: common
+    currency: gold
+    icon: helm_leather.webp
+    stats:
+      str: 1
+      int: 1
+
+  - id: eq_ranger_helmet_t2
+    slot: helmet
+    equipment_type: hood
+    allowed_classes: [ranger]
+    armor_weight: none
+    required_level: 5
+    name: T2 Ranger Hood
+    description: Permanent ranger ranger hood with tier 2 functional stats.
+    price: 200
+    rarity: rare
+    currency: gold
+    icon: helm_archer.webp
+    stats:
+      str: 2
+      int: 2
+
+  - id: eq_ranger_helmet_t3
+    slot: helmet
+    equipment_type: hood
+    allowed_classes: [ranger]
+    armor_weight: none
+    required_level: 10
+    name: T3 Ranger Hood
+    description: Permanent ranger ranger hood with tier 3 functional stats.
+    price: 440
+    rarity: epic
+    currency: gold
+    icon: helm_hawkeye.webp
+    stats:
+      str: 3
+      int: 3
+
+  - id: eq_ranger_helmet_t4
+    slot: helmet
+    equipment_type: hood
+    allowed_classes: [ranger]
+    armor_weight: none
+    required_level: 20
+    name: T4 Ranger Hood
+    description: Permanent ranger ranger hood with tier 4 functional stats.
+    price: 800
+    rarity: epic
+    currency: gold
+    icon: helm_hawkeye.webp
+    stats:
+      str: 4
+      int: 4
+
+  - id: eq_ranger_helmet_t5
+    slot: helmet
+    equipment_type: hood
+    allowed_classes: [ranger]
+    armor_weight: none
+    required_level: 30
+    name: T5 Ranger Hood
+    description: Permanent ranger ranger hood with tier 5 functional stats.
+    price: 1380
+    rarity: legendary
+    currency: gold
+    icon: helm_sky.webp
+    stats:
+      str: 5
+      int: 5
+
+  - id: eq_ranger_armor_t1
+    slot: armor
+    equipment_type: leather
+    allowed_classes: [ranger]
+    armor_weight: light
+    required_level: 1
+    name: T1 Leather Armor
+    description: Permanent ranger leather armor with tier 1 functional stats.
+    price: 70
+    rarity: common
+    currency: gold
+    icon: armor_leather.webp
+    stats:
+      def: 1
+      vit: 1
+
+  - id: eq_ranger_armor_t2
+    slot: armor
+    equipment_type: leather
+    allowed_classes: [ranger]
+    armor_weight: light
+    required_level: 5
+    name: T2 Leather Armor
+    description: Permanent ranger leather armor with tier 2 functional stats.
+    price: 200
+    rarity: rare
+    currency: gold
+    icon: armor_leather.webp
+    stats:
+      def: 2
+      vit: 2
+
+  - id: eq_ranger_armor_t3
+    slot: armor
+    equipment_type: leather
+    allowed_classes: [ranger]
+    armor_weight: light
+    required_level: 10
+    name: T3 Leather Armor
+    description: Permanent ranger leather armor with tier 3 functional stats.
+    price: 440
+    rarity: epic
+    currency: gold
+    icon: armor_wind.webp
+    stats:
+      def: 3
+      vit: 3
+
+  - id: eq_ranger_armor_t4
+    slot: armor
+    equipment_type: leather
+    allowed_classes: [ranger]
+    armor_weight: light
+    required_level: 20
+    name: T4 Leather Armor
+    description: Permanent ranger leather armor with tier 4 functional stats.
+    price: 800
+    rarity: epic
+    currency: gold
+    icon: armor_wind.webp
+    stats:
+      def: 4
+      vit: 4
+
+  - id: eq_ranger_armor_t5
+    slot: armor
+    equipment_type: leather
+    allowed_classes: [ranger]
+    armor_weight: light
+    required_level: 30
+    name: T5 Leather Armor
+    description: Permanent ranger leather armor with tier 5 functional stats.
+    price: 1380
+    rarity: legendary
+    currency: gold
+    icon: armor_wind.webp
+    stats:
+      def: 5
+      vit: 5
+
+  - id: eq_ranger_accessory_t1
+    slot: accessory
+    equipment_type: compass
+    allowed_classes: [ranger]
+    armor_weight: none
+    required_level: 1
+    name: T1 Wayfinder Compass
+    description: Permanent ranger wayfinder compass with tier 1 functional stats.
+    price: 70
+    rarity: common
+    currency: gold
+    icon: talisman_wind.webp
+    stats:
+      def: 1
+      vit: 1
+
+  - id: eq_ranger_accessory_t2
+    slot: accessory
+    equipment_type: compass
+    allowed_classes: [ranger]
+    armor_weight: none
+    required_level: 5
+    name: T2 Wayfinder Compass
+    description: Permanent ranger wayfinder compass with tier 2 functional stats.
+    price: 200
+    rarity: rare
+    currency: gold
+    icon: quiver_swift.webp
+    stats:
+      def: 2
+      vit: 2
+
+  - id: eq_ranger_accessory_t3
+    slot: accessory
+    equipment_type: compass
+    allowed_classes: [ranger]
+    armor_weight: none
+    required_level: 10
+    name: T3 Wayfinder Compass
+    description: Permanent ranger wayfinder compass with tier 3 functional stats.
+    price: 440
+    rarity: epic
+    currency: gold
+    icon: amulet_sun.webp
+    stats:
+      def: 3
+      vit: 3
+
+  - id: eq_ranger_accessory_t4
+    slot: accessory
+    equipment_type: compass
+    allowed_classes: [ranger]
+    armor_weight: none
+    required_level: 20
+    name: T4 Wayfinder Compass
+    description: Permanent ranger wayfinder compass with tier 4 functional stats.
+    price: 800
+    rarity: epic
+    currency: gold
+    icon: pendant_moon.webp
+    stats:
+      def: 4
+      vit: 4
+
+  - id: eq_ranger_accessory_t5
+    slot: accessory
+    equipment_type: compass
+    allowed_classes: [ranger]
+    armor_weight: none
+    required_level: 30
+    name: T5 Wayfinder Compass
+    description: Permanent ranger wayfinder compass with tier 5 functional stats.
+    price: 1380
+    rarity: legendary
+    currency: gold
+    icon: relic_void.webp
+    stats:
+      def: 5
+      vit: 5

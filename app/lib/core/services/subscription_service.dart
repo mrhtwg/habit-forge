@@ -9,7 +9,6 @@ import 'package:habit_forge_app/core/services/entitlement_service.dart';
 import 'package:habit_forge_app/core/services/firebase_session.dart';
 import 'package:habit_forge_app/core/services/subscription_tier.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart';
-import 'package:habit_forge_app/generated/protos/shared/v1/shared.pbenum.dart';
 import 'package:habit_forge_app/generated/protos/shop/v1/shop.pb.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:in_app_purchase_android/billing_client_wrappers.dart';
@@ -18,8 +17,8 @@ import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 /// Owns Play Billing purchases and the tier the rest of the app reads.
 ///
 /// Freemium rules (store / cloud builds):
-/// - Free: 3 habits, warrior only, week stats, non-intrusive ads, no legendary gear
-/// - Premium (monthly/yearly/lifetime): unlocks the rest
+/// - Free: 3 habits, all classes and functional attributes, optional ads
+/// - Premium (monthly/yearly/lifetime): convenience and cosmetic entitlements
 /// - Both tiers may opt into rewarded ads for bonus resources; premium users
 ///   are never shown forced/interstitial ads.
 /// - Yearly/Lifetime: yearly exclusive shop ids
@@ -84,23 +83,21 @@ class SubscriptionService extends GetxService {
 
   bool canCreateHabit(int currentHabitCount) => currentHabitCount < habitSlotLimit;
 
-  bool canUseClass(CharacterClass c) {
-    if (isPremium) return true;
-    return c == CharacterClass.CHARACTER_CLASS_WARRIOR || c == CharacterClass.CHARACTER_CLASS_UNSPECIFIED;
-  }
+  /// Classes and functional attributes are part of the free core loop. A
+  /// subscription never changes EXP, gold, streak, HP or stat efficiency.
+  bool canUseClass(CharacterClass c) => c != CharacterClass.CHARACTER_CLASS_UNSPECIFIED || isPremium;
 
   /// Legendary gear (and yearly exclusives) require a matching tier.
   bool canAccessShopItem(ShopItem item) {
-    if (item.rarity == EquipmentRarity.EQUIPMENT_RARITY_LEGENDARY) {
-      return isPremium;
-    }
     if (_yearlyExclusiveIds.contains(item.id)) {
       return hasYearlyExtras;
     }
     return true;
   }
 
-  bool get canUseAdvancedStats => isPremium;
+  /// Stats remain a free progression system. Subscription monetizes
+  /// convenience/cosmetics, never task efficiency or attributes.
+  bool get canUseAdvancedStats => true;
   bool get isProcessing => switch (purchaseState.value) {
         PurchaseFlowState.launching || PurchaseFlowState.restoring || PurchaseFlowState.verifying => true,
         _ => false,

@@ -153,7 +153,7 @@ class ForgeController extends GetxController {
   void _updateCountdown() {
     final now = DateTime.now();
 
-    // Daily deal remaining time. Once it expires (local midnight) the deal is
+    // Daily featured items remaining time. Once it expires (local midnight) the deal is
     // re-fetched, so the banner and the charged price switch days together.
     final deal = dailyDeal.value;
     final remaining = DateTime.fromMillisecondsSinceEpoch(deal.expiresAt.toInt()).difference(now);

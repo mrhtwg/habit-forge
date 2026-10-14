@@ -1,4 +1,3 @@
-import 'package:habit_forge_app/generated/protos/character/v1/character.pbenum.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart';
 import 'package:habit_forge_app/generated/protos/shared/v1/shared.pbenum.dart';
 import 'package:habit_forge_app/generated/protos/shop/v1/shop.pb.dart';

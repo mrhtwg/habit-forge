@@ -230,6 +230,7 @@ class CharacterPage extends GetView<CharacterController> {
   String _xpText() {
     final char = UserService.to.character.value;
     final level = char?.level ?? 1;
+    if (level >= GameConstants.maxLevel) return 'MAX';
     final needed = GameConstants.expForLevel(level);
     return '${char?.currentExp ?? 0}/$needed';
   }

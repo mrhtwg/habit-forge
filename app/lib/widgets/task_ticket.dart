@@ -64,8 +64,8 @@ class _TaskTicketState extends State<TaskTicket> {
     // A negative habit ("bad habit") pays nothing: tapping it logs a slip and
     // costs HP, so the card shows the cost instead of a reward.
     final isNegative = GameLogic.isNegative(task);
-    final exp = task.customExpReward > 0 ? task.customExpReward : GameConstants.baseExpReward(task.difficulty);
-    final gold = task.customGoldReward > 0 ? task.customGoldReward : GameConstants.baseGoldReward(task.difficulty);
+    final exp = GameConstants.baseExpReward(task.difficulty);
+    final gold = GameConstants.baseGoldReward(task.difficulty);
     final ticketRadius = BorderRadius.circular(18.r);
 
     return ClipRRect(

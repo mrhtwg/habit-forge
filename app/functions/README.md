@@ -55,8 +55,8 @@ below.
 # from app/
 npm --prefix functions install          # firebase-admin, firebase-functions, googleapis
 npx firebase use --add                   # select the production Firebase project once
-npm run deploy:rules                    # firestore rules (events + entitlement)
-firebase deploy --only functions
+npm --prefix functions run deploy:rules # firestore rules (events + entitlement)
+npm --prefix functions run deploy      # Cloud Functions
 ```
 
 The deployment includes `deleteAccount`, an authenticated callable Function.

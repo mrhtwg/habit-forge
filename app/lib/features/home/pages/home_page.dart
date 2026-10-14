@@ -208,48 +208,47 @@ class HomePage extends GetView<HomeController> {
   }
 
   Widget _emptyState() {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 96.w,
-            height: 96.w,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.goldLight,
-              border: Border.all(color: AppColors.border, width: 3),
-            ),
-            child: Icon(Icons.auto_stories_rounded, size: 44.w, color: AppColors.goldDark),
-          ),
-          SizedBox(height: 14.h),
-          Text(LanKey.noQuestsToday.tr, style: textStyleBold(fontSize: 20.sp)),
-          SizedBox(height: 6.h),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 40.w),
-            child: Text(
-              LanKey.dayClearAddFirstQuest.tr,
-              textAlign: TextAlign.center,
-              style: textStyleMedium(fontSize: 13.sp, color: AppColors.textSecondary),
-            ),
-          ),
-          SizedBox(height: 18.h),
-          PressableButton(
-            onTap: () async {
-              await TaskFormSheet.show(Get.context!);
-              controller.loadTodayTasks();
-            },
-            padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
-            child: Row(
+    return LayoutBuilder(
+      builder: (context, constraints) => SingleChildScrollView(
+        padding: EdgeInsets.symmetric(vertical: 12.h),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: constraints.maxHeight),
+          child: Center(
+            child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.add_rounded, color: Colors.white, size: 20),
-                SizedBox(width: 6.w),
-                Text(LanKey.createQuest.tr, style: textStyleBold(fontSize: 15.sp, color: Colors.white)),
+                Container(
+                  width: 96.w,
+                  height: 96.w,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.goldLight,
+                    border: Border.all(color: AppColors.border, width: 3),
+                  ),
+                  child: Icon(Icons.auto_stories_rounded, size: 44.w, color: AppColors.goldDark),
+                ),
+                SizedBox(height: 14.h),
+                Text(LanKey.noQuestsToday.tr, style: textStyleBold(fontSize: 20.sp)),
+                SizedBox(height: 18.h),
+                PressableButton(
+                  onTap: () async {
+                    await TaskFormSheet.show(Get.context!);
+                    controller.loadTodayTasks();
+                  },
+                  padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.add_rounded, color: Colors.white, size: 20),
+                      SizedBox(width: 6.w),
+                      Text(LanKey.createQuest.tr, style: textStyleBold(fontSize: 15.sp, color: Colors.white)),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -268,6 +267,7 @@ class HomePage extends GetView<HomeController> {
   String _xpText() {
     final char = UserService.to.character.value;
     final level = char?.level ?? 1;
+    if (level >= GameConstants.maxLevel) return 'MAX';
     final needed = GameConstants.expForLevel(level);
     return '${char?.currentExp ?? 0}/$needed';
   }

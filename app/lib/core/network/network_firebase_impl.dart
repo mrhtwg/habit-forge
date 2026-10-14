@@ -9,6 +9,7 @@ import 'package:habit_forge_app/core/extensions/date_extensions.dart';
 import 'package:habit_forge_app/core/network/api_response.dart';
 import 'package:habit_forge_app/core/network/daily_login_reward.dart';
 import 'package:habit_forge_app/core/network/hive/game_logic.dart';
+import 'package:habit_forge_app/core/network/hive/game_balance_config.dart';
 import 'package:habit_forge_app/core/network/hive/equipment_rules.dart';
 import 'package:habit_forge_app/core/network/hive/shop_config.dart';
 import 'package:habit_forge_app/core/network/ledger/game_ledger.dart';
@@ -406,27 +407,39 @@ class NetworkFirebaseImpl implements NetworkInterface {
     final user = _user;
     if (user == null) return _unauthenticated();
 
-    final token = await user.getIdToken();
-    if (token == null || token.isEmpty) {
-      return ApiResponse.failure(code: StatusCode.internal, message: 'Failed to obtain ID token');
-    }
-    await UserService.to.setSessionToken(token);
-    await _ensureUserDoc();
-    await _ensureLedgerOpen();
-    await _settleOverduePenalty();
+    try {
+      final token = await user.getIdToken();
+      if (token == null || token.isEmpty) {
+        return ApiResponse.failure(code: StatusCode.internal, message: 'Failed to obtain ID token');
+      }
+      await UserService.to.setSessionToken(token);
+      await _ensureUserDoc();
+      await _ensureLedgerOpen();
+      await _settleOverduePenalty();
 
-    return ApiResponse.success(
-      LoginReply(
-        token: token,
-        user: UserInfo(
-          id: user.uid,
-          email: user.email ?? '',
-          nickname: user.displayName ?? '',
-          avatarUrl: user.photoURL ?? '',
+      return ApiResponse.success(
+        LoginReply(
+          token: token,
+          user: UserInfo(
+            id: user.uid,
+            email: user.email ?? '',
+            nickname: user.displayName ?? '',
+            avatarUrl: user.photoURL ?? '',
+          ),
         ),
-      ),
-      'Signed in',
-    );
+        'Signed in',
+      );
+    } on FirebaseException catch (error, stackTrace) {
+      Log.e(
+        'Firebase cloud login sync failed: ${error.code}',
+        error: error,
+        stackTrace: stackTrace,
+      );
+      return ApiResponse.failure(
+        code: StatusCode.internal,
+        message: 'Firestore ${error.code}: ${error.message ?? 'request rejected'}',
+      );
+    }
   }
 
   Future<void> _ensureUserDoc() async {
@@ -772,8 +785,27 @@ class NetworkFirebaseImpl implements NetworkInterface {
         // A negative habit is a *slip*: nothing is earned and HP is lost
         // (GameLogic.isNegative — the flag only ever applies to habits).
         final isSlip = GameLogic.isNegative(task);
-        final gainExp = GameLogic.expReward(task, character);
-        final gainGold = GameLogic.goldReward(task, character);
+        final rawExp = GameLogic.expReward(task, character);
+        final rawGold = GameLogic.goldReward(task, character);
+        final budgetDate = _dateKey(now);
+        final storedBudget = data?['taskBudget'];
+        final budget =
+            storedBudget is Map && storedBudget['date'] == budgetDate ? storedBudget : const <String, dynamic>{};
+        final usedExp = (budget['exp'] as num?)?.toInt() ?? 0;
+        final usedGold = (budget['gold'] as num?)?.toInt() ?? 0;
+        final firstCompletion = !isSlip && budget['firstCompletionDate'] != budgetDate;
+        final expRemaining = GameBalanceConfig.configuredTaskDailyExpCap - usedExp;
+        final goldRemaining = GameBalanceConfig.configuredTaskDailyGoldCap - usedGold;
+        final gainExp = expRemaining <= 0
+            ? 0
+            : rawExp < expRemaining
+                ? rawExp
+                : expRemaining;
+        final gainGold = goldRemaining <= 0
+            ? 0
+            : rawGold < goldRemaining
+                ? rawGold
+                : goldRemaining;
         var prefs = _prefsFrom(data);
         if (!isSlip) {
           // Logging a slip is not a completed task: the wallet and the counters
@@ -794,6 +826,10 @@ class NetworkFirebaseImpl implements NetworkInterface {
           final gained = GameLogic.gainExp(character, gainExp);
           newCharacter = gained.$1;
           leveledTo = gained.$2;
+        }
+        if (firstCompletion) {
+          final mageBonus = character.characterClass == CharacterClass.CHARACTER_CLASS_MAGE ? 5 : 0;
+          newCharacter = GameLogic.heal(newCharacter, GameBalanceConfig.firstCompletionHeal + mageBonus);
         }
         final newTask = GameLogic.completeTask(task);
 
@@ -842,6 +878,12 @@ class NetworkFirebaseImpl implements NetworkInterface {
         tx.update(userRef, <String, dynamic>{
           'prefs': _toMap(prefs),
           'character': _toMap(newCharacter),
+          'taskBudget': <String, dynamic>{
+            'date': budgetDate,
+            'exp': usedExp + gainExp,
+            'gold': usedGold + gainGold,
+            if (firstCompletion || budget['firstCompletionDate'] == budgetDate) 'firstCompletionDate': budgetDate,
+          },
           'unlockedAchievementIds': unlocked.toList(),
           ..._appendEvents(tx, data, rows),
         });
@@ -860,6 +902,9 @@ class NetworkFirebaseImpl implements NetworkInterface {
       return ApiResponse.failure(code: e.code, message: e.message);
     }
   }
+
+  static String _dateKey(DateTime date) =>
+      '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
 
   @override
   Future<ApiResponse<SkipTaskReply>> skipTask(String id) async {
@@ -957,7 +1002,7 @@ class NetworkFirebaseImpl implements NetworkInterface {
   @override
   Future<ApiResponse<GetPrefsReply>> claimRewardedAdReward(
     String rewardId, {
-    int gems = 5,
+    int gems = 2,
     int gold = 0,
   }) async {
     if (_uid == null) return _unauthenticated();
@@ -1016,7 +1061,13 @@ class NetworkFirebaseImpl implements NetworkInterface {
     // Charge today's deal price when this item is the deal of the day.
     // Recomputed here rather than taken from the UI, so the charge can never
     // disagree with what the shop showed.
-    final deal = ShopConfig.dailyDealFor(_uid ?? 'guest', DateTime.now());
+    final userSnapshot = await _userRef().get();
+    final deal = ShopConfig.dailyDealFor(
+      _uid ?? 'guest',
+      DateTime.now(),
+      character: _characterFrom(userSnapshot.data()),
+      ownedItemIds: _ownedFrom(userSnapshot.data()).toSet(),
+    );
     final price = ShopConfig.effectivePrice(item.price.toInt(), itemId, deal);
     final appliedDiscount = deal.itemId == itemId ? deal.discountPercent : 0;
     try {
@@ -1087,7 +1138,15 @@ class NetworkFirebaseImpl implements NetworkInterface {
 
   @override
   Future<ApiResponse<DailyDeal>> getDailyDeal() async {
-    return ApiResponse.success(ShopConfig.dailyDealFor(_uid ?? 'guest', DateTime.now()));
+    final user = await _userRef().get();
+    return ApiResponse.success(
+      ShopConfig.dailyDealFor(
+        _uid ?? 'guest',
+        DateTime.now(),
+        character: _characterFrom(user.data()),
+        ownedItemIds: _ownedFrom(user.data()).toSet(),
+      ),
+    );
   }
 
   // ── Achievements ──

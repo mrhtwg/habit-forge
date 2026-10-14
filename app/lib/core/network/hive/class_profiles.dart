@@ -84,37 +84,39 @@ class ClassProfiles {
   /// Tanky: highest HP pool, cheapest comeback after defeat.
   static const warrior = ClassProfile(
     strength: 3,
-    intelligence: 0,
-    defense: 3,
-    vitality: 5,
-    recoveryHp: 75,
+    intelligence: 1,
+    defense: 4,
+    vitality: 4,
+    recoveryHp: 81,
     recoveryMinutes: 20,
-    streakGrowth: 0.02,
+    streakGrowth: 0.01,
     hpPenaltyScale: 1.0,
   );
 
-  /// Growth: more EXP per point spent, and streaks pay off twice as fast.
+  /// Growth: INT is the only income advantage; streak rules are shared by all
+  /// classes so changing class cannot multiply the economy.
   static const mage = ClassProfile(
-    strength: 0,
-    intelligence: 7,
-    defense: 0,
-    vitality: 2,
-    recoveryHp: GameConstants.deathRecoveryHp,
+    strength: 1,
+    intelligence: 5,
+    defense: 2,
+    vitality: 4,
+    recoveryHp: 54,
     recoveryMinutes: GameConstants.deathRecoveryMinutes,
-    streakGrowth: 0.04,
+    streakGrowth: 0.01,
     hpPenaltyScale: 1.0,
   );
 
-  /// Steady: balanced spread and half the damage when a daily slips.
+  /// Steady: balanced spread. Daily protection is applied to the first
+  /// occurrence by the settlement layer, not as a global income multiplier.
   static const ranger = ClassProfile(
     strength: 3,
-    intelligence: 2,
-    defense: 1,
+    intelligence: 3,
+    defense: 3,
     vitality: 3,
-    recoveryHp: GameConstants.deathRecoveryHp,
+    recoveryHp: 53,
     recoveryMinutes: GameConstants.deathRecoveryMinutes,
-    streakGrowth: 0.02,
-    hpPenaltyScale: 0.5,
+    streakGrowth: 0.01,
+    hpPenaltyScale: 1.0,
   );
 
   /// Profile of [value]; unknown / unspecified classes fall back to the Warrior

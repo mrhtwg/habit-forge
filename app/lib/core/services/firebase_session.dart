@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:get/get.dart';
 import 'package:habit_forge_app/core/common/utils/log.dart';
 import 'package:habit_forge_app/core/network/api_response.dart';
+import 'package:habit_forge_app/core/network/api_status_code.dart';
 import 'package:habit_forge_app/core/network/network_firebase_impl.dart';
 import 'package:habit_forge_app/core/network/network_hive_impl.dart';
 import 'package:habit_forge_app/core/network/network_registry.dart';
@@ -45,16 +46,32 @@ class FirebaseSession {
 
   /// After Settings Google/email success (or splash restore of a linked user).
   static Future<ApiResponse<LoginReply>> useCloudBackend({String provider = 'google'}) async {
-    NetworkRegistry.register(NetworkFirebaseImpl());
-    await NetworkRegistry.ins.init();
-    final result = await NetworkRegistry.ins.login(provider);
-    // Premium is verified against the account we just signed in with.
-    if (result.isSuccess) {
-      if (Get.isRegistered<EntitlementService>()) {
-        await EntitlementService.to.start();
+    var stage = 'registering cloud backend';
+    try {
+      NetworkRegistry.register(NetworkFirebaseImpl());
+      stage = 'initializing Firestore';
+      await NetworkRegistry.ins.init();
+      stage = 'syncing cloud account';
+      final result = await NetworkRegistry.ins.login(provider);
+      // Premium is verified against the account we just signed in with.
+      if (result.isSuccess) {
+        stage = 'starting entitlement listener';
+        if (Get.isRegistered<EntitlementService>()) {
+          await EntitlementService.to.start();
+        }
       }
+      return result;
+    } on FirebaseException catch (error, stackTrace) {
+      Log.e(
+        'Firebase cloud backend failed during $stage: ${error.code}',
+        error: error,
+        stackTrace: stackTrace,
+      );
+      return ApiResponse.failure(
+        code: StatusCode.internal,
+        message: 'Firestore ${error.code} during $stage: ${error.message ?? 'request rejected'}',
+      );
     }
-    return result;
   }
 
   /// Splash helper: restore cloud only when already signed in; otherwise local.

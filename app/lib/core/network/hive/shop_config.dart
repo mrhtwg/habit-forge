@@ -2,6 +2,8 @@ import 'package:fixnum/fixnum.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:habit_forge_app/core/achievements/achievement_catalog.dart';
 import 'package:habit_forge_app/core/common/utils/log.dart';
+import 'package:habit_forge_app/core/network/hive/game_balance_config.dart';
+import 'package:habit_forge_app/core/network/hive/equipment_rules.dart';
 import 'package:habit_forge_app/generated/protos/achievement/v1/achievement.pb.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart';
 import 'package:habit_forge_app/generated/protos/shared/v1/shared.pbenum.dart';
@@ -57,22 +59,22 @@ class ShopConfig {
   static ShopCurrency currencyOf(String itemId) =>
       isGemItem(itemId) ? ShopCurrency.SHOP_CURRENCY_GEMS : ShopCurrency.SHOP_CURRENCY_GOLD;
 
-  // ── Rotating picks (refreshes every 2 hours) ──
+  // ── Daily featured picks ──
 
   /// Index of the current 2-hour rotation window (minutes since local
   /// midnight divided by 120): windows start at local 00:00 / 02:00 / 04:00…
-  static int rotationWindowOf(DateTime now) => (now.hour * 60 + now.minute) ~/ 120;
+  static int rotationWindowOf(DateTime now) => now.year * 10000 + now.month * 100 + now.day;
 
   /// The next rotation boundary after [now].
   static DateTime nextRotationAt(DateTime now) {
     final midnight = DateTime(now.year, now.month, now.day);
-    return midnight.add(Duration(minutes: (rotationWindowOf(now) + 1) * 120));
+    return midnight.add(const Duration(days: 1));
   }
 
   // ── Deal of the day (rotates at local midnight) ──
 
   /// Discount percentages a deal can roll.
-  static const List<int> _dealDiscounts = [30, 20, 40];
+  static List<int> get _dealDiscounts => <int>[GameBalanceConfig.configuredDealDiscountPercent];
 
   /// The deal of the day for [userSeed] on the local day of [now].
   ///
@@ -80,8 +82,13 @@ class ShopConfig {
   /// modes derive the same deal, so it needs no persistence, and it flips at
   /// local midnight (when [DailyDeal.expiresAt] passes). Legendary gear is
   /// excluded so a free player never gets a deal they are not allowed to buy.
-  static DailyDeal dailyDealFor(String userSeed, DateTime now) {
-    final pool = _dealPool();
+  static DailyDeal dailyDealFor(
+    String userSeed,
+    DateTime now, {
+    Character? character,
+    Set<String> ownedItemIds = const <String>{},
+  }) {
+    final pool = _dealPool(character: character, ownedItemIds: ownedItemIds);
     if (pool.isEmpty) return DailyDeal();
     final dayKey = '${now.year}-${now.month}-${now.day}';
     var seed = _stableSeed('$userSeed|$dayKey');
@@ -96,9 +103,14 @@ class ShopConfig {
   }
 
   /// Items a deal may land on (everything a player is allowed to buy).
-  static List<ShopItem> _dealPool() {
-    final buyable = shopItems.where((i) => i.rarity != EquipmentRarity.EQUIPMENT_RARITY_LEGENDARY).toList();
-    return buyable.isNotEmpty ? buyable : shopItems;
+  static List<ShopItem> _dealPool({Character? character, Set<String> ownedItemIds = const <String>{}}) {
+    final buyable = shopItems
+        .where((i) => currencyOf(i.id) == ShopCurrency.SHOP_CURRENCY_GOLD)
+        .where((i) => i.rarity != EquipmentRarity.EQUIPMENT_RARITY_LEGENDARY)
+        .where((i) => !ownedItemIds.contains(i.id))
+        .where((i) => character == null || EquipmentRules.isCompatible(character, i))
+        .toList();
+    return buyable;
   }
 
   /// The price actually charged for [itemId]: [basePrice] minus [deal]'s
@@ -120,7 +132,7 @@ class ShopConfig {
     return hash;
   }
 
-  /// Deterministic rotating batch for the current 2-hour window: up to [size]
+  /// Deterministic daily featured batch: up to [size]
   /// picks from [catalog], with at least one epic/legendary when the catalog
   /// has any. The same window always yields the same picks, so the shop stays
   /// stable across restarts and only changes at the boundary.
@@ -168,6 +180,7 @@ class ShopConfig {
     try {
       final raw = await rootBundle.loadString('assets/config/config.yml');
       final doc = loadYaml(raw) as Map;
+      GameBalanceConfig.load(doc['balance'] as Map?);
 
       _skinIds.clear();
       _categories.clear();
@@ -221,6 +234,13 @@ class ShopConfig {
         ..._parseItems(doc['appearance']),
         ..._parseItems(doc['skins']),
       ];
+      final functionalRaw = await rootBundle.loadString('assets/config/functional_equipment_v1.yml');
+      final functionalDoc = loadYaml(functionalRaw) as Map;
+      final functionalItems = _parseItems(functionalDoc['equipment']);
+      items.addAll(functionalItems);
+      for (final item in functionalItems) {
+        _icons[item.id] = 'eq_warrior_weapon_t1.png';
+      }
       if (items.isNotEmpty) shopItems = items;
 
       Log.d('ShopConfig loaded: ${achievementDefs.length} achievements, ${shopItems.length} items');
@@ -236,6 +256,8 @@ class ShopConfig {
       final id = m['id'] as String? ?? '';
       final slot = _slotFor(m['slot'] as String?);
       final inferred = _metadataFor(id, slot);
+      final icon = m['icon'] as String?;
+      if (icon != null && icon.isNotEmpty) _icons[id] = icon;
       final configuredClasses = (m['allowed_classes'] as List?)?.map((value) => value.toString()).toList();
       items.add(
         ShopItem(

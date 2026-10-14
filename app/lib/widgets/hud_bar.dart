@@ -68,6 +68,7 @@ class HudBar extends StatelessWidget {
       return ((char?.currentHp ?? max) / max).clamp(0.0, 1.0).toDouble();
     }
     final level = char?.level ?? 1;
+    if (level >= GameConstants.maxLevel) return 1.0;
     final needed = GameConstants.expForLevel(level).toDouble();
     return ((char?.currentExp.toInt() ?? 0) / needed).clamp(0.0, 1.0).toDouble();
   }

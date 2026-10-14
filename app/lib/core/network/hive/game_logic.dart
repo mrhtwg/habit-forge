@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:fixnum/fixnum.dart';
 import 'package:habit_forge_app/core/extensions/date_extensions.dart';
 import 'package:habit_forge_app/core/network/hive/class_profiles.dart';
+import 'package:habit_forge_app/core/network/hive/game_balance_config.dart';
 import 'package:habit_forge_app/core/network/hive/game_constants.dart';
 import 'package:habit_forge_app/core/network/hive/shop_config.dart';
 import 'package:habit_forge_app/generated/protos/achievement/v1/achievement.pb.dart';
@@ -85,6 +86,13 @@ class GameLogic {
 
   static UserPrefs addGems(UserPrefs p, int amount) =>
       (p.deepCopy()..freeze()).rebuild((x) => x..currentGems = x.currentGems + amount);
+
+  static Character heal(Character c, int amount) {
+    if (amount <= 0 || c.isDead) return c;
+    final frozen = c.deepCopy()..freeze();
+    final maxHp = maxHpOf(frozen);
+    return frozen.rebuild((x) => x..currentHp = (frozen.currentHp + amount).clamp(0, maxHp));
+  }
 
   // ── Task ──
 
@@ -248,9 +256,9 @@ class GameLogic {
       } else if (!isDueOn(task, y)) {
         continue;
       }
-      damage += task.hpPenalty;
+      damage += task.hpPenalty > 0 ? task.hpPenalty : GameConstants.defaultHpPenalty(task.difficulty);
     }
-    return damage;
+    return damage.clamp(0, GameBalanceConfig.dailyDamageCap).toInt();
   }
 
   /// Maps an [EquipmentSlot] to the equipment-map key used on the character.
@@ -304,7 +312,12 @@ class GameLogic {
 
   /// Spends one available point on the given attribute.
   static Character allocateStat(Character c, StatType stat) {
-    if (c.availableStatPoints <= 0) return c;
+    if (c.availableStatPoints <= 0 ||
+        stat == StatType.STAT_TYPE_AGILITY ||
+        stat == StatType.STAT_TYPE_LUCK ||
+        stat == StatType.STAT_TYPE_UNSPECIFIED) {
+      return c;
+    }
     final frozen = c.deepCopy()..freeze();
     final s = frozen.baseStats;
     return frozen.rebuild(
@@ -405,10 +418,15 @@ class GameLogic {
   /// (and its rewards would be perverse anyway).
   static int expReward(Task task, Character character) {
     if (isNegative(task)) return 0;
-    if (task.customExpReward > 0) return task.customExpReward;
-    final base = GameConstants.baseExpReward(task.difficulty) *
-        GameConstants.streakMultiplier(task.streak, perDay: ClassProfiles.of(character.characterClass).streakGrowth);
-    return (base * (1 + effectiveStats(character).intelligence * 0.01)).round();
+    final stats = effectiveStats(character);
+    final effectiveInt = stats.intelligence.clamp(0, 60).toInt();
+    final expBps =
+        (effectiveInt * GameBalanceConfig.incomeBpsPerPoint).clamp(0, GameBalanceConfig.incomeCapBps).toInt();
+    final streakBps = (task.streak.clamp(0, 10).toInt() * GameBalanceConfig.streakBonusBps)
+        .clamp(0, GameBalanceConfig.streakBonusCapBps)
+        .toInt();
+    final multiplierBps = 10000 + expBps + streakBps;
+    return (GameConstants.baseExpReward(task.difficulty) * multiplierBps) ~/ 10000;
   }
 
   /// Applies exp and returns (character, newLevel or -1).
@@ -450,13 +468,15 @@ class GameLogic {
   }
 
   /// Base gold reward for a task, scaled by the character's effective STR
-  /// bonus (+1% per point). Custom rewards are respected verbatim and never
-  /// scaled. A negative habit pays nothing (see [expReward]).
+  /// bonus (+0.5% per point). Custom reward fields are legacy-only and are
+  /// mapped to the selected difficulty for the v1 economy.
   static int goldReward(Task task, Character character) {
     if (isNegative(task)) return 0;
-    if (task.customGoldReward > 0) return task.customGoldReward;
-    final base = GameConstants.baseGoldReward(task.difficulty);
-    return (base * (1 + effectiveStats(character).strength * 0.01)).round();
+    final stats = effectiveStats(character);
+    final effectiveStrength = stats.strength.clamp(0, 60).toInt();
+    final goldBps =
+        (effectiveStrength * GameBalanceConfig.incomeBpsPerPoint).clamp(0, GameBalanceConfig.incomeCapBps).toInt();
+    return (GameConstants.baseGoldReward(task.difficulty) * (10000 + goldBps)) ~/ 10000;
   }
 
   static int levelForExp(int totalExp) {
@@ -498,12 +518,12 @@ class GameLogic {
   /// damage) and effective VIT raises the HP cap. The character dies at
   /// 0 HP and schedules recovery.
   static Character takeDamage(Character c, int amount) {
-    if (c.isDead) return c;
+    if (c.isDead || amount <= 0) return c;
     final frozen = c.deepCopy()..freeze();
     final effective = effectiveStats(frozen);
-    final reduced = amount - effective.defense;
-    final dealt = reduced < 1 ? 1 : reduced;
-    final newHp = (frozen.currentHp - dealt).clamp(0, GameConstants.maxHpFor(effective.vitality));
+    final defenseBps = (effective.defense.clamp(0, 50).toInt() * 100).clamp(0, GameBalanceConfig.defenseCapBps).toInt();
+    final dealt = ((amount * (10000 - defenseBps) + 9999) ~/ 10000).clamp(1, amount).toInt();
+    final newHp = (frozen.currentHp - dealt).clamp(0, GameConstants.maxHpFor(effective.vitality)).toInt();
     final dead = newHp <= 0;
     return frozen.rebuild(
       (x) => x

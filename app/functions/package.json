@@ -8,6 +8,7 @@
   },
   "scripts": {
     "deploy": "firebase deploy --only functions",
+    "deploy:rules": "firebase deploy --only firestore:rules",
     "logs": "firebase functions:log"
   },
   "dependencies": {

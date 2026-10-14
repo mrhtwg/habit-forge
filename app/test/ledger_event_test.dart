@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:fixnum/fixnum.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:habit_forge_app/core/network/hive/game_constants.dart';
 import 'package:habit_forge_app/core/network/hive/shop_config.dart';
@@ -10,7 +11,6 @@ import 'package:habit_forge_app/generated/protos/character/v1/character.pb.dart'
 import 'package:habit_forge_app/generated/protos/shop/v1/shop.pbenum.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';
 import 'package:habit_forge_app/generated/protos/user/v1/user.pb.dart';
-import 'package:fixnum/fixnum.dart';
 import 'package:yaml/yaml.dart';
 
 /// The ledger row is the contract between three places that must agree: the
@@ -67,9 +67,8 @@ void main() {
     test('the built-in shop fallback fits too (used when config.yml is missing)', () {
       expect(ShopConfig.shopItems, isNotEmpty);
       for (final item in ShopConfig.shopItems) {
-        final cap = ShopConfig.currencyOf(item.id) == ShopCurrency.SHOP_CURRENCY_GEMS
-            ? LedgerLimits.gems
-            : LedgerLimits.gold;
+        final cap =
+            ShopConfig.currencyOf(item.id) == ShopCurrency.SHOP_CURRENCY_GEMS ? LedgerLimits.gems : LedgerLimits.gold;
         expect(item.price.toInt(), lessThanOrEqualTo(cap), reason: item.id);
       }
       for (final def in ShopConfig.achievementDefs) {
@@ -81,7 +80,7 @@ void main() {
       // The applied delta is bounded by the character's HP cap (damage clamps at
       // 0 HP), and the cap grows with VIT — 7 base + 49 level points is the
       // reachable ceiling before equipment.
-      const highestReachableVitality = 7 + GameConstants.maxLevel + 40;
+      final highestReachableVitality = 7 + GameConstants.maxLevel + 40;
       expect(
         GameConstants.maxHpFor(highestReachableVitality),
         lessThanOrEqualTo(LedgerLimits.hp),
@@ -91,15 +90,13 @@ void main() {
 
     test('the richest possible task reward fits the exp and gold caps', () {
       // base 50 × streak cap 2.0 × (+1% per point of the effective stat).
-      const highestReachableStat = 7 + GameConstants.maxLevel + 40;
-      final richestExp = (GameConstants.baseExpReward(TaskDifficulty.TASK_DIFFICULTY_HARD) *
-              2.0 *
-              (1 + highestReachableStat * 0.01))
-          .round();
-      final richestGold = (GameConstants.baseGoldReward(TaskDifficulty.TASK_DIFFICULTY_HARD) *
-              2.0 *
-              (1 + highestReachableStat * 0.01))
-          .round();
+      final highestReachableStat = 7 + GameConstants.maxLevel + 40;
+      final richestExp =
+          (GameConstants.baseExpReward(TaskDifficulty.TASK_DIFFICULTY_HARD) * 2.0 * (1 + highestReachableStat * 0.01))
+              .round();
+      final richestGold =
+          (GameConstants.baseGoldReward(TaskDifficulty.TASK_DIFFICULTY_HARD) * 2.0 * (1 + highestReachableStat * 0.01))
+              .round();
       expect(richestExp, lessThanOrEqualTo(LedgerLimits.exp));
       expect(richestGold, lessThanOrEqualTo(LedgerLimits.gold));
     });

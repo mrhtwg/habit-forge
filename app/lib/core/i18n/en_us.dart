@@ -67,7 +67,6 @@ const Map<LanKey, String> enUS = {
   LanKey.goodMorningAdventurer: 'Good morning, adventurer!',
   LanKey.aFreshDayAwaits: 'A fresh day awaits',
   LanKey.noQuestsToday: 'No quests for today!',
-  LanKey.dayClearAddFirstQuest: 'Your day is clear. Add your first quest to start earning EXP and gold.',
   LanKey.createQuest: 'Create Quest',
   LanKey.rewardedAdTitle: 'Bonus Gems',
   LanKey.rewardedAdDescription: 'Watch a short ad to earn bonus gems',

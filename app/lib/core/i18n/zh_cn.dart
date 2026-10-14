@@ -66,7 +66,6 @@ const Map<LanKey, String> zhCN = {
   LanKey.goodMorningAdventurer: '早上好，冒险家！',
   LanKey.aFreshDayAwaits: '全新的一天开始了',
   LanKey.noQuestsToday: '今日暂无任务！',
-  LanKey.dayClearAddFirstQuest: '今天很清闲。创建你的第一个任务，开始赚取经验和金币吧。',
   LanKey.createQuest: '创建任务',
   LanKey.rewardedAdTitle: '免费宝石奖励',
   LanKey.rewardedAdDescription: '观看一段短广告，获得额外宝石',
