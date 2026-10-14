@@ -14,6 +14,8 @@ class RewardedAdCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (!RewardedAdService.adEntryPointsEnabled) return const SizedBox.shrink();
+
     final service = RewardedAdService.to;
     return Obx(() {
       if (service.dailyLimitReached) return const SizedBox.shrink();

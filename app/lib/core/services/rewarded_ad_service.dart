@@ -14,6 +14,7 @@ import 'package:uuid/uuid.dart';
 class RewardedAdService extends GetxService {
   static RewardedAdService get to => Get.find();
 
+  static const adEntryPointsEnabled = false;
   static const androidTestAdUnitId = 'ca-app-pub-3940256099942544/5224354917';
   static const iOSTestAdUnitId = 'ca-app-pub-3940256099942544/1712485313';
   static int get rewardGems => GameBalanceConfig.configuredAdGems;

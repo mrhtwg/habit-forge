@@ -124,17 +124,17 @@ class SettingsPage extends GetView<SettingsController> {
                   //     ],
                   //   ),
                   // ),
-                  const SizedBox(height: 20),
-                  _SectionHeader(LanKey.language.tr),
-                  _SettingsCard(
-                    child: Column(
-                      children: [
-                        _LanguageOption(label: 'English', value: AppLocale.en),
-                        const Divider(color: AppColors.elevated, height: 1, thickness: 1),
-                        _LanguageOption(label: '中文', value: AppLocale.zh),
-                      ],
-                    ),
-                  ),
+                  // const SizedBox(height: 20),
+                  // _SectionHeader(LanKey.language.tr),
+                  // _SettingsCard(
+                  //   child: Column(
+                  //     children: [
+                  //       _LanguageOption(label: 'English', value: AppLocale.en),
+                  //       const Divider(color: AppColors.elevated, height: 1, thickness: 1),
+                  //       _LanguageOption(label: '中文', value: AppLocale.zh),
+                  //     ],
+                  //   ),
+                  // ),
                   const SizedBox(height: 20),
                   _SectionHeader(LanKey.legal.tr),
                   _SettingsCard(

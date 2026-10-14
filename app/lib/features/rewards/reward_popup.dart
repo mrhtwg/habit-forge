@@ -462,7 +462,7 @@ class RewardPopup {
               ),
             ],
           ),
-          if (goldGained > 0) ...[
+          if (goldGained > 0 && RewardedAdService.adEntryPointsEnabled) ...[
             SizedBox(height: 16.h),
             _DoubleRewardButton(gold: goldGained),
           ],
@@ -531,6 +531,7 @@ class _DoubleRewardButtonState extends State<_DoubleRewardButton> {
 
   @override
   Widget build(BuildContext context) {
+    if (!RewardedAdService.adEntryPointsEnabled) return const SizedBox.shrink();
     if (!Get.isRegistered<RewardedAdService>()) return const SizedBox.shrink();
 
     final service = RewardedAdService.to;
