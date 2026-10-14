@@ -23,46 +23,49 @@ class AccountBindBanner extends StatelessWidget {
     return Obx(() {
       if (auth.hasCloudIdentity) return const SizedBox.shrink();
 
-      return SafeArea(
-        bottom: false,
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(12.w, 6.h, 12.w, 6.h),
-          child: GestureDetector(
-            key: const ValueKey('account-bind-banner'),
-            onTap: auth.isLoading.value ? null : () => auth.signInWithGoogleFromSettings(context),
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
-              decoration: BoxDecoration(
-                color: AppColors.goldLight,
-                border: Border.all(color: AppColors.border, width: 2),
-                borderRadius: BorderRadius.circular(14),
-                boxShadow: const [BoxShadow(color: Color(0xFFEFDFC4), offset: Offset(0, 3))],
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.cloud_off_rounded, size: 16.w, color: AppColors.goldDark),
-                  SizedBox(width: 8.w),
-                  Expanded(
-                    child: Text(
-                      LanKey.bindAccountBanner.tr,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: textStyleBold(fontSize: 11.sp, color: AppColors.textPrimary),
+      return ColoredBox(
+        color: const Color(0xFF8FD4FF),
+        child: SafeArea(
+          bottom: false,
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(12.w, 6.h, 12.w, 6.h),
+            child: GestureDetector(
+              key: const ValueKey('account-bind-banner'),
+              onTap: auth.isLoading.value ? null : () => auth.signInWithGoogleFromSettings(context),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+                decoration: BoxDecoration(
+                  color: AppColors.goldLight,
+                  border: Border.all(color: AppColors.border, width: 2),
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: const [BoxShadow(color: Color(0xFFEFDFC4), offset: Offset(0, 3))],
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.cloud_off_rounded, size: 16.w, color: AppColors.goldDark),
+                    SizedBox(width: 8.w),
+                    Expanded(
+                      child: Text(
+                        LanKey.bindAccountBanner.tr,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: textStyleBold(fontSize: 11.sp, color: AppColors.textPrimary),
+                      ),
                     ),
-                  ),
-                  SizedBox(width: 8.w),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(999),
+                    SizedBox(width: 8.w),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: Text(
+                        LanKey.bindNow.tr,
+                        style: textStyleBold(fontSize: 11.sp, color: Colors.white),
+                      ),
                     ),
-                    child: Text(
-                      LanKey.bindNow.tr,
-                      style: textStyleBold(fontSize: 11.sp, color: Colors.white),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

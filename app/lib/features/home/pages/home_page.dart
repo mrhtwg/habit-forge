@@ -8,6 +8,7 @@ import 'package:habit_forge_app/core/network/hive/game_logic.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
+import 'package:habit_forge_app/features/auth/controllers/auth_controller.dart';
 import 'package:habit_forge_app/features/home/controllers/home_controller.dart';
 import 'package:habit_forge_app/features/quests/pages/task_form_sheet.dart';
 import 'package:habit_forge_app/generated/protos/shared/v1/shared.pbenum.dart';
@@ -91,8 +92,9 @@ class HomePage extends GetView<HomeController> {
 
   // ─────────────── Sky header: greeting + wallet + hero + status bars ───────────────
   Widget _buildSkyHeader() {
+    final auth = Get.find<AuthController>();
+
     return Container(
-      padding: EdgeInsets.only(top: MediaQuery.of(Get.context!).padding.top),
       width: double.infinity,
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -104,6 +106,12 @@ class HomePage extends GetView<HomeController> {
       ),
       child: Column(
         children: [
+          Obx(
+            () => auth.hasCloudIdentity
+                ? SizedBox(height: MediaQuery.of(Get.context!).padding.top)
+                : const SizedBox.shrink(),
+          ),
+
           // Greeting + wallet
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 14.h),

@@ -7,6 +7,7 @@ import 'package:habit_forge_app/core/routes/app_routes.dart';
 import 'package:habit_forge_app/core/services/user_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
+import 'package:habit_forge_app/features/auth/controllers/auth_controller.dart';
 import 'package:habit_forge_app/features/profile/controllers/profile_controller.dart';
 import 'package:habit_forge_app/generated/protos/character/v1/character.pbenum.dart';
 import 'package:habit_forge_app/generated/protos/shared/v1/shared.pbenum.dart';
@@ -103,6 +104,7 @@ class ProfilePage extends GetView<ProfileController> {
 
   // ─────────── Sky header: user card ───────────
   Widget _buildSkyHeader() {
+    final auth = Get.find<AuthController>();
     return Container(
       width: double.infinity,
       decoration: const BoxDecoration(
@@ -113,70 +115,73 @@ class ProfilePage extends GetView<ProfileController> {
         ),
         borderRadius: BorderRadius.only(bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30)),
       ),
-      padding: EdgeInsets.fromLTRB(20.w, 14.h + MediaQuery.of(Get.context!).padding.top, 20.w, 20.h),
+      padding: EdgeInsets.fromLTRB(20.w, 14.h, 20.w, 20.h),
       child: Obx(() {
-        // final char = NetworkRegistry.ins.character.value;
-        return Row(
-          children: [
-            // Knight circular frame (idle animation)
-            Container(
-              width: 84.w,
-              height: 84.w,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: AppColors.border, width: 3),
-                gradient: const RadialGradient(
-                  colors: [Color(0xFFEFE6FF), Color(0xFFCDB7FF), Color(0xFF9B6BFF)],
-                  stops: [0, 0.48, 1],
-                ),
-                boxShadow: const [BoxShadow(color: Color(0xFFE7B93F), offset: Offset(0, 5))],
-              ),
-              child: ClipOval(
-                child: FrameSequencePlayer(
-                  frames: UserService.to.getCharacterFrame(),
-                  preferredSize: Size(62.w, 78.h),
-                ),
-              ),
-            ),
-            SizedBox(width: 14.w),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(LanKey.adventurer.tr, style: textStyleBlack(fontSize: 20.sp, color: AppColors.textPrimary)),
-                  SizedBox(height: 3.h),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 3.h),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(color: AppColors.border, width: 2),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      LanKey.profileLevelClass.trParams({
-                        'level': '${UserService.to.character.value?.level ?? 1}',
-                        'className': switch (UserService.to.character.value?.characterClass) {
-                          CharacterClass.CHARACTER_CLASS_WARRIOR => LanKey.warrior.tr,
-                          CharacterClass.CHARACTER_CLASS_MAGE => LanKey.mage.tr,
-                          CharacterClass.CHARACTER_CLASS_RANGER => LanKey.ranger.tr,
-                          _ => LanKey.warrior.tr,
-                        },
-                      }),
-                      style: textStyleBold(fontSize: 12.sp, color: AppColors.primaryDark),
-                    ),
+        return Padding(
+          padding:
+              auth.hasCloudIdentity ? EdgeInsets.only(top: MediaQuery.of(Get.context!).padding.top) : EdgeInsets.zero,
+          child: Row(
+            children: [
+              // Knight circular frame (idle animation)
+              Container(
+                width: 84.w,
+                height: 84.w,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppColors.border, width: 3),
+                  gradient: const RadialGradient(
+                    colors: [Color(0xFFEFE6FF), Color(0xFFCDB7FF), Color(0xFF9B6BFF)],
+                    stops: [0, 0.48, 1],
                   ),
-                  SizedBox(height: 8.h),
-                  Row(
-                    children: [
-                      MiniChip(sysMaterial: SysMaterial.SYSMATERIAL_GOLD),
-                      SizedBox(width: 8.w),
-                      MiniChip(sysMaterial: SysMaterial.SYSMATERIAL_GEM),
-                    ],
+                  boxShadow: const [BoxShadow(color: Color(0xFFE7B93F), offset: Offset(0, 5))],
+                ),
+                child: ClipOval(
+                  child: FrameSequencePlayer(
+                    frames: UserService.to.getCharacterFrame(),
+                    preferredSize: Size(62.w, 78.h),
                   ),
-                ],
+                ),
               ),
-            ),
-          ],
+              SizedBox(width: 14.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(LanKey.adventurer.tr, style: textStyleBlack(fontSize: 20.sp, color: AppColors.textPrimary)),
+                    SizedBox(height: 3.h),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 3.h),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: AppColors.border, width: 2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        LanKey.profileLevelClass.trParams({
+                          'level': '${UserService.to.character.value?.level ?? 1}',
+                          'className': switch (UserService.to.character.value?.characterClass) {
+                            CharacterClass.CHARACTER_CLASS_WARRIOR => LanKey.warrior.tr,
+                            CharacterClass.CHARACTER_CLASS_MAGE => LanKey.mage.tr,
+                            CharacterClass.CHARACTER_CLASS_RANGER => LanKey.ranger.tr,
+                            _ => LanKey.warrior.tr,
+                          },
+                        }),
+                        style: textStyleBold(fontSize: 12.sp, color: AppColors.primaryDark),
+                      ),
+                    ),
+                    SizedBox(height: 8.h),
+                    Row(
+                      children: [
+                        MiniChip(sysMaterial: SysMaterial.SYSMATERIAL_GOLD),
+                        SizedBox(width: 8.w),
+                        MiniChip(sysMaterial: SysMaterial.SYSMATERIAL_GEM),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         );
       }),
     );

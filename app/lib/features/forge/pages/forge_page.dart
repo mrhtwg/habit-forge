@@ -6,6 +6,7 @@ import 'package:habit_forge_app/core/network/hive/shop_config.dart';
 import 'package:habit_forge_app/core/services/subscription_service.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
+import 'package:habit_forge_app/features/auth/controllers/auth_controller.dart';
 import 'package:habit_forge_app/features/forge/controllers/forge_controller.dart';
 import 'package:habit_forge_app/features/forge/pages/item_detail_sheet.dart';
 import 'package:habit_forge_app/generated/assets.dart';
@@ -343,6 +344,7 @@ class ForgePage extends GetView<ForgeController> {
 
   // ─────────── Sky header: title + coins ───────────
   Widget _buildSkyHeader() {
+    final auth = Get.find<AuthController>();
     return Container(
       width: double.infinity,
       decoration: const BoxDecoration(
@@ -353,15 +355,21 @@ class ForgePage extends GetView<ForgeController> {
         ),
         borderRadius: BorderRadius.only(bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30)),
       ),
-      padding: EdgeInsets.fromLTRB(20.w, 12.h + MediaQuery.of(Get.context!).padding.top, 20.w, 18.h),
-      child: Row(
-        children: [
-          Text(LanKey.forge.tr, style: textStyleBlack(fontSize: 26.sp, color: AppColors.textPrimary)),
-          const Spacer(),
-          WalletChip(sysMaterial: SysMaterial.SYSMATERIAL_GOLD),
-          SizedBox(width: 8.w),
-          WalletChip(sysMaterial: SysMaterial.SYSMATERIAL_GEM),
-        ],
+      padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 18.h),
+      child: Obx(
+        () => Padding(
+          padding:
+              auth.hasCloudIdentity ? EdgeInsets.only(top: MediaQuery.of(Get.context!).padding.top) : EdgeInsets.zero,
+          child: Row(
+            children: [
+              Text(LanKey.forge.tr, style: textStyleBlack(fontSize: 26.sp, color: AppColors.textPrimary)),
+              const Spacer(),
+              WalletChip(sysMaterial: SysMaterial.SYSMATERIAL_GOLD),
+              SizedBox(width: 8.w),
+              WalletChip(sysMaterial: SysMaterial.SYSMATERIAL_GEM),
+            ],
+          ),
+        ),
       ),
     );
   }

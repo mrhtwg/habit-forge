@@ -6,6 +6,7 @@ import 'package:habit_forge_app/core/extensions/task_extensions.dart';
 import 'package:habit_forge_app/core/i18n/lan_key.dart';
 import 'package:habit_forge_app/core/theme/app_colors.dart';
 import 'package:habit_forge_app/core/theme/app_theme.dart';
+import 'package:habit_forge_app/features/auth/controllers/auth_controller.dart';
 import 'package:habit_forge_app/features/quests/controllers/quests_controller.dart';
 import 'package:habit_forge_app/features/quests/pages/task_form_sheet.dart';
 import 'package:habit_forge_app/generated/protos/task/v1/task.pb.dart';
@@ -118,6 +119,7 @@ class QuestsPage extends GetView<QuestsController> {
 
   // ─────────── Sky header: title + today's count ───────────
   Widget _buildSkyHeader() {
+    final auth = Get.find<AuthController>();
     return Container(
       width: double.infinity,
       decoration: const BoxDecoration(
@@ -128,28 +130,34 @@ class QuestsPage extends GetView<QuestsController> {
         ),
         borderRadius: BorderRadius.only(bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30)),
       ),
-      padding: EdgeInsets.fromLTRB(20.w, 12.h + MediaQuery.of(Get.context!).padding.top, 20.w, 18.h),
-      child: Row(
-        children: [
-          Text(LanKey.quests.tr, style: textStyleBlack(fontSize: 26.sp, color: AppColors.textPrimary)),
-          const Spacer(),
-          Obx(() {
-            final n = controller.tasks.where((t) => !t.isSkipped && t.isDueToday).length;
-            return Container(
-              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 5.h),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(color: AppColors.border, width: 2),
-                borderRadius: BorderRadius.circular(14),
-                boxShadow: const [BoxShadow(color: Color(0xFFD6C3A4), offset: Offset(0, 3))],
-              ),
-              child: Text(
-                LanKey.questCountToday.trParams({'n': '$n'}),
-                style: textStyleBold(fontSize: 13.sp, color: AppColors.textSecondary),
-              ),
-            );
-          }),
-        ],
+      padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 18.h),
+      child: Obx(
+        () => Padding(
+          padding:
+              auth.hasCloudIdentity ? EdgeInsets.only(top: MediaQuery.of(Get.context!).padding.top) : EdgeInsets.zero,
+          child: Row(
+            children: [
+              Text(LanKey.quests.tr, style: textStyleBlack(fontSize: 26.sp, color: AppColors.textPrimary)),
+              const Spacer(),
+              Obx(() {
+                final n = controller.tasks.where((t) => !t.isSkipped && t.isDueToday).length;
+                return Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 5.h),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: AppColors.border, width: 2),
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: const [BoxShadow(color: Color(0xFFD6C3A4), offset: Offset(0, 3))],
+                  ),
+                  child: Text(
+                    LanKey.questCountToday.trParams({'n': '$n'}),
+                    style: textStyleBold(fontSize: 13.sp, color: AppColors.textSecondary),
+                  ),
+                );
+              }),
+            ],
+          ),
+        ),
       ),
     );
   }
